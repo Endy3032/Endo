@@ -1,30 +1,38 @@
-const dotenv = require('dotenv')
-const BigEval = require('bigeval')
-const { Client, Intents, Constants } = require('discord.js')
-const { isApplicationCommandDMInteraction } = require('discord-api-types/utils/v9')
+const dotenv = require('dotenv');
+const BigEval = require('bigeval');
+const { Client, Collection, Constants, Intents } = require('discord.js');
+const fs = require('fs');
 
-dotenv.config()
-var CMath = new BigEval()
+dotenv.config();
+var CMath = new BigEval();
 
-const client = new Client({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_BANS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS
-  ]
-});
+const client = new Client({intents: [
+  Intents.FLAGS.GUILDS,
+  Intents.FLAGS.GUILD_BANS,
+  Intents.FLAGS.GUILD_MESSAGES,
+  Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+]});
 
-client.once('ready', () => {
-	console.log('Ready!');
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-  client.user.setPresence(
-    {
-      activities: [{ name: '🌧agoraphobic🌧', type: 2 }],
-      status: 'idle'
-    }
-  );
+commandFiles.forEach(file => {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.data.name, command)
+})
 
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+
+eventFiles.forEach(file => {
+  const event = require(`./events/${file}`);
+  event.once
+  ? client.once(event.name, (...args) => event.execute(...args))
+  : client.on(event.name, (...args) => event.execute(...args));
+})
+
+/*
+client.once('ready', c => {
+	console.log(`[${c.user.tag}] - Ready!`);
   const guild = client.guilds.cache.get('864972641219248140')
   let commands
 
@@ -64,17 +72,26 @@ client.once('ready', () => {
       }
     ]
   })
-
-  /* DELETE ALL COMMANDS
-  client.application.commands.set([])
-  guild.commands.set([]) */
+  
 })
+DELETE ALL COMMANDS
+client.application.commands.set([])
+guild.commands.set([]) */
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) {
-    return
-  }
+  if (!interaction.isCommand()) {return}
 
+  const command = client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {await command.execute(interaction)}
+  catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'This interaction failed (without the red coloring :D)', ephemeral: true });
+	}
+
+  /*
   const { commandName, options } = interaction
 
   if (commandName === 'ping') {
@@ -94,7 +111,7 @@ client.on('interactionCreate', async (interaction) => {
       content: `${content}`,
       ephemeral: false
     })
-  }
+  } */
 })
 
 client.login(process.env.TOKEN)
