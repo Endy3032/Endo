@@ -8,11 +8,12 @@ module.exports = {
 		.setDescription('Evaluate an expression and return the result')
     .addStringOption(option => 
       option.setName('expression')
-            .setDescription('The expression to evaluate')
+            .setDescription('The expression to evaluate [string]')
             .setRequired(true)
-          //.setType(Constants.ApplicationCommandOptionTypes.STRING)
     ),
 	async execute(interaction) {
-    interaction.reply('Not Working')
+    const expression = interaction.options.getString('expression');
+    await interaction.reply({ content: `${expression} = ${Math.exec(expression)}` })
+    console.log(expression)
 	}
 }
