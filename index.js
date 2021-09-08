@@ -88,6 +88,12 @@ client.on('interactionCreate', async (interaction) => {
       content: `${expression} = ${CMath.exec(expression)}`,
       ephemeral: false
     })
+  } else if (commandName === 'say') {
+    const content = options.getString('content')
+    interaction.reply({
+      content: `${content}`,
+      ephemeral: false
+    })
   }
 })
 
