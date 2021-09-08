@@ -15,8 +15,6 @@ const client = new Client({
   ]
 });
 
-
-
 client.once('ready', () => {
 	console.log('Ready!');
 
@@ -48,6 +46,19 @@ client.once('ready', () => {
       {
         name: 'expression',
         description: 'The expression to evaluate',
+        required: true,
+        type: Constants.ApplicationCommandOptionTypes.STRING
+      }
+    ]
+  })
+
+  commands?.create({
+    name: 'say',
+    description: 'Make the bot say something',
+    options: [
+      {
+        name: 'content',
+        description: 'The content of the message',
         required: true,
         type: Constants.ApplicationCommandOptionTypes.STRING
       }
