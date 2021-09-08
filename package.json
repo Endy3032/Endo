@@ -1,0 +1,30 @@
+{
+  "name": "endyjs",
+  "version": "1.0.0",
+  "description": "A discord.js bot by Endy#3032",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "Endy3032",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@sapphire/snowflake": "^2.0.0",
+    "bigeval": "^3.1.0",
+    "discord-api-types": "^0.20.2",
+    "discord-buttons": "^4.0.0",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.12",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  },
+  "devDependencies": {
+    "node": "^16.6.1"
+  }
+}
