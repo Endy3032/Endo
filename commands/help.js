@@ -1,7 +1,8 @@
 const fs = require("fs")
 const { SlashCommandBuilder } = require('@discordjs/builders')
 const { MessageEmbed } = require('discord.js');
-colors = ['5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
+
+const colors = ['5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
           'F47B67', 'F8A532', '48B784', '45DDCO', '99AAB5',
           '23272A', 'B7C2CE', '4187ED', '36393F', '3E70DD',
           '4P5D7F', '7289DA', '4E5D94', '9C84EF', 'F47FFF',
@@ -36,10 +37,10 @@ module.exports.help = {
 }
 
 /* module.exports.run = async(bot, message, args, con) => {
-    fs.readdir("./cmds/", (err, files) => {
+    fs.readdir("./commands/", (err, files) => {
         if(err) console.error(err);
 
-        let jsfiles = files.filter(f => f.split(".").pop() === "js");
+        let commandFiles = files.filter(f => f.split(".").pop() === "js");
         if(jsfiles.length <= 0) {
             console.log("No commands to load!");
             return;
