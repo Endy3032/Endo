@@ -26,17 +26,28 @@ eventFiles.forEach(file => {
 })
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) {return}
-  
   const command = client.commands.get(interaction.commandName);
+
+  if (!interaction.isSelectMenu() && !interaction.isCommand()) {return}
   
-	if (!command) return;
-  
-	try {await command.execute(interaction)}
-  catch (error) {
-    console.error(error);
-		await interaction.reply({ content: 'This interaction failed (without the red coloring :D)', ephemeral: true });
-	}
+  if (interaction.isSelectMenu()) {
+    try {
+      interaction.message.interaction.commandName === 'help'
+      ? console.log(`${interaction.values[0]}`)
+      : null
+    }
+    catch(error) {
+      console.error(error)
+    }
+  }
+
+  if (interaction.isCommand()) {
+    try {await command.execute(interaction)}
+    catch (error) {
+      console.error(error);
+      await interaction.reply({ content: 'This interaction failed (without the red coloring :D)', ephemeral: true });
+    }
+  }
 })
 
 client.login(process.env.TOKEN)

@@ -18,8 +18,8 @@ module.exports = {
 
     var expression = interaction.options.getString('expression')
     var expression_2 = expression
-    symbols.forEach(value => {
-      expression_2 = expression_2.replace(value, symvalue[symbols.indexOf(value)])
+    symbols.forEach((value, i) => {
+      expression_2 = expression_2.replace(value, symvalue[i])
     })
 
     await interaction.reply({ content: `${expression} = ${Math.exec(expression_2)}` })
