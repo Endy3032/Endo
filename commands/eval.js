@@ -31,5 +31,5 @@ module.exports.help = {
   name: module.exports.data.name,
   description: module.exports.data.description,
   arguments: "<expression [str]>",
-  usage: '`/' + module.exports.data.name + '<expression>`'
+  usage: '`/' + module.exports.data.name + ' <expression>`'
 }

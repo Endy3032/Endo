@@ -36,5 +36,5 @@ module.exports.help = {
   name: module.exports.data.name,
   description: module.exports.data.description,
   arguments: "`<subcommand ['user', 'server']>`",
-  usage: '`/' + module.exports.data.name + '<subcommand>`'
+  usage: '`/' + module.exports.data.name + ' <subcommand>`'
 }

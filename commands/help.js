@@ -1,6 +1,6 @@
 const fs = require("fs")
 const { SlashCommandBuilder } = require('@discordjs/builders')
-const { MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageEmbed, MessageSelectMenu } = require('discord.js');
 
 const colors = ['5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
           'F47B67', 'F8A532', '48B784', '45DDCO', '99AAB5',
@@ -35,6 +35,14 @@ names.forEach((x, i) => {
   options.push(option)
 })
 
+const menu = new MessageActionRow()
+  .addComponents(
+    new MessageSelectMenu()
+      .setCustomId('help_menu')
+      .setPlaceholder('Select a command')
+      .addOptions(options)
+  )
+
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('help')
@@ -49,15 +57,33 @@ module.exports = {
       .addFields({ name: 'Navigate the help menu', value: 'Use the dropdown menu to navigate the help menu!' })
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+      
+      await interaction.reply({ embeds: [help_main], components: [menu] })
+    },
+    
+    async menu(interaction) {
+      index = names.indexOf(interaction.values[0].slice(0, -4))
+      
+      const help = new MessageEmbed()
+      .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
+      .setTitle('Help - ' + names[index])
+      .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
+      .setDescription('`[arguments]` are optional arguments\n`<arguments>` are required arguments')
+      .addFields({ name: 'Name', value: names[index] })
+      .addFields({ name: 'Description', value: descs[index] })
+      .addFields({ name: 'Arguments', value: args[index] })
+      .addFields({ name: 'Usage', value: usage[index] })
+      .setTimestamp()
+      .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+      
+      await interaction.reply({ embeds: [help], components: [menu] })
+    }
+}
 
-    const menu = new MessageActionRow()
-      .addComponents(
-        new MessageSelectMenu()
-          .setCustomId('menu')
-          .setPlaceholder('Select a command')
-          .addOptions(options)
-      )
-
-    await interaction.reply({ embeds: [help_main], components: [menu] })
-	}
+module.exports.commandList = {
+  names: names,
+  descs: descs,
+  args: args,
+  usage: usage,
+  options: options
 }
