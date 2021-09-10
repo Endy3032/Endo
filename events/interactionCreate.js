@@ -1,15 +1,18 @@
 module.exports = {
 	name: 'interactionCreate',
 	async execute(interaction) {
-		interaction.isCommand() ? console.log(`[${interaction.user.tag} - #${interaction.channel.name}] - Triggered the [${interaction.commandName}] command`)
-    : interaction.isButton() ? console.log(`[${interaction.user.tag} - #${interaction.channel.name}] - Pushed the [${interaction.message.interaction.commandName}]'s command [${interaction.customId}] button`)
-    : interaction.isSelectMenu() ? console.log(`[${interaction.user.tag} - #${interaction.channel.name}] - Chose the [${interaction.message.interaction.commandName}] command's [${interaction.values[0]}] option`)
-    : console.log(interaction + '\nTHIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
+		// interaction.isCommand() ? console.log(`[${interaction.user.tag} - #${interaction.channel.name}] - Triggered the [${interaction.commandName}] command`)
+    // : interaction.isButton() ? console.log(`[${interaction.user.tag} - #${interaction.channel.name}] - Pushed the [${interaction.message.interaction.commandName}]'s command [${interaction.customId}] button`)
+    // : interaction.isSelectMenu() ? console.log(`[${interaction.user.tag} - #${interaction.channel.name}] - Chose the [${interaction.message.interaction.commandName}] command's [${interaction.values[0]}] option`)
+    // : console.log(interaction + '\nTHIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
 
     if (interaction.isCommand()) {
       commandName = interaction.commandName
-    } else if (interaction.isButton() || interaction.isSelectMenu()) {
+    } else if (interaction.isButton()) {
       commandName = interaction.message.interaction.commandName
+    } else if (interaction.isSelectMenu()) {
+      try {commandName = interaction.message.interaction.commandName}
+      catch (e) {commandName = interaction.customId.slice(0, -5)}
     }
     
     const command = interaction.client.commands.get(commandName)

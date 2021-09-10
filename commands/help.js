@@ -58,26 +58,26 @@ module.exports = {
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
       
-      await interaction.reply({ embeds: [help_main], components: [menu] })
-    },
+    await interaction.reply({ embeds: [help_main], components: [menu] })
+  },
+  
+  async menu(interaction) {
+    index = names.indexOf(interaction.values[0].slice(0, -4))
     
-    async menu(interaction) {
-      index = names.indexOf(interaction.values[0].slice(0, -4))
-      
-      const help = new MessageEmbed()
-      .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
-      .setTitle('Help - ' + names[index])
-      .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
-      .setDescription('`[arguments]` are optional arguments\n`<arguments>` are required arguments')
-      .addFields({ name: 'Name', value: names[index] })
-      .addFields({ name: 'Description', value: descs[index] })
-      .addFields({ name: 'Arguments', value: args[index] })
-      .addFields({ name: 'Usage', value: usage[index] })
-      .setTimestamp()
-      .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
-      
-      await interaction.reply({ embeds: [help], components: [menu] })
-    }
+    const help = new MessageEmbed()
+    .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
+    .setTitle('Help - ' + names[index])
+    .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
+    .setDescription('`[arguments]` are optional arguments\n`<arguments>` are required arguments')
+    .addFields({ name: 'Name', value: names[index] })
+    .addFields({ name: 'Description', value: descs[index] })
+    .addFields({ name: 'Arguments', value: args[index] })
+    .addFields({ name: 'Usage', value: usage[index] })
+    .setTimestamp()
+    .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+    
+    await interaction.update({ embeds: [help], components: [menu] })
+  }
 }
 
 module.exports.commandList = {
