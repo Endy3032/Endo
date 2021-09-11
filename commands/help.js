@@ -29,7 +29,7 @@ names.forEach((x, i) => {
   options.push(option)
 })
 
-const menu = new MessageActionRow()
+const help_menu = new MessageActionRow()
   .addComponents(
     new MessageSelectMenu()
       .setCustomId('help_menu')
@@ -52,7 +52,7 @@ module.exports = {
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
       
-    await interaction.reply({ embeds: [help_main], components: [menu] })
+    await interaction.reply({ embeds: [help_main], components: [help_menu] })
   },
   
   async menu(interaction) {
@@ -70,7 +70,7 @@ module.exports = {
     .setTimestamp()
     .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
     
-    await interaction.update({ embeds: [help], components: [menu] })
+    await interaction.update({ embeds: [help], components: [help_menu] })
   }
 }
 

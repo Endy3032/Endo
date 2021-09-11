@@ -22,7 +22,6 @@ commandFiles.forEach(command => {
 			Routes.applicationCommands(process.env.CLIENT),
 			{ body: commands },
 		);
-    console.log(commands)
 
 		console.log(`Successfully registered ${commandFiles.length} application commands.`);
 	}
