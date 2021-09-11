@@ -27,7 +27,7 @@ commands.forEach(command => {
 
 (async () => {
   try {
-    console.log('Started refreshing application (/) commands.');
+    console.log('Started refreshing commands.');
 		await rest.put(
       Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
 			{ body: commands },

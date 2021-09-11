@@ -17,11 +17,12 @@ commandFiles.forEach(command => {
 
 (async () => {
 	try {
-    console.log('Started refreshing application (/) commands.');
+    console.log('Started refreshing commands.');
 		await rest.put(
 			Routes.applicationCommands(process.env.CLIENT),
 			{ body: commands },
 		);
+    console.log(commands)
 
 		console.log(`Successfully registered ${commandFiles.length} application commands.`);
 	}

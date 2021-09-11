@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'interactionCreate',
 	async execute(interaction) {
-    if (interaction.guildId !== '864972641219248140') {return}
+    // if (interaction.guildId !== '864972641219248140') {return}
 
     interaction.guildId
     ? message = `[${interaction.user.tag} - #${interaction.channel.name}] - `

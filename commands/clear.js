@@ -24,7 +24,7 @@ module.exports = {
       await interaction.reply({ content: `You cannot use the clear command`, ephemeral: false })
       console.log('BUT FAILED MISERABLY HAHAHAHAHAHHAHAHWAIHUFAIUFAIWF')
     }
-	}
+  }
 }
 
 module.exports.help = {
