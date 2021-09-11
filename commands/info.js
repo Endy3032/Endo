@@ -4,15 +4,15 @@ const { SlashCommandBuilder } = require('@discordjs/builders')
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('info')
-  .setDescription('Get info about a user or the server')
+  .setDescription('Get info about a user or the server [G]')
   .addSubcommand(subcommand => subcommand
     .setName('user')
-    .setDescription('Get info about a user')
+    .setDescription('Get info about a user [G]')
     .addUserOption(option => option.setName('target').setDescription('The user to get info [mention / none]'))
   )
   .addSubcommand(subcommand => subcommand
     .setName('server')
-    .setDescription('Get info about the server')
+    .setDescription('Get info about the server [G]')
   ),
   
   async execute(interaction) {

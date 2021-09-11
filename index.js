@@ -28,5 +28,4 @@ eventFiles.forEach(file => {
 client.login(process.env.TOKEN)
 
 /* DELETE ALL COMMANDS
-client.application.commands.set([])
-guild.commands.set([]) */
+client.application.commands.set([]) */

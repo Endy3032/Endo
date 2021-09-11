@@ -12,7 +12,7 @@ const colors = ['5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.startsWith('help'));
 var names = ['help']
-var descs = ['Show the list of all available commands']
+var descs = ['Show the list of all available commands [G]']
 var args = ['none']
 var usage = ['`/help`']
 
@@ -46,7 +46,7 @@ const menu = new MessageActionRow()
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('help')
-  .setDescription('Show the list of all available commands'),
+  .setDescription('Show the list of all available commands [G]'),
   
   async execute(interaction) {
     const help_main = new MessageEmbed()
