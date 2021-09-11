@@ -13,7 +13,7 @@ module.exports = {
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
     : console.log(interaction + '\nTHIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
 
-    console.log(message)
+    // console.log(message)
 
     let commandName
     if (interaction.isCommand()) {
