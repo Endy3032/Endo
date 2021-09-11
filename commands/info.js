@@ -1,4 +1,7 @@
+const misc = require("../other/misc.js")
 const { SlashCommandBuilder } = require('@discordjs/builders')
+const { MessageEmbed } = require('discord.js')
+const colors = misc.colors
 
 
 module.exports = {
@@ -18,6 +21,9 @@ module.exports = {
   async execute(interaction) {
     if (interaction.options.getSubcommand() === 'user') {
 			const user = interaction.options.getUser('target')
+      const user_embed = new MessageEmbed()
+      .setTitle('User Info')
+      .setColor()
 
       user
       ? await interaction.reply(`Username: ${user.username}\nID: ${user.id}`)
