@@ -1,18 +1,12 @@
 const fs = require("fs")
+const misc = require("../other/misc.js")
 const { SlashCommandBuilder } = require('@discordjs/builders')
-const { MessageActionRow, MessageEmbed, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageEmbed, MessageSelectMenu } = require('discord.js')
 
-const colors = ['5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
-          'F47B67', 'F8A532', '48B784', '45DDCO', '99AAB5',
-          '23272A', 'B7C2CE', '4187ED', '36393F', '3E70DD',
-          '4P5D7F', '7289DA', '4E5D94', '9C84EF', 'F47FFF',
-          'FFFFFF', '9684ec', '583694', '37393e', '5866ef',
-          '3da560', 'f9a62b', 'f37668', '49ddc1', '4f5d7e',
-          '09bOf2', '2f3136', 'ec4145', 'fe73f6', '000000']
-
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.startsWith('help'));
+const colors = misc.colors
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.startsWith('help'))
 var names = ['help']
-var descs = ['Show the list of all available commands [G]']
+var descs = ['Show the list of all available commands']
 var args = ['none']
 var usage = ['`/help`']
 
@@ -46,7 +40,7 @@ const menu = new MessageActionRow()
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('help')
-  .setDescription('Show the list of all available commands [G]'),
+  .setDescription(descs[0]),
   
   async execute(interaction) {
     const help_main = new MessageEmbed()
@@ -80,10 +74,10 @@ module.exports = {
   }
 }
 
-module.exports.commandList = {
-  names: names,
-  descs: descs,
-  args: args,
-  usage: usage,
-  options: options
-}
+// module.exports.commandList = {
+//   names: names,
+//   descs: descs,
+//   args: args,
+//   usage: usage,
+//   options: options
+// }

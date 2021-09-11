@@ -1,23 +1,29 @@
+const misc = require("../other/misc.js")
 const { SlashCommandBuilder } = require('@discordjs/builders')
+const { MessageEmbed } = require('discord.js')
+const colors = misc.colors
 
 
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('info')
-  .setDescription('Get info about a user or the server [G]')
+  .setDescription('Get info about a user or the server')
   .addSubcommand(subcommand => subcommand
     .setName('user')
-    .setDescription('Get info about a user [G]')
+    .setDescription('Get info about a user')
     .addUserOption(option => option.setName('target').setDescription('The user to get info [mention / none]'))
   )
   .addSubcommand(subcommand => subcommand
     .setName('server')
-    .setDescription('Get info about the server [G]')
+    .setDescription('Get info about the server')
   ),
   
   async execute(interaction) {
     if (interaction.options.getSubcommand() === 'user') {
 			const user = interaction.options.getUser('target')
+      const user_embed = new MessageEmbed()
+      .setTitle('User Info')
+      .setColor()
 
       user
       ? await interaction.reply(`Username: ${user.username}\nID: ${user.id}`)

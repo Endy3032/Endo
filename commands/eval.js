@@ -6,7 +6,7 @@ var Math = new BigEval()
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('eval')
-  .setDescription('Evaluate an expression and return the result [G]')
+  .setDescription('Evaluate an expression and return the result')
   .addStringOption(option => option
     .setName('expression')
     .setDescription('The expression to evaluate [string]')

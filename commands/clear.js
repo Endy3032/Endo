@@ -5,7 +5,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('clear')
-  .setDescription('Clear messages in the channel [G]')
+  .setDescription('Clear messages in the channel')
   .addIntegerOption(option => option
     .setName('amount')
     .setDescription('Amount of messages to clear [integer 1~100]')
