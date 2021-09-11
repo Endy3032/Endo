@@ -7,7 +7,8 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "deploy": "node deploy.js && npm run dev"
+    "geploy": "node deployGuild.js && npm run dev",
+    "ceploy": "node deployClient.js && npm run dev"
   },
   "keywords": [],
   "author": "Endy3032",

@@ -1,5 +1,4 @@
 const dotenv = require('dotenv');
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const fs = require('fs')
@@ -22,7 +21,6 @@ commandFiles.forEach(command => {
     console.log('Started refreshing application (/) commands.');
 		await rest.put(
 			Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
-			// Routes.applicationCommands(process.env.CLIENT, process.env.GUILD),
 			{ body: commands },
 		);
 
