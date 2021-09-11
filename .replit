@@ -1,2 +1,2 @@
 language = "node.js"
-run = "npm run ceploy"
+run = "npm run dev"
