@@ -1,15 +1,38 @@
-const { MessageEmbed } = require('discord.js');
-
 module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
 		console.log(`[${client.user.tag}][SYSTEM] Ready`)
 
-    client.user.setPresence({
-      activities: [{ name: '🌧agoraphobic🌧', type: 2 }],
-      status: 'idle'
-    })
+    setInterval(() => {
+      activities = [
+        {
+          activites: [{ name: '/help', type: 2 }],
+          status: 'idle'
+        },
+        {
+          activities: [{ name: '🌧agoraphobic🌧', type: 2 }],
+          status: 'idle'
+        },
+        {
+          activites: [{ name: 'Stranger Things', type: 3 }],
+          status: 'idle'
+        },
+        {
+          activites: [{ name: 'discord.js', type: 0 }],
+          status: 'idle'
+        },
+        {
+          activites: [{ name: 'jealous - llusion', type: 2 }],
+          status: 'idle'
+        },
+        {
+          activites: [{ name: 'jealous - llusion', type: 2 }],
+          status: 'idle'
+        }
+      ]
+      client.user.setActivity(activities[Math.floor(Math.random() * (activities.length - 1) + 1)]);
+    }, 60000);
 
     channel = client.channels.cache.get("769497610300948480");
     channel.send({content: '`[NOTIFICATION]` System Online'})
