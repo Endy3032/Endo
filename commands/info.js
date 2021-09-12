@@ -20,7 +20,7 @@ module.exports = {
   
   async execute(interaction) {
     if (interaction.options.getSubcommand() === 'user') {
-			const user = interaction.options.getUser('target')
+      const user = interaction.options.getUser('target')
       const user_embed = new MessageEmbed()
       .setTitle('User Info')
       .setColor()
@@ -28,14 +28,14 @@ module.exports = {
       user
       ? await interaction.reply(`Username: ${user.username}\nID: ${user.id}`)
       : await interaction.reply(`Your username: ${interaction.user.username}\nYour ID: ${interaction.user.id}`)
-		}
+    }
     else if (interaction.options.getSubcommand() === 'server') {
 			await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`)
-		}
+    }
 
     const msg = await interaction.fetchReply()
     console.log(msg.content)
-	}
+  }
 }
 
 module.exports.help = {

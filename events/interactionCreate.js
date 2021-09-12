@@ -5,8 +5,8 @@ dotenv.config()
 
 
 module.exports = {
-	name: 'interactionCreate',
-	async execute(interaction) {
+  name: 'interactionCreate',
+  async execute(interaction) {
     // if (interaction.guildId !== process.env.GUILD) {return}
     // console.log(interaction)
 
@@ -15,7 +15,7 @@ module.exports = {
     ? message += `${interaction.channel.name}] - `
     : message += `DM] - `
 
-		interaction.isCommand() ? message += `Triggered the [${interaction.commandName}] command`
+    interaction.isCommand() ? message += `Triggered the [${interaction.commandName}] command`
     : interaction.isButton() ? message += `Pushed the [${interaction.message.interaction.commandName}]'s command [${interaction.customId}] button`
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
     : (console.log(interaction), message += 'THIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')

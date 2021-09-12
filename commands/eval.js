@@ -24,7 +24,7 @@ module.exports = {
 
     await interaction.reply({ content: `${expression} = ${Math.exec(expression_2)}` })
     console.log(expression + ' = ' + Math.exec(expression_2))
-	}
+  }
 }
 
 module.exports.help = {
