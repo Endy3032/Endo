@@ -30,7 +30,7 @@ module.exports = {
       : await interaction.reply(`Your username: ${interaction.user.username}\nYour ID: ${interaction.user.id}`)
     }
     else if (interaction.options.getSubcommand() === 'server') {
-			await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`)
+      await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`)
     }
 
     const msg = await interaction.fetchReply()

@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 
 module.exports = {
-	data: new SlashCommandBuilder()
+  data: new SlashCommandBuilder()
     .setName('ping')
     .setDescription('Get the bot latency info'),
 	async execute(interaction) {
