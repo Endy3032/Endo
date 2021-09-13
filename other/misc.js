@@ -1,3 +1,7 @@
+const fs = require('fs');
+var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
+
+
 module.exports = {
   colors: [
     '5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
@@ -19,4 +23,67 @@ module.exports = {
   6: '6️⃣', 7: '7️⃣', 8: '8️⃣', 9: '9️⃣',
   10: '🔟', '#': '#️⃣', '*': '*️⃣',
   '!': '❗', '?': '❓',
+  activities: [
+    {
+      activities: [{ name: 'discord.js', type: 0 }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'replit', type: 0 }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'Code', type: 0 }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=9FIkzOrryf8' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=5qap5aO4i9A' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=DWcJFNfaw9c' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=TsTtqGAxvWk' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=CIfGUiICf8U' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=CIfGUiICf8U' }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'llusion - jealous', type: 2 }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: '/help', type: 2 }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: '🌧agoraphobic🌧', type: 2 }],
+      status: 'idle'
+    },
+    {
+      activities: [{ name: 'Stranger Things', type: 3 }],
+      status: 'idle'
+    }
+  ],
+  async log(content) {
+    log_content = `[${new Date().toLocaleString('default', {dateStyle: 'short', timeStyle: 'medium', hour12: false})}] ` + content
+    console.log(log_content)
+    logStream.write(log_content + '\n')
+  }
 };

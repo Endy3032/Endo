@@ -1,6 +1,5 @@
-const fs = require('fs');
-const dotenv = require('dotenv');
-var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
+const misc = require("../other/misc.js")
+const dotenv = require('dotenv')
 dotenv.config()
 
 
@@ -10,7 +9,7 @@ module.exports = {
     // if (interaction.guildId !== process.env.GUILD) {return}
     // console.log(interaction)
 
-    message = `[${new Date().toLocaleString('default', {dateStyle: 'short', timeStyle: 'medium', hour12: false})} | ${interaction.user.tag} - #`
+    message = `[${interaction.user.tag} - #`
     interaction.guildId
     ? message += `${interaction.channel.name}] - `
     : message += `DM] - `
@@ -20,8 +19,7 @@ module.exports = {
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
     : (console.log(interaction), message += 'THIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
 
-    console.log(message)
-    logStream.write(message + '\n')
+    misc.log(message)
 
     let commandName
     if (interaction.isCommand()) {

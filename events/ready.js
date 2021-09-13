@@ -1,35 +1,26 @@
+const misc = require("../other/misc.js")
+activities = misc.activities
+
+
 module.exports = {
   name: 'ready',
   once: true,
   async execute(client) {
     console.log(`[${client.user.tag}][SYSTEM] Ready`)
-    activities = [
-      {
-        activites: [{ name: '/help', type: 2 }],
-        status: 'idle'
-      },
-      {
-        activities: [{ name: '🌧agoraphobic🌧', type: 2 }],
-        status: 'idle'
-      },
-      {
-        activites: [{ name: 'Stranger Things', type: 3 }],
-        status: 'idle'
-      },
-      {
-        activites: [{ name: 'discord.js', type: 0 }],
-        status: 'idle'
-      },
-      {
-        activites: [{ name: 'jealous - llusion', type: 2 }],
-        status: 'idle'
-      }
-    ]
 
     setInterval(() => {
-      client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
-    }, 10000);
-
+      activity = activities[Math.floor(Math.random() * activities.length)]
+      client.user.setPresence(activity)
+      act_type = activity['activities'][0]['type']
+      act_name = activity['activities'][0]['name']
+      act_types = ['Playing', 'Streaming', 'Listening to', 'Watching']
+      misc.log(`Current Status: ${act_types[act_type]} ${act_name}`)
+      act_name === 'lofi'
+      ? misc.log(activity['activities'][0]['url'])
+      : null
+    }, 300000);
+    client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
+    
     channel = client.channels.cache.get("769497610300948480");
     channel.send({content: '`[NOTIFICATION]` System Online'})
 
