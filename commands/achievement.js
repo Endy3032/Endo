@@ -64,17 +64,7 @@ module.exports = {
   ),
 
   async execute(interaction) {
-    symbols = ['π']
-    symvalue = ['3.14']
-
-    var expression = interaction.options.getString('expression')
-    var expression_2 = expression
-    symbols.forEach((value, i) => {
-      expression_2 = expression_2.replace(value, symvalue[i])
-    })
-
-    await interaction.reply({ content: `${expression} = ${Math.exec(expression_2)}` })
-    console.log(expression + ' = ' + Math.exec(expression_2))
+    await interaction.reply({ content: `Not working hehe` })
   }
 }
 

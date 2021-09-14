@@ -6,7 +6,7 @@ dotenv.config()
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
-    if (interaction.guildId !== process.env.GUILD) {return}
+    // if (interaction.guildId !== process.env.GUILD) {return}
     // console.log(interaction)
 
     message = `[${interaction.user.tag} - #`
@@ -15,6 +15,8 @@ module.exports = {
     : message += `DM] - `
 
     interaction.isCommand() ? message += `Triggered the [${interaction.commandName}] command`
+    : interaction.isCommand() && interaction.options._group && interaction.options._subcommand ? message += `Triggered the [${interaction.commandName} - ${interation.options._group} - ${interaction.options._subcommand}] command`
+    : interaction.isCommand() && interaction.options._subcommand ? message += `Triggered the [${interaction.commandName}]'s ${interaction.options._subcommand}] command`
     : interaction.isButton() ? message += `Pushed the [${interaction.message.interaction.commandName}]'s command [${interaction.customId}] button`
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
     : (console.log(interaction), message += 'THIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')

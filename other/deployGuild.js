@@ -17,12 +17,12 @@ commandFiles.forEach(command => {
 });
 
 commands.forEach(command => {
-  command.description += ' [G]'
+  command.description = `[GUILD!!!!!] ${command.description} [GUILD!!!!!]`
   command.options.forEach(option => {
-    option.description += ' [G]'
+    option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
     if (option.options) {
       option.options.forEach(suboption => {
-        suboption.description += ' [G]'
+        suboption.description = `[GUILD!!!!!] ${suboption.description} [GUILD!!!!!]`
       })
     }
   })
