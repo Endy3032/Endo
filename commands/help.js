@@ -48,7 +48,7 @@ module.exports = {
       .setTitle('Help')
       .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
       .setDescription('`[arguments]` are optional arguments\n`<arguments>` are required arguments')
-      .addFields({ name: 'Navigate the help menu', value: 'Use the dropdown menu to navigate the help menu!' })
+      .addField('Navigate the help menu', 'Use the dropdown menu to navigate the help menu!')
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
       
@@ -63,10 +63,12 @@ module.exports = {
     .setTitle('Help - ' + names[index])
     .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
     .setDescription('`[arguments]` are optional arguments\n`<arguments>` are required arguments')
-    .addFields({ name: 'Name', value: names[index] })
-    .addFields({ name: 'Description', value: descs[index] })
-    .addFields({ name: 'Arguments', value: args[index] })
-    .addFields({ name: 'Usage', value: usage[index] })
+    .addFields(
+      { name: 'Name', value: names[index] },
+      { name: 'Description', value: descs[index] },
+      { name: 'Arguments', value: args[index] },
+      { name: 'Usage', value: usage[index] }
+    )
     .setTimestamp()
     .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
     

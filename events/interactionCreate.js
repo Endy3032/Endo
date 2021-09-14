@@ -1,4 +1,4 @@
-const misc = require("../other/misc.js")
+const index = require("../index.js")
 const dotenv = require('dotenv')
 dotenv.config()
 
@@ -6,7 +6,7 @@ dotenv.config()
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
-    // if (interaction.guildId !== process.env.GUILD) {return}
+    if (interaction.guildId !== process.env.GUILD) {return}
     // console.log(interaction)
 
     message = `[${interaction.user.tag} - #`
@@ -19,7 +19,7 @@ module.exports = {
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
     : (console.log(interaction), message += 'THIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
 
-    misc.log(message)
+    // index.log(message)
 
     let commandName
     if (interaction.isCommand()) {
@@ -31,12 +31,16 @@ module.exports = {
     }
     
     const command = interaction.client.commands.get(commandName)
+
+    // console.log(interaction)
+    // console.log(command)
     
     if (interaction.isCommand()) {
       try {await command.execute(interaction)}
       catch (error) {
         console.error(error);
-        await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true });
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
       }
     }
 
@@ -44,7 +48,8 @@ module.exports = {
       try {await command.buttonclick(interaction)}
       catch (error) {
         console.error(error);
-        await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Button]', ephemeral: true });
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
       }
     }
 
@@ -52,7 +57,8 @@ module.exports = {
       try {await command.menu(interaction)}
       catch (error) {
         console.error(error);
-        await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu]', ephemeral: true });
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
       }
     }
     /* if (!interaction.isCommand()) return;

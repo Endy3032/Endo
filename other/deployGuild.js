@@ -19,10 +19,16 @@ commandFiles.forEach(command => {
 commands.forEach(command => {
   command.description += ' [G]'
   command.options.forEach(option => {
-    if (option.type === 1) {
-      option.description += ' [G]'
+    option.description += ' [G]'
+    if (option.options) {
+      option.options.forEach(suboption => {
+        suboption.description += ' [G]'
+      })
     }
   })
+  
+  // DEBUG ONLY
+  // console.log(command)
 });
 
 (async () => {

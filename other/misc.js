@@ -1,7 +1,3 @@
-const fs = require('fs');
-var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
-
-
 module.exports = {
   colors: [
     '5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
@@ -80,10 +76,5 @@ module.exports = {
       activities: [{ name: 'Stranger Things', type: 3 }],
       status: 'idle'
     }
-  ],
-  async log(content) {
-    log_content = `[${new Date().toLocaleString('default', {dateStyle: 'short', timeStyle: 'medium', hour12: false})}] ` + content
-    console.log(log_content)
-    logStream.write(log_content + '\n')
-  }
+  ]
 };

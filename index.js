@@ -1,6 +1,8 @@
-const dotenv = require('dotenv');
 const { Client, Collection, Intents } = require('discord.js');
+const dotenv = require('dotenv');
 const fs = require('fs');
+
+var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
 dotenv.config();
 
 const client = new Client({intents: [
@@ -9,6 +11,14 @@ const client = new Client({intents: [
   Intents.FLAGS.GUILD_MESSAGES,
   Intents.FLAGS.GUILD_MESSAGE_REACTIONS
 ]});
+
+async function log (content) {
+  const channel = client.channels.cache.get("769497610300948480");
+  log_content = `\`[${new Date().toLocaleString('default', {dateStyle: 'short', timeStyle: 'medium', hour12: false})}]\` ` + content
+  console.log(log_content)
+  logStream.write(log_content + '\n')
+  channel.send(log_content)
+}
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -27,5 +37,6 @@ eventFiles.forEach(file => {
 
 client.login(process.env.TOKEN)
 
+module.exports.log = log;
 /* DELETE ALL COMMANDS
 client.application.commands.set([]) */
