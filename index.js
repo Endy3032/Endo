@@ -1,6 +1,8 @@
 const { Client, Collection, Intents } = require('discord.js');
 const dotenv = require('dotenv');
 const fs = require('fs');
+const Bree = require('bree');
+
 
 var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
 dotenv.config();
@@ -26,6 +28,7 @@ commandFiles.forEach(file => {
   const command = require(`./commands/${file}`);
   client.commands.set(command.data.name, command)
 })
+console.log(client.commands)
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 eventFiles.forEach(file => {
@@ -38,5 +41,6 @@ eventFiles.forEach(file => {
 client.login(process.env.TOKEN)
 
 module.exports.log = log;
+
 /* DELETE ALL COMMANDS
 client.application.commands.set([]) */

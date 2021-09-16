@@ -21,6 +21,7 @@
     "@sapphire/snowflake": "^2.0.0",
     "axios": "^0.21.4",
     "bigeval": "^3.1.0",
+    "bree": "^6.3.0",
     "discord-api-types": "^0.20.2",
     "discord-buttons": "^4.0.0",
     "discord.js": "^13.1.0",

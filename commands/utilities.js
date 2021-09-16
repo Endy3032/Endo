@@ -21,7 +21,7 @@ module.exports = {
         .setDescription('The data provider to use')
         // .addChoice('AccuWeather', 'forecast_accuweather')
         .addChoice('OpenWeatherMap', 'forecast_openweathermap')
-        // .addChoice('WeatherAPI', 'forecast_weatherapi')
+        .addChoice('WeatherAPI', 'forecast_weatherapi')
         .setRequired(true)
         )
       .addStringOption(option => option
@@ -29,11 +29,9 @@ module.exports = {
         .setDescription('The location to get the weather data')
         .setRequired(true)
       )
-      .addStringOption(option => option
-        .setName('unit')
-        .setDescription('The unit for the weather data')
-        .addChoice('Metric (˚C)', 'weather_metric')
-        .addChoice('Imperial (˚F)', 'weather_imperial')
+      .addBooleanOption(option => option
+        .setName('is_imperial')
+        .setDescription('Whether to use imperial (˚F) for the result')
       )
     )
     /* .addSubcommand(subcommand => subcommand
@@ -74,6 +72,29 @@ module.exports = {
         .setRequired(true)
       )
     ) */
+  )
+  .addSubcommandGroup(group => group
+    .setName('color')
+    .setDescription('Return a preview of the color')
+    .addSubcommand(subcommand => subcommand
+      .setName('rgb')
+      .setDescription('Input RGB color type')
+      .addStringOption(option => option
+        .setName('red')
+        .setDescription('The red value of the color')
+        .setRequired(true)
+      )
+      .addStringOption(option => option
+        .setName('green')
+        .setDescription('The green value of the color')
+        .setRequired(true)
+      )
+      .addStringOption(option => option
+        .setName('blue')
+        .setDescription('The blue value of the color')
+        .setRequired(true)
+      )
+    )
   ),
 
   async execute(interaction) {
@@ -109,19 +130,22 @@ module.exports = {
             .then(response => {
               const weather_embed = new MessageEmbed()
                 .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
-                .setTitle(`${response.data.name} - GMT${response.data.timezone > 0 ? '+' : '-'}${response.data.timezone/3600}`)
+                .setTitle(`${response.data.name} - ${response.data.sys.country} (GMT${response.data.timezone > 0 ? '+' : ''}${response.data.timezone/3600})`)
                 .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
                 .setDescription(`${response.data.weather[0].description.charAt(0).toUpperCase() + response.data.weather[0].description.slice(1)}`)
                 .addFields(
-                  { name: 'Temperature', value: `${response.data.main.temp}${symbol}`, inline: true },
-                  { name: 'Feels Like', value: `${response.data.main.feels_like}${symbol}`, inline: true },
-                  { name: 'Min/Max Temperature', value: `${response.data.main.temp_min}${symbol}/${response.data.main.temp_max}${symbol}`, inline: true },
+                  { name: 'Temperature   ', value: `${response.data.main.temp}${symbol}`, inline: true },
+                  { name: 'Feels Like   ', value: `${response.data.main.feels_like}${symbol}`, inline: true },
+                  { name: 'Min/Max Temp', value: `${response.data.main.temp_min}${symbol}/${response.data.main.temp_max}${symbol}`, inline: true },
                   { name: 'Pressure', value: `${response.data.main.pressure}hPa`, inline: true },
                   { name: 'Humidity', value: `${response.data.main.humidity}%`, inline: true },
-                  { name: 'Wind', value: `${response.data.wind.speed}${speed} ${response.data.wind.deg}˚`, inline: true }
+                  { name: 'Wind', value: `${response.data.wind.speed}${speed} ${response.data.wind.deg}˚`, inline: true },
+                  { name: 'Clouds', value: `${response.data.clouds.all/100}%`, inline: true },
+                  { name: 'Sunrise', value: `<t:${response.data.sys.sunrise}:T>`, inline: true },
+                  { name: 'Sunset', value: `<t:${response.data.sys.sunset}:T>`, inline: true }
                 )
                 .setThumbnail(`http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`)
-                .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+                .setFooter('OpenWeatherMap', `https://pbs.twimg.com/profile_images/1173919481082580992/f95OeyEW_400x400.jpg`)
                 .setTimestamp()
 
               interaction.editReply({ embeds: [weather_embed] })
