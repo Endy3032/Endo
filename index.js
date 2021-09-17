@@ -4,7 +4,7 @@ const fs = require('fs');
 const keepAlive = require('./server.js');
 
 
-var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
+var logStream = fs.createWriteStream('./other/botlog.log', {flags: 'a'});
 dotenv.config();
 
 const client = new Client({intents: [
