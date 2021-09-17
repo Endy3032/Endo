@@ -1,7 +1,7 @@
 const { Client, Collection, Intents } = require('discord.js');
 const dotenv = require('dotenv');
 const fs = require('fs');
-const Bree = require('bree');
+const keepAlive = require('./server.js');
 
 
 var logStream = fs.createWriteStream('./botlog.log', {flags: 'a'});
@@ -38,6 +38,8 @@ eventFiles.forEach(file => {
   : client.on(event.name, (...args) => event.execute(...args));
 })
 
+
+keepAlive()
 client.login(process.env.TOKEN)
 
 module.exports.log = log;
