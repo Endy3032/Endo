@@ -1,3 +1,4 @@
+var axios = require("axios").default
 const index = require("../index.js")
 const misc = require("../other/misc.js")
 const activities = misc.activities
@@ -8,6 +9,20 @@ module.exports = {
   once: true,
   async execute(client) {
     index.log(`\`[${client.user.tag}]\` System Online`)
+
+    // pinger = {
+    //   method: "HEAD",
+    //   url: "https://endyjs.enderhoang.repl.co/"
+    // }
+
+    function pinger() {
+      axios.head('https://endyjs.enderhoang.repl.co')
+      .catch(function(error) {
+        error.response
+        ? console.log(`${error.response.status} - Repl seems to be offline`)
+        : null
+      })
+    }
 
     setInterval(() => {
       activity = activities[Math.floor(Math.random() * activities.length)]
@@ -20,8 +35,11 @@ module.exports = {
       act_name === 'lofi'
       ? index.log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity['activities'][0]['url']}`)
       : index.log(`Current Status: ${type_str[act_type]} ${act_name}`)
-    }, 900000);
+
+      pinger()
+    }, 900000)
     
+    pinger()
     client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
 
     // clientcmd = client.application.commands.fetch()
@@ -30,16 +48,16 @@ module.exports = {
     delete_cmd = false
 
     const guild = client.guilds.cache.get('864972641219248140')
-    commands = guild.commands
+    // commands = guild.commands
 
     client.application.commands.fetch()
     .then(commands => console.log(`Fetched ${commands.size} global commands`))
-    .catch(console.error);
+    .catch(console.error)
 
     guild.commands.fetch()
     .then(commands => console.log(`Fetched ${commands.size} test commands`))
-    .catch(console.error);
+    .catch(console.error)
     
     delete_cmd ? guild.commands.set([]) : null
   },
-};
+}

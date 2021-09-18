@@ -105,19 +105,15 @@ module.exports = {
         switch (interaction.options._subcommand) {
           case 'current':
             location = interaction.options.getString('location')
-            switch (interaction.options.getString('unit')) {
-              case 'weather_metric':
-                unit = 'metric'
-                symbol = '˚C'
-                speed = 'm/s'
-              case 'weather_imperial':
-                unit = 'imperial'
-                symbol = '˚F'
-                speed = 'mi/h'
-              default:
-                unit = 'metric'
-                symbol = '˚C'
-                speed = 'm/s'
+            console.log(interaction.options.getBoolean('is_imperial'))
+            if (interaction.options.getBoolean('is_imperial')) {
+              unit = 'imperial'
+              symbol = '˚F'
+              speed = 'mi/h'
+            } else {
+              unit = 'metric'
+              symbol = '˚C'
+              speed = 'm/s'
             }
 
             request = {
@@ -125,6 +121,8 @@ module.exports = {
               url: encodeURI(`https://api.openweathermap.org/data/2.5/weather`),
               params: {q: location, units: unit, appid: process.env.OPENWEATHERMAP}
             }
+
+            console.log(unit, symbol, speed)
 
             await axios.request(request)
             .then(response => {
