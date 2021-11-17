@@ -174,11 +174,9 @@ module.exports = {
             hsv = misc.Convert.toHSV(rgb)
             cmyk = misc.Convert.toCMYK(rgb)
 
-            console.log(hex.substring(1, 7))
-
             const color_embed = new MessageEmbed()
             .setTitle('Color Conversion')
-            // .setColor(`#${hex}`)
+            .setColor(`${hex}`)
             .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
             .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
             .setTimestamp()
@@ -187,6 +185,7 @@ module.exports = {
               {name: '​', value: `​`, inline: true},
               {name: 'HEX', value: `${hex}`, inline: true},
               {name: 'HSV', value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true},
+              {name: '​', value: `​`, inline: true},
               {name: 'CMYK', value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true}
             )
             .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png`)
