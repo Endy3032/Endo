@@ -18,6 +18,7 @@ module.exports = {
       .addStringOption(option => option
         .setName('icon')
         .setDescription('The icon for the achievement')
+        .addChoice('random', '0')
         .addChoice('grass_block', '1')
         .addChoice('diamond', '2')
         .addChoice('diamond_sword', '3')
@@ -38,7 +39,6 @@ module.exports = {
         .addChoice('furnace', '18')
         .addChoice('book', '19')
         .addChoice('stone', '20')
-        .addChoice('random', '0')
         .setRequired(true)
       )
       .addStringOption(option => option
@@ -58,6 +58,7 @@ module.exports = {
       .addStringOption(option => option
         .setName('icon')
         .setDescription('The icon for the achievement')
+        .addChoice('random', '0')
         .addChoice('planks', '21')
         .addChoice('iron_ingot', '22')
         .addChoice('gold_ingot', '23')
@@ -77,7 +78,6 @@ module.exports = {
         .addChoice('water', '37')
         .addChoice('lava', '38')
         .addChoice('milk', '39')
-        .addChoice('random', '0')
         .setRequired(true)
       )
       .addStringOption(option => option
