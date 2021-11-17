@@ -186,10 +186,12 @@ const Convert = {
 
   _RGBtoHEX : function (RGB) {
     hex = '#'
+
+    hr = `000${RGB.r.toString(16)}`.substr(-2)
+    hg = `000${RGB.g.toString(16)}`.substr(-2)
+    hb = `000${RGB.b.toString(16)}`.substr(-2)
     
-    hex += RGB.r.toString(16)
-    hex += RGB.g.toString(16)
-    hex += RGB.b.toString(16)
+    hex += hr + hg + hb
     
     return hex
   },

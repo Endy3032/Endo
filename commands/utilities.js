@@ -80,19 +80,75 @@ module.exports = {
       .setDescription('Input RGB color type')
       .addIntegerOption(option => option
         .setName('red')
-        .setDescription('The red value of the color [integer 0~255]')
+        .setDescription('The red value of the RGB color [integer 0~255]')
         .setRequired(true)
       )
       .addIntegerOption(option => option
         .setName('green')
-        .setDescription('The green value of the color [integer 0~255]')
+        .setDescription('The green value of the RGB color [integer 0~255]')
         .setRequired(true)
       )
       .addIntegerOption(option => option
         .setName('blue')
-        .setDescription('The blue value of the color [integer 0~255]')
+        .setDescription('The blue value of the RGB color [integer 0~255]')
         .setRequired(true)
       )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('hex')
+      .setDescription('Input Hex color type')
+      .addStringOption(option => option
+        .setName('value')
+        .setDescription('The Hex value of the color [hex, length 6]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('hsv')
+      .setDescription('Input HSV color type')
+      .addIntegerOption(option => option
+        .setName('hue')
+        .setDescription('The hue value of the HSV color [integer 0~360]')
+        .setRequired(true)
+      )
+      .addIntegerOption(option => option
+        .setName('saturation')
+        .setDescription('The green value of the HSV color [integer 0~100]')
+        .setRequired(true)
+      )
+      .addIntegerOption(option => option
+        .setName('value')
+        .setDescription('The value value of the HSV color [integer 0~100]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('cmyk')
+      .setDescription('Input RGB color type')
+      .addIntegerOption(option => option
+        .setName('cyan')
+        .setDescription('The cyan value of the CMYK color [integer 0~100]')
+        .setRequired(true)
+        )
+      .addIntegerOption(option => option
+        .setName('magenta')
+        .setDescription('The magenta value of the CMYK color [integer 0~100]')
+        .setRequired(true)
+      )
+      .addIntegerOption(option => option
+        .setName('yellow')
+        .setDescription('The yellow value of the CMYK color [integer 0~100]')
+        .setRequired(true)
+      )
+      .addIntegerOption(option => option
+        .setName('key')
+        .setDescription('The key value of the CMYK color [integer 0~100]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('random')
+      .setDescription('Generate a random color')
     )
   ),
 
@@ -164,39 +220,85 @@ module.exports = {
             g = interaction.options.getInteger('green')
             b = interaction.options.getInteger('blue')
 
-            // if (r <= 255 && g <= 255 && b <= 255) {
-            //   interaction.reply({ content: `${r}, ${g}, ${b} = #${r.toString(16)}${g.toString(16)}${b.toString(16)}` })
-            // } else {
-            //   interaction.reply({ content: 'The color values you provided is not valid. They must be between 0 and 255.', ephemeral: true })
-            // }
             rgb = new misc.RGB(r, g, b)
             hex = misc.Convert.toHEX(rgb)
             hsv = misc.Convert.toHSV(rgb)
             cmyk = misc.Convert.toCMYK(rgb)
 
-            const color_embed = new MessageEmbed()
-            .setTitle('Color Conversion')
-            .setColor(`${hex}`)
-            .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
-            .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
-            .setTimestamp()
-            .addFields(
-              {name: 'RGB', value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true},
-              {name: '​', value: `​`, inline: true},
-              {name: 'HEX', value: `${hex}`, inline: true},
-              {name: 'HSV', value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true},
-              {name: '​', value: `​`, inline: true},
-              {name: 'CMYK', value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true}
-            )
-            .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png`)
+            break
+          }
+          
+          case 'hex': {
+            hex = interaction.options.getString('value')
+            hex.startsWith('#') && hex.length == 7 ? hex = hex.substring(1, 7) : hex
 
-            await interaction.reply({embeds: [color_embed]})
+            rgb = misc.Convert.toRGB(hex)
+            hsv = misc.Convert.toHSV(rgb)
+            cmyk = misc.Convert.toCMYK(rgb)
+            hex = `#${hex}`
 
             break
           }
 
-        break
+          case 'hsv': {
+            h = interaction.options.getInteger('hue')
+            s = interaction.options.getInteger('saturation')
+            v = interaction.options.getInteger('value')
+
+            hsv = new misc.HSV(h, s, v)
+            rgb = misc.Convert.toRGB(hsv)
+            hex = misc.Convert.toHEX(rgb)
+            cmyk = misc.Convert.toCMYK(rgb)
+
+            break
+          }
+
+          case 'cmyk': {
+            c = interaction.options.getInteger('cyan')
+            m = interaction.options.getInteger('magenta')
+            y = interaction.options.getInteger('yellow')
+            k = interaction.options.getInteger('key')
+
+            cmyk = new misc.CMYK(c, m, y, k)
+            rgb = misc.Convert.toRGB(cmyk)
+            hex = misc.Convert.toHEX(rgb)
+            hsv = misc.Convert.toHSV(rgb)
+
+            break
+          }
+
+          case 'random': {
+            r = Math.floor(Math.random() * 255)
+            g = Math.floor(Math.random() * 255)
+            b = Math.floor(Math.random() * 255)
+
+            rgb = new misc.RGB(r, g, b)
+            hex = misc.Convert.toHEX(rgb)
+            hsv = misc.Convert.toHSV(rgb)
+            cmyk = misc.Convert.toCMYK(rgb)
+
+            break
+          }
         }
+
+        const color_embed = new MessageEmbed()
+        .setTitle('Color Conversion')
+        .setColor(`${hex}`)
+        .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
+        .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+        .setTimestamp()
+        .addFields(
+          {name: 'RGB', value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true},
+          {name: '​', value: `​`, inline: true},
+          {name: 'HEX', value: `${hex}`, inline: true},
+          {name: 'HSV', value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true},
+          {name: '​', value: `​`, inline: true},
+          {name: 'CMYK', value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true}
+        )
+        .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png`)
+
+        await interaction.reply({embeds: [color_embed]})
+        break
       }
     }
   }
