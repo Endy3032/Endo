@@ -178,7 +178,7 @@ module.exports = {
 
             const color_embed = new MessageEmbed()
             .setTitle('Color Conversion')
-            // .setColor(`#${hex}`)
+            .setColor(`${hex}`)
             .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
             .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
             .setTimestamp()
