@@ -17,6 +17,11 @@ module.exports = {
     symvalue = ['3.14']
 
     var expression = interaction.options.getString('expression')
+    if (expression.match(/([A-z])/g)) {
+      await interaction.reply('I don\'t think so dude stop doing this to me')
+      return
+    }
+
     var expression_2 = expression
     symbols.forEach((value, i) => {
       expression_2 = expression_2.replace(value, symvalue[i])
