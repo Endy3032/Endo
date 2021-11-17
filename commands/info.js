@@ -55,8 +55,8 @@ module.exports = {
           { name: 'AFK Timeout', value: `${guild.afkTimeout / 60} Minutes`, inline: true },
           { name: 'AFK Channel', value: guild.afkChannelId !== null ? guild.afkChannelId : 'None', inline: true }
         )
-        .setThumbnail(`https://cdn.discordapp.com/icons/${id}/${guild.icon}.png?size=4096`)
-        guild.banner !== null ? server_embed.setImage(`https://cdn.discordapp.com/banners/${id}/${guild.banner}.jpg?size=4096`) : null
+        .setThumbnail(`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=4096`)
+        guild.banner !== null ? server_embed.setImage(`https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096`) : null
 
         await interaction.reply({ embeds: [server_embed] })
         break
