@@ -174,6 +174,8 @@ module.exports = {
             hsv = misc.Convert.toHSV(rgb)
             cmyk = misc.Convert.toCMYK(rgb)
 
+            console.log(hex.substring(1, 7))
+
             const color_embed = new MessageEmbed()
             .setTitle('Color Conversion')
             // .setColor(`#${hex}`)
@@ -187,7 +189,7 @@ module.exports = {
               {name: 'HSV', value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true},
               {name: 'CMYK', value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true}
             )
-            .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 6)}/${hex.substring(1, 6)}.png`)
+            .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png`)
 
             await interaction.reply({embeds: [color_embed]})
 
