@@ -8,19 +8,18 @@ module.exports = {
   name: 'ready',
   once: true,
   async execute(client) {
-    index.log(`\`[${client.user.tag}]\` System Online`)
+    index.log(`Ready`)
 
-    // pinger = {
-    //   method: "HEAD",
-    //   url: "https://endyjs.enderhoang.repl.co/"
-    // }
+    servers = ['pinger', 'endyjs']
 
     function pinger() {
-      axios.head('https://endyjs.enderhoang.repl.co')
-      .catch(function(error) {
-        error.response
-        ? console.log(`${error.response.status} - Repl seems to be offline`)
-        : null
+      servers.forEach(server => {
+        axios.head(`https://${server}.enderhoang.repl.co`)
+        .catch(function(error) {
+          error.response
+          ? console.log(`${error.response.status} - Repl seems to be offline`)
+          : null
+        })
       })
     }
 

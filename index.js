@@ -16,10 +16,17 @@ const client = new Client({intents: [
 
 async function log (content) {
   const channel = client.channels.cache.get("769497610300948480");
-  log_content = `\`[${new Date().toLocaleString('default', {dateStyle: 'short', timeStyle: 'medium', hour12: false})}]\` ` + content
-  console.log(log_content)
-  logStream.write(log_content + '\n')
-  channel.send(log_content)
+  const date = new Date()
+  
+  readable = date.toLocaleString('default', {dateStyle: 'short', timeStyle: 'medium', hour12: false, timeZone: 'Asia/Ho_Chi_Minh'})
+  epoch = Math.floor(date.getTime()/1000)
+  
+  console_log = `[${readable}] ${content}`
+  discord_log = `[<t:${epoch}:d> <t:${epoch}:T>] ${content}`
+  
+  console.log(console_log)
+  logStream.write(console_log + '\n')
+  channel.send(discord_log)
 }
 
 client.commands = new Collection();
@@ -28,7 +35,7 @@ commandFiles.forEach(file => {
   const command = require(`./commands/${file}`);
   client.commands.set(command.data.name, command)
 })
-console.log(client.commands)
+// console.log(client.commands)
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 eventFiles.forEach(file => {

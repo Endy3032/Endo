@@ -20,18 +20,47 @@ module.exports = {
   
   async execute(interaction) {
     switch (interaction.options.getSubcommand()) {
-      case 'user':
-        const user = interaction.options.getUser('target')
+      case 'user': {
+        interaction.options.getUser('target') ? user = interaction.options.getUser('target') : user = interaction.user
+        
         const user_embed = new MessageEmbed()
-        .setTitle('User Info')
-        .setColor()
+        .setTitle(`User Info`)
+        .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
+        .addFields(
+          { name: 'Name', value: `${user.username}`, inline: true },
+          { name: 'Tag', value: `${user.discriminator}`, inline: true },
+          { name: 'ID', value: `${user.id}`, inline: false },
+        )
+        .setThumbnail(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096`)
+
     
-        user
-        ? await interaction.reply(`Username: ${user.username}\nID: ${user.id}`)
-        : await interaction.reply(`Your username: ${interaction.user.username}\nYour ID: ${interaction.user.id}`)
+        await interaction.reply({ embeds: [user_embed] })
+        break
+      }
       
-      case 'server':
-        await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`)
+      case 'server': {
+        guild = interaction.guild
+
+        const server_embed = new MessageEmbed()
+        .setTitle(`Server Info - ${guild.name} [${guild.id}]`)
+        .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
+        .setDescription(guild.description !== null ? `Server Description: ${guild.description}` : 'Server Description: none')
+        .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
+        .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+        .addFields(
+          { name: 'Owner', value: `<@${guild.ownerId}>`, inline: true },
+          { name: 'Verification Level', value: guild.verificationLevel.charAt(0).toUpperCase() + guild.verificationLevel.slice(1).toLowerCase(), inline: true },
+          { name: 'NSFW Level', value: guild.nsfwLevel.charAt(0).toUpperCase() + guild.nsfwLevel.slice(1).toLowerCase(), inline: true },
+          { name: 'Vanity URL', value: guild.vanityURLCode !== null ? guild.vanityURLCode : 'None', inline: true },
+          { name: 'AFK Timeout', value: `${guild.afkTimeout / 60} Minutes`, inline: true },
+          { name: 'AFK Channel', value: guild.afkChannelId !== null ? guild.afkChannelId : 'None', inline: true }
+        )
+        .setThumbnail(`https://cdn.discordapp.com/icons/${id}/${guild.icon}.png?size=4096`)
+        guild.banner !== null ? server_embed.setImage(`https://cdn.discordapp.com/banners/${id}/${guild.banner}.jpg?size=4096`) : null
+
+        await interaction.reply({ embeds: [server_embed] })
+        break
+      }
     }
 
     const msg = await interaction.fetchReply()
