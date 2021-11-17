@@ -6,7 +6,7 @@ dotenv.config()
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
-    // if (interaction.guildId !== process.env.GUILD) {return}
+    if (interaction.guildId !== process.env.GUILD) {return}
     // console.log(interaction)
 
     message = `[${interaction.user.tag} - #`
@@ -21,7 +21,7 @@ module.exports = {
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
     : (console.log(interaction), message += 'THIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
 
-    // index.log(message)
+    index.log(message)
 
     let commandName
     if (interaction.isCommand()) {
@@ -34,7 +34,7 @@ module.exports = {
     
     const command = interaction.client.commands.get(commandName)
 
-    // console.log(interaction)
+    console.log(interaction)
     // console.log(command)
     
     if (interaction.isCommand()) {

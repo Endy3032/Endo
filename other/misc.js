@@ -57,10 +57,6 @@ module.exports = {
       status: 'idle'
     },
     {
-      activities: [{ name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=CIfGUiICf8U' }],
-      status: 'idle'
-    },
-    {
       activities: [{ name: 'llusion - jealous', type: 2 }],
       status: 'idle'
     },
