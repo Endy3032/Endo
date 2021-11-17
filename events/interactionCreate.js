@@ -34,7 +34,7 @@ module.exports = {
     
     const command = interaction.client.commands.get(commandName)
 
-    console.log(interaction)
+    // console.log(interaction)
     // console.log(command)
     
     if (interaction.isCommand()) {
@@ -50,8 +50,8 @@ module.exports = {
       try {await command.buttonclick(interaction)}
       catch (error) {
         console.error(error);
-        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Button]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Button]', ephemeral: true })}
       }
     }
 
@@ -59,8 +59,8 @@ module.exports = {
       try {await command.menu(interaction)}
       catch (error) {
         console.error(error);
-        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu]', ephemeral: true })}
       }
     }
     /* if (!interaction.isCommand()) return;

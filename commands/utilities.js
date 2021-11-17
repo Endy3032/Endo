@@ -5,7 +5,6 @@ const { SlashCommandBuilder } = require('@discordjs/builders')
 
 const colors = misc.colors
 
-
 module.exports = {
   data: new SlashCommandBuilder()
   .setName('utils')
@@ -26,7 +25,7 @@ module.exports = {
         )
       .addStringOption(option => option
         .setName('location')
-        .setDescription('The location to get the weather data')
+        .setDescription('The location to get the weather data [string]')
         .setRequired(true)
       )
       .addBooleanOption(option => option
@@ -79,31 +78,30 @@ module.exports = {
     .addSubcommand(subcommand => subcommand
       .setName('rgb')
       .setDescription('Input RGB color type')
-      .addStringOption(option => option
+      .addIntegerOption(option => option
         .setName('red')
-        .setDescription('The red value of the color')
+        .setDescription('The red value of the color [integer 0~255]')
         .setRequired(true)
       )
-      .addStringOption(option => option
+      .addIntegerOption(option => option
         .setName('green')
-        .setDescription('The green value of the color')
+        .setDescription('The green value of the color [integer 0~255]')
         .setRequired(true)
       )
-      .addStringOption(option => option
+      .addIntegerOption(option => option
         .setName('blue')
-        .setDescription('The blue value of the color')
+        .setDescription('The blue value of the color [integer 0~255]')
         .setRequired(true)
       )
     )
   ),
 
   async execute(interaction) {
-    await interaction.deferReply()
-
     switch(interaction.options._group) {
-      case 'weather':
+      case 'weather': {
+        await interaction.deferReply()
         switch (interaction.options._subcommand) {
-          case 'current':
+          case 'current': {
             location = interaction.options.getString('location')
             console.log(interaction.options.getBoolean('is_imperial'))
             if (interaction.options.getBoolean('is_imperial')) {
@@ -148,12 +146,57 @@ module.exports = {
 
               interaction.editReply({ embeds: [weather_embed] })
             })
-            .catch(error => {
-              interaction.editReply({ content: `Error: City not found. Check your spelling?`, ephemeral: true })
+            .catch(_ => {
+              interaction.editReply({ content: `The city you provided is not found. Maybe check your spelling?`, ephemeral: true })
             })
 
-              
+            break
+          }
         }
+
+        break
+      }
+
+      case 'color': {
+        switch (interaction.options._subcommand) {
+          case 'rgb': {
+            r = interaction.options.getInteger('red')
+            g = interaction.options.getInteger('green')
+            b = interaction.options.getInteger('blue')
+
+            // if (r <= 255 && g <= 255 && b <= 255) {
+            //   interaction.reply({ content: `${r}, ${g}, ${b} = #${r.toString(16)}${g.toString(16)}${b.toString(16)}` })
+            // } else {
+            //   interaction.reply({ content: 'The color values you provided is not valid. They must be between 0 and 255.', ephemeral: true })
+            // }
+            rgb = new misc.RGB(r, g, b)
+            hex = misc.Convert.toHEX(rgb)
+            hsv = misc.Convert.toHSV(rgb)
+            cmyk = misc.Convert.toCMYK(rgb)
+
+            const color_embed = new MessageEmbed()
+            .setTitle('Color Conversion')
+            // .setColor(`#${hex}`)
+            .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
+            .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+            .setTimestamp()
+            .addFields(
+              {name: 'RGB', value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true},
+              {name: 'HEX', value: `${hex}`, inline: true},
+              {name: '​', value: `​`, inline: true},
+              {name: 'HSV', value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true},
+              {name: 'CMYK', value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true}
+            )
+            .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 6)}/${hex.substring(1, 6)}.png`)
+
+            await interaction.reply({embeds: [color_embed]})
+
+            break
+          }
+
+        break
+        }
+      }
     }
   }
 }
