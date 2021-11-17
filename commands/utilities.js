@@ -184,8 +184,8 @@ module.exports = {
             .setTimestamp()
             .addFields(
               {name: 'RGB', value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true},
-              {name: 'HEX', value: `${hex}`, inline: true},
               {name: '​', value: `​`, inline: true},
+              {name: 'HEX', value: `${hex}`, inline: true},
               {name: 'HSV', value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true},
               {name: 'CMYK', value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true}
             )

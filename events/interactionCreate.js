@@ -1,12 +1,17 @@
 const index = require("../index.js")
 const dotenv = require('dotenv')
+const os = require('os')
 dotenv.config()
 
 
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
-    if (interaction.guildId !== process.env.GUILD) {return}
+    if (os.hostname().indexOf('local') > -1) {
+      if (interaction.guildId !== process.env.GUILD) {return}
+    } else {
+      if (interaction.guildId == process.env.GUILD) {return}
+    }
     // console.log(interaction)
 
     message = `[${interaction.user.tag} - #`
