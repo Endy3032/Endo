@@ -191,8 +191,15 @@ module.exports = {
 
         switch(interaction.options._subcommand) {
           case 'varied': {
+            turn = false
             for (i = 0; i < text.length; i++) {
-              i % 2 == 0 ? result += text[i] : result += text[i].toUpperCase()
+              if (text[i] == ' ') {
+                result += ' '
+                turn = !turn
+              } else {
+                turn ? cond = i % 2 == 0 : cond = i % 2 !== 0
+                cond ? result += text[i].toUpperCase() : result += text[i]
+              }
             }
             break
           }
