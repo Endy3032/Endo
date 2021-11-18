@@ -1,7 +1,6 @@
-const misc = require("../other/misc.js")
+const { colors } = require("../other/misc.js")
 const { SlashCommandBuilder } = require('@discordjs/builders')
 const { MessageEmbed } = require('discord.js')
-const colors = misc.colors
 
 
 module.exports = {

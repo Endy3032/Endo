@@ -1,9 +1,9 @@
 const fs = require("fs")
-const misc = require("../other/misc.js")
+const { colors } = require("../other/misc.js")
 const { SlashCommandBuilder } = require('@discordjs/builders')
 const { MessageActionRow, MessageEmbed, MessageSelectMenu } = require('discord.js')
 
-const colors = misc.colors
+
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.startsWith('help'))
 var names = ['help']
 var descs = ['Show the list of all available commands']

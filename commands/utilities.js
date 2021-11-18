@@ -1,9 +1,8 @@
 var axios = require('axios').default
-const misc = require("../other/misc.js")
+const { colors } = require("../other/misc.js")
 const { MessageEmbed } = require('discord.js')
 const { SlashCommandBuilder } = require('@discordjs/builders')
 
-const colors = misc.colors
 
 module.exports = {
   data: new SlashCommandBuilder()

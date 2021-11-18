@@ -1,8 +1,5 @@
-const misc = require("../other/misc.js")
 const { MessageEmbed } = require('discord.js')
 const { SlashCommandBuilder } = require('@discordjs/builders')
-const { t } = require("../other/misc.js")
-const colors = misc.colors
 
 
 module.exports = {
@@ -91,6 +88,73 @@ module.exports = {
         .setRequired(false)
       )
     )
+  )
+  .addSubcommandGroup(group => group
+    .setName('format')
+    .setDescription('Reformat a text to any style you want')
+    .addSubcommand(subcommand => subcommand
+      .setName('varied')
+      .setDescription('mAkE yOuR tExT uSe VaRiEd CaSe')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('smallcaps')
+      .setDescription('Mᴀᴋᴇ ʏᴏᴜʀ ᴛᴇxᴛ ᴜsᴇ sᴍᴀʟʟ ᴄᴀᴘs')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('superscript')
+      .setDescription('ᵐᵃᵏᵉ ʸᵒᵘʳ ᵗᵉˣᵗ ᵗᶦⁿʸ (make your text tiny)')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('upsidedown')
+      .setDescription('uʍopǝpᴉsdn ʇxǝʇ ɹnoʎ uɹnʇ (turn your text upsidedown)')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('fullwidth')
+      .setDescription('Ｍａｋｅ　ｙｏｕｒ　ｔｅｘｔ　ｆｕｌｌ　ｗｉｄｔｈ')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('leet')
+      .setDescription('1337ify y0uЯ 73x7 (leetify your text)')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
+    .addSubcommand(subcommand => subcommand
+      .setName('japanese')
+      .setDescription('从卂长乇　丫口凵尺　丅乇乂丅　乚口口长丂　乚工长乇　丁卂尸卂ん乇丂乇 (make your text looks like japanese)')
+      .addStringOption(option => option
+        .setName('text')
+        .setDescription('The text to be formatted [string]')
+        .setRequired(true)
+      )
+    )
   ),
 
   async execute(interaction) {
@@ -107,6 +171,73 @@ module.exports = {
         .setColor('#2f3136')
 
         await interaction.reply({embeds: [achievement_embed]})
+        break
+      }
+
+      case 'format': {
+        text = interaction.options.getString('text')
+        result = ''
+        og = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}";
+        sc = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}";
+        ss = " !\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁνᵂˣʸᶻÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖᑫʳˢᵗᵘᵛʷˣʸᶻáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}";
+        ud = " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{";
+        fw = "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝";
+        lt = " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}";
+        jp = "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}";
+
+        switch(interaction.options._subcommand) {
+          case 'varied': {
+            for (i = 0; i < text.length; i++) {
+              i % 2 == 0 ? result += text[i] : result += text[i].toUpperCase()
+            }
+            break
+          }
+
+          case 'smallcaps': {
+            for (i = 0; i < text.length; i++) {
+              result += sc[og.indexOf(text[i])]
+            }
+            break
+          }
+
+          case 'superscript': {
+            for (i = 0; i < text.length; i++) {
+              result += ss[og.indexOf(text[i])]
+            }
+            break
+          }
+
+          case 'upsidedown': {
+            for (i = 0; i < text.length; i++) {
+              result += ud[og.indexOf(text[i])]
+            }
+            break
+          }
+          
+          case 'fullwidth': {
+            for (i = 0; i < text.length; i++) {
+              result += fw[og.indexOf(text[i])]
+            }
+            break
+          }
+          
+          case 'leet': {
+            for (i = 0; i < text.length; i++) {
+              result += lt[og.indexOf(text[i])]
+            }
+            break
+          }
+          
+          case 'japanese': {
+            for (i = 0; i < text.length; i++) {
+              result += jp[og.indexOf(text[i])]
+            }
+            break
+          }
+
+        }
+        
+        await interaction.reply(`${interaction.user.username}#${interaction.user.discriminator} ${result}`)
         break
       }
     }
