@@ -1,5 +1,5 @@
 var axios = require('axios').default
-const { colors } = require("../other/misc.js")
+const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
 const { MessageEmbed } = require('discord.js')
 const { SlashCommandBuilder } = require('@discordjs/builders')
 
@@ -219,10 +219,10 @@ module.exports = {
             g = interaction.options.getInteger('green')
             b = interaction.options.getInteger('blue')
 
-            rgb = new misc.RGB(r, g, b)
-            hex = misc.Convert.toHEX(rgb)
-            hsv = misc.Convert.toHSV(rgb)
-            cmyk = misc.Convert.toCMYK(rgb)
+            rgb = new RGB(r, g, b)
+            hex = Convert.toHEX(rgb)
+            hsv = Convert.toHSV(rgb)
+            cmyk = Convert.toCMYK(rgb)
 
             break
           }
@@ -231,9 +231,9 @@ module.exports = {
             hex = interaction.options.getString('value')
             hex.startsWith('#') && hex.length == 7 ? hex = hex.substring(1, 7) : hex
 
-            rgb = misc.Convert.toRGB(hex)
-            hsv = misc.Convert.toHSV(rgb)
-            cmyk = misc.Convert.toCMYK(rgb)
+            rgb = Convert.toRGB(hex)
+            hsv = Convert.toHSV(rgb)
+            cmyk = Convert.toCMYK(rgb)
             hex = `#${hex}`
 
             break
@@ -244,10 +244,10 @@ module.exports = {
             s = interaction.options.getInteger('saturation')
             v = interaction.options.getInteger('value')
 
-            hsv = new misc.HSV(h, s, v)
-            rgb = misc.Convert.toRGB(hsv)
-            hex = misc.Convert.toHEX(rgb)
-            cmyk = misc.Convert.toCMYK(rgb)
+            hsv = new HSV(h, s, v)
+            rgb = Convert.toRGB(hsv)
+            hex = Convert.toHEX(rgb)
+            cmyk = Convert.toCMYK(rgb)
 
             break
           }
@@ -258,10 +258,10 @@ module.exports = {
             y = interaction.options.getInteger('yellow')
             k = interaction.options.getInteger('key')
 
-            cmyk = new misc.CMYK(c, m, y, k)
-            rgb = misc.Convert.toRGB(cmyk)
-            hex = misc.Convert.toHEX(rgb)
-            hsv = misc.Convert.toHSV(rgb)
+            cmyk = new CMYK(c, m, y, k)
+            rgb = Convert.toRGB(cmyk)
+            hex = Convert.toHEX(rgb)
+            hsv = Convert.toHSV(rgb)
 
             break
           }
@@ -271,10 +271,10 @@ module.exports = {
             g = Math.floor(Math.random() * 255)
             b = Math.floor(Math.random() * 255)
 
-            rgb = new misc.RGB(r, g, b)
-            hex = misc.Convert.toHEX(rgb)
-            hsv = misc.Convert.toHSV(rgb)
-            cmyk = misc.Convert.toCMYK(rgb)
+            rgb = new RGB(r, g, b)
+            hex = Convert.toHEX(rgb)
+            hsv = Convert.toHSV(rgb)
+            cmyk = Convert.toCMYK(rgb)
 
             break
           }
