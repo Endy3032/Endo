@@ -12,7 +12,7 @@ module.exports = {
     } else {
       if (interaction.guildId == process.env.GUILD) {return}
     }
-    console.log(interaction)
+    // console.log(interaction)
 
     message = `[${interaction.user.tag} - `
     interaction.guildId
@@ -28,13 +28,13 @@ module.exports = {
 
     index.log(message)
 
-    // let commandName
-    //   interaction.isCommand() ? commandName = interaction.commandName
-    // : interaction.isButton() ? commandName = interaction.message.interaction.commandName
-    // : interaction.isSelectMenu() ? commandName = interaction.customId.slice(0, -5)
-    // : null
+    let commandName
+      interaction.isCommand() ? commandName = interaction.commandName
+    : interaction.isButton() ? commandName = interaction.message.interaction.commandName
+    : interaction.isSelectMenu() ? commandName = interaction.customId.slice(0, -5)
+    : null
 
-    // const command = interaction.client.commands.get(commandName)
+    const command = interaction.client.commands.get(commandName)
 
     // console.log(command)
     
