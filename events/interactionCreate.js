@@ -12,7 +12,7 @@ module.exports = {
     } else {
       if (interaction.guildId == process.env.GUILD) {return}
     }
-    console.log(interaction)
+    // console.log(interaction)
 
     message = `[${interaction.user.tag} - `
     interaction.guildId
