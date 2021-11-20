@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 
@@ -7,7 +8,15 @@ module.exports = {
     .setDescription('Get the bot latency info'),
 	async execute(interaction) {
     const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
-    interaction.editReply(`Pong!\nWebsocket Latency: ${interaction.client.ws.ping}ms\nRoundtrip Latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms`);
+
+    const pingEmbed = new MessageEmbed()
+    .setTitle('Pong!')
+    .addFields(
+      { name: 'Websocket Latency', value: `${interaction.client.ws.ping}ms`, inline: false },
+      { name: 'Roundtrip Latency', value: `${sent.createdTimestamp - interaction.createdTimestamp}ms`, inline: false }
+    )
+
+    await interaction.editReply({content: null, embeds: [pingEmbed]})
   },
 };
 

@@ -164,17 +164,17 @@ module.exports = {
   async execute(interaction) {
     switch(interaction.options._group) {
       case 'achievement': {
-        default_title = ['Achievement Get!', 'Advancement Made!', 'Goal Reached!', 'Challenge Complete!']
+        var defaultTitle = ['Achievement Get!', 'Advancement Made!', 'Goal Reached!', 'Challenge Complete!']
 
         interaction.options.getString('icon') !== '0' ? icon = interaction.options.getString('icon') : icon = Math.floor(Math.random() * 39)
         content = interaction.options.getString('content')
-        interaction.options.getString('title') !== null ? title = interaction.options.getString('title') : title = default_title[Math.floor(Math.random() * default_title.length)]
+        interaction.options.getString('title') !== null ? title = interaction.options.getString('title') : title = defaultTitle[Math.floor(Math.random() * defaultTitle.length)]
         
-        achievement_embed = new MessageEmbed()
+        achievementEmbed = new MessageEmbed()
         .setImage(`https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}`)
         .setColor('#2f3136')
 
-        await interaction.reply({embeds: [achievement_embed]})
+        await interaction.reply({embeds: [achievementEmbed]})
         break
       }
 
@@ -278,14 +278,14 @@ module.exports = {
             "Most of these facts are written by Adnagaporp#1965"
           ]
 
-          const fact_embed = new MessageEmbed()
+          const factEmbed = new MessageEmbed()
           .setTitle('Facts')
           .setDescription('Fresh out of the oven.')
           .addField('The fact of the second is...', facts[Math.floor(Math.random() * facts.length)], false)
           .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
           .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
 
-          await interaction.reply({embeds: [fact_embed]})
+          await interaction.reply({embeds: [factEmbed]})
           break
         }
       }

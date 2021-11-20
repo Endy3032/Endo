@@ -29,7 +29,7 @@ names.forEach((x, i) => {
   options.push(option)
 })
 
-const help_menu = new MessageActionRow()
+const helpMenu = new MessageActionRow()
   .addComponents(
     new MessageSelectMenu()
       .setCustomId('help_menu')
@@ -43,7 +43,7 @@ module.exports = {
   .setDescription(descs[0]),
   
   async execute(interaction) {
-    const help_main = new MessageEmbed()
+    const helpMain = new MessageEmbed()
       .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
       .setTitle('Help')
       .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
@@ -52,10 +52,10 @@ module.exports = {
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
       
-    await interaction.reply({ embeds: [help_main], components: [help_menu] })
+    await interaction.reply({ embeds: [helpMain], components: [helpMenu] })
   },
   
-  async menu(interaction) {
+  async menuchoose(interaction) {
     index = names.indexOf(interaction.values[0].slice(0, -4))
     
     const help = new MessageEmbed()
@@ -72,7 +72,7 @@ module.exports = {
     .setTimestamp()
     .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
     
-    await interaction.update({ embeds: [help], components: [help_menu] })
+    await interaction.update({ embeds: [help], components: [helpMenu] })
   }
 }
 

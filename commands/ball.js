@@ -48,7 +48,7 @@ module.exports = {
              : question.endsWith('\​') ? responses[2][Math.floor(Math.random() * responses[2].length)]
              : responses[index][Math.floor(Math.random() * responses[index].length)]
 
-    ball_embed = new MessageEmbed()
+    ballEmbed = new MessageEmbed()
     .setTitle('Magic 8-Ball')
     .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
     .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
@@ -58,7 +58,7 @@ module.exports = {
       { name: ':8ball: Answer', value: response, inline: false }
     )
 
-    await interaction.reply({ embeds: [ball_embed] })
+    await interaction.reply({ embeds: [ballEmbed] })
   }
 }
 

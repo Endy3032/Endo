@@ -22,13 +22,13 @@ module.exports = {
       return
     }
 
-    var expression_2 = expression
+    var expression2 = expression
     symbols.forEach((value, i) => {
-      expression_2 = expression_2.replace(value, symvalue[i])
+      expression2 = expression2.replace(value, symvalue[i])
     })
 
-    await interaction.reply({ content: `${expression} = ${Math.exec(expression_2)}` })
-    console.log(expression + ' = ' + Math.exec(expression_2))
+    await interaction.reply({ content: `${expression} = ${Math.exec(expression2)}` })
+    console.log(expression + ' = ' + Math.exec(expression2))
   }
 }
 

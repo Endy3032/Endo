@@ -12,63 +12,57 @@ module.exports = {
     } else {
       if (interaction.guildId == process.env.GUILD) {return}
     }
-    // console.log(interaction)
+    console.log(interaction)
 
-    message = `[${interaction.user.tag} - #`
+    message = `[${interaction.user.tag} - `
     interaction.guildId
-    ? message += `${interaction.channel.name}] - `
+    ? message += `${interaction.guild.name} #${interaction.channel.name}] - `
     : message += `DM] - `
 
-    interaction.isCommand() ? message += `Triggered the [${interaction.commandName}] command`
-    : interaction.isCommand() && interaction.options._group && interaction.options._subcommand ? message += `Triggered the [${interaction.commandName} - ${interation.options._group} - ${interaction.options._subcommand}] command`
-    : interaction.isCommand() && interaction.options._subcommand ? message += `Triggered the [${interaction.commandName}]'s ${interaction.options._subcommand}] command`
+    interaction.isCommand() && interaction.options._group && interaction.options._subcommand ? message += `Ran the [${interaction.commandName}:${interaction.options._group}:${interaction.options._subcommand}] command`
+    : interaction.isCommand() && interaction.options._subcommand ? message += `Ran the [${interaction.commandName}:${interaction.options._subcommand}] command`
+    : interaction.isCommand() ? message += `Ran the [${interaction.commandName}] command`
     : interaction.isButton() ? message += `Pushed the [${interaction.message.interaction.commandName}]'s command [${interaction.customId}] button`
     : interaction.isSelectMenu() ? message += `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
-    : (console.log(interaction), message += 'THIS INTERACTION IS NOT RECORDED PLEASE DO IT IMMEDIATELY')
+    : (console.log(interaction), message += 'This interaction type hasn\'t been logged yet. <@554680253876928512>')
 
     index.log(message)
 
-    let commandName
-    if (interaction.isCommand()) {
-      commandName = interaction.commandName
-    } else if (interaction.isButton()) {
-      commandName = interaction.message.interaction.commandName
-    } else if (interaction.isSelectMenu()) {
-      commandName = interaction.customId.slice(0, -5)
-    }
-    
-    const command = interaction.client.commands.get(commandName)
+    // let commandName
+    //   interaction.isCommand() ? commandName = interaction.commandName
+    // : interaction.isButton() ? commandName = interaction.message.interaction.commandName
+    // : interaction.isSelectMenu() ? commandName = interaction.customId.slice(0, -5)
+    // : null
 
-    // console.log(interaction)
+    // const command = interaction.client.commands.get(commandName)
+
     // console.log(command)
     
     if (interaction.isCommand()) {
       try {await command.execute(interaction)}
       catch (error) {
         console.error(error);
-        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command]', ephemeral: true })}
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command Error]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command Error]', ephemeral: true })}
       }
     }
 
     if (interaction.isButton()) {
-      try {await command.buttonclick(interaction)}
+      try {await command.btnpress(interaction)}
       catch (error) {
         console.error(error);
-        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Button]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Button]', ephemeral: true })}
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Button Error]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Button Error]', ephemeral: true })}
       }
     }
 
     if (interaction.isSelectMenu()) {
-      try {await command.menu(interaction)}
+      try {await command.menuchoose(interaction)}
       catch (error) {
         console.error(error);
-        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu]', ephemeral: true })}
+        try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu Error]', ephemeral: true })}
+        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu Error]', ephemeral: true })}
       }
     }
-    /* if (!interaction.isCommand()) return;
-	  console.log(interaction); */
 	},
 };

@@ -179,7 +179,7 @@ module.exports = {
 
             await axios.request(request)
             .then(response => {
-              const weather_embed = new MessageEmbed()
+              const weatherEmbed = new MessageEmbed()
                 .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
                 .setTitle(`${response.data.name} - ${response.data.sys.country} (GMT${response.data.timezone > 0 ? '+' : ''}${response.data.timezone/3600})`)
                 .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
@@ -199,7 +199,7 @@ module.exports = {
                 .setFooter('OpenWeatherMap', `https://pbs.twimg.com/profile_images/1173919481082580992/f95OeyEW_400x400.jpg`)
                 .setTimestamp()
 
-              interaction.editReply({ embeds: [weather_embed] })
+              interaction.editReply({ embeds: [weatherEmbed] })
             })
             .catch(_ => {
               interaction.editReply({ content: `The city you provided is not found. Maybe check your spelling?`, ephemeral: true })
@@ -280,7 +280,7 @@ module.exports = {
           }
         }
 
-        const color_embed = new MessageEmbed()
+        const colorEmbed = new MessageEmbed()
         .setTitle('Color Conversion')
         .setColor(`${hex}`)
         .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
@@ -296,7 +296,7 @@ module.exports = {
         )
         .setThumbnail(`https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png`)
 
-        await interaction.reply({embeds: [color_embed]})
+        await interaction.reply({embeds: [colorEmbed]})
         break
       }
     }

@@ -22,7 +22,7 @@ module.exports = {
       case 'user': {
         interaction.options.getUser('target') ? user = interaction.options.getUser('target') : user = interaction.user
         
-        const user_embed = new MessageEmbed()
+        const userEmbed = new MessageEmbed()
         .setTitle(`User Info`)
         .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
         .addFields(
@@ -33,14 +33,14 @@ module.exports = {
         .setThumbnail(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096`)
 
     
-        await interaction.reply({ embeds: [user_embed] })
+        await interaction.reply({ embeds: [userEmbed] })
         break
       }
       
       case 'server': {
         guild = interaction.guild
 
-        const server_embed = new MessageEmbed()
+        const serverEmbed = new MessageEmbed()
         .setTitle(`Server Info - ${guild.name} [${guild.id}]`)
         .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
         .setDescription(guild.description !== null ? `Server Description: ${guild.description}` : 'Server Description: none')
@@ -55,9 +55,9 @@ module.exports = {
           { name: 'AFK Channel', value: guild.afkChannelId !== null ? guild.afkChannelId : 'None', inline: true }
         )
         .setThumbnail(`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=4096`)
-        guild.banner !== null ? server_embed.setImage(`https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096`) : null
+        guild.banner !== null ? serverEmbed.setImage(`https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096`) : null
 
-        await interaction.reply({ embeds: [server_embed] })
+        await interaction.reply({ embeds: [serverEmbed] })
         break
       }
     }

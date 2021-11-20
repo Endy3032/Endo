@@ -17,8 +17,8 @@ module.exports = {
     
     if (interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
       interaction.channel.bulkDelete(amount)
-        .then(console.log(`Cleared ${amount} messages`))
-        .catch(console.error);
+      .then(console.log(`Cleared ${amount} messages`))
+      .catch(console.error)
       await interaction.reply({ content: `Cleared \`${amount}\` messages`, ephemeral: true })
     } else {
       await interaction.reply({ content: `You cannot use the clear command`, ephemeral: false })
