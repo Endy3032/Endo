@@ -14,27 +14,39 @@ module.exports = {
   ),
   async execute(interaction) {
     responses = [
-      "It's certain.",
-      "It's decidedly so.",
-      "Without a doubt.",
-      "Yes, definitely.",
-      "You may rely on it.",
-      "As i see it, yes.",
-      "Most likely.",
-      "Outlook good.",
-      "Yes.",
-      "Signs point to Yes.",
-      "Reply hazy, try again.",
-      "Ask again later.",
-      "Better not tell you now.",
-      "Can't predict now",
-      "Concentrate and ask again",
-      "Don't count on it.",
-      "My reply is no.",
-      "My sources say no.",
-      "Outlook not so good.",
-      "Very doubtful"
+      yes = [
+        "It's certain.",
+        "It's decidedly so.",
+        "Without a doubt.",
+        "Yes, definitely.",
+        "You may rely on it.",
+        "As i see it, yes.",
+        "Most likely.",
+        "Outlook good.",
+        "Yes.",
+        "Signs point to Yes.",
+      ],
+      neutral = [
+        "Reply hazy, try again.",
+        "Ask again later.",
+        "Better not tell you now.",
+        "Can't predict now",
+        "Concentrate and ask again",
+      ],
+      no = [
+        "Don't count on it.",
+        "My reply is no.",
+        "My sources say no.",
+        "Outlook not so good.",
+        "Very doubtful",
+      ]
     ]
+
+    question = interaction.options.getString('question')
+    index = Math.floor(Math.random() * 3)
+    response = question.endsWith('​') ? responses[0][Math.floor(Math.random() * responses[0].length)]
+             : question.endsWith('\​') ? responses[2][Math.floor(Math.random() * responses[2].length)]
+             : responses[index][Math.floor(Math.random() * responses[index].length)]
 
     ball_embed = new MessageEmbed()
     .setTitle('Magic 8-Ball')
@@ -42,8 +54,8 @@ module.exports = {
     .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
     .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
     .addFields(
-      { name: ':question: Question', value: interaction.options.getString('question'), inline: false },
-      { name: ':8ball: Answer', value: `${responses[Math.floor(Math.random() * responses.length)]}`, inline: false }
+      { name: ':question: Question', value: question, inline: false },
+      { name: ':8ball: Answer', value: response, inline: false }
     )
 
     await interaction.reply({ embeds: [ball_embed] })
