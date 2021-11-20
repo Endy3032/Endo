@@ -27,10 +27,13 @@ module.exports = {
 
     times > 10 ? (times = 10, response += '\nNote: 10 times maximum') : times
     response = `Dispatching "${message}" ${times} times`
-    await interaction.reply({content: response, ephemeral: true})
-
-    for (let i = 0; i < times; i++) {
-      rep(message, i)
+    
+    if (interaction.guild) {
+      await interaction.reply({content: response, ephemeral: true})
+      for (let i = 0; i < times; i++) {rep(message, i)}
+    }
+    else {
+      await interaction.reply("This command can't be used in DM or any other places except for server channels.")
     }
   },
 };
