@@ -44,8 +44,8 @@ module.exports = {
 
     question = interaction.options.getString('question')
     index = Math.floor(Math.random() * 3)
-    response = question.endsWith('​') ? responses[0][Math.floor(Math.random() * responses[0].length)]
-             : question.endsWith('\​') ? responses[2][Math.floor(Math.random() * responses[2].length)]
+    response = question.endsWith('\​') ? responses[2][Math.floor(Math.random() * responses[2].length)]
+             : question.endsWith('​') ? responses[0][Math.floor(Math.random() * responses[0].length)]
              : responses[index][Math.floor(Math.random() * responses[index].length)]
 
     ballEmbed = new MessageEmbed()
