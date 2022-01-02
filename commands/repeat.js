@@ -1,23 +1,26 @@
-const { promisify } = require('util')
-const { SlashCommandBuilder } = require('@discordjs/builders');
-
-
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('repeat')
-    .setDescription('Repeat something')
-    .addStringOption(option => option
-      .setName('message')
-      .setDescription('The message to repeat [string]')
-      .setRequired(true)
-    )
-    .addIntegerOption(option => option
-      .setName('times')
-      .setDescription('The number of times to repeat the message [int 1~10, default 3]')
-      .setRequired(false)
-    ),
+  cmd: {
+    name: "repeat",
+    description: "Repeat something",
+    options: [
+      {
+        type: 3,
+        name: "message",
+        description: "The message to repeat [string]",
+        required: true
+      },
+      {
+        type: 4,
+        name: "times",
+        description: "The number of times to repeat the message [int 1~10, default 3]",
+        "min-value": 1,
+        "max-value": 10,
+        required: false
+      }
+    ]
+  },
 
-	async execute(interaction) {
+  async execute(interaction) {
     function rep(msg, x) {
       setTimeout(function() {interaction.channel.send(msg)}, 500 * x)
     }
@@ -38,9 +41,9 @@ module.exports = {
   },
 };
 
-module.exports.help = {
-  name: module.exports.data.name,
-  description: module.exports.data.description,
-  arguments: "none",
-  usage: '`/' + module.exports.data.name + '`'
-}
+// module.exports.help = {
+//   name: module.exports.data.name,
+//   description: module.exports.data.description,
+//   arguments: "none",
+//   usage: '`/' + module.exports.data.name + '`'
+// }

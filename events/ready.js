@@ -2,7 +2,7 @@ var axios = require("axios").default
 const index = require("../index.js")
 const misc = require("../other/misc.js")
 const activities = misc.activities
-
+const os = require('os')
 
 module.exports = {
   name: 'ready',
@@ -14,7 +14,7 @@ module.exports = {
 
     function pinger() {
       servers.forEach(server => {
-        axios.head(`https://${server}.enderhoang.repl.co`)
+        axios.head(`https://${server}.endy3032.repl.co`)
         .catch(function(error) {
           error.response
           ? console.log(`${error.response.status} - Repl seems to be offline`)
@@ -24,20 +24,21 @@ module.exports = {
     }
 
     setInterval(() => {
-      activity = activities[Math.floor(Math.random() * activities.length)]
-      client.user.setPresence(activity)
-      
-      act_type = activity['activities'][0]['type']
-      act_name = activity['activities'][0]['name']
-      type_str = ['Playing', 'Streaming', 'Listening to', 'Watching']
-      
-      act_name === 'lofi'
-      ? index.log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity['activities'][0]['url']}`)
-      : index.log(`Current Status: ${type_str[act_type]} ${act_name}`)
-
+      if (!(os.hostname().indexOf('local') > -1)) {
+        activity = activities[Math.floor(Math.random() * activities.length)]
+        client.user.setPresence(activity)
+        
+        act_type = activity['activities'][0]['type']
+        act_name = activity['activities'][0]['name']
+        type_str = ['Playing', 'Streaming', 'Listening to', 'Watching']
+        
+        act_name === 'lofi'
+        ? index.log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity['activities'][0]['url']}`)
+        : index.log(`Current Status: ${type_str[act_type]} ${act_name}`)
+      }
       pinger()
-    }, 900000)
-    
+    }, 300000)
+
     pinger()
     client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
 

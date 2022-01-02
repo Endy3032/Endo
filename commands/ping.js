@@ -1,12 +1,12 @@
 const { MessageEmbed } = require('discord.js')
-const { SlashCommandBuilder } = require('@discordjs/builders');
-
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('ping')
-    .setDescription('Get the bot latency info'),
-	async execute(interaction) {
+  cmd: {
+    name: "ping",
+    description: "Get the bot latency info",
+  },
+
+  async execute(interaction) {
     const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
 
     const pingEmbed = new MessageEmbed()
@@ -20,9 +20,9 @@ module.exports = {
   },
 };
 
-module.exports.help = {
-  name: module.exports.data.name,
-  description: module.exports.data.description,
-  arguments: "none",
-  usage: '`/' + module.exports.data.name + '`'
-}
+// module.exports.help = {
+//   name: module.exports.data.name,
+//   description: module.exports.data.description,
+//   arguments: "none",
+//   usage: '`/' + module.exports.data.name + '`'
+// }

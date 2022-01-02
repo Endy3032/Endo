@@ -4,6 +4,7 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('fs')
 
 dotenv.config();
+// const commands = [].map(command => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 

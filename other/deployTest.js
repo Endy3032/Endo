@@ -10,7 +10,7 @@ const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
+console.log(commandFiles)
 commandFiles.forEach(command => {
   const cmd = require(`../commands/${command}`);
   commands.push(cmd.cmd);
@@ -18,14 +18,14 @@ commandFiles.forEach(command => {
 
 commands.forEach(command => {
   command.description = `[GUILD!!!!!] ${command.description} [GUILD!!!!!]`
-  command.options.forEach(option => {
+  if (command.options) {command.options.forEach(option => {
     option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
     if (option.options) {
       option.options.forEach(suboption => {
         suboption.description = `[GUILD!!!!!] ${suboption.description} [GUILD!!!!!]`
       })
     }
-  })
+  })}
 
   // DEBUG ONLY
   // console.log(command)

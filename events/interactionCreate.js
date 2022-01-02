@@ -3,7 +3,6 @@ const dotenv = require('dotenv')
 const os = require('os')
 dotenv.config()
 
-
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {

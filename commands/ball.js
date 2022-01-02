@@ -1,17 +1,20 @@
-const { colors } = require('../other/misc.js');
-const { MessageEmbed } = require('discord.js')
-const { SlashCommandBuilder } = require('@discordjs/builders')
-
+const { colors } = require("../other/misc.js");
+const { MessageEmbed } = require("discord.js")
 
 module.exports = {
-  data: new SlashCommandBuilder()
-  .setName('8ball')
-  .setDescription('Ask the 8-Ball anything')
-  .addStringOption(option => option
-    .setName('question')
-    .setDescription('The question to ask the 8-Ball [string]')
-    .setRequired(true)
-  ),
+  cmd: {
+    name: "8ball",
+    description: "Ask the 8-Ball anything",
+    options: [
+      {
+        type: 3,
+        name: "question",
+        description: "The question to ask the 8-Ball [string]",
+        required: true
+      }
+    ]
+  },
+
   async execute(interaction) {
     responses = [
       yes = [
@@ -42,14 +45,14 @@ module.exports = {
       ]
     ]
 
-    question = interaction.options.getString('question')
+    question = interaction.options.getString("question")
     index = Math.floor(Math.random() * 3)
-    response = question.endsWith('\​') ? responses[2][Math.floor(Math.random() * responses[2].length)]
-             : question.endsWith('​') ? responses[0][Math.floor(Math.random() * responses[0].length)]
+    response = question.endsWith("\​") ? responses[2][Math.floor(Math.random() * responses[2].length)]
+             : question.endsWith("​") ? responses[0][Math.floor(Math.random() * responses[0].length)]
              : responses[index][Math.floor(Math.random() * responses[index].length)]
 
     ballEmbed = new MessageEmbed()
-    .setTitle('Magic 8-Ball')
+    .setTitle("Magic 8-Ball")
     .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
     .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
     .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
@@ -62,9 +65,9 @@ module.exports = {
   }
 }
 
-module.exports.help = {
-  name: module.exports.data.name,
-  description: module.exports.data.description,
-  arguments: "<expression [str]>",
-  usage: '`/' + module.exports.data.name + ' <expression>`'
-}
+// module.exports.help = {
+//   name: module.exports.data.name,
+//   description: module.exports.data.description,
+//   arguments: "<expression [str]>",
+//   usage: '`/' + module.exports.data.name + ' <expression>`'
+// }

@@ -1,165 +1,217 @@
 const { MessageEmbed } = require('discord.js')
-const { SlashCommandBuilder } = require('@discordjs/builders')
-
 
 module.exports = {
-  data: new SlashCommandBuilder()
-  .setName('fun')
-  .setDescription('Random fun commands')
-  .addSubcommandGroup(group => group
-    .setName('achievement')
-    .setDescription('Make your own Minecraft achievement')
-    .addSubcommand(subcommand => subcommand
-      .setName('icon_pack1')
-      .setDescription('Make your own Minecraft achievement [Icon Pack #1]')
-      .addStringOption(option => option
-        .setName('icon')
-        .setDescription('The icon for the achievement')
-        .addChoice('random', '0')
-        .addChoice('grass_block', '1')
-        .addChoice('diamond', '2')
-        .addChoice('diamond_sword', '3')
-        .addChoice('creeper', '4')
-        .addChoice('pig', '5')
-        .addChoice('tnt', '6')
-        .addChoice('cookie', '7')
-        .addChoice('heart', '8')
-        .addChoice('bed', '9')
-        .addChoice('cake', '10')
-        .addChoice('sign', '11')
-        .addChoice('rail', '12')
-        .addChoice('crafting_table', '13')
-        .addChoice('redstone', '14')
-        .addChoice('fire', '15')
-        .addChoice('cobweb', '16')
-        .addChoice('chest', '17')
-        .addChoice('furnace', '18')
-        .addChoice('book', '19')
-        .addChoice('stone', '20')
-        .setRequired(true)
-      )
-      .addStringOption(option => option
-        .setName('content')
-        .setDescription('The content of the achievement')
-        .setRequired(true)
-      )
-      .addStringOption(option => option
-        .setName('title')
-        .setDescription('The title of the achievement')
-        .setRequired(false)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('icon_pack2')
-      .setDescription('Make your own Minecraft achievement [Icon Pack #2]')
-      .addStringOption(option => option
-        .setName('icon')
-        .setDescription('The icon for the achievement')
-        .addChoice('random', '0')
-        .addChoice('planks', '21')
-        .addChoice('iron_ingot', '22')
-        .addChoice('gold_ingot', '23')
-        .addChoice('oak_door', '24')
-        .addChoice('iron_door', '25')
-        .addChoice('diamond_armor', '26')
-        .addChoice('flint_and_steel', '27')
-        .addChoice('potion', '28')
-        .addChoice('splash', '29')
-        .addChoice('spawn_egg', '30')
-        .addChoice('coal_block', '31')
-        .addChoice('iron_sword', '32')
-        .addChoice('bow', '33')
-        .addChoice('arrow', '34')
-        .addChoice('iron_armor', '35')
-        .addChoice('bucket', '36')
-        .addChoice('water', '37')
-        .addChoice('lava', '38')
-        .addChoice('milk', '39')
-        .setRequired(true)
-      )
-      .addStringOption(option => option
-        .setName('content')
-        .setDescription('The content of the achievement')
-        .setRequired(true)
-      )
-      .addStringOption(option => option
-        .setName('title')
-        .setDescription('The title of the achievement')
-        .setRequired(false)
-      )
-    )
-  )
-  .addSubcommandGroup(group => group
-    .setName('format')
-    .setDescription('Reformat a text to any style you want')
-    .addSubcommand(subcommand => subcommand
-      .setName('varied')
-      .setDescription('mAkE yOuR tExT uSe VaRiEd CaSe')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('smallcaps')
-      .setDescription('Mᴀᴋᴇ ʏᴏᴜʀ ᴛᴇxᴛ ᴜsᴇ sᴍᴀʟʟ ᴄᴀᴘs')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('superscript')
-      .setDescription('ᵐᵃᵏᵉ ʸᵒᵘʳ ᵗᵉˣᵗ ᵗᶦⁿʸ (make your text tiny)')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('upsidedown')
-      .setDescription('uʍopǝpᴉsdn ʇxǝʇ ɹnoʎ uɹnʇ (turn your text upsidedown)')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('fullwidth')
-      .setDescription('Ｍａｋｅ　ｙｏｕｒ　ｔｅｘｔ　ｆｕｌｌ　ｗｉｄｔｈ')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('leet')
-      .setDescription('1337ify y0uЯ 73x7 (leetify your text)')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('japanese')
-      .setDescription('从卂长乇　丫口凵尺　丅乇乂丅　乚口口长丂　乚工长乇　丁卂尸卂ん乇丂乇 (make your text looks like japanese)')
-      .addStringOption(option => option
-        .setName('text')
-        .setDescription('The text to be formatted [string]')
-        .setRequired(true)
-      )
-    )
-  )
-  .addSubcommand(subcommand => subcommand
-    .setName('facts')
-    .setDescription('Get some random facts')
-  ),
+  cmd: {
+    name: "fun",
+    description: "Random fun commands",
+    options: [
+      {
+        name: "achievement",
+        description: "Make your own Minecraft achievement",
+        type: 2,
+        options: [
+          {
+            name: "icon_pack_1",
+            description: "Make your own Minecraft achievement [Icon Pack #1]",
+            type: 1,
+            options: [
+              {
+                name: "icon",
+                description: "The icon for the achievement",
+                type: 3,
+                required: true,
+                choices: [
+                  { name: "random",          value: "0"  },
+                  { name: "grass_block",     value: "1"  },
+                  { name: "diamond",         value: "2"  },
+                  { name: "diamond_sword",   value: "3"  },
+                  { name: "creeper",         value: "4"  },
+                  { name: "pig",             value: "5"  },
+                  { name: "tnt",             value: "6"  },
+                  { name: "cookie",          value: "7"  },
+                  { name: "heart",           value: "8"  },
+                  { name: "bed",             value: "9"  },
+                  { name: "cake",            value: "10" },
+                  { name: "sign",            value: "11" },
+                  { name: "rail",            value: "12" },
+                  { name: "crafting_table",  value: "13" },
+                  { name: "redstone",        value: "14" },
+                  { name: "fire",            value: "15" },
+                  { name: "cobweb",          value: "16" },
+                  { name: "chest",           value: "17" },
+                  { name: "furnace",         value: "18" },
+                  { name: "book",            value: "19" },
+                  { name: "stone",           value: "20" }
+                ]
+              },
+              {
+                name: "content",
+                description: "The content of the achievement",
+                type: 3,
+                required: true
+              },
+              {
+                name: "title",
+                description: "The title of the achievement",
+                type: 3,
+                required: false
+              }
+            ]
+          },
+          {
+            name: "icon_pack_2",
+            description: "Make your own Minecraft achievement [Icon Pack #2]",
+            type: 1,
+            options: [
+              {
+                name: "icon",
+                description: "The icon for the achievement",
+                type: 3,
+                required: true,
+                choices: [
+                  { name: "random",           value: "0"  },
+                  { name: "planks",           value: "21" },
+                  { name: "iron_ingot",       value: "22" },
+                  { name: "gold_ingot",       value: "23" },
+                  { name: "oak_door",         value: "24" },
+                  { name: "iron_door",        value: "25" },
+                  { name: "diamond_armor",    value: "26" },
+                  { name: "flint_and_steel",  value: "27" },
+                  { name: "potion",           value: "28" },
+                  { name: "splash",           value: "29" },
+                  { name: "spawn_egg",        value: "30" },
+                  { name: "coal_block",       value: "31" },
+                  { name: "iron_sword",       value: "32" },
+                  { name: "bow",              value: "33" },
+                  { name: "arrow",            value: "34" },
+                  { name: "iron_armor",       value: "35" },
+                  { name: "bucket",           value: "36" },
+                  { name: "water",            value: "37" },
+                  { name: "lava",             value: "38" },
+                  { name: "milk",             value: "39" }
+                ]
+              },
+              {
+                name: "content",
+                description: "The content of the achievement",
+                type: 3,
+                required: true
+              },
+              {
+                name: "title",
+                description: "The title of the achievement",
+                type: 3,
+                required: false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: "format",
+        description: "Reformat your text to any style from the list",
+        type: 2,
+        options: [
+          {
+            name: "varied",
+            description: "mAkE y0uR tExT uSeS vArIEd CaSeS",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "smallcaps",
+            description: "Mᴀᴋᴇ ʏᴏᴜʀ ᴛᴇxᴛ ᴜsᴇ sᴍᴀʟʟ ᴄᴀᴘs",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "superscript",
+            description: "ᵐᵃᵏᵉ ʸᵒᵘʳ ᵗᵉˣᵗ ᵗᶦⁿʸ (make your text tiny)",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "upsidedown",
+            description: "uʍopǝpᴉsdn ʇxǝʇ ɹnoʎ uɹnʇ (turn your text upsidedown)",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "fullwidth",
+            description: "Ｍａｋｅ　ｙｏｕｒ　ｔｅｘｔ　ｆｕｌｌ　ｗｉｄｔｈ",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "leet",
+            description: "1337ify y0uЯ 73x7 (leetify your text)",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "japanese",
+            description: "从卂长乇　丫口凵尺　丅乇乂丅　乚口口长丂　乚工长乇　丁卂尸卂ん乇丂乇 (make your text looks like japanese)",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to be formatted [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+        ]
+      },
+      {
+        name: "facts",
+        description: "Get a random fact",
+        type: 1
+      }
+    ]
+  },
 
   async execute(interaction) {
     switch(interaction.options._group) {
@@ -198,7 +250,7 @@ module.exports = {
                 turn = !turn
               } else {
                 turn ? cond = i % 2 == 0 : cond = i % 2 !== 0
-                cond ? result += text[i].toUpperCase() : result += text[i]
+                cond ? result += text[i].toUpperCase() : result += text[i].toLowerCase()
               }
             }
             break
@@ -293,9 +345,9 @@ module.exports = {
   }
 }
 
-module.exports.help = {
-  name: module.exports.data.name,
-  description: module.exports.data.description,
-  arguments: "<location>",
-  usage: '`/' + module.exports.data.name + ' <location>`'
-}
+// module.exports.help = {
+//   name: module.exports.data.name,
+//   description: module.exports.data.description,
+//   arguments: "<location>",
+//   usage: '`/' + module.exports.data.name + ' <location>`'
+// }

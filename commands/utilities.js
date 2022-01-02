@@ -1,155 +1,258 @@
 var axios = require('axios').default
 const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
 const { MessageEmbed } = require('discord.js')
-const { SlashCommandBuilder } = require('@discordjs/builders')
 
 
 module.exports = {
-  data: new SlashCommandBuilder()
-  .setName('utils')
-  .setDescription('Random utilities for you to use!')
-  .addSubcommandGroup(group => group
-    .setName('weather')
-    .setDescription('Get the current weather for any places from different sources')
-    .addSubcommand(subcommand => subcommand
-      .setName('current')
-      .setDescription('Get the weather from the chosen provider')
-      .addStringOption(option => option
-        .setName('api')
-        .setDescription('The data provider to use')
-        // .addChoice('AccuWeather', 'forecast_accuweather')
-        .addChoice('OpenWeatherMap', 'forecast_openweathermap')
-        .addChoice('WeatherAPI', 'forecast_weatherapi')
-        .setRequired(true)
-        )
-      .addStringOption(option => option
-        .setName('location')
-        .setDescription('The location to get the weather data [string]')
-        .setRequired(true)
-      )
-      .addBooleanOption(option => option
-        .setName('is_imperial')
-        .setDescription('Whether to use imperial (˚F) for the result')
-      )
-    )
-    /* .addSubcommand(subcommand => subcommand
-      .setName('forecast')
-      .setDescription('Get air pollution data from the chosen provider')
-      .addStringOption(option => option
-        .setName('api')
-        .setDescription('The data provider to use')
-        .addChoice('AccuWeather', 'forecast_accuweather')
-        .addChoice('OpenWeatherMap', 'forecast_openweathermap')
-        .addChoice('WeatherAPI', 'forecast_weatherapi')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('air_pollution')
-      .setDescription('Get air pollution data from the chosen provider')
-      .addStringOption(option => option
-        .setName('api')
-        .setDescription('The data provider to use')
-        .addChoice('AccuWeather', 'forecast_accuweather')
-        .addChoice('OpenWeatherMap', 'forecast_openweathermap')
-        .addChoice('WeatherAPI', 'forecast_weatherapi')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('weather_map')
-      .setDescription('Get a weather map from openweathermap.org')
-      .addStringOption(option => option
-        .setName('map_type')
-        .setDescription('The type of map to get')
-        .addChoice('Clouds', 'map_clouds')
-        .addChoice('Precipitation', 'map_precipication')
-        .addChoice('Pressure', 'map_pressure')
-        .addChoice('Wind', 'map_wind')
-        .addChoice('Temperature', 'map_temperature')
-        .setRequired(true)
-      )
-    ) */
-  )
-  .addSubcommandGroup(group => group
-    .setName('color')
-    .setDescription('Return a preview of the color')
-    .addSubcommand(subcommand => subcommand
-      .setName('rgb')
-      .setDescription('Input RGB color type')
-      .addIntegerOption(option => option
-        .setName('red')
-        .setDescription('The red value of the RGB color [integer 0~255]')
-        .setRequired(true)
-      )
-      .addIntegerOption(option => option
-        .setName('green')
-        .setDescription('The green value of the RGB color [integer 0~255]')
-        .setRequired(true)
-      )
-      .addIntegerOption(option => option
-        .setName('blue')
-        .setDescription('The blue value of the RGB color [integer 0~255]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('hex')
-      .setDescription('Input Hex color type')
-      .addStringOption(option => option
-        .setName('value')
-        .setDescription('The Hex value of the color [hex, length 6]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('hsv')
-      .setDescription('Input HSV color type')
-      .addIntegerOption(option => option
-        .setName('hue')
-        .setDescription('The hue value of the HSV color [integer 0~360]')
-        .setRequired(true)
-      )
-      .addIntegerOption(option => option
-        .setName('saturation')
-        .setDescription('The green value of the HSV color [integer 0~100]')
-        .setRequired(true)
-      )
-      .addIntegerOption(option => option
-        .setName('value')
-        .setDescription('The value value of the HSV color [integer 0~100]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('cmyk')
-      .setDescription('Input RGB color type')
-      .addIntegerOption(option => option
-        .setName('cyan')
-        .setDescription('The cyan value of the CMYK color [integer 0~100]')
-        .setRequired(true)
-        )
-      .addIntegerOption(option => option
-        .setName('magenta')
-        .setDescription('The magenta value of the CMYK color [integer 0~100]')
-        .setRequired(true)
-      )
-      .addIntegerOption(option => option
-        .setName('yellow')
-        .setDescription('The yellow value of the CMYK color [integer 0~100]')
-        .setRequired(true)
-      )
-      .addIntegerOption(option => option
-        .setName('key')
-        .setDescription('The key value of the CMYK color [integer 0~100]')
-        .setRequired(true)
-      )
-    )
-    .addSubcommand(subcommand => subcommand
-      .setName('random')
-      .setDescription('Generate a random color')
-    )
-  ),
+  cmd: {
+    name: "utils",
+    description: "Random utilities for you to use!",
+    options: [
+      {
+        name: "weather",
+        description: "Get the current weather for any places from different sources",
+        type: 2,
+        options: [
+          {
+            name: "current",
+            description: "Get the weather from the chosen provider",
+            type: 1,
+            options: [
+              {
+                name: "api",
+                description: "The data provider to use",
+                type: 3,
+                choices: [
+                  { name: "AccuWeather", value: "forecast_accuweather" },
+                  { name: "OpenWeatherMap", value: "forecast_openweathermap" },
+                  { name: "WeatherAPI", value: "forecast_weatherapi" }
+                ],
+                required: true
+              },
+              {
+                name: "location",
+                description: "The location to get the weather data [string]",
+                type: 3,
+                required: true
+              },
+              {
+                name: "is_imperial",
+                description: "Whether to use imperial (˚F) for the result",
+                type: 5,
+                required: false
+              }
+            ]
+          },
+          {
+            name: "forecast",
+            description: "Get the forecast from the chosen provider",
+            type: 1,
+            options: [
+              {
+                name: "api",
+                description: "The data provider to use",
+                type: 3,
+                choices: [
+                  { name: "AccuWeather", value: "forecast_accuweather" },
+                  { name: "OpenWeatherMap", value: "forecast_openweathermap" },
+                  { name: "WeatherAPI", value: "forecast_weatherapi" }
+                ],
+                required: true
+              },
+              {
+                name: "location",
+                description: "The location to get the weather data [string]",
+                type: 3,
+                required: true
+              },
+              {
+                name: "is_imperial",
+                description: "Whether to use imperial (˚F) for the result",
+                type: 5,
+                required: false
+              }
+            ]
+          },
+          {
+            name: "air_pollution",
+            description: "Get air pollution data from the chosen provider",
+            type: 1,
+            options: [
+              {
+                name: "api",
+                description: "The data provider to use",
+                type: 3,
+                choices: [
+                  { name: "AccuWeather", value: "forecast_accuweather" },
+                  { name: "OpenWeatherMap", value: "forecast_openweathermap" },
+                  { name: "WeatherAPI", value: "forecast_weatherapi" }
+                ],
+                required: true
+              },
+              {
+                name: "location",
+                description: "The location to get the weather data [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "weather_map",
+            description: "Get a weather map from openweathermap.org",
+            type: 1,
+            options: [
+              {
+                name: "location",
+                description: "The location to get the weather data [string]",
+                type: 3,
+                required: true
+              },
+              {
+                name: "map_type",
+                description: "The type of map to get",
+                type: 3,
+                choices: [
+                  { name: "Clouds",         value: "map_clouds" },
+                  { name: "Precipitation",  value: "map_precipication" },
+                  { name: "Pressure",       value: "map_pressure" },
+                  { name: "Temperature",    value: "map_temperature" },
+                  { name: "Wind",           value: "map_wind" },
+                ],
+                required: true
+              }
+            ]
+          },
+        ]
+      },
+      {
+        name: "color",
+        description: "Return a preview of the color",
+        type: 2,
+        options: [
+          { 
+            name: "rgb",
+            description: "Input RGB color type",
+            type: 1,
+            options: [
+              {
+                name: "red",
+                description: "The red value of the RGB color [integer 0~255]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 255,
+                required: true
+              },
+              {
+                name: "green",
+                description: "The green value of the RGB color [integer 0~255]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 255,
+                required: true
+              },
+              {
+                name: "blue",
+                description: "The blue value of the RGB color [integer 0~255]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 255,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "hex",
+            description: "Input Hex color type",
+            type: 1,
+            options: [
+              {
+                name: "value",
+                description: "The hex value of the color [string]",
+                type: 3,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "hsv",
+            description: "Input HSV color type",
+            type: 1,
+            options: [
+              {
+                name: "hue",
+                description: "The hue value of the HSV color [integer 0~360]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 360,
+                required: true
+              },
+              {
+                name: "saturation",
+                description: "The saturation value of the HSV color [integer 0~100]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 100,
+                required: true
+              },
+              {
+                name: "value",
+                description: "The value value of the HSV color [integer 0~100]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 100,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "cmyk",
+            description: "Input CMYK color type",
+            type: 1,
+            options: [
+              {
+                name: "cyan",
+                description: "The cyan value of the CMYK color [integer 0~100]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 100,
+                required: true
+              },
+              {
+                name: "magenta",
+                description: "The magenta value of the CMYK color [integer 0~100]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 100,
+                required: true
+              },
+              {
+                name: "yellow",
+                description: "The yellow value of the CMYK color [integer 0~100]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 100,
+                required: true
+              },
+              {
+                name: "key",
+                description: "The key value of the CMYK color [integer 0~100]",
+                type: 4,
+                "min-value": 0,
+                "max-value": 100,
+                required: true
+              }
+            ]
+          },
+          {
+            name: "random",
+            description: "Generate a random color",
+            type: 1
+          }
+        ]
+      }
+    ]
+  },
 
   async execute(interaction) {
     switch(interaction.options._group) {
@@ -303,9 +406,9 @@ module.exports = {
   }
 }
 
-module.exports.help = {
-  name: module.exports.data.name,
-  description: module.exports.data.description,
-  arguments: "<location>",
-  usage: '`/' + module.exports.data.name + ' <location>`'
-}
+// module.exports.help = {
+//   name: module.exports.data.name,
+//   description: module.exports.data.description,
+//   arguments: "<location>",
+//   usage: '`/' + module.exports.data.name + ' <location>`'
+// }

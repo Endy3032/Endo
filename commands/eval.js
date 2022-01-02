@@ -1,17 +1,20 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
 const BigEval = require('bigeval')
 var Math = new BigEval()
 
-
 module.exports = {
-  data: new SlashCommandBuilder()
-  .setName('eval')
-  .setDescription('Evaluate an expression and return the result')
-  .addStringOption(option => option
-    .setName('expression')
-    .setDescription('The expression to evaluate [string]')
-    .setRequired(true)
-  ),
+  cmd: {
+    name: "eval",
+    description: "Evaluate an expression and return the result",
+    options: [
+      {
+        type: 3,
+        name: "expression",
+        description: "The expression to evaluate [string]",
+        required: true
+      }
+    ]
+  },
+
   async execute(interaction) {
     symbols = ['π']
     symvalue = ['3.14']
@@ -28,9 +31,9 @@ module.exports = {
   }
 }
 
-module.exports.help = {
-  name: module.exports.data.name,
-  description: module.exports.data.description,
-  arguments: "<expression [str]>",
-  usage: '`/' + module.exports.data.name + ' <expression>`'
-}
+// module.exports.help = {
+//   name: module.exports.data.name,
+//   description: module.exports.data.description,
+//   arguments: "<expression [str]>",
+//   usage: '`/' + module.exports.data.name + ' <expression>`'
+// }
