@@ -2,7 +2,6 @@ var axios = require('axios').default
 const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
 const { MessageEmbed } = require('discord.js')
 
-
 module.exports = {
   cmd: {
     name: "utils",
@@ -250,6 +249,11 @@ module.exports = {
             type: 1
           }
         ]
+      },
+      { 
+        name: "ping",
+        description: "Get the bot latency info",
+        type: 1
       }
     ]
   },
@@ -402,6 +406,27 @@ module.exports = {
         await interaction.reply({embeds: [colorEmbed]})
         break
       }
+
+      default: {
+        switch(interaction.options._subcommand) {
+          case 'ping': {
+            const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
+
+            const pingEmbed = new MessageEmbed()
+            .setTitle('Pong!')
+            .addFields(
+              { name: 'Websocket Latency', value: `${interaction.client.ws.ping}ms`, inline: false },
+              { name: 'Roundtrip Latency', value: `${sent.createdTimestamp - interaction.createdTimestamp}ms`, inline: false }
+            )
+
+            await interaction.editReply({content: null, embeds: [pingEmbed]})
+
+            break
+          }
+        }
+      }
+
+      break
     }
   }
 }
