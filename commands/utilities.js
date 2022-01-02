@@ -289,7 +289,6 @@ module.exports = {
               const weatherEmbed = new MessageEmbed()
                 .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
                 .setTitle(`${response.data.name} - ${response.data.sys.country} (GMT${response.data.timezone > 0 ? '+' : ''}${response.data.timezone/3600})`)
-                .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
                 .setDescription(`${response.data.weather[0].description.charAt(0).toUpperCase() + response.data.weather[0].description.slice(1)}`)
                 .addFields(
                   { name: 'Temperature   ', value: `${response.data.main.temp}${symbol}`, inline: true },
@@ -303,7 +302,8 @@ module.exports = {
                   { name: 'Sunset', value: `<t:${response.data.sys.sunset}:T>`, inline: true }
                 )
                 .setThumbnail(`http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`)
-                .setFooter('OpenWeatherMap', `https://pbs.twimg.com/profile_images/1173919481082580992/f95OeyEW_400x400.jpg`)
+                .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
+                .setFooter({ text: 'OpenWeatherMap', iconURL: `https://pbs.twimg.com/profile_images/1173919481082580992/f95OeyEW_400x400.jpg` })
                 .setTimestamp()
 
               interaction.editReply({ embeds: [weatherEmbed] })
@@ -390,8 +390,8 @@ module.exports = {
         const colorEmbed = new MessageEmbed()
         .setTitle('Color Conversion')
         .setColor(`${hex}`)
-        .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
-        .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+        .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
+        .setFooter({ text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` })
         .setTimestamp()
         .addFields(
           {name: 'RGB', value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true},

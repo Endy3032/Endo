@@ -54,8 +54,8 @@ module.exports = {
     ballEmbed = new MessageEmbed()
     .setTitle("Magic 8-Ball")
     .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
-    .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
-    .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+    .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
+    .setFooter({ text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` })
     .addFields(
       { name: ':question: Question', value: question, inline: false },
       { name: ':8ball: Answer', value: response, inline: false }

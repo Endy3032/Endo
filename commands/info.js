@@ -86,8 +86,8 @@ module.exports = {
         .setTitle(`Server Info - ${guild.name} [${guild.id}]`)
         .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
         .setDescription(guild.description ? `Server Description: ${guild.description}` : 'Server Description: None')
-        .setAuthor(`${interaction.user.username}#${interaction.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png`)
-        .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
+        .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
+        .setFooter({ text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` })
         .addFields(
           { name: 'Owner', value: `<@${guild.ownerId}>`, inline: true },
           { name: 'Verification Level', value: guild.verificationLevel.charAt(0).toUpperCase() + guild.verificationLevel.slice(1).toLowerCase(), inline: true },
