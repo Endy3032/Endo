@@ -292,7 +292,7 @@ module.exports = {
 
                   const weatherEmbed = new MessageEmbed()
                   .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
-                  .setTitle(`${w.name} - ${w.sys.country} (${w.timezone > 0 ? '+' : ''}${w.timezone/3600})`)
+                  .setTitle(`${w.name} - ${w.sys.country} (UTC${w.timezone !== 0 ? w.timezone > 0 ? ' +' : '' : ''}${w.timezone !== 0 ? w.timezone/3600 : ''})`)
                   .setDescription(`${w.weather[0].description.charAt(0).toUpperCase() + w.weather[0].description.slice(1)}`)
                   .addFields(
                     { name: 'Temperature   ', value: `${w.main.temp + symbol}`, inline: true },
@@ -337,8 +337,8 @@ module.exports = {
                   data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset())/60)
 
                   data.location.region == ''
-                  ? data.title = `${data.location.name} - ${data.location.country} (${data.tz > 0 ? '+' : ''}${data.tz})`
-                  : data.title = `${data.location.name} - ${data.location.region} - ${data.location.country} (${data.tz > 0 ? '+' : ''}${data.tz})`
+                  ? data.title = `${data.location.name} - ${data.location.country} (UTC${data.tz !== 0 ? data.tz > 0 ? ' +' : '' : ''}${data.tz !== 0 ? data.tz : ''})`
+                  : data.title = `${data.location.name} - ${data.location.region} - ${data.location.country} (UTC${data.tz !== 0 ? data.tz > 0 ? ' +' : '' : ''}${data.tz !== 0 ? data.tz : ''})`
                 })
                 .catch(e => {
                   e.response.data.error.message == 'No matching location found.'
@@ -360,7 +360,7 @@ module.exports = {
                   if (time.startsWith('0')) time = time.substring(1)
                   times[ind] = time
                 })
-                
+
                 const weatherEmbed = new MessageEmbed()
                 .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
                 .setTitle(`${data.title}`)
