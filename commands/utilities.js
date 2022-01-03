@@ -303,7 +303,8 @@ module.exports = {
                     { name: 'Clouds', value: `${w.clouds.all/100}%`, inline: true },
                     { name: 'Wind', value: `${w.wind.speed + speed} ${w.wind.deg}˚\n${w.wind.gust + speed}`, inline: true },
                     { name: 'Sunrise', value: `<t:${w.sys.sunrise}:T>\n${rlocal} Local`, inline: true },
-                    { name: 'Sunset', value: `<t:${w.sys.sunset}:T>\n${slocal} Local`, inline: true }
+                    { name: 'Sunset', value: `<t:${w.sys.sunset}:T>\n${slocal} Local`, inline: true },
+                    { name: '​', value: `Data Provided by [OpenWeatherMap](https://openweathermap.org/)`, inline: true }
                   )
                   .setThumbnail(`https://openweathermap.org/img/wn/${w.weather[0].icon}@2x.png`,)
                   .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
@@ -378,6 +379,7 @@ module.exports = {
                   { name: 'Moon Phase', value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illumination`, inline: true },
                   { name: 'Moonrise', value: `<t:${astro_time[2]}:T>\n${times[2]} Local`, inline: true },
                   { name: 'Moonset', value: `<t:${astro_time[3]}:T>\n${times[3]} Local`, inline: true },
+                  { name: '​', value: `Data Provided by [WeatherAPI]](https://www.weatherapi.com/)`, inline: true }
                 )
                 .setThumbnail(`https:${data.current.condition.icon}`)
                 .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
