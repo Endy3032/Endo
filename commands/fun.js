@@ -1,6 +1,7 @@
 const { MessageEmbed, MessageAttachment } = require('discord.js')
 const sizeOf = require('image-size')
 const Canvas = require('canvas')
+const canvasTxt = require('canvas-txt').default
 const fs = require('fs')
 
 module.exports = {
@@ -208,34 +209,46 @@ module.exports = {
           },
         ]
       },
-      // {
-      //   name: "meme",
-      //   description: "Make your own meme",
-      //   type: 2,
-      //   options: [
-      //     {
-      //       name: "mememan",
-      //       description: "Make your own Mememan meme",
-      //       type: 1,
-      //       options: [
-      //         {
-      //           name: "text",
-      //           description: "The text to make the meme",
-      //           type: 3,
-      //           required: true
-      //         },
-      //         {
-      //           name: "variant",
-      //           description: "The variant of the mememan to use [Leave blank to pick random]",
-      //           type: 3,
-      //           choices: [
-      //             { name: "stocks/stonks", value: "stonks" },
-      //           ]
-      //         }
-      //       ]
-      //     }
-      //   ]
-      // },
+      {
+        name: "meme",
+        description: "Make your own meme",
+        type: 2,
+        options: [
+          {
+            name: "mememan",
+            description: "Make your own Mememan meme",
+            type: 1,
+            options: [
+              {
+                name: "text",
+                description: "The text to make the meme",
+                type: 3,
+                required: true
+              },
+              {
+                name: "variant",
+                description: "The variant of the mememan to use [Leave blank to pick random]",
+                type: 3,
+                choices: [
+                  { name: "acceleration yes", value: "acceleration_yes" },
+                  { name: "bylingal", value: "bylingal" },
+                  { name: "fier", value: "fier" },
+                  { name: "helth", value: "helth" },
+                  { name: "kemist", value: "kemist" },
+                  { name: "meth", value: "meth" },
+                  { name: "ort", value: "ort" },
+                  { name: "sconce", value: "sconce" },
+                  { name: "shef", value: "shef" },
+                  { name: "spanesh", value: "spanesh" },
+                  { name: "stonks", value: "stonks" },
+                  { name: "tehc", value: "tehc" },
+                  { name: "teknologi expirt", value: "teknologi_expirt" },
+                ]
+              }
+            ]
+          }
+        ]
+      },
       {
         name: "facts",
         description: "Get a random fact",
@@ -337,12 +350,11 @@ module.exports = {
 
       case 'meme': {
         await interaction.deferReply()
+        Canvas.registerFont('./Resources/Meme/Mememan/Ascender Sans Regular.ttf', { family: 'Ascender Sans' })
 
         const text = interaction.options.getString('text')
         const variants = fs.readdirSync("./Resources/Meme/Mememan/").filter((file) => file.endsWith(".png"))
         const variant = interaction.options.getString('variant') || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
-        
-        Canvas.registerFont('./Resources/Meme/Mememan/Ascender Sans Regular.ttf', { family: 'Ascender Sans' })
 
         const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
         const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
@@ -353,47 +365,13 @@ module.exports = {
         ctx.fillStyle = '#ffffff'
         ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
         ctx.fillStyle = '#000000'
-        ctx.font = `${dimensions.height * 0.120}px Ascender Sans`
-        ctx.textAlign = 'center'
-        ctx.fillText(text, dimensions.width / 2, dimensions.height * 0.15)
-
+        canvasTxt.fontSize = Math.min(dimensions.height * 0.120, dimensions.width * 0.085) * (0.975 ** Math.floor(text.length / 7.5))
+        canvasTxt.font = 'Ascender Sans'
+        canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * 0.35 + (canvasTxt.fontSize / 2))
+        
         const attachment = new MessageAttachment(canvas.toBuffer(), `meme.png`)
         await interaction.editReply({ files: [attachment] })
-
-        // Testing Code
-        /* async function asyncForEach(array, callback) {
-          for (let index = 0; index < array.length; index++) {
-            await callback(array[index], index, array);
-          }
-        }
-
-        var attachments = []
-        asyncForEach(variants, async (variant, index) => {
-          variant = variant.slice(0, -4)
-          const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
-          const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
-          const ctx = canvas.getContext('2d')
-          const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
-  
-          ctx.drawImage(bg, 0, dimensions.height * 0.35, dimensions.width, dimensions.height)
-          ctx.fillStyle = '#ffffff'
-          ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
-          ctx.fillStyle = '#000000'
-          ctx.font = `${dimensions.height * 0.120}px Ascender Sans`
-          ctx.textAlign = 'center'
-          ctx.fillText('Placeholder Text', dimensions.width / 2, dimensions.height * 0.15)
-  
-          const attachment = new MessageAttachment(canvas.toBuffer(), `meme.png`)
-          
-          attachments.push(attachment)
-          console.log(index)
-          if (index == variants.length - 1) {
-            await interaction.channel.send({files: attachments})
-          }
-        })
-
-        await interaction.editReply({ content: 'Done' })
-        */
+        break
       }
       
       default: {
