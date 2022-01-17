@@ -1,4 +1,7 @@
-const { MessageEmbed } = require('discord.js')
+const { MessageEmbed, MessageAttachment } = require('discord.js')
+const sizeOf = require('image-size')
+const Canvas = require('canvas')
+const fs = require('fs')
 
 module.exports = {
   cmd: {
@@ -205,6 +208,34 @@ module.exports = {
           },
         ]
       },
+      // {
+      //   name: "meme",
+      //   description: "Make your own meme",
+      //   type: 2,
+      //   options: [
+      //     {
+      //       name: "mememan",
+      //       description: "Make your own Mememan meme",
+      //       type: 1,
+      //       options: [
+      //         {
+      //           name: "text",
+      //           description: "The text to make the meme",
+      //           type: 3,
+      //           required: true
+      //         },
+      //         {
+      //           name: "variant",
+      //           description: "The variant of the mememan to use [Leave blank to pick random]",
+      //           type: 3,
+      //           choices: [
+      //             { name: "stocks/stonks", value: "stonks" },
+      //           ]
+      //         }
+      //       ]
+      //     }
+      //   ]
+      // },
       {
         name: "facts",
         description: "Get a random fact",
@@ -303,42 +334,104 @@ module.exports = {
         await interaction.reply(`${interaction.user.username} wanna say: ${result}`)
         break
       }
-    }
-    if (interaction.options._group == null) {
-      switch (interaction.options._subcommand) {
-        case 'facts': {
-          const facts = [
-            "The chicken came first or the egg? The answer is... `the chicken`",
-            "The alphabet is completely random",
-            "I ran out of facts. That's a fact",
-            "Found this fact? You're lucky!",
-            "There are 168 prime numbers between 1 and 1000",
-            "`τ` is just `π` times two!",
-            "`τ` is `tau` and `π` is `pi`!",
-            "The F word is the most flexible word in English!",
-            "`Homosapiens` are how biologists call humans!",
-            "`Endy` is a cool bot! And that's a fact!",
-            "`Long` is short and `short` is long!",
-            "√-1 love you!",
-            "There are 13 Slavic countries in the world -- Brought to you by your gopnik friend!",
-            "There are plagues in 1620, 1720, 1820, 1920 and...",
-            "The phrase: `The quick brown fox jumps over the lazy dog` contains every letter in the alphabet!",
-            "There are no Nobel prizes for math because Nobel lost his love to a mathematician",
-            "Endy is intellegent",
-            "69 is just a normal number ok?",
-            "There are 24 synthetic elements from 95~118",
-            "Most of these facts are written by Adnagaporp#1965"
-          ]
 
-          const factEmbed = new MessageEmbed()
-          .setTitle('Facts')
-          .setDescription('Fresh out of the oven.')
-          .addField('The fact of the second is...', facts[Math.floor(Math.random() * facts.length)], false)
-          .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
-          .setFooter({ text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` })
+      case 'meme': {
+        await interaction.deferReply()
 
-          await interaction.reply({embeds: [factEmbed]})
-          break
+        const text = interaction.options.getString('text')
+        const variants = fs.readdirSync("./Resources/Meme/Mememan/").filter((file) => file.endsWith(".png"))
+        const variant = interaction.options.getString('variant') || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
+        
+        Canvas.registerFont('./Resources/Meme/Mememan/Ascender Sans Regular.ttf', { family: 'Ascender Sans' })
+
+        const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
+        const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
+        const ctx = canvas.getContext('2d')
+        const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
+
+        ctx.drawImage(bg, 0, dimensions.height * 0.35, dimensions.width, dimensions.height)
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
+        ctx.fillStyle = '#000000'
+        ctx.font = `${dimensions.height * 0.120}px Ascender Sans`
+        ctx.textAlign = 'center'
+        ctx.fillText(text, dimensions.width / 2, dimensions.height * 0.15)
+
+        const attachment = new MessageAttachment(canvas.toBuffer(), `meme.png`)
+        await interaction.editReply({ files: [attachment] })
+
+        // Testing Code
+        /* async function asyncForEach(array, callback) {
+          for (let index = 0; index < array.length; index++) {
+            await callback(array[index], index, array);
+          }
+        }
+
+        var attachments = []
+        asyncForEach(variants, async (variant, index) => {
+          variant = variant.slice(0, -4)
+          const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
+          const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
+          const ctx = canvas.getContext('2d')
+          const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
+  
+          ctx.drawImage(bg, 0, dimensions.height * 0.35, dimensions.width, dimensions.height)
+          ctx.fillStyle = '#ffffff'
+          ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
+          ctx.fillStyle = '#000000'
+          ctx.font = `${dimensions.height * 0.120}px Ascender Sans`
+          ctx.textAlign = 'center'
+          ctx.fillText('Placeholder Text', dimensions.width / 2, dimensions.height * 0.15)
+  
+          const attachment = new MessageAttachment(canvas.toBuffer(), `meme.png`)
+          
+          attachments.push(attachment)
+          console.log(index)
+          if (index == variants.length - 1) {
+            await interaction.channel.send({files: attachments})
+          }
+        })
+
+        await interaction.editReply({ content: 'Done' })
+        */
+      }
+      
+      default: {
+        switch (interaction.options._subcommand) {
+          case 'facts': {
+            const facts = [
+              "The chicken came first or the egg? The answer is... `the chicken`",
+              "The alphabet is completely random",
+              "I ran out of facts. That's a fact",
+              "Found this fact? You're lucky!",
+              "There are 168 prime numbers between 1 and 1000",
+              "`τ` is just `π` times two!",
+              "`τ` is `tau` and `π` is `pi`!",
+              "The F word is the most flexible word in English!",
+              "`Homosapiens` are how biologists call humans!",
+              "`Endy` is a cool bot! And that's a fact!",
+              "`Long` is short and `short` is long!",
+              "√-1 love you!",
+              "There are 13 Slavic countries in the world -- Brought to you by your gopnik friend!",
+              "There are plagues in 1620, 1720, 1820, 1920 and...",
+              "The phrase: `The quick brown fox jumps over the lazy dog` contains every letter in the alphabet!",
+              "There are no Nobel prizes for math because Nobel lost his love to a mathematician",
+              "Endy is intellegent",
+              "69 is just a normal number ok?",
+              "There are 24 synthetic elements from 95~118",
+              "Most of these facts are written by Adnagaporp#1965"
+            ]
+
+            const factEmbed = new MessageEmbed()
+            .setTitle('Facts')
+            .setDescription('Fresh out of the oven.')
+            .addField('The fact of the second is...', facts[Math.floor(Math.random() * facts.length)], false)
+            .setAuthor({ name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` })
+            .setFooter({ text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` })
+
+            await interaction.reply({embeds: [factEmbed]})
+            break
+          }
         }
       }
     }

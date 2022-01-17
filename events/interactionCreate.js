@@ -11,7 +11,6 @@ module.exports = {
     } else {
       if (interaction.guildId == process.env.GUILD) {return}
     }
-    // console.log(interaction)
 
     message = `[${interaction.user.tag} - `
     interaction.guildId
@@ -42,7 +41,13 @@ module.exports = {
       catch (error) {
         console.error(error);
         try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Command Error]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command Error]', ephemeral: true })}
+        catch (error) {
+          try {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Command Error]', ephemeral: true })}
+          catch (err) {
+            try {await interaction.followUp({ content: 'This interaction failed (without the red coloring :D) [Command Error]', ephemeral: true })}
+            catch (err) {console.error(err)}
+          }
+        }
       }
     }
 
@@ -51,7 +56,13 @@ module.exports = {
       catch (error) {
         console.error(error);
         try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [Button Error]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Button Error]', ephemeral: true })}
+        catch (error) {
+          try {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [Button Error]', ephemeral: true })}
+          catch (err) {
+            try {await interaction.followUp({ content: 'This interaction failed (without the red coloring :D) [Button Error]', ephemeral: true })}
+            catch (err) {console.error(err)}
+          }
+        }
       }
     }
 
@@ -60,7 +71,13 @@ module.exports = {
       catch (error) {
         console.error(error);
         try {await interaction.reply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu Error]', ephemeral: true })}
-        catch (error) {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu Error]', ephemeral: true })}
+        catch (error) {
+          try {await interaction.editReply({ content: 'This interaction failed (without the red coloring :D) [SelectMenu Error]', ephemeral: true })}
+          catch (err) {
+            try {await interaction.followUp({ content: 'This interaction failed (without the red coloring :D) [SelectMenu Error]', ephemeral: true })}
+            catch (err) {console.error(err)}
+          }
+        }
       }
     }
 	},

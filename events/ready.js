@@ -17,7 +17,7 @@ module.exports = {
         axios.head(`https://${server}.endy3032.repl.co`)
         .catch(function(error) {
           error.response
-          ? console.log(`${error.response.status} - Repl seems to be offline`)
+          ? console.log(`${error.response.status} - [${server}] seems to be offline`)
           : null
         })
       })
