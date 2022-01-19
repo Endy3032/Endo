@@ -17,18 +17,20 @@ commandFiles.forEach(command => {
 });
 
 commands.forEach(command => {
-  command.description = `[GUILD!!!!!] ${command.description} [GUILD!!!!!]`
-  if (command.options) {command.options.forEach(option => {
-    option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
-    if (option.options) {
-      option.options.forEach(suboption => {
-        suboption.description = `[GUILD!!!!!] ${suboption.description} [GUILD!!!!!]`
-      })
-    }
-  })}
+  if (command.type == 1 || null) {
+    command.description = `[GUILD!!!!!] ${command.description} [GUILD!!!!!]`
+    if (command.options) {command.options.forEach(option => {
+      option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
+      if (option.options) {
+        option.options.forEach(suboption => {
+          suboption.description = `[GUILD!!!!!] ${suboption.description} [GUILD!!!!!]`
+        })
+      }
+    })}
 
-  // DEBUG ONLY
-  // console.log(command)
+    // DEBUG ONLY
+    // console.log(command)
+  }
 });
 
 (async () => {

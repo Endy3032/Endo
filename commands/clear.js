@@ -44,7 +44,7 @@ module.exports = {
     }
   },
 
-  async btnpress(interaction) {
+  async button(interaction) {
     channelID = interaction.message.channelId
     amount = interaction.customId
     

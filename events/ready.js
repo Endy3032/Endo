@@ -8,7 +8,9 @@ module.exports = {
   name: 'ready',
   once: true,
   async execute(client) {
-    index.log(`Ready`)
+    os.hostname().indexOf('local') > -1
+    ? index.log(`Ready [VSCode]`)
+    : index.log(`Ready [Replit]`)
 
     servers = ['pinger', 'endyjs']
 
