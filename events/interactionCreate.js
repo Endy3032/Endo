@@ -28,14 +28,13 @@ module.exports = {
     index.log(message)
 
     let commandName
-      interaction.isCommand() || interaction.isMessageContextMenu() ? commandName = interaction.commandName
+      interaction.isCommand() ? commandName = interaction.commandName
     : interaction.isButton() ? commandName = interaction.message.interaction.commandName
     : interaction.isSelectMenu() ? commandName = interaction.customId.slice(0, -5)
+    : interaction.isContextMenu() ? commandName = interaction.commandName.replace('[G] ', '')
     : null
 
     const command = interaction.client.commands.get(commandName)
-
-    // console.log(command)
     
     if (interaction.isCommand()) {
       try {await command.execute(interaction)}
@@ -82,7 +81,7 @@ module.exports = {
       }
     }
 
-    if (interaction.isMessageContextMenu()) {
+    if (interaction.isContextMenu()) {
       try {await command.ctxMenu(interaction)}
       catch (error) {
         console.error(error);

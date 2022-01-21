@@ -17,7 +17,7 @@ commandFiles.forEach(command => {
 });
 
 commands.forEach(command => {
-  if (command.type == 1 || null) {
+  if (command.type == (1 || null)) {
     command.description = `[GUILD!!!!!] ${command.description} [GUILD!!!!!]`
     if (command.options) {command.options.forEach(option => {
       option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
@@ -30,6 +30,8 @@ commands.forEach(command => {
 
     // DEBUG ONLY
     // console.log(command)
+  } else if (command.type == (3 || 2)) {
+    command.name = `[G] ${command.name}`
   }
 });
 

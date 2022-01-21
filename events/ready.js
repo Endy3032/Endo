@@ -8,6 +8,29 @@ module.exports = {
   name: 'ready',
   once: true,
   async execute(client) {
+    // const Guilds = client.guilds.cache.map(guild => (guild.id))
+    // const channel = client.channels.cache.get(process.env.LOG)
+
+    // console.log(Guilds[0])
+    // const guildd = client.guilds.cache.get(String(Guilds[0]))
+    // // console.log(guildd.members.cache.map(guild => (guild.members.username, guild.members.discriminator)))
+    // guildd.members.fetch()
+    // .then((guild) => {console.log(guild)})
+    // // .then((ls)=>{console.log(ls)})
+    // // .catch((er) => {console.error(er)})
+
+    // await Guilds.forEach(guildId => {
+    //   const guild = client.guilds.cache.get(guildId)
+    //   console.log('Fetching...')
+    //   guild.members.fetch()
+    //   .then(members => {
+    //     console.log(members)
+    //     // members = members.map(mem => mem.code)
+    //     // channel.send(`discord.gg/${invites[0]}\n`)
+    //   })
+    //   .catch((err) => {console.error(err)})
+    // })
+
     os.hostname().indexOf('local') > -1
     ? index.log(`Ready [VSCode]`)
     : index.log(`Ready [Replit]`)
