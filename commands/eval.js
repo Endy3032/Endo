@@ -1,4 +1,5 @@
-const BigEval = require('bigeval')
+const { ApplicationCommandOptionType } = require("discord.js")
+const BigEval = require("bigeval")
 var Math = new BigEval()
 
 module.exports = {
@@ -7,7 +8,7 @@ module.exports = {
     description: "Evaluate an expression and return the result",
     options: [
       {
-        type: 3,
+        type: ApplicationCommandOptionType.String,
         name: "expression",
         description: "The expression to evaluate [string]",
         required: true
@@ -16,18 +17,19 @@ module.exports = {
   },
 
   async execute(interaction) {
-    symbols = ['π']
-    symvalue = ['3.14']
+    symbols = ["π"]
+    symvalue = ["3.14"]
 
-    var expression = interaction.options.getString('expression')
-
-    var expression2 = expression
+    expression = interaction.options.getString("expression")
+    expression2 = expression
     symbols.forEach((value, i) => {
       expression2 = expression2.replace(value, symvalue[i])
     })
 
-    await interaction.reply({ content: `${expression} = ${Math.exec(expression2)}` })
-    console.log(expression + ' = ' + Math.exec(expression2))
+    result = `${expression} = ${Math.exec(expression2)}`
+
+    console.log(result)
+    await interaction.reply({ content: result })
   }
 }
 

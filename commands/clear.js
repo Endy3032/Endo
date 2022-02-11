@@ -1,4 +1,4 @@
-const { Permissions } = require('discord.js');
+const { ApplicationCommandOptionType, ButtonStyle, ComponentType, PermissionFlagsBits } = require("discord.js")
 
 module.exports = {
   cmd: {
@@ -6,7 +6,7 @@ module.exports = {
     description: "Clear messages in the channel",
     options: [
       {
-        type: 4,
+        type: ApplicationCommandOptionType.Integer,
         name: "amount",
         description: "Amount of messages to clear [integer 1~100]",
         required: true,
@@ -17,42 +17,43 @@ module.exports = {
   },
 
   async execute(interaction) {
-    if (interaction.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES && Permissions.FLAGS.MANAGE_SERVER)) {
-      const amount = interaction.options.getInteger('amount')
+    if (interaction.member.permissions.has(PermissionFlagsBits.ManageMessages && PermissionFlagsBits.ManageGuild)) {
+      const amount = interaction.options.getInteger("amount")
       
       components = [
         {
-          "type": 1,
-          "components": [
+          type: ComponentType.ActionRow,
+          components: [
             {
-              "type": 2,
-              "style": 4,
-              "label": "Confirm",
-              "emoji": "<:trash:927050313943380089>",
-              "custom_id": `${amount <= 100 ? amount : 100}`
+              type: ComponentType.Button,
+              style: ButtonStyle.Danger,
+              label: "Confirm",
+              emoji: {
+                name: "trash",
+                id: "927050313943380089"
+              },
+              custom_id: `${amount <= 100 ? amount : 100}`
             }
           ]
         }
       ]
 
       amount <= 100
-      ? interaction.reply({ content: `Press \`Confirm\` to delete \`${amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
-      : interaction.reply({ content: `It seems like you've somehow bypassed the 1-100 integer limit\n>100 clear is dangerous and won't be implemented (learning from past mistake)\n\nAre you sure you want to delete \`100\` messages?`, components: components, ephemeral: true })
+        ? interaction.reply({ content: `Press \`Confirm\` to delete \`${amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
+        : interaction.reply({ content: "It seems like you've somehow bypassed the 1-100 integer limit\n>100 clear is dangerous and won't be implemented (learning from past mistake)\n\nAre you sure you want to delete `100` messages?", components: components, ephemeral: true })
     } else {
-      await interaction.reply({ content: `You can't use the \`clear\` command without having "Manage Message" and "Manage Server" permissions.`, ephemeral: true })
-      console.log('BUT FAILED MISERABLY HAHAHAHAHAHHAHAHWAIHUFAIUFAIWF')
+      await interaction.reply({ content: "You can't use the `clear` command without having \"Manage Message\" and \"Manage Server\" permissions.", ephemeral: true })
+      console.log("BUT FAILED MISERABLY HAHAHAHAHAHHAHAHWAIHUFAIUFAIWF")
     }
   },
 
   async button(interaction) {
-    channelID = interaction.message.channelId
     amount = interaction.customId
     
     interaction.channel.bulkDelete(amount)
-    .then(console.log(`Cleared ${amount} messages`))
-    .catch(console.error)
-    
-    await interaction.reply({ content: `Cleared \`${amount}\` messages. Feel free to dismiss the messages.`, ephemeral: true })
+      .then(console.log(`Cleared ${amount} messages`))
+      .then(await interaction.reply({ content: ":white_check_mark:", ephemeral: true }))
+      .catch(console.error)
   }
 }
 

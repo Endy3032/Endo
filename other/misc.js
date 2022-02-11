@@ -60,14 +60,14 @@ const Convert = {
       del_G = (((max - g) / 6) + (delta / 2)) / delta
       del_B = (((max - b) / 6) + (delta / 2)) / delta
 
-        r == max ? hsv.h = del_B - del_G
-      : g == max ? hsv.h = (1 / 3) + del_R - del_B
-      : b == max ? hsv.h = (2 / 3) + del_G - del_R
-      : null
+      r == max ? hsv.h = del_B - del_G
+        : g == max ? hsv.h = (1 / 3) + del_R - del_B
+          : b == max ? hsv.h = (2 / 3) + del_G - del_R
+            : null
       
-        hsv.h < 0 ? hsv.h += 1
-      : hsv.h > 1 ? hsv.h -= 1
-      : null
+      hsv.h < 0 ? hsv.h += 1
+        : hsv.h > 1 ? hsv.h -= 1
+          : null
     }
     
     hsv.h = Math.round(hsv.h * 360)
@@ -175,7 +175,7 @@ const Convert = {
   _HEXtoRGB : function (HEX) {
     rgb = new RGB(0, 0, 0)
     
-    HEX = HEX.replace('#', '')
+    HEX = HEX.replace("#", "")
 
     rgb.r = parseInt(HEX.substring(0, 2), 16)
     rgb.g = parseInt(HEX.substring(2, 4), 16)
@@ -185,7 +185,7 @@ const Convert = {
   },
 
   _RGBtoHEX : function (RGB) {
-    hex = '#'
+    hex = "#"
 
     hr = `000${RGB.r.toString(16)}`.substr(-2)
     hg = `000${RGB.g.toString(16)}`.substr(-2)
@@ -225,83 +225,90 @@ const Convert = {
   }
 }
 
+async function rep(interaction, object) {
+  interaction.replied || interaction.deferred
+    ? await interaction.followUp(object)
+    : await interaction.reply(object)
+}
+
 module.exports = {
   colors: [
-    '5865F2', '57F287', 'FEE75C', 'EB459E', 'ED4245',
-    'F47B67', 'F8A532', '48B784', '45DDCO', '99AAB5',
-    '23272A', 'B7C2CE', '4187ED', '36393F', '3E70DD',
-    '4P5D7F', '7289DA', '4E5D94', '9C84EF', 'F47FFF',
-    'FFFFFF', '9684ec', '583694', '37393e', '5866ef',
-    '3da560', 'f9a62b', 'f37668', '49ddc1', '4f5d7e',
-    '09bOf2', '2f3136', 'ec4145', 'fe73f6', '000000'
+    "5865F2", "57F287", "FEE75C", "EB459E", "ED4245",
+    "F47B67", "F8A532", "48B784", "45DDCO", "99AAB5",
+    "23272A", "B7C2CE", "4187ED", "36393F", "3E70DD",
+    "4P5D7F", "7289DA", "4E5D94", "9C84EF", "F47FFF",
+    "FFFFFF", "9684ec", "583694", "37393e", "5866ef",
+    "3da560", "f9a62b", "f37668", "49ddc1", "4f5d7e",
+    "09bOf2", "2f3136", "ec4145", "fe73f6", "000000"
   ],
-  a: '🇦', b: '🇧', c: '🇨', d: '🇩',
-  e: '🇪', f: '🇫', g: '🇬', h: '🇭',
-  i: '🇮', j: '🇯', k: '🇰', l: '🇱',
-  m: '🇲', n: '🇳', o: '🇴', p: '🇵',
-  q: '🇶', r: '🇷', s: '🇸', t: '🇹',
-  u: '🇺', v: '🇻', w: '🇼', x: '🇽',
-  y: '🇾', z: '🇿', 0: '0️⃣', 1: '1️⃣',
-  2: '2️⃣', 3: '3️⃣', 4: '4️⃣', 5: '5️⃣',
-  6: '6️⃣', 7: '7️⃣', 8: '8️⃣', 9: '9️⃣',
-  10: '🔟', '#': '#️⃣', '*': '*️⃣',
-  '!': '❗', '?': '❓',
+  a: "🇦", b: "🇧", c: "🇨", d: "🇩",
+  e: "🇪", f: "🇫", g: "🇬", h: "🇭",
+  i: "🇮", j: "🇯", k: "🇰", l: "🇱",
+  m: "🇲", n: "🇳", o: "🇴", p: "🇵",
+  q: "🇶", r: "🇷", s: "🇸", t: "🇹",
+  u: "🇺", v: "🇻", w: "🇼", x: "🇽",
+  y: "🇾", z: "🇿", 0: "0️⃣", 1: "1️⃣",
+  2: "2️⃣", 3: "3️⃣", 4: "4️⃣", 5: "5️⃣",
+  6: "6️⃣", 7: "7️⃣", 8: "8️⃣", 9: "9️⃣",
+  10: "🔟", "#": "#️⃣", "*": "*️⃣",
+  "!": "❗", "?": "❓",
   activities: [
     {
-      activities: [{name: 'discord.js', type: 0}],
-      status: 'idle'
+      activities: [{ name: "discord.js", type: 0 }],
+      status: "idle"
     },
     {
-      activities: [{name: 'replit', type: 0}],
-      status: 'idle'
+      activities: [{ name: "replit", type: 0 }],
+      status: "idle"
     },
     {
-      activities: [{name: 'Code', type: 0}],
-      status: 'idle'
+      activities: [{ name: "Code", type: 0 }],
+      status: "idle"
     },
     {
-      activities: [{name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'}],
-      status: 'idle'
+      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }],
+      status: "idle"
     },
     {
-      activities: [{name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=9FIkzOrryf8'}],
-      status: 'idle'
+      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=9FIkzOrryf8" }],
+      status: "idle"
     },
     {
-      activities: [{name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=5qap5aO4i9A'}],
-      status: 'idle'
+      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=5qap5aO4i9A" }],
+      status: "idle"
     },
     {
-      activities: [{name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=DWcJFNfaw9c'}],
-      status: 'idle'
+      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=DWcJFNfaw9c" }],
+      status: "idle"
     },
     {
-      activities: [{name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=TsTtqGAxvWk'}],
-      status: 'idle'
+      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=TsTtqGAxvWk" }],
+      status: "idle"
     },
     {
-      activities: [{name: 'lofi', type: 1, url: 'https://www.youtube.com/watch?v=CIfGUiICf8U'}],
-      status: 'idle'
+      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=CIfGUiICf8U" }],
+      status: "idle"
     },
     {
-      activities: [{name: 'llusion - jealous', type: 2}],
-      status: 'idle'
+      activities: [{ name: "llusion - jealous", type: 2 }],
+      status: "idle"
     },
     {
-      activities: [{name: '/help', type: 2}],
-      status: 'idle'
+      activities: [{ name: "/help", type: 2 }],
+      status: "idle"
     },
     {
-      activities: [{name: '🌧agoraphobic🌧', type: 2}],
-      status: 'idle'
+      activities: [{ name: "🌧agoraphobic🌧", type: 2 }],
+      status: "idle"
     },
     {
-      activities: [{name: 'Stranger Things', type: 3}],
-      status: 'idle'
+      activities: [{ name: "Stranger Things", type: 3 }],
+      status: "idle"
     }
   ],
   HSV: HSV,
   RGB: RGB,
   CMYK: CMYK,
-  Convert: Convert
+  Convert: Convert,
+  rep: rep
 }

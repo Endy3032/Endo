@@ -1,19 +1,21 @@
 const fs = require("fs")
 const dotenv = require("dotenv")
 const keepAlive = require("./server.js")
-const { Client, Collection, Intents } = require("discord.js")
+const { Client, Collection, GatewayIntentBits } = require("discord.js")
 
 dotenv.config()
 
 var logStream = fs.createWriteStream("./other/botlog.log", { flags: "a" })
 
-const client = new Client({intents: [
-  Intents.FLAGS.GUILDS,
-  Intents.FLAGS.GUILD_BANS,
-  Intents.FLAGS.GUILD_MEMBERS,
-  Intents.FLAGS.GUILD_MESSAGES,
-  Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-]})
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildBans,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+  ]
+})
 
 async function log(content) {
   const channel = client.channels.cache.get(process.env.LOG)
@@ -46,8 +48,8 @@ eventFiles.forEach((file) => {
   const event = require(`./events/${file}`)
   
   event.once
-  ? client.once(event.name, (...args) => event.execute(...args))
-  : client.on(event.name, (...args) => event.execute(...args))
+    ? client.once(event.name, (...args) => event.execute(...args))
+    : client.on(event.name, (...args) => event.execute(...args))
 })
 
 keepAlive()

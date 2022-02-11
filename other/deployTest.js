@@ -1,49 +1,47 @@
-const dotenv = require('dotenv');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const fs = require('fs')
+const dotenv = require("dotenv")
+const { REST } = require("@discordjs/rest")
+const { Routes } = require("discord-api-types/v9")
+const fs = require("fs")
 
-dotenv.config();
+dotenv.config()
 // const commands = [].map(command => command.toJSON());
 
-const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: "9" }).setToken(process.env.TOKEN)
 
-const commands = [];
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commands = []
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"))
 console.log(commandFiles)
 commandFiles.forEach(command => {
-  const cmd = require(`../commands/${command}`);
-  commands.push(cmd.cmd);
-});
+  const cmd = require(`../commands/${command}`)
+  commands.push(cmd.cmd)
+})
 
 commands.forEach(command => {
-  if (command.type == (1 || null)) {
+  if (command.type == 1 || command.type == null) {
     command.description = `[GUILD!!!!!] ${command.description} [GUILD!!!!!]`
     if (command.options) {command.options.forEach(option => {
       option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
       if (option.options) {
-        option.options.forEach(suboption => {
-          suboption.description = `[GUILD!!!!!] ${suboption.description} [GUILD!!!!!]`
+        option.options.forEach(option => {
+          option.description = `[GUILD!!!!!] ${option.description} [GUILD!!!!!]`
         })
       }
     })}
 
-    // DEBUG ONLY
     // console.log(command)
-  } else if (command.type == (3 || 2)) {
+  } else if (command.type == 2 || command.type == 3) {
     command.name = `[G] ${command.name}`
   }
 });
 
 (async () => {
   try {
-    console.log('Started refreshing commands.');
+    console.log("Started refreshing commands.")
     await rest.put(
       Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
       { body: commands },
-    );
+    )
 
-    console.log(`Successfully registered ${commandFiles.length} application commands.`);
-  }
-  catch (error) {console.error(error)}
-})();
+    console.log(`Successfully registered ${commandFiles.length} application commands.`)
+  } catch (err) {console.error(err)}
+})()
