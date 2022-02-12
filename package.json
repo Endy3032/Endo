@@ -2,6 +2,10 @@
   "name": "endyjs",
   "version": "1.0.0",
   "description": "A discord.js bot by Endy#3032",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Endy3032/EndyJS.git"
+  },
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
