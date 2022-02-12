@@ -254,7 +254,7 @@ module.exports = {
       }
       }
 
-      await interaction.reply({ content: `**Original:** ${text}\n**nConverted:** ${result}`, ephemeral: true })
+      await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
       break
     }
 
