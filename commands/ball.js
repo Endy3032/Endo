@@ -48,8 +48,8 @@ module.exports = {
     question = interaction.options.getString("question")
     ch = Math.floor(Math.random() * 300)
     index = ch % 3 == 2 ? 2 : ch % 3 == 1 ? 1 : 0
-    response = question.endsWith("​") ? responses[2][Math.floor(Math.random() * responses[2].length)]
-      : question.endsWith(" ") ? responses[0][Math.floor(Math.random() * responses[0].length)]
+    response = question.endsWith("\u200b") ? responses[2][Math.floor(Math.random() * responses[2].length)]
+      : question.endsWith("\u200a") ? responses[0][Math.floor(Math.random() * responses[0].length)]
         : responses[index][Math.floor(Math.random() * responses[index].length)]
 
     await interaction.reply({ embeds: [{

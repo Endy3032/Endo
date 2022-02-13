@@ -179,10 +179,11 @@ module.exports = {
           }
         ]
       },
-      // { 
-      //   name: "poll",
-      //   description: "Make a poll!",
-      //   type: ApplicationCommandOptionType.Subcommand,
+      { 
+        name: "poll",
+        description: "Make a poll!",
+        type: ApplicationCommandOptionType.Subcommand
+      },
       //   options: [
       //     {
       //       name: "question",
@@ -309,10 +310,10 @@ module.exports = {
                 { name: "Moonrise", value: `<t:${astro_time[2]}:T>\n${times[2]} Local`, inline: true },
                 { name: "Moonset", value: `<t:${astro_time[3]}:T>\n${times[3]} Local`, inline: true },
 
-                { name: "​", value: "```Air Quality```", inline: false },
+                { name: "\u200b", value: "```Air Quality```", inline: false },
                 { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },
                 { name: "UK Defra Rating", value: `${aqi_ratings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk`, inline: true },
-                { name: "​", value: "​", inline: true },
+                { name: "\u200b", value: "\u200b", inline: true },
                 { name: "CO", value: `${data.current.air_quality.co.toFixed(1)} μg/m³`, inline: true },
                 { name: "O₃", value: `${data.current.air_quality.o3.toFixed(1)} μg/m³`, inline: true },
                 { name: "NO₂", value: `${data.current.air_quality.no2.toFixed(1)} μg/m³`, inline: true },
@@ -414,10 +415,10 @@ module.exports = {
         footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` },
         fields: [
           { name: "RGB", value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true },
-          { name: "​", value: "​", inline: true },
+          { name: "\u200b", value: "\u200b", inline: true },
           { name: "HEX", value: `${hex}`, inline: true },
           { name: "HSV", value: `${hsv.h}, ${hsv.s}, ${hsv.v}`, inline: true },
-          { name: "​", value: "​", inline: true },
+          { name: "\u200b", value: "\u200b", inline: true },
           { name: "CMYK", value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true }
         ],
         thumbnail: { url: `https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png` },
@@ -446,72 +447,118 @@ module.exports = {
         break
       }
 
-      // case "poll": {
-      //   const ques = interaction.options.getString("question")
-      //   const opt1 = interaction.options.getString("option1")
-      //   const opt2 = interaction.options.getString("option2")
-      //   const opt3 = interaction.options.getString("option3") || null
-      //   const opt4 = interaction.options.getString("option4") || null
-      //   const opt5 = interaction.options.getString("option5") || null
-        
-      //   const split1 = splitBar(100, 0, 25)
-      //   const split2 = splitBar(100, 0, 25)
+      case "poll": {
+        modal = {
+          title: "title",
+          custom_id: "poll",
+          components: {
+            type: 1,
+            components: [
+              {
+                type: 4,
+                label: "Label",
+                placeholder: "Placeholder",
+                custom_id: "id",
+                style: 1
+              }
+            ]
+          }
+        }
 
-      //   creation = new Date()
-      //   creation = (creation - creation.getMilliseconds()) / 1000
-        
-      //   amount = Math.floor(Math.random() * 1000)
+        // await interaction.modalSubmit(modal)
 
-      //   fields = [
-      //     { name: `${opt1.charAt(0).toUpperCase() + opt1.substring(1)} • 0/${amount} Votes • ${split1[1]}%`, value: `[${split1[0]}]`, inline: false },
-      //     { name: `${opt2.charAt(0).toUpperCase() + opt2.substring(1)} • 0/${amount} Votes • ${split2[1]}%`, value: `[${split2[0]}]`, inline: false },
-      //   ]
+        // // Create text input fields
+        // const tvShowInputComponent = new TextInputComponent()
+        //   .setCustomId('tvField')
+        //   .setLabel('Favorite TV show')
+        //   .setStyle(TextStyle.Short);
 
-      //   components = [
-      //     {
-      //       "type": 1,
-      //       "components": [
-      //         { "type": 2, "style": 2, "label": opt1, "custom_id": "poll_1_0" },
-      //         { "type": 2, "style": 2, "label": opt2, "custom_id": "poll_2_0" }
-      //       ]
-      //     },
-      //     {
-      //       "type": 1,
-      //       "components": [
-      //         { "type": 2, "style": 4, "label": "Close Poll", "custom_id": "poll_close" },
-      //       ]
-      //     }
-      //   ]
+        // const haikuInputComponent = new TextInputComponent()
+        //   .setCustomId('haikuField')
+        //   .setLabel('Write down your favorite haiku')
+        //   .setStyle(TextStyle.Paragraph);
 
-      //   if (opt3) {
-      //     const split3 = splitBar(100, 0, 25)
-      //     fields.push({ name: `${opt3.charAt(0).toUpperCase() + opt3.substring(1)} • 0/${amount} Votes • ${split3[1]}%`, value: `[${split3[0]}]`, inline: false })
-      //     components[0].components.push({ "type": 2, "style": 2, "label": opt3, "custom_id": "poll_3_0" })
-      //   }
-        
-      //   if (opt4) {
-      //     const split4 = splitBar(100, 0, 25)
-      //     fields.push({ name: `${opt4.charAt(0).toUpperCase() + opt4.substring(1)} • 0/${amount} Votes • ${split4[1]}%`, value: `[${split4[0]}]`, inline: false })
-      //     components[0].components.push({ "type": 2, "style": 2, "label": opt4, "custom_id": "poll_4_0" })
-      //   }
-        
-      //   if (opt5) {
-      //     const split5 = splitBar(100, 0, 25)
-      //     fields.push({ name: `${opt5.charAt(0).toUpperCase() + opt5.substring(1)} • 0/${amount} Votes • ${split5[1]}%`, value: `[${split5[0]}]`, inline: false })
-      //     components[0].components.push({ "type": 2, "style": 2, "label": opt5, "custom_id": "poll_5_0" })
-      //   }
+        // const actionRows = [tvShowInputComponent, haikuInputComponent].map(
+        //   (component) =>
+        //     new ActionRow<ModalActionRowComponent>().addComponents(component)
+        // );
 
-      //   embed = {
-      //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.substring(1)}`,
-      //     color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-      //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
-      //     fields: fields,
-      //     footer: { text: "Last updated" },
-      //     timestamp: new Date().getTime()
-      //   }
+        // // Add action rows to form
+        // modal.addComponents(...rows);
+
+        // // --- snip ---
+
+        // // Present the modal to the user
+        // await interaction.presentModal(modal);
+
+        // await interaction.reply({ components: components })
+        // interaction.client.api.interactions(interaction.id)[interaction.token].callback.post({ data: { type: 9, data: modal } })
+
+        //   const ques = interaction.options.getString("question")
+        //   const opt1 = interaction.options.getString("option1")
+        //   const opt2 = interaction.options.getString("option2")
+        //   const opt3 = interaction.options.getString("option3") || null
+        //   const opt4 = interaction.options.getString("option4") || null
+        //   const opt5 = interaction.options.getString("option5") || null
+          
+        //   const split1 = splitBar(100, 0, 25)
+        //   const split2 = splitBar(100, 0, 25)
+
+        //   creation = new Date()
+        //   creation = (creation - creation.getMilliseconds()) / 1000
+          
+        //   amount = Math.floor(Math.random() * 1000)
+
+        //   fields = [
+        //     { name: `${opt1.charAt(0).toUpperCase() + opt1.substring(1)} • 0/${amount} Votes • ${split1[1]}%`, value: `[${split1[0]}]`, inline: false },
+        //     { name: `${opt2.charAt(0).toUpperCase() + opt2.substring(1)} • 0/${amount} Votes • ${split2[1]}%`, value: `[${split2[0]}]`, inline: false },
+        //   ]
+
+        //   components = [
+        //     {
+        //       "type": 1,
+        //       "components": [
+        //         { "type": 2, "style": 2, "label": opt1, "custom_id": "poll_1_0" },
+        //         { "type": 2, "style": 2, "label": opt2, "custom_id": "poll_2_0" }
+        //       ]
+        //     },
+        //     {
+        //       "type": 1,
+        //       "components": [
+        //         { "type": 2, "style": 4, "label": "Close Poll", "custom_id": "poll_close" },
+        //       ]
+        //     }
+        //   ]
+
+        //   if (opt3) {
+        //     const split3 = splitBar(100, 0, 25)
+        //     fields.push({ name: `${opt3.charAt(0).toUpperCase() + opt3.substring(1)} • 0/${amount} Votes • ${split3[1]}%`, value: `[${split3[0]}]`, inline: false })
+        //     components[0].components.push({ "type": 2, "style": 2, "label": opt3, "custom_id": "poll_3_0" })
+        //   }
+          
+        //   if (opt4) {
+        //     const split4 = splitBar(100, 0, 25)
+        //     fields.push({ name: `${opt4.charAt(0).toUpperCase() + opt4.substring(1)} • 0/${amount} Votes • ${split4[1]}%`, value: `[${split4[0]}]`, inline: false })
+        //     components[0].components.push({ "type": 2, "style": 2, "label": opt4, "custom_id": "poll_4_0" })
+        //   }
+          
+        //   if (opt5) {
+        //     const split5 = splitBar(100, 0, 25)
+        //     fields.push({ name: `${opt5.charAt(0).toUpperCase() + opt5.substring(1)} • 0/${amount} Votes • ${split5[1]}%`, value: `[${split5[0]}]`, inline: false })
+        //     components[0].components.push({ "type": 2, "style": 2, "label": opt5, "custom_id": "poll_5_0" })
+        //   }
+
+        //   embed = {
+        //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.substring(1)}`,
+        //     color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+        //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
+        //     fields: fields,
+        //     footer: { text: "Last updated" },
+        //     timestamp: new Date().getTime()
+        //   }
 
       //   await interaction.reply({ embeds: [embed], components: components })
-      // }
+      }
       }
     }
 

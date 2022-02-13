@@ -52,7 +52,7 @@ module.exports = {
     
     interaction.channel.bulkDelete(amount)
       .then(console.log(`Cleared ${amount} messages`))
-      .then(await interaction.reply({ content: ":white_check_mark:", ephemeral: true }))
+      .then(await interaction.deferUpdate())
       .catch(console.error)
   }
 }

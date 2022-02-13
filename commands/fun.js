@@ -1,4 +1,4 @@
-const { ApplicationCommandOptionType, MessageAttachment } = require("discord.js")
+const { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageAttachment } = require("discord.js")
 const canvasTxt = require("canvas-txt").default
 const { colors } = require("../other/misc.js")
 const sizeOf = require("image-size")
@@ -176,6 +176,24 @@ module.exports = {
         ]
       },
       {
+        name: "wordle",
+        description: "Play a game of Wordle!",
+        type: ApplicationCommandOptionType.SubcommandGroup,
+        options: [
+          {
+            name: "random",
+            description: "Play a random word",
+            type: ApplicationCommandOptionType.Subcommand,
+            // options: [
+            //   {
+            //     name: "length",
+            //     description: "The length of the word to play",
+            //   }
+            // ]
+          }
+        ]
+      },
+      {
         name: "facts",
         description: "Get a random fact",
         type: ApplicationCommandOptionType.Subcommand
@@ -283,7 +301,90 @@ module.exports = {
       await interaction.editReply({ files: [attachment] })
       break
     }
-      
+
+    case "wordle": {
+      ansi = {
+        dark: "\u001b[0;40;37m",
+        orange: "\u001b[0;41;37m",
+        greyple: "\u001b[0;42;37m",
+        blurple: "\u001b[0;45;37m",
+        reset: "\u001b[0m"
+      }
+
+      embed = {
+        title: "Wordle!",
+        timestamp: new Date().getTime(),
+        color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+        footer: { text: "Answer: THINK" },
+        description: `\`\`\`ansi
+${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${ansi.reset} ${ansi.greyple} D ${ansi.reset} ${ansi.dark} L ${ansi.reset} ${ansi.orange} E ${ansi.reset}
+
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+
+  ${ansi.dark}Q${ansi.reset} ${ansi.dark}W${ansi.reset} ${ansi.dark}E${ansi.reset} ${ansi.dark}R${ansi.reset} ${ansi.dark}T${ansi.reset} ${ansi.dark}Y${ansi.reset} ${ansi.dark}U${ansi.reset} ${ansi.dark}I${ansi.reset} ${ansi.dark}O${ansi.reset} ${ansi.dark}P${ansi.reset}
+   ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}
+     ${ansi.dark}Z${ansi.reset} ${ansi.dark}X${ansi.reset} ${ansi.dark}C${ansi.reset} ${ansi.dark}V${ansi.reset} ${ansi.dark}B${ansi.reset} ${ansi.dark}N${ansi.reset} ${ansi.dark}M${ansi.reset}
+\`\`\``
+      }
+
+      components = [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: "TUBES",
+              custom_id: "tubes"
+            },
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: "FLING",
+              custom_id: "fling"
+            },
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: "WORDY",
+              custom_id: "wordy"
+            }
+          ]
+        },
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: "CHAMP",
+              custom_id: "champ"
+            },
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: "BATHE",
+              custom_id: "bathe"
+            },
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Success,
+              label: "THINK",
+              custom_id: "think"
+            }
+          ]
+        }
+      ]
+
+      await interaction.reply({ embeds: [embed], components: components })
+      break
+    }
+
     default: {
       switch (interaction.options._subcommand) {
       case "achievement": {
@@ -343,6 +444,50 @@ module.exports = {
       }
     }
     }
+  },
+
+  async button(interaction) {
+    let [embed, word, answer] = [interaction.message.embeds[0], interaction.customId.toUpperCase(), "THINK"]
+    if (word.length !== 5) return interaction.reply("Invalid word length!")
+
+    ansi = {
+      dark: "\u001b[0;40;37m",
+      orange: "\u001b[0;41;37m",
+      greyple: "\u001b[0;42;37m",
+      blurple: "\u001b[0;45;37m",
+      reset: "\u001b[0m",
+    }
+    ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
+
+    function rewrite(embed, word, answer) {
+      let { description } = embed
+      result = ""
+      if (word == answer) {
+        result = `${ansi.blurple} ${word[0]}   ${word[1]}   ${word[2]}   ${word[3]}   ${word[4]} ${ansi.reset}`
+        embed.title += " - You Won!"
+      } else {
+        for (i = 0; i < word.length; i++) {
+          if (word[i] === answer[i]) {
+            result += `${ansi.blurple} ${word[i]} ${ansi.reset} `
+            description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
+            description = description.replace(`${ansi.greyple}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
+          } else if (answer.includes(word[i])) {
+            result += `${ansi.greyple} ${word[i]} ${ansi.reset} `
+            description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.greyple}${word[i]}${ansi.reset}`)
+          } else {
+            result += `${ansi.orange} ${word[i]} ${ansi.reset} `
+            description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.orange}${word[i]}${ansi.reset}`)
+          }
+        }
+      }
+      embed.description = description.replace(ansi.blank, result.trim())
+
+      return embed
+    }
+
+    embed = rewrite(embed, word, answer)
+    if (word == answer) await interaction.update({ embeds: [embed], components: [] })
+    else await interaction.update({ embeds: [embed] })
   },
 
   async autocomplete(interaction) {
