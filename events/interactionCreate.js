@@ -13,8 +13,6 @@ module.exports = {
       if (interaction.guildId == process.env.GUILD) {return}
     }
 
-    console.log(interaction)
-
     commandName =
     interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
       : interaction.isButton() ? interaction.message.interaction.commandName || interaction.message.interaction.name
@@ -28,7 +26,7 @@ module.exports = {
       interaction.guildId
         ? `${interaction.guild.name} #${interaction.channel.name}] - `
         : "DM] - "
-      
+
       message +=
       interaction.isChatInputCommand() && interaction.options._group ? `Ran the [${commandName}:${interaction.options._group}:${interaction.options._subcommand}] command`
         : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the [${commandName}:${interaction.options._subcommand}] command`
@@ -42,7 +40,7 @@ module.exports = {
     }
 
     const command = interaction.client.commands.get(commandName)
-    
+
     if (interaction.isChatInputCommand()) {
       try {await command.execute(interaction)}
       catch (err) {
