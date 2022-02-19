@@ -17,7 +17,7 @@ module.exports = {
   },
 
   async execute(interaction) {
-    if (interaction.member.permissions.has(PermissionFlagsBits.ManageMessages && PermissionFlagsBits.ManageGuild)) {
+    if (interaction.member.permissions.has(PermissionFlagsBits.ManageMessages && PermissionFlagsBits.ManageGuild) || !interaction.guild) {
       const amount = interaction.options.getInteger("amount")
       
       components = [

@@ -46,10 +46,9 @@ module.exports = {
     ]
 
     question = interaction.options.getString("question")
-    ch = Math.floor(Math.random() * 300)
-    index = ch % 3 == 2 ? 2 : ch % 3 == 1 ? 1 : 0
-    response = question.endsWith("\u200b") ? responses[2][Math.floor(Math.random() * responses[2].length)]
-      : question.endsWith("\u200a") ? responses[0][Math.floor(Math.random() * responses[0].length)]
+    index = Math.floor(Math.random() * 300) % 3
+    response = question.endsWith("\u200a") || question.startsWith("\u200a") ? responses[0][Math.floor(Math.random() * responses[0].length)]
+      : question.endsWith("\u200b") || question.startsWith("\u200b") ? responses[2][Math.floor(Math.random() * responses[2].length)]
         : responses[index][Math.floor(Math.random() * responses[index].length)]
 
     await interaction.reply({ embeds: [{

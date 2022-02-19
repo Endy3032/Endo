@@ -448,48 +448,100 @@ module.exports = {
       }
 
       case "poll": {
-        modal = {
-          title: "title",
-          custom_id: "poll",
-          components: {
-            type: 1,
+        placeholders = [["Do you like pineapples on pizza?", "Yes", "No", "Why even?", "What the heck is a pineapple pizza"], ["Where should we go to eat today", "McDonald's", "Burger King", "Taco Bell", "Wendy's"], ["What's your favorite primary color?", "Red", "Green", "Green", "Yellow"]]
+        index = Math.floor(Math.random() * placeholders.length)
+
+        modalData = {
+          type: 9,
+          data: {
+            title: "Create a Poll",
+            custom_id: "poll",
             components: [
               {
-                type: 4,
-                label: "Label",
-                placeholder: "Placeholder",
-                custom_id: "id",
-                style: 1
-              }
+                type: 1,
+                components: [
+                  {
+                    type: 4,
+                    label: "Question",
+                    placeholder: placeholders[index][0],
+                    style: 1,
+                    min_length: 1,
+                    max_length: 500,
+                    custom_id: "Poll Question",
+                    required: true
+                  }
+                ]
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 4,
+                    label: "Option 1",
+                    placeholder: placeholders[index][1],
+                    style: 1,
+                    min_length: 1,
+                    max_length: 100,
+                    custom_id: "Opt1",
+                    required: true
+                  }
+                ]
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 4,
+                    label: "Option 2",
+                    placeholder: placeholders[index][2],
+                    style: 1,
+                    min_length: 1,
+                    max_length: 100,
+                    custom_id: "Opt2",
+                    required: true
+                  }
+                ]
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 4,
+                    label: "Option 3",
+                    placeholder: placeholders[index][3],
+                    style: 1,
+                    min_length: 1,
+                    max_length: 100,
+                    custom_id: "Opt3",
+                    required: false
+                  }
+                ]
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 4,
+                    label: "Option 4",
+                    placeholder: placeholders[index][4],
+                    style: 1,
+                    min_length: 1,
+                    max_length: 100,
+                    custom_id: "Opt4",
+                    required: false
+                  }
+                ]
+              },
             ]
           }
         }
 
-        // await interaction.modalSubmit(modal)
-
-        // // Create text input fields
-        // const tvShowInputComponent = new TextInputComponent()
-        //   .setCustomId('tvField')
-        //   .setLabel('Favorite TV show')
-        //   .setStyle(TextStyle.Short);
-
-        // const haikuInputComponent = new TextInputComponent()
-        //   .setCustomId('haikuField')
-        //   .setLabel('Write down your favorite haiku')
-        //   .setStyle(TextStyle.Paragraph);
-
-        // const actionRows = [tvShowInputComponent, haikuInputComponent].map(
-        //   (component) =>
-        //     new ActionRow<ModalActionRowComponent>().addComponents(component)
-        // );
-
-        // // Add action rows to form
-        // modal.addComponents(...rows);
-
-        // // --- snip ---
-
-        // // Present the modal to the user
-        // await interaction.presentModal(modal);
+        await axios({
+          method: "POST",
+          url: `https://discord.com/api/interactions/${interaction.id}/${interaction.token}/callback`,
+          headers: { Authorization: `Bot ${interaction.client.token}` },
+          data: modalData
+        })
 
         // await interaction.reply({ components: components })
         // interaction.client.api.interactions(interaction.id)[interaction.token].callback.post({ data: { type: 9, data: modal } })

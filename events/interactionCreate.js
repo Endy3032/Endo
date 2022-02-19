@@ -13,6 +13,15 @@ module.exports = {
       if (interaction.guildId == process.env.GUILD) {return}
     }
 
+    console.log(interaction)
+
+    commandName =
+    interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
+      : interaction.isButton() ? interaction.message.interaction.commandName || interaction.message.interaction.name
+        : interaction.isSelectMenu() ? interaction.customId.slice(0, -5)
+          : interaction.isContextMenuCommand() ? interaction.commandName.replace("[G] ", "")
+            : null
+
     if (!interaction.isAutocomplete()) {
       message = `[${interaction.user.tag} - `
       message +=
@@ -21,23 +30,16 @@ module.exports = {
         : "DM] - "
       
       message +=
-      interaction.isChatInputCommand() && interaction.options._group && interaction.options._subcommand ? `Ran the [${interaction.commandName}:${interaction.options._group}:${interaction.options._subcommand}] command`
-        : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the [${interaction.commandName}:${interaction.options._subcommand}] command`
-          : interaction.isChatInputCommand() ? `Ran the [${interaction.commandName}] command`
-            : interaction.isButton() ? `Pushed the [${interaction.message.interaction.commandName}]'s command [${interaction.customId}] button`
-              : interaction.isSelectMenu() ? `Chose the [${interaction.customId.slice(0, -5)}] command's [${interaction.values[0]}] option`
-                : interaction.isContextMenuCommand() ? `Ran the [${interaction.commandName}] context menu command`
+      interaction.isChatInputCommand() && interaction.options._group ? `Ran the [${commandName}:${interaction.options._group}:${interaction.options._subcommand}] command`
+        : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the [${commandName}:${interaction.options._subcommand}] command`
+          : interaction.isChatInputCommand() ? `Ran the [${commandName}] command`
+            : interaction.isButton() ? `Pushed the [${commandName}]'s command [${interaction.customId}] button`
+              : interaction.isSelectMenu() ? `Chose the [${commandName}] command's [${interaction.values[0]}] option`
+                : interaction.isContextMenuCommand() ? `Ran the [${commandName}] context menu command`
                   : (console.log(interaction), "This interaction type hasn't been logged yet. <@554680253876928512>")
 
       index.log(message)
     }
-
-    commandName =
-    interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
-      : interaction.isButton() ? interaction.message.interaction.commandName
-        : interaction.isSelectMenu() ? interaction.customId.slice(0, -5)
-          : interaction.isContextMenuCommand() ? interaction.commandName.replace("[G] ", "")
-            : null
 
     const command = interaction.client.commands.get(commandName)
     
