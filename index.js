@@ -46,7 +46,7 @@ commandFiles.forEach((file) => {
 const eventFiles = fs.readdirSync("./events").filter((file) => file.endsWith(".js"))
 eventFiles.forEach((file) => {
   const event = require(`./events/${file}`)
-  
+
   event.once
     ? client.once(event.name, (...args) => event.execute(...args))
     : client.on(event.name, (...args) => event.execute(...args))

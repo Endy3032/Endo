@@ -58,7 +58,7 @@ module.exports = {
         description: "Return a preview of the color",
         type: ApplicationCommandOptionType.SubcommandGroup,
         options: [
-          { 
+          {
             name: "rgb",
             description: "Input RGB color type",
             type: ApplicationCommandOptionType.Subcommand,
@@ -179,7 +179,7 @@ module.exports = {
           }
         ]
       },
-      { 
+      {
         name: "poll",
         description: "Make a poll!",
         type: ApplicationCommandOptionType.Subcommand
@@ -433,7 +433,7 @@ module.exports = {
       switch (interaction.options._subcommand) {
       case "ping": {
         await interaction.reply({ content: "Pinging...", fetchReply: true })
-        
+
         pingEmbed = {
           title: "Pong!",
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
@@ -552,13 +552,13 @@ module.exports = {
         //   const opt3 = interaction.options.getString("option3") || null
         //   const opt4 = interaction.options.getString("option4") || null
         //   const opt5 = interaction.options.getString("option5") || null
-          
+
         //   const split1 = splitBar(100, 0, 25)
         //   const split2 = splitBar(100, 0, 25)
 
         //   creation = new Date()
         //   creation = (creation - creation.getMilliseconds()) / 1000
-          
+
         //   amount = Math.floor(Math.random() * 1000)
 
         //   fields = [
@@ -587,13 +587,13 @@ module.exports = {
         //     fields.push({ name: `${opt3.charAt(0).toUpperCase() + opt3.substring(1)} • 0/${amount} Votes • ${split3[1]}%`, value: `[${split3[0]}]`, inline: false })
         //     components[0].components.push({ "type": 2, "style": 2, "label": opt3, "custom_id": "poll_3_0" })
         //   }
-          
+
         //   if (opt4) {
         //     const split4 = splitBar(100, 0, 25)
         //     fields.push({ name: `${opt4.charAt(0).toUpperCase() + opt4.substring(1)} • 0/${amount} Votes • ${split4[1]}%`, value: `[${split4[0]}]`, inline: false })
         //     components[0].components.push({ "type": 2, "style": 2, "label": opt4, "custom_id": "poll_4_0" })
         //   }
-          
+
         //   if (opt5) {
         //     const split5 = splitBar(100, 0, 25)
         //     fields.push({ name: `${opt5.charAt(0).toUpperCase() + opt5.substring(1)} • 0/${amount} Votes • ${split5[1]}%`, value: `[${split5[0]}]`, inline: false })

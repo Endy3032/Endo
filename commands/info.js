@@ -76,7 +76,7 @@ module.exports = {
       }
     ]
   },
-  
+
   async execute(interaction) {
     switch (interaction.options.getSubcommand()) {
     case "server": {

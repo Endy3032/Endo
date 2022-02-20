@@ -41,7 +41,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("help")
     .setDescription(descs[0]),
-  
+
   async execute(interaction) {
     const helpMain = new MessageEmbed()
       .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
@@ -51,13 +51,13 @@ module.exports = {
       .addField("Navigate the help menu", "Use the dropdown menu to navigate the help menu!")
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
-      
+
     await interaction.reply({ embeds: [helpMain], components: [helpMenu] })
   },
-  
+
   async menuchoose(interaction) {
     index = names.indexOf(interaction.values[0].slice(0, -4))
-    
+
     const help = new MessageEmbed()
       .setColor(`#${colors[Math.floor(Math.random() * colors.length)]}`)
       .setTitle("Help - " + names[index])
@@ -71,7 +71,7 @@ module.exports = {
       )
       .setTimestamp()
       .setFooter(`${interaction.client.user.username}#${interaction.client.user.discriminator}`, `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png`)
-    
+
     await interaction.update({ embeds: [help], components: [helpMenu] })
   }
 }

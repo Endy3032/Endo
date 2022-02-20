@@ -249,21 +249,21 @@ module.exports = {
         }
         break
       }
-          
+
       case "fullwidth": {
         for (i = 0; i < text.length; i++) {
           result += fw[og.indexOf(text[i])]
         }
         break
       }
-          
+
       case "leet": {
         for (i = 0; i < text.length; i++) {
           result += lt[og.indexOf(text[i])]
         }
         break
       }
-          
+
       case "japanese": {
         for (i = 0; i < text.length; i++) {
           result += jp[og.indexOf(text[i])]
@@ -296,7 +296,7 @@ module.exports = {
       canvasTxt.fontSize = Math.min(dimensions.height * 0.120, dimensions.width * 0.085) * (0.975 ** Math.floor(text.length / 7.5))
       canvasTxt.font = "Ascender Sans"
       canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * 0.35 + (canvasTxt.fontSize / 2))
-        
+
       const attachment = new MessageAttachment(canvas.toBuffer(), "meme.png")
       await interaction.editReply({ files: [attachment] })
       break
@@ -389,16 +389,16 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
       switch (interaction.options._subcommand) {
       case "achievement": {
         var defaultTitle = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
-  
+
         interaction.options.getString("icon") !== "0" ? icon = interaction.options.getString("icon") : icon = Math.floor(Math.random() * 39)
         content = interaction.options.getString("content")
         interaction.options.getString("title") !== null ? title = interaction.options.getString("title") : title = defaultTitle[Math.floor(Math.random() * defaultTitle.length)]
-          
+
         achievementEmbed = {
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
           image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
         }
-  
+
         await interaction.reply({ embeds: [achievementEmbed] })
         break
       }
@@ -533,7 +533,7 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
       { name: "tnt",              value: "6"  },
       { name: "water",            value: "37" },
     ]
-    
+
     options = {
       distance: 24,
       keys: [
@@ -541,15 +541,15 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
         "value"
       ]
     }
-    
+
     res = [{ name: "random", value: "0" }]
-    
+
     const fuse = new Fuse(choices, options)
     pattern = interaction.options.getString("icon")
-    
+
     if (pattern.length > 0) {fuse.search(pattern).forEach(item => res.push(item.item))}
     else {for (i = 0; i < 24; i++) {res.push(choices[i])}}
-    
+
     interaction.respond(res)
   }
 }
