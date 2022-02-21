@@ -28,7 +28,7 @@
     "canvas": "^2.9.0",
     "canvas-txt": "^3.0.0",
     "discord-api-types": "^0.27.2",
-    "discord.js": "^14.0.0-dev.1645142857.f7257f0",
+    "discord.js": "^14.0.0-dev.1645402068.78aa36f",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "fuse.js": "^6.5.3",
