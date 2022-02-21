@@ -323,7 +323,7 @@ module.exports = {
               ],
               thumbnail: { url: `https:${data.current.condition.icon}` },
               footer: { text: "Data Provided by WeatherAPI", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
-              timestamp: Math.floor(Date.now())
+              timestamp: new Date().toISOString()
             }
 
             interaction.editReply({ embeds: [weatherEmbed] })
@@ -422,7 +422,7 @@ module.exports = {
           { name: "CMYK", value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true }
         ],
         thumbnail: { url: `https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png` },
-        timestamp: Math.floor(Date.now()),
+        timestamp: new Date().toISOString(),
       }
 
       await interaction.reply({ embeds: [colorEmbed] })
@@ -606,7 +606,7 @@ module.exports = {
         //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
         //     fields: fields,
         //     footer: { text: "Last updated" },
-        //     timestamp: new Date().getTime()
+        //     timestamp: new Date().toISOString()
         //   }
 
       //   await interaction.reply({ embeds: [embed], components: components })

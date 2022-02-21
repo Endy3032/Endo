@@ -313,7 +313,7 @@ module.exports = {
 
       embed = {
         title: "Wordle!",
-        timestamp: new Date().getTime(),
+        timestamp: new Date().toISOString(),
         color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
         footer: { text: "Answer: THINK" },
         description: `\`\`\`ansi
