@@ -1,3 +1,5 @@
+const { ActivityType } = require("discord.js")
+
 class HSV {
   constructor(h, s, v) {
     h <= 0 ? h = 0 : h > 360 ? h = 360 : h
@@ -241,6 +243,12 @@ module.exports = {
     "3da560", "f9a62b", "f37668", "49ddc1", "4f5d7e",
     "09bOf2", "2f3136", "ec4145", "fe73f6", "000000"
   ],
+  emojis: {
+    checkmark: { shorthand: "<:checkmark:924151198339174430>", id: "944867707202301952" },
+    crossmark: { shorthand: "<:crossmark:944867707201937409>", id: "944867707201937409" },
+    trash: { shorthand: "<:trash:927050313943380089>", id: "927050313943380089" },
+    WeatherAPI: { shorthand: "<:WeatherAPI:932557801153241088>", id: "932557801153241088" },
+  },
   a: "🇦", b: "🇧", c: "🇨", d: "🇩",
   e: "🇪", f: "🇫", g: "🇬", h: "🇭",
   i: "🇮", j: "🇯", k: "🇰", l: "🇱",
@@ -254,57 +262,61 @@ module.exports = {
   "!": "❗", "?": "❓",
   activities: [
     {
-      activities: [{ name: "discord.js", type: 0 }],
+      activities: [{ name: "discord.js", type: ActivityType.Playing }],
       status: "idle"
     },
     {
-      activities: [{ name: "replit", type: 0 }],
+      activities: [{ name: "replit", type: ActivityType.Playing }],
       status: "idle"
     },
     {
-      activities: [{ name: "Code", type: 0 }],
+      activities: [{ name: "Code", type: ActivityType.Playing }],
       status: "idle"
     },
     {
-      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }],
+      activities: [{ name: "lofi", type: ActivityType.Streaming, url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }],
       status: "idle"
     },
     {
-      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=9FIkzOrryf8" }],
+      activities: [{ name: "lofi", type: ActivityType.Streaming, url: "https://www.youtube.com/watch?v=9FIkzOrryf8" }],
       status: "idle"
     },
     {
-      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=5qap5aO4i9A" }],
+      activities: [{ name: "lofi", type: ActivityType.Streaming, url: "https://www.youtube.com/watch?v=5qap5aO4i9A" }],
       status: "idle"
     },
     {
-      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=DWcJFNfaw9c" }],
+      activities: [{ name: "lofi", type: ActivityType.Streaming, url: "https://www.youtube.com/watch?v=DWcJFNfaw9c" }],
       status: "idle"
     },
     {
-      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=TsTtqGAxvWk" }],
+      activities: [{ name: "lofi", type: ActivityType.Streaming, url: "https://www.youtube.com/watch?v=TsTtqGAxvWk" }],
       status: "idle"
     },
     {
-      activities: [{ name: "lofi", type: 1, url: "https://www.youtube.com/watch?v=CIfGUiICf8U" }],
+      activities: [{ name: "lofi", type: ActivityType.Streaming, url: "https://www.youtube.com/watch?v=CIfGUiICf8U" }],
       status: "idle"
     },
     {
-      activities: [{ name: "llusion - jealous", type: 2 }],
+      activities: [{ name: "llusion - jealous", type: ActivityType.Listening }],
       status: "idle"
     },
     {
-      activities: [{ name: "/help", type: 2 }],
+      activities: [{ name: "/help", type: ActivityType.Listening }],
       status: "idle"
     },
     {
-      activities: [{ name: "🌧agoraphobic🌧", type: 2 }],
+      activities: [{ name: "🌧agoraphobic🌧", type: ActivityType.Listening }],
       status: "idle"
     },
     {
-      activities: [{ name: "Stranger Things", type: 3 }],
+      activities: [{ name: "Stranger Things", type: ActivityType.Watching }],
       status: "idle"
-    }
+    },
+    {
+      activities: [{ name: "Thinger Strangs", type: ActivityType.Watching }],
+      status: "idle"
+    },
   ],
   HSV: HSV,
   RGB: RGB,
