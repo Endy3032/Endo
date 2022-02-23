@@ -180,10 +180,34 @@ module.exports = {
         ]
       },
       {
-        name: "poll",
-        description: "Make a poll!",
-        type: ApplicationCommandOptionType.Subcommand
+        name: "info",
+        description: "Get info about anything in the server",
+        type: ApplicationCommandOptionType.SubcommandGroup,
+        options: [
+          {
+            name: "server",
+            description: "Get info about the server",
+            type: ApplicationCommandOptionType.Subcommand
+          },
+          {
+            name: "user",
+            description: "Get info about a user",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "target",
+                description: "The user to get info [mention / none]",
+                type: ApplicationCommandOptionType.User
+              }
+            ]
+          }
+        ]
       },
+      // {
+      //   name: "poll",
+      //   description: "Make a poll!",
+      //   type: ApplicationCommandOptionType.Subcommand
+      // },
       //   options: [
       //     {
       //       name: "question",
@@ -429,6 +453,63 @@ module.exports = {
       break
     }
 
+    case "info": {
+      switch (interaction.options.getSubcommand()) {
+      case "server": {
+        guild = interaction.guild
+        verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
+        filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
+
+        serverEmbed = {
+          title: `${guild.name} [${guild.id}]`,
+          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+          description: guild.description ? `Server Description: ${guild.description}` : "Server Description: None",
+          author: { name: "Server Info" },
+          fields: [
+            { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
+            { name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
+            { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
+            { name: "Vanity URL", value: guild.vanityURLCode || "None", inline: true },
+            { name: "AFK Channel", value: guild.afkChannelId !== null ? `<#${guild.afkChannelId}>` : "None", inline: true },
+            { name: "AFK Timeout", value: `${guild.afkTimeout / 60} Minutes`, inline: true },
+            { name: "Members", value: guild.memberCount, inline: true },
+            { name: "Channels", value: guild.channels.cache.size, inline: true },
+            { name: "Roles", value: guild.roles.cache.size, inline: true },
+            { name: "Creation Date", value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:D> (<t:${Math.floor(guild.createdTimestamp / 1000)}:R>)`, inline: true }
+          ],
+          thumbnail: { url: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=4096` },
+          image: guild.banner !== null ? { url: `https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096` } : null
+        }
+
+        await interaction.reply({ embeds: [serverEmbed] })
+        break
+      }
+
+      case "user": {
+        user = interaction.options.getUser("target") || interaction.user
+        console.log(user)
+        nitroType = ["None", "Nitro Classic", "Nitro"]
+
+        await interaction.reply({ embeds: [{
+          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+          title: "User Info",
+          fields: [
+            { name: "Name", value: user.username, inline: true },
+            { name: "Tag", value: user.discriminator, inline: true },
+            { name: "ID", value: user.id, inline: true },
+            { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
+            { name: "Banner Color", value: !user.banner ? user.accent_color || "Default" : "Banner Image Set", inline: true },
+            { name: "Nitro Type", value: nitroType[user.premium_type] || "None", inline: true }
+          ],
+          thumbnail: { url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` },
+          image: user.banner ? { url: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.png` } : null
+        }] })
+        break
+      }
+      }
+      break
+    }
+
     default: {
       switch (interaction.options._subcommand) {
       case "ping": {
@@ -627,9 +708,8 @@ module.exports = {
       switch (interaction.customId.substring(5)) {
       case "close": {
         console.log("close")
-        if (interaction.user.id == user) {
-          await interaction.message.edit({ components: [] })
-        } else {await interaction.reply({ content: "You cannot close this poll", ephemeral: true })}
+        if (interaction.user.id == user) {await interaction.message.edit({ components: [] })}
+        else {await interaction.reply({ content: "You cannot close this poll", ephemeral: true })}
         break
       }
       }
