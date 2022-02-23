@@ -70,10 +70,21 @@ module.exports = {
     }
     }
 
-    await execute(interaction)
-      .catch(err => {
-        console.error(err)
-        rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-      })
+    try {await execute(interaction)}
+    catch (err) {
+      rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
+      // try {
+      //   const msg = await interaction.fetchReply()
+      //   console.log(msg.content)
+      // } catch {
+      //   console.log("Unable to fetch response [ephemeral]")
+      // }
+      console.error(err)
+    }
+
+    process.once("unhandledRejection", err => {
+      console.error("Unhandled promise rejection:", err)
+      rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
+    })
   }
 }
