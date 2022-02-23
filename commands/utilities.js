@@ -513,7 +513,7 @@ module.exports = {
     default: {
       switch (interaction.options._subcommand) {
       case "ping": {
-        await interaction.reply({ content: "Pinging...", fetchReply: true })
+        const sent = await interaction.reply({ content: "Pinging...", fetchReply: true })
 
         pingEmbed = {
           title: "Pong!",
