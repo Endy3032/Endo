@@ -447,7 +447,7 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
   },
 
   async button(interaction) {
-    let [embed, word, answer] = [interaction.message.embeds[0], interaction.customId.toUpperCase(), "THINK"]
+    var [embed, word, answer] = [interaction.message.embeds[0], interaction.customId.toUpperCase(), "THINK"]
     if (word.length !== 5) return interaction.reply("Invalid word length!")
 
     ansi = {
@@ -459,33 +459,29 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
     }
     ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
 
-    function rewrite(embed, word, answer) {
-      let { description } = embed
-      result = ""
-      if (word == answer) {
-        result = `${ansi.blurple} ${word[0]}   ${word[1]}   ${word[2]}   ${word[3]}   ${word[4]} ${ansi.reset}`
-        embed.title += " - You Won!"
-      } else {
-        for (i = 0; i < word.length; i++) {
-          if (word[i] === answer[i]) {
-            result += `${ansi.blurple} ${word[i]} ${ansi.reset} `
-            description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
-            description = description.replace(`${ansi.greyple}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
-          } else if (answer.includes(word[i])) {
-            result += `${ansi.greyple} ${word[i]} ${ansi.reset} `
-            description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.greyple}${word[i]}${ansi.reset}`)
-          } else {
-            result += `${ansi.orange} ${word[i]} ${ansi.reset} `
-            description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.orange}${word[i]}${ansi.reset}`)
-          }
+    var { description } = embed
+    result = ""
+
+    if (word == answer) {
+      result = `${ansi.blurple} ${word[0]}   ${word[1]}   ${word[2]}   ${word[3]}   ${word[4]} ${ansi.reset}`
+      embed.data.title += " - You Won!"
+    } else {
+      for (i = 0; i < word.length; i++) {
+        if (word[i] === answer[i]) {
+          result += `${ansi.blurple} ${word[i]} ${ansi.reset} `
+          description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
+          description = description.replace(`${ansi.greyple}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
+        } else if (answer.includes(word[i])) {
+          result += `${ansi.greyple} ${word[i]} ${ansi.reset} `
+          description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.greyple}${word[i]}${ansi.reset}`)
+        } else {
+          result += `${ansi.orange} ${word[i]} ${ansi.reset} `
+          description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.orange}${word[i]}${ansi.reset}`)
         }
       }
-      embed.description = description.replace(ansi.blank, result.trim())
-
-      return embed
     }
+    embed.data.description = description.replace(ansi.blank, result.trim())
 
-    embed = rewrite(embed, word, answer)
     if (word == answer) await interaction.update({ embeds: [embed], components: [] })
     else await interaction.update({ embeds: [embed] })
   },
