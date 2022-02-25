@@ -1,65 +1,64 @@
+import * as os from "os"
+import log from "../index"
+import { activities } from "../other/misc"
+import { Client, PresenceData } from "discord.js"
 var axios = require("axios").default
-const index = require("../index.js")
-const misc = require("../other/misc.js")
-const activities = misc.activities
-const os = require("os")
 
 module.exports = {
   name: "ready",
   once: true,
-  async execute(client) {
-    os.hostname().indexOf("local") > -1
-      ? index.log("Ready [VSCode]")
-      : index.log("Ready [Replit]")
+  async execute(client: Client) {
+    os.hostname().includes("local")
+      ? log("Ready [VSCode - Dev]")
+      : log("Ready [Replit - Prod]")
 
-    servers = ["pinger", "endyjs"]
+    const servers = ["pinger", "endyjs", "shithole"]
 
     function pinger() {
       servers.forEach(server => {
         axios.head(`https://${server}.endy3032.repl.co`)
-          .catch(function(error) {
-            error.response
-              ? console.log(`${error.response.status} - [${server}] seems to be offline`)
-              : null
+          .catch((err: any) => {
+            console.log(typeof err)
+            err.response
+              ? console.warn(`[${server}] seems to be offline`)
+              : console.log(`[${server}] - 200 OK`)
           })
       })
     }
 
     setInterval(() => {
-      if (!(os.hostname().indexOf("local") > -1)) {
-        activity = activities[Math.floor(Math.random() * activities.length)]
+      if (!os.hostname().includes("local")) {
+        const activity = activities[Math.floor(Math.random() * activities.length)] as PresenceData
         client.user.setPresence(activity)
 
-        act_type = activity["activities"][0]["type"]
-        act_name = activity["activities"][0]["name"]
-        type_str = ["Playing", "Streaming", "Listening to", "Watching"]
+        const type_str = ["Playing", "Streaming", "Listening to", "Watching"]
+        const act_type = activity["activities"][0]["type"]
+        const act_name = activity["activities"][0]["name"]
 
         act_name === "lofi"
-          ? index.log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity["activities"][0]["url"]}`)
-          : index.log(`Current Status: ${type_str[act_type]} ${act_name}`)
+          ? log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity["activities"][0]["url"]}`)
+          : log(`Current Status: ${type_str[act_type]} ${act_name}`)
       }
       pinger()
     }, 300000)
 
     pinger()
-    client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
-
+    client.user.setPresence(activities[Math.floor(Math.random() * activities.length)] as PresenceData)
     // clientcmd = client.application.commands.fetch()
     // .then(cmds => console.log(cmds))
-
-    const guild = client.guilds.cache.get("864972641219248140")
-    // commands = guild.commands
 
     client.application.commands.fetch()
       .then(commands => console.log(`Fetched ${commands.size} global commands`))
       .catch(console.error)
 
+    const guild = client.guilds.cache.get("864972641219248140")
+    // commands = guild.commands
     guild.commands.fetch()
       .then(commands => console.log(`Fetched ${commands.size} test commands`))
       .catch(console.error)
 
-    delete_cmd = false
-    delete_cmd ? guild.commands.set([]) : null
+    // delete_cmd = false
+    // delete_cmd ? guild.commands.set([]) : null
   },
 }
 

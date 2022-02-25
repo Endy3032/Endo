@@ -1,7 +1,11 @@
-node_modules
+# Folders
+logs
+node_modules*
+
+# Files
 .env
-.DS_Store
 *.log
 .vscode
+.DS_Store
 forecast.json
 package-lock.json

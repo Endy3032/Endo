@@ -4,6 +4,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
+  sourceType: "module",
   extends: "eslint:recommended",
   parserOptions: {
     ecmaVersion: "latest",
@@ -15,6 +16,7 @@ module.exports = {
     semi: ["error", "never"],
     "no-undef": ["off", "never"],
     "object-curly-spacing": ["warn", "always"],
-    "no-whitespace-before-property": "warn"
+    "no-whitespace-before-property": "warn",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

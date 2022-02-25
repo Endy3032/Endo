@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "allowJs": true,
+    "target": "esnext",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "alwaysStrict": false,
+    "module": "commonjs",
+    "checkJs": true,
+    "noEmit": true
+  },
+  "exclude": [
+    "node_modules",
+    "logs",
+    "Resources"
+  ]
+}
