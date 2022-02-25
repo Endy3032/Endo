@@ -19,7 +19,7 @@ module.exports = {
   },
 
   async execute(interaction) {
-    if (!interaction.guild) return await interaction.reply({ content: `${emojis.crossmark} This command can only be used in a server`, ephemeral: true })
+    if (!interaction.guild) return await interaction.reply({ content: `${emojis.crossmark.shorthand} This command can only be used in a server`, ephemeral: true })
 
     const manageMsgs = interaction.member.permissions.has(PermissionFlagsBits.ManageMessages)
     const manageGuild = interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)
@@ -49,7 +49,7 @@ module.exports = {
         ? interaction.reply({ content: `Press \`Confirm\` to delete \`${amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
         : interaction.reply({ content: "Press `Confirm` to delete `100` messages or `Dismiss message` to cancel. (100 max clear safety)", components: components, ephemeral: true })
     } else {
-      await interaction.reply({ content: `You can't use the \`clear\` command without having \`Manage Messages\` and \`Manage Server\` permissions.\nYou currently have:\n${manageMsgs ? emojis.checkmark : emojis.crossmark} \`Manage Messages\`\n${manageGuild ? emojis.checkmark : emojis.crossmark} \`Manage Server\``, ephemeral: true })
+      await interaction.reply({ content: `You can't use the \`clear\` command without having \`Manage Messages\` and \`Manage Server\` permissions.\nYou currently have:\n${manageMsgs ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Messages\`\n${manageGuild ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Server\``, ephemeral: true })
       console.log(`${chalk.yellow("Missing Permissions")} | ${manageMsgs ? chalk.green("Manage Messages") : chalk.red("Manage Messages")} | ${manageGuild ? chalk.green("Manage Server") : chalk.red("Manage Server")}`)
     }
   },

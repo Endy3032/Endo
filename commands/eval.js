@@ -1,6 +1,7 @@
-var Math = new BigEval()
 const BigEval = require("bigeval")
 const { ApplicationCommandOptionType } = require("discord.js")
+
+var Math = new BigEval()
 
 module.exports = {
   cmd: {

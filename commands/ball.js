@@ -49,7 +49,7 @@ module.exports = {
     index = Math.floor(Math.random() * 300) % 3
     response = question.endsWith("\u200a") || question.startsWith("\u200a") ? responses[0][Math.floor(Math.random() * responses[0].length)]
       : question.endsWith("\u200b") || question.startsWith("\u200b") ? responses[2][Math.floor(Math.random() * responses[2].length)]
-        : responses[index][Math.floor(Math.random() * responses[index].length)]
+      : responses[index][Math.floor(Math.random() * responses[index].length)]
 
     await interaction.reply({ embeds: [{
       title: "Magic 8-Ball",
