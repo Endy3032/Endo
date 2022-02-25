@@ -1,5 +1,6 @@
 const fs = require("fs")
 const chalk = require("chalk")
+const stripAnsi = require("strip-ansi")
 const keepAlive = require("./server.js")
 const { Client, Collection, GatewayIntentBits } = require("discord.js")
 
@@ -12,10 +13,10 @@ async function log(content, logLevel = "INFO") {
   epoch = Math.floor(date.getTime() / 1000)
 
   logLevelColors = {
-    INFO: chalk.green(logLevel),
-    WARN: chalk.yellow(logLevel),
-    ERROR: chalk.red(logLevel),
-    DEBUG: chalk.blue(logLevel),
+    INFO: chalk.green(`[${logLevel}]`),
+    WARN: chalk.yellow(`[${logLevel}]`),
+    ERROR: chalk.red(`[${logLevel}]`),
+    DEBUG: chalk.cyan(`[${logLevel}]`),
   }
 
   logTime = date.toLocaleString("default", {
@@ -31,8 +32,8 @@ async function log(content, logLevel = "INFO") {
     fractionalSecondDigits: 2
   })
 
-  console.log(`${chalk.blue(logTime)} ${logLevelColors[logLevel]} > ${content}`)
-  logStream.write(`${logTime.replace(",", "")} ${logLevel} > ${content}\n`)
+  console.log(`${chalk.blueBright(logTime)} ${logLevelColors[logLevel]} ${chalk.magenta("|")} ${chalk.blue(content)}`)
+  logStream.write(stripAnsi(`${logTime.replace(",", "")} ${logLevel} | ${content}\n`))
   channel.send(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`)
 }
 
@@ -52,8 +53,8 @@ eventFiles.forEach((file) => {
     : client.on(event.name, (...args) => event.execute(...args))
 })
 
-keepAlive()
 client.login(process.env.TOKEN)
+keepAlive()
 
 module.exports.log = log
 

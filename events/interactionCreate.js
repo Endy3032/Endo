@@ -1,4 +1,5 @@
 const os = require("os")
+const chalk = require("chalk")
 const dotenv = require("dotenv")
 const index = require("../index.js")
 const { emojis, rep } = require("../other/misc.js")
@@ -18,20 +19,16 @@ module.exports = {
     : null
 
     if (!interaction.isAutocomplete()) {
-      message = `[${interaction.user.tag} - `
-      message +=
-      interaction.guildId
-        ? `${interaction.guild.name} #${interaction.channel.name}] - `
-        : "DM] - "
+      message = chalk.cyan(`[${interaction.user.tag} | ${interaction.guildId ? `${interaction.guild.name} | #${interaction.channel.name}` : "DM"}] `)
 
       message +=
-      interaction.isChatInputCommand() && interaction.options._group ? `Ran the [${commandName}:${interaction.options._group}:${interaction.options._subcommand}] command`
-      : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the [${commandName}:${interaction.options._subcommand}] command`
-      : interaction.isChatInputCommand() ? `Ran the [${commandName}] command`
-      : interaction.isButton() ? `Pushed the [${commandName}] command's [${interaction.customId}] button`
-      : interaction.isSelectMenu() ? `Chose the [${commandName}] command's [${interaction.values[0]}] option`
-      : interaction.isContextMenuCommand() ? `Ran the [${commandName}] context menu command`
-      : (console.log(interaction), "This interaction type hasn't been logged yet. <@554680253876928512>")
+      interaction.isChatInputCommand() && interaction.options._group ? `Ran the ${chalk.cyan(`[${commandName}:${interaction.options._group}:${interaction.options._subcommand}]`)} command`
+      : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the ${chalk.cyan(`[${commandName}:${interaction.options._subcommand}]`)} command`
+      : interaction.isChatInputCommand() ? `Ran the ${chalk.cyan(`[${commandName}]`)} command`
+      : interaction.isButton() ? `Pushed the ${chalk.cyan(`[${commandName}]`)} command's ${chalk.cyan(`[${interaction.customId}]`)} button`
+      : interaction.isSelectMenu() ? `Chose the ${chalk.cyan(`[${commandName}]`)} command's ${chalk.cyan(`[${interaction.values[0]}]`)} option`
+      : interaction.isContextMenuCommand() ? `Ran the ${chalk.cyan(`[${commandName}]`)} context menu command`
+      : index.log(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)
 
       index.log(message)
     }
@@ -58,7 +55,7 @@ module.exports = {
     try {await execute(interaction)}
     catch (err) {
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-      console.error(err)
+      index.log(err, "ERROR")
       // try {
       //   const msg = await interaction.fetchReply()
       //   console.log(msg.content)
@@ -68,7 +65,7 @@ module.exports = {
     }
 
     process.once("unhandledRejection", err => {
-      console.error("Unhandled promise rejection:", err)
+      index.error(`Unhandled promise rejection: ${err}`, "ERROR")
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
     })
   }

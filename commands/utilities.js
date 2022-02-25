@@ -487,7 +487,6 @@ module.exports = {
 
           case "user": {
             user = interaction.options.getUser("target") || interaction.user
-            console.log(user)
             nitroType = ["None", "Nitro Classic", "Nitro"]
 
             await interaction.reply({ embeds: [{

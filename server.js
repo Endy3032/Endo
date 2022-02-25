@@ -1,6 +1,7 @@
-const { createWriteStream } = require("fs")
-const express = require("express")
+const chalk = require("chalk")
 const morgan = require("morgan")
+const express = require("express")
+const { createWriteStream } = require("fs")
 
 const server = express()
 const port = 3032
@@ -13,7 +14,22 @@ server.all("/", (_, res) => {
 })
 
 function keepAlive() {
-  server.listen(port, () => {console.log("Server is Ready!")})
+  server.listen(port, () => {
+    logTime = new Date().toLocaleString("default", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+  
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      fractionalSecondDigits: 2
+    })
+
+    console.log(`${chalk.blue(logTime)} ${chalk.green("[INFO]")} ${chalk.magenta("|")} ${chalk.blue("Server Ready")}`)
+  })
 }
 
 module.exports = keepAlive

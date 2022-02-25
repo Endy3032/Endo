@@ -1,4 +1,5 @@
 const os = require("os")
+const chalk = require("chalk")
 var axios = require("axios").default
 const index = require("../index.js")
 const { activities } = require("../other/misc.js")
@@ -8,18 +9,19 @@ module.exports = {
   once: true,
   async execute(client) {
     os.hostname().includes("local")
-      ? index.log("Ready [VSCode - Dev]")
-      : index.log("Ready [Replit - Prod]")
+      ? index.log(`Ready ${chalk.cyan("[VSCode - Dev]")}`)
+      : index.log(`Ready ${chalk.cyan("[Replit - Prod]")}`)
 
     servers = ["pinger", "endyjs"]
 
     function pinger() {
       servers.forEach(server => {
         axios.head(`https://${server}.endy3032.repl.co`)
+          .then((res) => {
+            index.log(`${chalk.cyan(`[${server}]`)} ${chalk.green(`${res.status} ${res.statusText}`)}`)
+          })
           .catch((err) => {
-            err.response
-              ? console.warn(`[${server}] seems to be offline`)
-              : console.log(`[${server}] - 200 OK`)
+            if (err.response) index.log(`${chalk.cyan(`[${server}]`)} ${chalk.red(`${err.response.status} ${err.response.statusText}`)}`, "WARN")
           })
       })
     }
@@ -33,9 +35,9 @@ module.exports = {
         act_name = activity["activities"][0]["name"]
         type_str = ["Playing", "Streaming", "Listening to", "Watching"]
 
-        act_name === "lofi"
-          ? index.log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity["activities"][0]["url"]}`)
-          : index.log(`Current Status: ${type_str[act_type]} ${act_name}`)
+        act_name == "lofi"
+          ? index.log(`Status Update: ${type_str[act_type]} ${act_name} ${chalk.cyanBright(`[${activity["activities"][0]["url"]}]`)}`)
+          : index.log(`Status Update: ${type_str[act_type]} ${act_name}`)
       }
       pinger()
     }, 300000)
@@ -46,13 +48,13 @@ module.exports = {
     // .then(cmds => console.log(cmds))
 
     client.application.commands.fetch()
-      .then(commands => console.log(`Fetched ${commands.size} global commands`))
+      .then(commands => index.log(`Fetched ${commands.size} global commands`))
       .catch(console.error)
 
     const guild = client.guilds.cache.get("864972641219248140")
     // commands = guild.commands
     guild.commands.fetch()
-      .then(commands => console.log(`Fetched ${commands.size} test commands`))
+      .then(commands => index.log(`Fetched ${commands.size} test commands`))
       .catch(console.error)
 
     // delete_cmd = false

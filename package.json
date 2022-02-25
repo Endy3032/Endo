@@ -37,6 +37,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.15",
     "string-progressbar": "^1.0.4",
+    "strip-ansi": "^6.0.1",
     "ts-node": "^10.5.0",
     "typescript": "^4.5.5"
   },
