@@ -1,7 +1,7 @@
-import dotenv from "dotenv"
-import { REST } from "@discordjs/rest"
-import { Routes } from "discord-api-types/v9"
-import fs from "fs"
+const dotenv = require("dotenv")
+const { REST } = require("@discordjs/rest")
+const { Routes } = require("discord-api-types/v9")
+const fs = require("fs")
 
 dotenv.config()
 // const commands = [].map(command => command.toJSON());

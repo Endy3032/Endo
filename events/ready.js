@@ -1,24 +1,22 @@
-import * as os from "os"
-import log from "../index"
-import { activities } from "../other/misc"
-import { Client, PresenceData } from "discord.js"
+const os = require("os")
 var axios = require("axios").default
+const index = require("../index.js")
+const { activities } = require("../other/misc.js")
 
 module.exports = {
   name: "ready",
   once: true,
-  async execute(client: Client) {
+  async execute(client) {
     os.hostname().includes("local")
-      ? log("Ready [VSCode - Dev]")
-      : log("Ready [Replit - Prod]")
+      ? index.log("Ready [VSCode - Dev]")
+      : index.log("Ready [Replit - Prod]")
 
-    const servers = ["pinger", "endyjs", "shithole"]
+    servers = ["pinger", "endyjs"]
 
     function pinger() {
       servers.forEach(server => {
         axios.head(`https://${server}.endy3032.repl.co`)
-          .catch((err: any) => {
-            console.log(typeof err)
+          .catch((err) => {
             err.response
               ? console.warn(`[${server}] seems to be offline`)
               : console.log(`[${server}] - 200 OK`)
@@ -28,22 +26,22 @@ module.exports = {
 
     setInterval(() => {
       if (!os.hostname().includes("local")) {
-        const activity = activities[Math.floor(Math.random() * activities.length)] as PresenceData
+        activity = activities[Math.floor(Math.random() * activities.length)]
         client.user.setPresence(activity)
 
-        const type_str = ["Playing", "Streaming", "Listening to", "Watching"]
-        const act_type = activity["activities"][0]["type"]
-        const act_name = activity["activities"][0]["name"]
+        act_type = activity["activities"][0]["type"]
+        act_name = activity["activities"][0]["name"]
+        type_str = ["Playing", "Streaming", "Listening to", "Watching"]
 
         act_name === "lofi"
-          ? log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity["activities"][0]["url"]}`)
-          : log(`Current Status: ${type_str[act_type]} ${act_name}`)
+          ? index.log(`Current Status: ${type_str[act_type]} ${act_name} - ${activity["activities"][0]["url"]}`)
+          : index.log(`Current Status: ${type_str[act_type]} ${act_name}`)
       }
       pinger()
     }, 300000)
 
     pinger()
-    client.user.setPresence(activities[Math.floor(Math.random() * activities.length)] as PresenceData)
+    client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
     // clientcmd = client.application.commands.fetch()
     // .then(cmds => console.log(cmds))
 

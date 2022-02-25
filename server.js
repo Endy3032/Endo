@@ -1,6 +1,6 @@
-import { createWriteStream } from "fs"
-import * as express from "express"
-import * as morgan from "morgan"
+const { createWriteStream } = require("fs")
+const express = require("express")
+const morgan = require("morgan")
 
 const server = express()
 const port = 3032
@@ -16,4 +16,4 @@ function keepAlive() {
   server.listen(port, () => {console.log("Server is Ready!")})
 }
 
-export default keepAlive
+module.exports = keepAlive

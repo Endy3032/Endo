@@ -1,25 +1,15 @@
-import * as fs from "fs"
-import * as chalk from "chalk"
-import keepAlive from "./server"
-import { Client, Collection, GatewayIntentBits, TextChannel } from "discord.js"
-import * as dotenv from "dotenv"
-dotenv.config()
+const fs = require("fs")
+const keepAlive = require("./server.js")
+const { Client, Collection, GatewayIntentBits } = require("discord.js")
 
-declare module "discord.js" {
-  export interface Client {
-    commands: Collection<unknown, any>
-  }
-}
-
-const logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
+var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 const client = new Client({ intents: [GatewayIntentBits.Guilds] })
 
-async function log(content: String, logLevel: String = "INFO") {
-  const channel = client.channels.cache.get(process.env.LOG as string) as TextChannel
+async function log(content) {
+  const channel = client.channels.cache.get(process.env.LOG)
   const date = new Date()
 
-  const epoch = Math.floor(date.getTime() / 1000)
-  const rtime = date.toLocaleString("default", {
+  rtime = date.toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric",
     month: "2-digit",
@@ -28,10 +18,13 @@ async function log(content: String, logLevel: String = "INFO") {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit"
+    second: "2-digit",
+    fractionalSecondDigits: 2
   })
 
-  const console_log = `${chalk.blue(rtime)} ${logLevel} > ${content}`
+  epoch = Math.floor(date.getTime() / 1000)
+  console_log = `${rtime} ${logLevel} > ${content}`
+
   console.log(console_log)
   logStream.write(console_log + "\n")
   channel.send(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`)
@@ -56,7 +49,7 @@ eventFiles.forEach((file) => {
 keepAlive()
 client.login(process.env.TOKEN)
 
-export default log
+module.exports.log = log
 
 // console.log(client.commands)
 // DELETE ALL COMMANDS

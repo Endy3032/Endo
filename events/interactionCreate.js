@@ -1,7 +1,7 @@
-import os from "os"
-import dotenv from "dotenv"
-import log from "../index"
-import { emojis, rep } from "../other/misc"
+const os = require("os")
+const dotenv = require("dotenv")
+const index = require("../index.js")
+const { emojis, rep } = require("../other/misc.js")
 dotenv.config()
 
 module.exports = {
@@ -11,14 +11,14 @@ module.exports = {
       return
     }
 
-    const commandName =
+    commandName =
     interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
       : interaction.isButton() || interaction.isSelectMenu() ? interaction.message.interaction.commandName || interaction.message.interaction.name
         : interaction.isContextMenuCommand() ? interaction.commandName.replace("[G] ", "")
           : null
 
     if (!interaction.isAutocomplete()) {
-      let message = `[${interaction.user.tag} - `
+      message = `[${interaction.user.tag} - `
       message +=
       interaction.guildId
         ? `${interaction.guild.name} #${interaction.channel.name}] - `
@@ -33,26 +33,26 @@ module.exports = {
                 : interaction.isContextMenuCommand() ? `Ran the [${commandName}] context menu command`
                   : (console.log(interaction), "This interaction type hasn't been logged yet. <@554680253876928512>")
 
-      log(message)
+      index.log(message)
     }
 
     const command = interaction.client.commands.get(commandName)
 
     if (interaction.isChatInputCommand()) {
-      var execute = command.execute
-      var type = "Command"
+      execute = command.execute
+      type = "Command"
     } else if (interaction.isButton()) {
-      var execute = command.button
-      var type = "Button"
+      execute = command.button
+      type = "Button"
     } else if (interaction.isSelectMenu()) {
-      var execute = command.selectMenu
-      var type = "Select"
+      execute = command.selectMenu
+      type = "Select"
     } else if (interaction.isContextMenuCommand()) {
-      var execute = command.ctxMenu
-      var type = "CtxMenu"
+      execute = command.ctxMenu
+      type = "CtxMenu"
     } else if (interaction.isAutocomplete()) {
-      var execute = command.autocomplete
-      var type = "Autocomplete"
+      execute = command.autocomplete
+      type = "Autocomplete"
     }
 
     try {await execute(interaction)}
