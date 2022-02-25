@@ -27,7 +27,6 @@ commands.forEach(command => {
         })
       }
     })}
-
     // console.log(command)
   } else if (command.type == 2 || command.type == 3) {
     command.name = `[G] ${command.name}`
@@ -41,7 +40,6 @@ commands.forEach(command => {
       Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
       { body: commands },
     )
-
-    console.log(`Successfully registered ${commandFiles.length} application commands.`)
+    console.log(`Successfully registered ${commandFiles.length} test commands.`)
   } catch (err) {console.error(err)}
 })()

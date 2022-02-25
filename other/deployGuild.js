@@ -38,8 +38,7 @@ commands.forEach(command => {
       Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
       { body: commands },
     )
-
-    console.log(`Successfully registered ${commandFiles.length} application commands.`)
+    console.log(`Successfully registered ${commandFiles.length} guild commands.`)
   }
   catch (error) {console.error(error)}
 })()

@@ -54,8 +54,6 @@ module.exports = {
     await interaction.reply({ embeds: [{
       title: "Magic 8-Ball",
       color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-      author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
-      footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` },
       fields: [
         { name: ":question: Question", value: question, inline: false },
         { name: ":8ball: Answer", value: response, inline: false }

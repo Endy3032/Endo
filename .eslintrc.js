@@ -9,7 +9,7 @@ module.exports = {
     ecmaVersion: "latest",
   },
   rules: {
-    indent: ["warn", 2],
+    indent: ["warn", 2, { SwitchCase: 1, flatTernaryExpressions: true }],
     "linebreak-style": ["warn", "unix"],
     quotes: ["warn", "double"],
     semi: ["error", "never"],

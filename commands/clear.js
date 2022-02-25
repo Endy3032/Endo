@@ -1,3 +1,5 @@
+const chalk = require("chalk")
+const { emojis } = require("../other/misc")
 const { ApplicationCommandOptionType, ButtonStyle, ComponentType, PermissionFlagsBits } = require("discord.js")
 
 module.exports = {
@@ -17,7 +19,7 @@ module.exports = {
   },
 
   async execute(interaction) {
-    if (!interaction.guild) return await interaction.reply({ content: "This command can only be used in a server", ephemeral: true })
+    if (!interaction.guild) return await interaction.reply({ content: `${emojis.crossmark} This command can only be used in a server`, ephemeral: true })
 
     const manageMsgs = interaction.member.permissions.has(PermissionFlagsBits.ManageMessages)
     const manageGuild = interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)
@@ -45,19 +47,18 @@ module.exports = {
 
       amount <= 100
         ? interaction.reply({ content: `Press \`Confirm\` to delete \`${amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
-        : interaction.reply({ content: "It seems like you've somehow bypassed the 1-100 integer limit\n>100 clear is dangerous and won't be implemented (learning from past mistake)\n\nAre you sure you want to delete `100` messages?", components: components, ephemeral: true })
+        : interaction.reply({ content: "Press `Confirm` to delete `100` messages or `Dismiss message` to cancel. (100 max clear safety)", components: components, ephemeral: true })
     } else {
-      await interaction.reply({ content: `You can't use the \`clear\` command without having \`Manage Messages\` and \`Manage Server\` permissions.\nYou currently have:\n${manageMsgs ? "<:checkmark:924151198339174430>" : ":x:"} \`Manage Messages\`\n${manageGuild ? "<:checkmark:924151198339174430>" : ":x:"} \`Manage Server\``, ephemeral: true })
-      console.log("Missing Permissions")
+      await interaction.reply({ content: `You can't use the \`clear\` command without having \`Manage Messages\` and \`Manage Server\` permissions.\nYou currently have:\n${manageMsgs ? emojis.checkmark : emojis.crossmark} \`Manage Messages\`\n${manageGuild ? emojis.checkmark : emojis.crossmark} \`Manage Server\``, ephemeral: true })
+      console.log(`${chalk.yellow("Missing Permissions")} | ${manageMsgs ? chalk.green("Manage Messages") : chalk.red("Manage Messages")} | ${manageGuild ? chalk.green("Manage Server") : chalk.red("Manage Server")}`)
     }
   },
 
   async button(interaction) {
     amount = interaction.customId
 
-    interaction.channel.bulkDelete(amount)
-      .then(console.log(`Cleared ${amount} messages`))
-      .then(await interaction.deferUpdate())
+    await interaction.channel.bulkDelete(amount)
+      .then(console.log(`Cleared ${amount} messages`), await interaction.deferUpdate())
       .catch(console.error)
   }
 }

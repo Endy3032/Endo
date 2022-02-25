@@ -64,12 +64,12 @@ const Convert = {
 
       r == max ? hsv.h = del_B - del_G
         : g == max ? hsv.h = (1 / 3) + del_R - del_B
-          : b == max ? hsv.h = (2 / 3) + del_G - del_R
-            : null
+        : b == max ? hsv.h = (2 / 3) + del_G - del_R
+        : null
 
       hsv.h < 0 ? hsv.h += 1
         : hsv.h > 1 ? hsv.h -= 1
-          : null
+        : null
     }
 
     hsv.h = Math.round(hsv.h * 360)

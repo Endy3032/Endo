@@ -1,15 +1,24 @@
 const fs = require("fs")
+const chalk = require("chalk")
 const keepAlive = require("./server.js")
 const { Client, Collection, GatewayIntentBits } = require("discord.js")
 
 var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 const client = new Client({ intents: [GatewayIntentBits.Guilds] })
 
-async function log(content) {
+async function log(content, logLevel = "INFO") {
   const channel = client.channels.cache.get(process.env.LOG)
   const date = new Date()
+  epoch = Math.floor(date.getTime() / 1000)
 
-  rtime = date.toLocaleString("default", {
+  logLevelColors = {
+    INFO: chalk.green(logLevel),
+    WARN: chalk.yellow(logLevel),
+    ERROR: chalk.red(logLevel),
+    DEBUG: chalk.blue(logLevel),
+  }
+
+  logTime = date.toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric",
     month: "2-digit",
@@ -22,11 +31,8 @@ async function log(content) {
     fractionalSecondDigits: 2
   })
 
-  epoch = Math.floor(date.getTime() / 1000)
-  console_log = `${rtime} ${logLevel} > ${content}`
-
-  console.log(console_log)
-  logStream.write(console_log + "\n")
+  console.log(`${chalk.blue(logTime)} ${logLevelColors[logLevel]} > ${content}`)
+  logStream.write(`${logTime.replace(",", "")} ${logLevel} > ${content}\n`)
   channel.send(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`)
 }
 

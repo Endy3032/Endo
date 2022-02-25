@@ -203,120 +203,114 @@ module.exports = {
 
   async execute(interaction) {
     switch(interaction.options._group) {
-    case "format": {
-      text = interaction.options.getString("text")
-      result = ""
-      og = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
-      sc = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
-      ss = " !\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁνᵂˣʸᶻÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖᑫʳˢᵗᵘᵛʷˣʸᶻáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
-      ud = " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{"
-      fw = "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝"
-      lt = " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
-      jp = "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
+      case "format": {
+        text = interaction.options.getString("text")
+        result = ""
+        replacements = {
+          og: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+          sc: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+          ss: " !\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁνᵂˣʸᶻÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖᑫʳˢᵗᵘᵛʷˣʸᶻáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+          ud: " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{",
+          fw: "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝",
+          lt: " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+          jp: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
+        }
 
-      switch(interaction.options._subcommand) {
-      case "varied": {
-        turn = false
-        for (i = 0; i < text.length; i++) {
-          if (text[i] == " ") {
-            result += " "
-            turn = !turn
-          } else {
-            turn ? cond = i % 2 == 0 : cond = i % 2 !== 0
-            cond ? result += text[i].toUpperCase() : result += text[i].toLowerCase()
+        switch(interaction.options._subcommand) {
+          case "varied": {
+            turn = false
+            for (i = 0; i < text.length; i++) {
+              if (text[i] == " ") {
+                result += " "
+                turn = !turn
+              } else {
+                turn ? cond = i % 2 == 0 : cond = i % 2 !== 0
+                cond ? result += text[i].toUpperCase() : result += text[i].toLowerCase()
+              }
+            }
+            break
+          }
+
+          case "smallcaps": {
+            replace = replacements.sc
+            break
+          }
+      
+          case "superscript": {
+            replace = replacements.ss
+            break
+          }
+
+          case "upsidedown": {
+            replace = replacements.ud
+            break
+          }
+
+          case "fullwidth": {
+            replace = replacements.fw
+            break
+          }
+
+          case "leet": {
+            replace = replacements.lt
+            break
+          }
+
+          case "japanese": {
+            replace = replacements.jp
+            break
           }
         }
-        break
-      }
 
-      case "smallcaps": {
         for (i = 0; i < text.length; i++) {
-          result += sc[og.indexOf(text[i])]
+          result += replace[replacements.og.indexOf(text[i])]
         }
+
+        await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
         break
       }
 
-      case "superscript": {
-        for (i = 0; i < text.length; i++) {
-          result += ss[og.indexOf(text[i])]
-        }
+      case "meme": {
+        await interaction.deferReply()
+        Canvas.registerFont("./Resources/Meme/Mememan/Ascender Sans Regular.ttf", { family: "Ascender Sans" })
+
+        const text = interaction.options.getString("text")
+        const variants = fs.readdirSync("./Resources/Meme/Mememan/").filter((file) => file.endsWith(".png"))
+        const variant = interaction.options.getString("variant") || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
+
+        const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
+        const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
+        const ctx = canvas.getContext("2d")
+        const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
+
+        ctx.drawImage(bg, 0, dimensions.height * 0.35, dimensions.width, dimensions.height)
+        ctx.fillStyle = "#ffffff"
+        ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
+        ctx.fillStyle = "#000000"
+        canvasTxt.fontSize = Math.min(dimensions.height * 0.120, dimensions.width * 0.085) * (0.975 ** Math.floor(text.length / 7.5))
+        canvasTxt.font = "Ascender Sans"
+        canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * 0.35 + (canvasTxt.fontSize / 2))
+
+        const attachment = new MessageAttachment(canvas.toBuffer(), "meme.png")
+        await interaction.editReply({ files: [attachment] })
         break
       }
 
-      case "upsidedown": {
-        for (i = 0; i < text.length; i++) {
-          result += ud[og.indexOf(text[i])]
+      case "wordle": {
+        ansi = {
+          dark: "\u001b[0;40;37m",
+          orange: "\u001b[0;41;37m",
+          greyple: "\u001b[0;42;37m",
+          blurple: "\u001b[0;45;37m",
+          reset: "\u001b[0m"
         }
-        break
-      }
 
-      case "fullwidth": {
-        for (i = 0; i < text.length; i++) {
-          result += fw[og.indexOf(text[i])]
-        }
-        break
-      }
-
-      case "leet": {
-        for (i = 0; i < text.length; i++) {
-          result += lt[og.indexOf(text[i])]
-        }
-        break
-      }
-
-      case "japanese": {
-        for (i = 0; i < text.length; i++) {
-          result += jp[og.indexOf(text[i])]
-        }
-        break
-      }
-      }
-
-      await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
-      break
-    }
-
-    case "meme": {
-      await interaction.deferReply()
-      Canvas.registerFont("./Resources/Meme/Mememan/Ascender Sans Regular.ttf", { family: "Ascender Sans" })
-
-      const text = interaction.options.getString("text")
-      const variants = fs.readdirSync("./Resources/Meme/Mememan/").filter((file) => file.endsWith(".png"))
-      const variant = interaction.options.getString("variant") || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
-
-      const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
-      const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
-      const ctx = canvas.getContext("2d")
-      const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
-
-      ctx.drawImage(bg, 0, dimensions.height * 0.35, dimensions.width, dimensions.height)
-      ctx.fillStyle = "#ffffff"
-      ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
-      ctx.fillStyle = "#000000"
-      canvasTxt.fontSize = Math.min(dimensions.height * 0.120, dimensions.width * 0.085) * (0.975 ** Math.floor(text.length / 7.5))
-      canvasTxt.font = "Ascender Sans"
-      canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * 0.35 + (canvasTxt.fontSize / 2))
-
-      const attachment = new MessageAttachment(canvas.toBuffer(), "meme.png")
-      await interaction.editReply({ files: [attachment] })
-      break
-    }
-
-    case "wordle": {
-      ansi = {
-        dark: "\u001b[0;40;37m",
-        orange: "\u001b[0;41;37m",
-        greyple: "\u001b[0;42;37m",
-        blurple: "\u001b[0;45;37m",
-        reset: "\u001b[0m"
-      }
-
-      embed = {
-        title: "Wordle!",
-        timestamp: new Date().toISOString(),
-        color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-        footer: { text: "Answer: THINK" },
-        description: `\`\`\`ansi
+        embed = {
+          title: "Wordle!",
+          timestamp: new Date().toISOString(),
+          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+          footer: { text: "Answer: THINK" },
+          description: `\`\`\`ansi
 ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${ansi.reset} ${ansi.greyple} D ${ansi.reset} ${ansi.dark} L ${ansi.reset} ${ansi.orange} E ${ansi.reset}
 
   ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
@@ -330,119 +324,119 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
    ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}
      ${ansi.dark}Z${ansi.reset} ${ansi.dark}X${ansi.reset} ${ansi.dark}C${ansi.reset} ${ansi.dark}V${ansi.reset} ${ansi.dark}B${ansi.reset} ${ansi.dark}N${ansi.reset} ${ansi.dark}M${ansi.reset}
 \`\`\``
-      }
-
-      components = [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              style: ButtonStyle.Primary,
-              label: "TUBES",
-              custom_id: "tubes"
-            },
-            {
-              type: ComponentType.Button,
-              style: ButtonStyle.Primary,
-              label: "FLING",
-              custom_id: "fling"
-            },
-            {
-              type: ComponentType.Button,
-              style: ButtonStyle.Primary,
-              label: "WORDY",
-              custom_id: "wordy"
-            }
-          ]
-        },
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              style: ButtonStyle.Primary,
-              label: "CHAMP",
-              custom_id: "champ"
-            },
-            {
-              type: ComponentType.Button,
-              style: ButtonStyle.Primary,
-              label: "BATHE",
-              custom_id: "bathe"
-            },
-            {
-              type: ComponentType.Button,
-              style: ButtonStyle.Success,
-              label: "THINK",
-              custom_id: "think"
-            }
-          ]
-        }
-      ]
-
-      await interaction.reply({ embeds: [embed], components: components })
-      break
-    }
-
-    default: {
-      switch (interaction.options._subcommand) {
-      case "achievement": {
-        var defaultTitle = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
-
-        interaction.options.getString("icon") !== "0" ? icon = interaction.options.getString("icon") : icon = Math.floor(Math.random() * 39)
-        content = interaction.options.getString("content")
-        interaction.options.getString("title") !== null ? title = interaction.options.getString("title") : title = defaultTitle[Math.floor(Math.random() * defaultTitle.length)]
-
-        achievementEmbed = {
-          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
         }
 
-        await interaction.reply({ embeds: [achievementEmbed] })
-        break
-      }
-
-      case "facts": {
-        const facts = [
-          "The chicken came first or the egg? The answer is... `the chicken`",
-          "The alphabet is completely random",
-          "I ran out of facts. That's a fact",
-          "Found this fact? You're lucky!",
-          "There are 168 prime numbers between 1 and 1000",
-          "`τ` is just `π` times two!",
-          "`τ` is `tau` and `π` is `pi`!",
-          "The F word is the most flexible word in English!",
-          "`Homosapiens` are how biologists call humans!",
-          "`Endy` is a cool bot! And that's a fact!",
-          "`Long` is short and `short` is long!",
-          "√-1 love you!",
-          "There are 13 Slavic countries in the world -- Brought to you by your gopnik friend!",
-          "There are plagues in 1620, 1720, 1820, 1920 and...",
-          "The phrase: `The quick brown fox jumps over the lazy dog` contains every letter in the alphabet!",
-          "There are no Nobel prizes for math because Nobel lost his love to a mathematician",
-          "Endy is intellegent",
-          "69 is just a normal number ok?",
-          "There are 24 synthetic elements from 95~118",
-          "Most of these facts are written by Adnagaporp#1965"
+        components = [
+          {
+            type: ComponentType.ActionRow,
+            components: [
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Primary,
+                label: "TUBES",
+                custom_id: "tubes"
+              },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Primary,
+                label: "FLING",
+                custom_id: "fling"
+              },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Primary,
+                label: "WORDY",
+                custom_id: "wordy"
+              }
+            ]
+          },
+          {
+            type: ComponentType.ActionRow,
+            components: [
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Primary,
+                label: "CHAMP",
+                custom_id: "champ"
+              },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Primary,
+                label: "BATHE",
+                custom_id: "bathe"
+              },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Success,
+                label: "THINK",
+                custom_id: "think"
+              }
+            ]
+          }
         ]
 
-        factEmbed = {
-          title: "Facts",
-          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          description: "Fresh out of the oven.",
-          fields: [
-            { name: "The fact of the second is...", value: facts[Math.floor(Math.random() * facts.length)], inline: false }
-          ],
-          authors: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
-          footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` }
-        }
-
-        await interaction.reply({ embeds: [factEmbed] })
+        await interaction.reply({ embeds: [embed], components: components })
         break
       }
+
+      default: {
+        switch (interaction.options._subcommand) {
+          case "achievement": {
+            var defaultTitle = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
+
+            interaction.options.getString("icon") !== "0" ? icon = interaction.options.getString("icon") : icon = Math.floor(Math.random() * 39)
+            content = interaction.options.getString("content")
+            interaction.options.getString("title") !== null ? title = interaction.options.getString("title") : title = defaultTitle[Math.floor(Math.random() * defaultTitle.length)]
+
+            achievementEmbed = {
+              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
+            }
+
+            await interaction.reply({ embeds: [achievementEmbed] })
+            break
+          }
+
+          case "facts": {
+            const facts = [
+              "The chicken came first or the egg? The answer is... `the chicken`",
+              "The alphabet is completely random",
+              "I ran out of facts. That's a fact",
+              "Found this fact? You're lucky!",
+              "There are 168 prime numbers between 1 and 1000",
+              "`τ` is just `π` times two!",
+              "`τ` is `tau` and `π` is `pi`!",
+              "The F word is the most flexible word in English!",
+              "`Homosapiens` are how biologists call humans!",
+              "`Endy` is a cool bot! And that's a fact!",
+              "`Long` is short and `short` is long!",
+              "√-1 love you!",
+              "There are 13 Slavic countries in the world -- Brought to you by your gopnik friend!",
+              "There are plagues in 1620, 1720, 1820, 1920 and...",
+              "The phrase: `The quick brown fox jumps over the lazy dog` contains every letter in the alphabet!",
+              "There are no Nobel prizes for math because Nobel lost his love to a mathematician",
+              "Endy is intellegent",
+              "69 is just a normal number ok?",
+              "There are 24 synthetic elements from 95~118",
+              "Most of these facts are written by Adnagaporp#1965"
+            ]
+
+            factEmbed = {
+              title: "Facts",
+              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              description: "Fresh out of the oven.",
+              fields: [
+                { name: "The fact of the second is...", value: facts[Math.floor(Math.random() * facts.length)], inline: false }
+              ],
+              authors: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
+              footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` }
+            }
+
+            await interaction.reply({ embeds: [factEmbed] })
+            break
+          }
+        }
       }
-    }
     }
   },
 

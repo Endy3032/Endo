@@ -13,9 +13,9 @@ module.exports = {
 
     commandName =
     interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
-      : interaction.isButton() || interaction.isSelectMenu() ? interaction.message.interaction.commandName || interaction.message.interaction.name
-        : interaction.isContextMenuCommand() ? interaction.commandName.replace("[G] ", "")
-          : null
+    : interaction.isButton() || interaction.isSelectMenu() ? interaction.message.interaction.commandName || interaction.message.interaction.name
+    : interaction.isContextMenuCommand() ? interaction.commandName.replace("[G] ", "")
+    : null
 
     if (!interaction.isAutocomplete()) {
       message = `[${interaction.user.tag} - `
@@ -26,12 +26,12 @@ module.exports = {
 
       message +=
       interaction.isChatInputCommand() && interaction.options._group ? `Ran the [${commandName}:${interaction.options._group}:${interaction.options._subcommand}] command`
-        : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the [${commandName}:${interaction.options._subcommand}] command`
-          : interaction.isChatInputCommand() ? `Ran the [${commandName}] command`
-            : interaction.isButton() ? `Pushed the [${commandName}] command's [${interaction.customId}] button`
-              : interaction.isSelectMenu() ? `Chose the [${commandName}] command's [${interaction.values[0]}] option`
-                : interaction.isContextMenuCommand() ? `Ran the [${commandName}] context menu command`
-                  : (console.log(interaction), "This interaction type hasn't been logged yet. <@554680253876928512>")
+      : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the [${commandName}:${interaction.options._subcommand}] command`
+      : interaction.isChatInputCommand() ? `Ran the [${commandName}] command`
+      : interaction.isButton() ? `Pushed the [${commandName}] command's [${interaction.customId}] button`
+      : interaction.isSelectMenu() ? `Chose the [${commandName}] command's [${interaction.values[0]}] option`
+      : interaction.isContextMenuCommand() ? `Ran the [${commandName}] context menu command`
+      : (console.log(interaction), "This interaction type hasn't been logged yet. <@554680253876928512>")
 
       index.log(message)
     }
