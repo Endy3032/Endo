@@ -13,10 +13,10 @@ async function log(content, logLevel = "INFO") {
   const channel = client.channels.cache.get(process.env.LOG)
 
   logLevelColors = {
-    INFO: nordChalk.info(logLevel),
-    WARN: nordChalk.warn(logLevel),
-    ERROR: nordChalk.error(logLevel),
-    DEBUG: nordChalk.debug(logLevel),
+    INFO: nordChalk.info,
+    WARN: nordChalk.warn,
+    ERROR: nordChalk.error,
+    DEBUG: nordChalk.debug,
   }
 
   logTime = date.toLocaleString("default", {
@@ -32,7 +32,7 @@ async function log(content, logLevel = "INFO") {
     fractionalSecondDigits: 2
   }).replace(",", "")
 
-  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel]} ${nordChalk.blue(`| ${content}`)}`
+  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](`${logLevel} `.substring(0, 5))} ${nordChalk.blue(`| ${content}`)}`
   console.log(consoleLog)
   logStream.write(stripAnsi(`${consoleLog}\n`))
   channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`))
@@ -58,6 +58,11 @@ client.login(process.env.TOKEN)
 keepAlive()
 
 module.exports.log = log
+
+process.on("uncaughtException", (err) => {
+  log(nordChalk.error(String(err).replaceAll("\n", nordChalk.blue("\n                             | ")), "ERROR"))
+    .catch(console.error)
+})
 
 // console.log(client.commands)
 // DELETE ALL COMMANDS

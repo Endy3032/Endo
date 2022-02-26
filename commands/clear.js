@@ -1,6 +1,4 @@
-const index = require("../index")
-const chalk = require("chalk")
-const { emojis } = require("../other/misc")
+const { emojis, nordChalk } = require("../other/misc")
 const { ApplicationCommandOptionType, ButtonStyle, ComponentType, PermissionFlagsBits } = require("discord.js")
 
 module.exports = {
@@ -50,8 +48,8 @@ module.exports = {
         ? interaction.reply({ content: `Press \`Confirm\` to delete \`${amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
         : interaction.reply({ content: "Press `Confirm` to delete `100` messages or `Dismiss message` to cancel. (100 max clear safety)", components: components, ephemeral: true })
     } else {
-      await interaction.reply({ content: `You can't use the \`clear\` command without having \`Manage Messages\` and \`Manage Server\` permissions.\nYou currently have:\n${manageMsgs ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Messages\`\n${manageGuild ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Server\``, ephemeral: true })
-      index.log(`${chalk.yellow("Missing Permissions")} | ${manageMsgs ? chalk.green("Manage Messages") : chalk.red("Manage Messages")} | ${manageGuild ? chalk.green("Manage Server") : chalk.red("Manage Server")}`, "WARN")
+      await interaction.reply({ content: `Permissions needed to use the \`clear\` command:\n${manageMsgs ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Messages\`\n${manageGuild ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Server\``, ephemeral: true })
+      index.log(`${nordChalk.yellow("Permissions")} [ ${manageMsgs ? nordChalk.green("Manage Messages") : nordChalk.red("Manage Messages")} | ${manageGuild ? nordChalk.green("Manage Server") : nordChalk.red("Manage Server")} ]`, "WARN")
     }
   },
 
@@ -63,6 +61,8 @@ module.exports = {
       .catch(console.error)
   }
 }
+
+const index = require("../index") // Prevent circular import leading to deployment issues
 
 // module.exports.help = {
 //   name: module.exports.data.name,

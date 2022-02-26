@@ -28,7 +28,7 @@ function keepAlive() {
       fractionalSecondDigits: 2
     }).replace(",", "")
 
-    console.log(`${nordChalk.blue(`${logTime} ${nordChalk.info("INFO")} | ${nordChalk.bright.cyan("[Server]")} Ready`)}`)
+    console.log(`${nordChalk.blue(`${logTime} ${nordChalk.info("INFO")}  | ${nordChalk.bright.cyan("[Server]")} Ready`)}`)
   })
 }
 

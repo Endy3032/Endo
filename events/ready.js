@@ -36,7 +36,7 @@ module.exports = {
         type_str = ["Playing", "Streaming", "Listening to", "Watching"]
 
         act_name == "lofi"
-          ? index.log(`Status Update: ${type_str[act_type]} ${act_name} ${nordChalk.cyanBright(`[${activity["activities"][0]["url"]}]`)}`)
+          ? index.log(`Status Update: ${type_str[act_type]} ${act_name} ${nordChalk.bright.cyan(`[${activity["activities"][0]["url"]}]`)}`)
           : index.log(`Status Update: ${type_str[act_type]} ${act_name}`)
       }
       pinger()

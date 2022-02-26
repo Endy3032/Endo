@@ -347,7 +347,7 @@ module.exports = {
                   ],
                   thumbnail: { url: `https:${data.current.condition.icon}` },
                   footer: { text: "Data Provided by WeatherAPI", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
-                  timestamp: new Date().toISOString()
+                  timestamp:"shi",
                 }
 
                 interaction.editReply({ embeds: [weatherEmbed] })

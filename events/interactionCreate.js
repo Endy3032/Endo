@@ -1,8 +1,7 @@
 const os = require("os")
-const chalk = require("chalk")
 const dotenv = require("dotenv")
 const index = require("../index.js")
-const { emojis, rep } = require("../other/misc.js")
+const { emojis, nordChalk, rep } = require("../other/misc.js")
 dotenv.config()
 
 module.exports = {
@@ -19,15 +18,14 @@ module.exports = {
     : null
 
     if (!interaction.isAutocomplete()) {
-      message = chalk.cyan(`[${interaction.user.tag} | ${interaction.guildId ? `${interaction.guild.name} | #${interaction.channel.name}` : "DM"}] `)
+      message = nordChalk.bright.cyan(`[${interaction.user.tag} | ${interaction.guildId ? `${interaction.guild.name}#${interaction.channel.name}` : "DM"}] `)
 
       message +=
-      interaction.isChatInputCommand() && interaction.options._group ? `Ran the ${chalk.cyan(`[${commandName}:${interaction.options._group}:${interaction.options._subcommand}]`)} command`
-      : interaction.isChatInputCommand() && interaction.options._subcommand ? `Ran the ${chalk.cyan(`[${commandName}:${interaction.options._subcommand}]`)} command`
-      : interaction.isChatInputCommand() ? `Ran the ${chalk.cyan(`[${commandName}]`)} command`
-      : interaction.isButton() ? `Pushed the ${chalk.cyan(`[${commandName}]`)} command's ${chalk.cyan(`[${interaction.customId}]`)} button`
-      : interaction.isSelectMenu() ? `Chose the ${chalk.cyan(`[${commandName}]`)} command's ${chalk.cyan(`[${interaction.values[0]}]`)} option`
-      : interaction.isContextMenuCommand() ? `Ran the ${chalk.cyan(`[${commandName}]`)} context menu command`
+      interaction.isChatInputCommand() && interaction.options._group ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${interaction.options._group}/${interaction.options._subcommand}]`)}`
+      : interaction.isChatInputCommand() && interaction.options._subcommand ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${interaction.options._subcommand}]`)}`
+      : interaction.isChatInputCommand() || interaction.isContextMenuCommand() ? `Triggered ${nordChalk.bright.cyan(`[${commandName}]`)}`
+      : interaction.isSelectMenu() ? `Selected ${nordChalk.bright.cyan(`[${commandName}/${interaction.values[0]}]`)}`
+      : interaction.isButton() ? `Pushed ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
       : index.log(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)
 
       index.log(message)
@@ -64,8 +62,8 @@ module.exports = {
       // }
     }
 
-    process.once("unhandledRejection", err => {
-      index.error(`Unhandled promise rejection: ${err}`, "ERROR")
+    process.once("unhandledRejection", (err) => {
+      index.log(nordChalk.error(`Unhandled Rejection - ${String(err).replaceAll("\n", nordChalk.blue("\n                             | "))}`), "ERROR")
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
     })
   }
