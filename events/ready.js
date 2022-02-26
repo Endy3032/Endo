@@ -17,9 +17,6 @@ module.exports = {
     function pinger() {
       servers.forEach(server => {
         axios.head(`https://${server}.endy3032.repl.co`)
-          .then((res) => {
-            index.log(`${nordChalk.bright.cyan(`[${server}]`)} ${nordChalk.info(`${res.status} ${res.statusText}`)}`)
-          })
           .catch((err) => {
             if (err.response) index.log(`${nordChalk.bright.cyan(`[${server}]`)} ${nordChalk.error(`${err.response.status} ${err.response.statusText}`)}`, "WARN")
           })
@@ -31,13 +28,15 @@ module.exports = {
         activity = activities[Math.floor(Math.random() * activities.length)]
         client.user.setPresence(activity)
 
-        act_type = activity["activities"][0]["type"]
-        act_name = activity["activities"][0]["name"]
+        act_type = activity.activities[0]["type"]
+        act_name = activity.activities[0]["name"]
         type_str = ["Playing", "Streaming", "Listening to", "Watching"]
 
-        act_name == "lofi"
-          ? index.log(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name} ${nordChalk.bright.cyan(`[${activity["activities"][0]["url"]}]`)}`)
-          : index.log(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name}`)
+        if (act_name == "lofi") {
+          console.log(activity.activities[0].url)
+          axios.get(`https://noembed.com/embed?url=${activity.activities[0].url}`)
+            .then(res => index.log(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name} ${nordChalk.bright.cyan(`[${activity.activities[0]["url"].replace("www.youtube.com/watch?v=", "youtu.be/")} - ${res.data.title}]`)}`))
+        } else index.log(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name}`)
       }
       pinger()
     }, 300000)
