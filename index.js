@@ -1,22 +1,22 @@
 const fs = require("fs")
-const chalk = require("chalk")
+const keepAlive = require("./server")
 const stripAnsi = require("strip-ansi")
-const keepAlive = require("./server.js")
+const { nordChalk } = require("./other/misc")
 const { Client, Collection, GatewayIntentBits } = require("discord.js")
 
-var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 const client = new Client({ intents: [GatewayIntentBits.Guilds] })
+var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 
 async function log(content, logLevel = "INFO") {
-  const channel = client.channels.cache.get(process.env.LOG)
   const date = new Date()
   epoch = Math.floor(date.getTime() / 1000)
+  const channel = client.channels.cache.get(process.env.LOG)
 
   logLevelColors = {
-    INFO: chalk.green(`[${logLevel}]`),
-    WARN: chalk.yellow(`[${logLevel}]`),
-    ERROR: chalk.red(`[${logLevel}]`),
-    DEBUG: chalk.cyan(`[${logLevel}]`),
+    INFO: nordChalk.info(logLevel),
+    WARN: nordChalk.warn(logLevel),
+    ERROR: nordChalk.error(logLevel),
+    DEBUG: nordChalk.debug(logLevel),
   }
 
   logTime = date.toLocaleString("default", {
@@ -30,11 +30,12 @@ async function log(content, logLevel = "INFO") {
     minute: "2-digit",
     second: "2-digit",
     fractionalSecondDigits: 2
-  })
+  }).replace(",", "")
 
-  console.log(`${chalk.blueBright(logTime)} ${logLevelColors[logLevel]} ${chalk.magenta("|")} ${chalk.blue(content)}`)
-  logStream.write(stripAnsi(`${logTime.replace(",", "")} ${logLevel} | ${content}\n`))
-  channel.send(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`)
+  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel]} ${nordChalk.blue(`| ${content}`)}`
+  console.log(consoleLog)
+  logStream.write(stripAnsi(`${consoleLog}\n`))
+  channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`))
 }
 
 client.commands = new Collection()

@@ -1,16 +1,16 @@
 const os = require("os")
-const chalk = require("chalk")
 var axios = require("axios").default
-const index = require("../index.js")
-const { activities } = require("../other/misc.js")
+const index = require("../index")
+const { nordChalk } = require("../other/misc")
+const { activities } = require("../other/misc")
 
 module.exports = {
   name: "ready",
   once: true,
   async execute(client) {
     os.hostname().includes("local")
-      ? index.log(`Ready ${chalk.cyan("[VSCode - Dev]")}`)
-      : index.log(`Ready ${chalk.cyan("[Replit - Prod]")}`)
+      ? index.log(`${nordChalk.bright.cyan("[VSCode]")} Ready`)
+      : index.log(`${nordChalk.bright.cyan("[Replit]")} Ready`)
 
     servers = ["pinger", "endyjs"]
 
@@ -18,10 +18,10 @@ module.exports = {
       servers.forEach(server => {
         axios.head(`https://${server}.endy3032.repl.co`)
           .then((res) => {
-            index.log(`${chalk.cyan(`[${server}]`)} ${chalk.green(`${res.status} ${res.statusText}`)}`)
+            index.log(`${nordChalk.bright.cyan(`[${server}]`)} ${nordChalk.info(`${res.status} ${res.statusText}`)}`)
           })
           .catch((err) => {
-            if (err.response) index.log(`${chalk.cyan(`[${server}]`)} ${chalk.red(`${err.response.status} ${err.response.statusText}`)}`, "WARN")
+            if (err.response) index.log(`${nordChalk.bright.cyan(`[${server}]`)} ${nordChalk.error(`${err.response.status} ${err.response.statusText}`)}`, "WARN")
           })
       })
     }
@@ -36,7 +36,7 @@ module.exports = {
         type_str = ["Playing", "Streaming", "Listening to", "Watching"]
 
         act_name == "lofi"
-          ? index.log(`Status Update: ${type_str[act_type]} ${act_name} ${chalk.cyanBright(`[${activity["activities"][0]["url"]}]`)}`)
+          ? index.log(`Status Update: ${type_str[act_type]} ${act_name} ${nordChalk.cyanBright(`[${activity["activities"][0]["url"]}]`)}`)
           : index.log(`Status Update: ${type_str[act_type]} ${act_name}`)
       }
       pinger()
@@ -48,13 +48,13 @@ module.exports = {
     // .then(cmds => console.log(cmds))
 
     client.application.commands.fetch()
-      .then(commands => index.log(`Fetched ${commands.size} global commands`))
+      .then(commands => index.log(`${nordChalk.bright.cyan("[Global]")} Fetched ${commands.size} commands`))
       .catch(console.error)
 
     const guild = client.guilds.cache.get("864972641219248140")
     // commands = guild.commands
     guild.commands.fetch()
-      .then(commands => index.log(`Fetched ${commands.size} test commands`))
+      .then(commands => index.log(`${nordChalk.bright.cyan("[ Test ]")} Fetched ${commands.size} commands`))
       .catch(console.error)
 
     // delete_cmd = false

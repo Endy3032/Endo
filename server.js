@@ -1,7 +1,7 @@
-const chalk = require("chalk")
 const morgan = require("morgan")
 const express = require("express")
 const { createWriteStream } = require("fs")
+const { nordChalk } = require("./other/misc")
 
 const server = express()
 const port = 3032
@@ -26,9 +26,9 @@ function keepAlive() {
       minute: "2-digit",
       second: "2-digit",
       fractionalSecondDigits: 2
-    })
+    }).replace(",", "")
 
-    console.log(`${chalk.blue(logTime)} ${chalk.green("[INFO]")} ${chalk.magenta("|")} ${chalk.blue("Server Ready")}`)
+    console.log(`${nordChalk.blue(`${logTime} ${nordChalk.info("INFO")} | ${nordChalk.bright.cyan("[Server]")} Ready`)}`)
   })
 }
 
