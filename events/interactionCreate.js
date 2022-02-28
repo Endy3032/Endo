@@ -14,7 +14,7 @@ module.exports = {
     commandName =
     interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
     : interaction.isButton() || interaction.isSelectMenu() ? interaction.message.interaction.commandName || interaction.message.interaction.name
-    : interaction.isContextMenuCommand() ? interaction.commandName.replace("[G] ", "")
+    : interaction.isContextMenuCommand() ? interaction.commandName.replace("[D] ", "")
     : null
 
     if (!interaction.isAutocomplete()) {

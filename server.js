@@ -1,7 +1,7 @@
 const morgan = require("morgan")
 const express = require("express")
 const { createWriteStream } = require("fs")
-const { nordChalk } = require("./other/misc")
+const { bootLog } = require("./other/misc")
 
 const server = express()
 const port = 3032
@@ -14,22 +14,7 @@ server.all("/", (_, res) => {
 })
 
 function keepAlive() {
-  server.listen(port, () => {
-    logTime = new Date().toLocaleString("default", {
-      timeZone: "Asia/Ho_Chi_Minh",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-  
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      fractionalSecondDigits: 2
-    }).replace(",", "")
-
-    console.log(`${nordChalk.blue(`${logTime} ${nordChalk.info("INFO")}  | ${nordChalk.bright.cyan("[Server]")} Ready`)}`)
-  })
+  server.listen(port, () => {bootLog("Server", "Ready")})
 }
 
 module.exports = keepAlive

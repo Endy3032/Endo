@@ -9,8 +9,8 @@ module.exports = {
   once: true,
   async execute(client) {
     os.hostname().includes("local")
-      ? index.log(`${nordChalk.bright.cyan("[VSCode]")} Ready`)
-      : index.log(`${nordChalk.bright.cyan("[Replit]")} Ready`)
+      ? index.log(`${nordChalk.bright.cyan("[VSCode]")} Client Ready`)
+      : index.log(`${nordChalk.bright.cyan("[Replit]")} Client Ready`)
 
     servers = ["pinger", "endyjs"]
 

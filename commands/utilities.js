@@ -1,6 +1,6 @@
 var axios = require("axios").default
-const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
 const { ApplicationCommandOptionType } = require("discord.js")
+const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
 // const { splitBar } = require("string-progressbar")
 
 module.exports = {
@@ -25,10 +25,15 @@ module.exports = {
                 required: true
               },
               {
-                name: "is_imperial",
-                description: "Whether to use imperial (˚F) for the result",
-                type: ApplicationCommandOptionType.Boolean,
-                required: false
+                name: "options",
+                description: "Several options to change the output",
+                type: ApplicationCommandOptionType.String,
+                required: false,
+                choices: [
+                  { name: "Use Imperial (˚F)", value: "imp" },
+                  { name: "Includes Air Quality", value: "aq" },
+                  { name: "Both", value: "both" }
+                ]
               }
             ]
           },
@@ -263,8 +268,9 @@ module.exports = {
         switch (interaction.options._subcommand) {
           case "current": {
             location = interaction.options.getString("location")
+            options = interaction.options.getString("options")
 
-            if (interaction.options.getBoolean("is_imperial")) {
+            if (options == "imp" || options == "both") {
               unit = "imperial"
               dist = "mi"
               symbol = "˚F"
@@ -333,7 +339,14 @@ module.exports = {
                     { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illumination`, inline: true },
                     { name: "Moonrise", value: `<t:${astro_time[2]}:T>\n${times[2]} Local`, inline: true },
                     { name: "Moonset", value: `<t:${astro_time[3]}:T>\n${times[3]} Local`, inline: true },
+                  ],
+                  thumbnail: { url: `https:${data.current.condition.icon}` },
+                  footer: { text: "Data Provided by WeatherAPI", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
+                  timestamp: new Date().toISOString(),
+                }
 
+                if (options == "aq" || options == "both") {
+                  weatherEmbed.fields.push(
                     { name: "\u200b", value: "```Air Quality```", inline: false },
                     { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },
                     { name: "UK Defra Rating", value: `${aqi_ratings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk`, inline: true },
@@ -344,10 +357,7 @@ module.exports = {
                     { name: "SO₂", value: `${data.current.air_quality.so2.toFixed(1)} μg/m³`, inline: true },
                     { name: "PM 2.5", value: `${data.current.air_quality.pm2_5.toFixed(1)} μg/m³`, inline: true },
                     { name: "PM 10", value: `${data.current.air_quality.pm10.toFixed(1)} μg/m³`, inline: true },
-                  ],
-                  thumbnail: { url: `https:${data.current.condition.icon}` },
-                  footer: { text: "Data Provided by WeatherAPI", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
-                  timestamp: new Date().toISOString(),
+                  )
                 }
 
                 interaction.editReply({ embeds: [weatherEmbed] })
