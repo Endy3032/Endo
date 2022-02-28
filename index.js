@@ -32,10 +32,10 @@ async function log(content, logLevel = "INFO") {
     fractionalSecondDigits: 2
   }).replace(",", "")
 
-  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](`${logLevel} `.substring(0, 5))} ${nordChalk.blue(`| ${content}`)}`
+  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](`${logLevel} `.substring(0, 5))} ${nordChalk.blue(`| ${content}`)}`.replaceAll("\n", nordChalk.blue("\n                             | "))
   console.log(consoleLog)
   logStream.write(stripAnsi(`${consoleLog}\n`))
-  channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>] ${content}`))
+  channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>]\n${content}`))
 }
 
 client.commands = new Collection()
@@ -60,7 +60,7 @@ keepAlive()
 module.exports.log = log
 
 process.on("uncaughtException", (err) => {
-  log(nordChalk.error(String(err).replaceAll("\n", nordChalk.blue("\n                             | ")), "ERROR"))
+  log(nordChalk.error(String(err), "ERROR"))
     .catch(console.error)
 })
 

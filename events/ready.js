@@ -33,7 +33,6 @@ module.exports = {
         type_str = ["Playing", "Streaming", "Listening to", "Watching"]
 
         if (act_name == "lofi") {
-          console.log(activity.activities[0].url)
           axios.get(`https://noembed.com/embed?url=${activity.activities[0].url}`)
             .then(res => index.log(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name} ${nordChalk.bright.cyan(`[${activity.activities[0]["url"].replace("www.youtube.com/watch?v=", "youtu.be/")} - ${res.data.title}]`)}`))
         } else index.log(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name}`)
