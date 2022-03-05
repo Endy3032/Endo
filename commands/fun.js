@@ -555,7 +555,7 @@ module.exports = {
     let { description } = embed
 
     if (guess.length !== 5) return interaction.reply("Invalid word length!")
-    if (wordle.allowed.includes(guess)) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
+    if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
 
     ansi = {
       dark: "\u001b[0;40;37m",

@@ -1,4 +1,4 @@
-dailyAnswers = [
+answers = [
   "cigar",
   "rebut",
   "sissy",
@@ -2310,7 +2310,7 @@ dailyAnswers = [
   "shave",
 ]
 
-allowedWords = [
+allowed = [
   "aahed",
   "aalii",
   "aargh",
@@ -12951,15 +12951,15 @@ allowedWords = [
   "zymic",
 ]
 
-allowedWords.push(dailyAnswers)
+allowed.push(answers)
 
-function getTodayWord() {
+function getWord() {
   const a = new Date()
-  return dailyAnswers[Math.floor(a/86400000) - 18797]
+  return answers[Math.floor(a/86400000) - 18797]
 }
 
 module.exports = {
-  answers: dailyAnswers,
-  allowed: allowedWords,
-  getWord: getTodayWord
+  answers: answers,
+  allowed: allowed,
+  getWord: getWord
 }
