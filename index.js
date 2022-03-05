@@ -1,3 +1,4 @@
+require("events").EventEmitter.defaultMaxListeners = 6
 const fs = require("fs")
 const keepAlive = require("./server")
 const stripAnsi = require("strip-ansi")
@@ -59,6 +60,7 @@ keepAlive()
 
 module.exports.log = log
 
+process.setMaxListeners(6)
 process.on("uncaughtException", (err) => {
   log(nordChalk.error(String(err), "ERROR"))
     .catch(console.error)

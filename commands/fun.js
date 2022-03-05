@@ -364,10 +364,11 @@ module.exports = {
         }
 
         embed = {
-          title: title,
+          title: `${title}`,
           timestamp: new Date().toISOString(),
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          description: `\`\`\`ansi
+          footer: { text: "6 guesses remaining" },
+          description: `<@${interaction.user.id}>'s Session\n\`\`\`ansi
   ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
   ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
   ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
@@ -462,6 +463,7 @@ module.exports = {
 
   async button(interaction) {
     if (interaction.customId.startsWith("wordle_")) {
+      if (!interaction.message.embeds[0].data.description.includes(interaction.user.id)) {return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })}
       await interaction.showModal({
         title: "Wordle",
         custom_id: "wordle",
@@ -552,7 +554,6 @@ module.exports = {
     var [embed, result] = [interaction.message.embeds[0], ""]
     let { description } = embed
 
-
     if (guess.length !== 5) return interaction.reply("Invalid word length!")
     if (wordle.allowed.includes(guess)) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
 
@@ -566,6 +567,7 @@ module.exports = {
     ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
 
     if (guess == answer) {
+      embed.data.footer = null
       embed.data.title += " - You Won!"
       embed.data.description = description.replace(ansi.blank, `${ansi.blurple} ${guess[0]}   ${guess[1]}   ${guess[2]}   ${guess[3]}   ${guess[4]} ${ansi.reset}`.trim())
       return await interaction.update({ embeds: [embed], components: [] })
@@ -585,7 +587,13 @@ module.exports = {
       }
     }
 
+    embed.data.footer.text = `${parseInt(embed.data.footer.text.charAt(0)) - 1} ${embed.data.footer.text.substring(2)}`
     embed.data.description = description.replace(ansi.blank, result.trim())
+    if (embed.data.footer.text.charAt(0) == "0") {
+      embed.data.footer = null
+      embed.data.title += " - You Lost :("
+      return await interaction.update({ embeds: [embed], components: [] })
+    }
     await interaction.update({ embeds: [embed] })
   }
 }
