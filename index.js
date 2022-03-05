@@ -60,12 +60,6 @@ keepAlive()
 
 module.exports.log = log
 
-process.setMaxListeners(6)
-process.on("uncaughtException", (err) => {
-  log(nordChalk.error(String(err), "ERROR"))
-    .catch(console.error)
-})
-
 // console.log(client.commands)
 // DELETE ALL COMMANDS
 // client.application.commands.set([])

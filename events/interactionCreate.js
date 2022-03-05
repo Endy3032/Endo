@@ -65,9 +65,12 @@ module.exports = {
       // }
     }
 
-    process.once("unhandledRejection", (err) => {
-      index.log(nordChalk.error(`Unhandled Rejection - ${String(err).replaceAll("\n", nordChalk.blue("\n                             | "))}`), "ERROR")
+    handleError = (err) => {
+      index.log(nordChalk.error(String(err), "ERROR"))
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-    })
+    }
+
+    process.once("uncaughtException", handleError)
+    process.once("unhandledRejection", handleError)
   }
 }
