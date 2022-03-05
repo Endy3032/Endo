@@ -12,7 +12,7 @@ module.exports = {
 
     commandName =
     interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
-    : interaction.isButton() || interaction.isSelectMenu() ? interaction.message.interaction.commandName || interaction.message.interaction.name
+    : interaction.isButton() || interaction.isSelectMenu() || interaction.isModalSubmit() ? interaction.message.interaction.commandName || interaction.message.interaction.name
     : interaction.isContextMenuCommand() ? interaction.commandName.replace("[D] ", "")
     : null
 
@@ -23,9 +23,10 @@ module.exports = {
       interaction.isChatInputCommand() && interaction.options._group ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${interaction.options._group}/${interaction.options._subcommand}]`)}`
       : interaction.isChatInputCommand() && interaction.options._subcommand ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${interaction.options._subcommand}]`)}`
       : interaction.isChatInputCommand() || interaction.isContextMenuCommand() ? `Triggered ${nordChalk.bright.cyan(`[${commandName}]`)}`
-      : interaction.isSelectMenu() ? `Selected ${nordChalk.bright.cyan(`[${commandName}/[${interaction.values.join("|")}]]`)}`
       : interaction.isButton() ? `Pushed ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
-      : index.log(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)
+      : interaction.isSelectMenu() ? `Selected ${nordChalk.bright.cyan(`[${commandName}/[${interaction.values.join("|")}]]`)}`
+      : interaction.isModalSubmit() ? `Submitted ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
+      : "Unknown Interaction", () => {index.log(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)}
 
       index.log(message)
     }
@@ -47,6 +48,9 @@ module.exports = {
     } else if (interaction.isAutocomplete()) {
       execute = command.autocomplete
       type = "Autocomplete"
+    } else if (interaction.isModalSubmit()) {
+      execute = command.modal
+      type = "Modal"
     }
 
     try {await execute(interaction)}

@@ -208,11 +208,11 @@ module.exports = {
           }
         ]
       },
-      // {
-      //   name: "poll",
-      //   description: "Make a poll!",
-      //   type: ApplicationCommandOptionType.Subcommand
-      // },
+      {
+        name: "poll",
+        description: "Make a poll!",
+        type: ApplicationCommandOptionType.Subcommand
+      },
       //   options: [
       //     {
       //       name: "question",

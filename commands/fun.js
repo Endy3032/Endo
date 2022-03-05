@@ -1,10 +1,5 @@
-const { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageAttachment } = require("discord.js")
-const canvasTxt = require("canvas-txt").default
 const { colors } = require("../other/misc.js")
-const sizeOf = require("image-size")
-const Canvas = require("canvas")
-const Fuse = require("fuse.js")
-const fs = require("fs")
+const { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageAttachment, TextInputStyle } = require("discord.js")
 
 module.exports = {
   cmd: {
@@ -181,16 +176,42 @@ module.exports = {
         type: ApplicationCommandOptionType.SubcommandGroup,
         options: [
           {
-            name: "random",
-            description: "Play a random word",
+            name: "daily",
+            description: "Play today's word from Wordle",
             type: ApplicationCommandOptionType.Subcommand,
-            // options: [
-            //   {
-            //     name: "length",
-            //     description: "The length of the word to play",
-            //   }
-            // ]
-          }
+          },
+          {
+            name: "replay",
+            description: "Replay a game of Worlde",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "id",
+                description: "The ID of the game to replay [integer 0~2308]",
+                type: ApplicationCommandOptionType.Integer,
+                required: true,
+                min_value: 0,
+                max_value: 2308
+              }
+            ]
+          },
+          {
+            name: "random",
+            description: "Play any random word",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "mode",
+                description: "The random mode to play",
+                type: ApplicationCommandOptionType.String,
+                required: true,
+                choices: [
+                  { name: "Random Words", value: "random" },
+                  { name: "Random Daily Wordle", value: "daily" },
+                ]
+              }
+            ]
+          },
         ]
       },
       {
@@ -273,6 +294,11 @@ module.exports = {
       }
 
       case "meme": {
+        const fs = require("fs")
+        const Canvas = require("canvas")
+        const sizeOf = require("image-size")
+        const canvasTxt = require("canvas-txt").default
+
         await interaction.deferReply()
         Canvas.registerFont("./Resources/Meme/Mememan/Ascender Sans Regular.ttf", { family: "Ascender Sans" })
 
@@ -299,6 +325,9 @@ module.exports = {
       }
 
       case "wordle": {
+        const wordle = require("../other/wordle")
+        var answer = ""
+
         ansi = {
           dark: "\u001b[0;40;37m",
           orange: "\u001b[0;41;37m",
@@ -307,24 +336,48 @@ module.exports = {
           reset: "\u001b[0m"
         }
 
+        switch (interaction.options._subcommand) {
+          case "daily": {
+            answer = wordle.getWord()
+            title = "Daily Wordle"
+            break
+          }
+          
+          case "replay": {
+            const id = interaction.options.getInteger("id")
+            answer = wordle.answers[id]
+            title = `Wordle #${id}`
+            break
+          }
+
+          case "random": {
+            const mode = interaction.options.getString("mode")
+            if (mode == "random") {
+              answer = wordle.allowed[Math.floor(Math.random() * wordle.allowed.length)]
+              title = "Random Wordle"
+            } else if (mode == "daily") {
+              answer = wordle.answers[Math.floor(Math.random() * wordle.answers.length)]
+              title = "Random Daily Wordle"
+            }
+            break
+          }
+        }
+
         embed = {
-          title: "Wordle!",
+          title: title,
           timestamp: new Date().toISOString(),
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          footer: { text: "Answer: THINK" },
           description: `\`\`\`ansi
-${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${ansi.reset} ${ansi.greyple} D ${ansi.reset} ${ansi.dark} L ${ansi.reset} ${ansi.orange} E ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
 
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-
-  ${ansi.dark}Q${ansi.reset} ${ansi.dark}W${ansi.reset} ${ansi.dark}E${ansi.reset} ${ansi.dark}R${ansi.reset} ${ansi.dark}T${ansi.reset} ${ansi.dark}Y${ansi.reset} ${ansi.dark}U${ansi.reset} ${ansi.dark}I${ansi.reset} ${ansi.dark}O${ansi.reset} ${ansi.dark}P${ansi.reset}
-   ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}
-     ${ansi.dark}Z${ansi.reset} ${ansi.dark}X${ansi.reset} ${ansi.dark}C${ansi.reset} ${ansi.dark}V${ansi.reset} ${ansi.dark}B${ansi.reset} ${ansi.dark}N${ansi.reset} ${ansi.dark}M${ansi.reset}
+  ${ansi.dark}Q${ansi.reset} ${ansi.dark}W${ansi.reset} ${ansi.dark}E${ansi.reset} ${ansi.dark}R${ansi.reset} ${ansi.dark}T${ansi.reset} ${ansi.dark}Y${ansi.reset} ${ansi.dark}U${ansi.reset} ${ansi.dark}I${ansi.reset} ${ansi.dark}O${ansi.reset} ${ansi.dark}P${ansi.reset}  
+   ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}   
+     ${ansi.dark}Z${ansi.reset} ${ansi.dark}X${ansi.reset} ${ansi.dark}C${ansi.reset} ${ansi.dark}V${ansi.reset} ${ansi.dark}B${ansi.reset} ${ansi.dark}N${ansi.reset} ${ansi.dark}M${ansi.reset}     
 \`\`\``
         }
 
@@ -335,44 +388,9 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
               {
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
-                label: "TUBES",
-                custom_id: "tubes"
+                label: "Guess",
+                custom_id: `wordle_${answer}`
               },
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Primary,
-                label: "FLING",
-                custom_id: "fling"
-              },
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Primary,
-                label: "WORDY",
-                custom_id: "wordy"
-              }
-            ]
-          },
-          {
-            type: ComponentType.ActionRow,
-            components: [
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Primary,
-                label: "CHAMP",
-                custom_id: "champ"
-              },
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Primary,
-                label: "BATHE",
-                custom_id: "bathe"
-              },
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Success,
-                label: "THINK",
-                custom_id: "think"
-              }
             ]
           }
         ]
@@ -443,46 +461,29 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
   },
 
   async button(interaction) {
-    var [embed, word, answer] = [interaction.message.embeds[0], interaction.customId.toUpperCase(), "THINK"]
-    if (word.length !== 5) return interaction.reply("Invalid word length!")
-
-    ansi = {
-      dark: "\u001b[0;40;37m",
-      orange: "\u001b[0;41;37m",
-      greyple: "\u001b[0;42;37m",
-      blurple: "\u001b[0;45;37m",
-      reset: "\u001b[0m",
+    if (interaction.customId.startsWith("wordle_")) {
+      await interaction.showModal({
+        title: "Wordle",
+        custom_id: "wordle",
+        components: [{
+          type: ComponentType.ActionRow,
+          components: [{
+            type: ComponentType.TextInput,
+            custom_id: "guess",
+            label: "Your Guess",
+            style: TextInputStyle.Short,
+            min_length: 5,
+            max_length: 5,
+            required: true
+          }]
+        }]
+      })
     }
-    ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
-
-    var { description } = embed
-    result = ""
-
-    if (word == answer) {
-      result = `${ansi.blurple} ${word[0]}   ${word[1]}   ${word[2]}   ${word[3]}   ${word[4]} ${ansi.reset}`
-      embed.data.title += " - You Won!"
-    } else {
-      for (i = 0; i < word.length; i++) {
-        if (word[i] === answer[i]) {
-          result += `${ansi.blurple} ${word[i]} ${ansi.reset} `
-          description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
-          description = description.replace(`${ansi.greyple}${word[i]}${ansi.reset}`, `${ansi.blurple}${word[i]}${ansi.reset}`)
-        } else if (answer.includes(word[i])) {
-          result += `${ansi.greyple} ${word[i]} ${ansi.reset} `
-          description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.greyple}${word[i]}${ansi.reset}`)
-        } else {
-          result += `${ansi.orange} ${word[i]} ${ansi.reset} `
-          description = description.replace(`${ansi.dark}${word[i]}${ansi.reset}`, `${ansi.orange}${word[i]}${ansi.reset}`)
-        }
-      }
-    }
-    embed.data.description = description.replace(ansi.blank, result.trim())
-
-    if (word == answer) await interaction.update({ embeds: [embed], components: [] })
-    else await interaction.update({ embeds: [embed] })
   },
 
   async autocomplete(interaction) {
+    const Fuse = require("fuse.js")
+
     choices = [
       { name: "arrow",            value: "34" },
       { name: "bed",              value: "9"  },
@@ -543,6 +544,49 @@ ${ansi.dark} W ${ansi.reset} ${ansi.orange} O ${ansi.reset} ${ansi.blurple} R ${
     else {for (i = 0; i < 24; i++) {res.push(choices[i])}}
 
     interaction.respond(res)
+  },
+
+  async modal(interaction) {
+    const wordle = require("../other/wordle")
+    const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), interaction.message.components[0].components[0].data.custom_id.substring(7).toUpperCase()]
+    var [embed, result] = [interaction.message.embeds[0], ""]
+    let { description } = embed
+
+
+    if (guess.length !== 5) return interaction.reply("Invalid word length!")
+    if (wordle.allowed.includes(guess)) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
+
+    ansi = {
+      dark: "\u001b[0;40;37m",
+      orange: "\u001b[0;41;37m",
+      greyple: "\u001b[0;42;37m",
+      blurple: "\u001b[0;45;37m",
+      reset: "\u001b[0m",
+    }
+    ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
+
+    if (guess == answer) {
+      result = `${ansi.blurple} ${guess[0]}   ${guess[1]}   ${guess[2]}   ${guess[3]}   ${guess[4]} ${ansi.reset}`
+      embed.data.title += " - You Won!"
+      return await interaction.update({ embeds: [embed], components: [] })
+    }
+
+    for (i = 0; i < guess.length; i++) {
+      if (guess[i] === answer[i]) {
+        result += `${ansi.blurple} ${guess[i]} ${ansi.reset} `
+        description = description.replace(`${ansi.dark}${guess[i]}${ansi.reset}`, `${ansi.blurple}${guess[i]}${ansi.reset}`)
+        description = description.replace(`${ansi.greyple}${guess[i]}${ansi.reset}`, `${ansi.blurple}${guess[i]}${ansi.reset}`)
+      } else if (answer.includes(guess[i])) {
+        result += `${ansi.greyple} ${guess[i]} ${ansi.reset} `
+        description = description.replace(`${ansi.dark}${guess[i]}${ansi.reset}`, `${ansi.greyple}${guess[i]}${ansi.reset}`)
+      } else {
+        result += `${ansi.orange} ${guess[i]} ${ansi.reset} `
+        description = description.replace(`${ansi.dark}${guess[i]}${ansi.reset}`, `${ansi.orange}${guess[i]}${ansi.reset}`)
+      }
+    }
+
+    embed.data.description = description.replace(ansi.blank, result.trim())
+    await interaction.update({ embeds: [embed] })
   }
 }
 
