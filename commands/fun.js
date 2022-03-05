@@ -566,8 +566,8 @@ module.exports = {
     ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
 
     if (guess == answer) {
-      result = `${ansi.blurple} ${guess[0]}   ${guess[1]}   ${guess[2]}   ${guess[3]}   ${guess[4]} ${ansi.reset}`
       embed.data.title += " - You Won!"
+      embed.data.description = description.replace(ansi.blank, `${ansi.blurple} ${guess[0]}   ${guess[1]}   ${guess[2]}   ${guess[3]}   ${guess[4]} ${ansi.reset}`.trim())
       return await interaction.update({ embeds: [embed], components: [] })
     }
 
