@@ -384,7 +384,7 @@ module.exports = {
   },
 
   async button(interaction) {
-    if (interaction.message.interaction.commandName == "wordle") {
+    if (interaction.customId.startsWith("wordle")) {
       if (!interaction.message.embeds[0].data.description.includes(interaction.user.id)) {return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })}
       await interaction.showModal({
         title: "Wordle",

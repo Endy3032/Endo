@@ -12951,7 +12951,7 @@ allowed = [
   "zymic",
 ]
 
-allowed.push(answers)
+allowed.push(...answers)
 
 function getWord() {
   const a = new Date()
