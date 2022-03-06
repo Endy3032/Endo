@@ -1,8 +1,7 @@
 const os = require("os")
-var axios = require("axios").default
 const index = require("../index")
-const { nordChalk } = require("../other/misc")
-const { activities } = require("../other/misc")
+const axios = require("axios").default
+const { activities, nordChalk } = require("../other/misc")
 
 module.exports = {
   name: "ready",
@@ -12,9 +11,8 @@ module.exports = {
       ? index.log(`${nordChalk.bright.cyan("[VSCode]")} Client Ready`)
       : index.log(`${nordChalk.bright.cyan("[Replit]")} Client Ready`)
 
-    servers = ["pinger", "endyjs"]
-
     function pinger() {
+      servers = ["pinger", "endyjs"]
       servers.forEach(server => {
         axios.head(`https://${server}.endy3032.repl.co`)
           .catch((err) => {

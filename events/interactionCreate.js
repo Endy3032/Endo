@@ -56,7 +56,7 @@ module.exports = {
     try {await execute(interaction)}
     catch (err) {
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-      index.log(err, "ERROR")
+      index.log(nordChalk.error(String(err)), "ERROR")
       // try {
       //   const msg = await interaction.fetchReply()
       //   console.log(msg.content)
@@ -66,8 +66,8 @@ module.exports = {
     }
 
     handleError = (err) => {
-      index.log(nordChalk.error(String(err), "ERROR"))
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
+      index.log(nordChalk.error(String(err)), "ERROR")
     }
 
     process.once("uncaughtException", handleError)

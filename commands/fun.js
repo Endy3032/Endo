@@ -14,7 +14,7 @@ module.exports = {
           {
             name: "icon",
             description: "The icon of the achievement",
-            type: 3,
+            type: ApplicationCommandOptionType.String,
             autocomplete: true,
             required: true
           },
@@ -33,101 +33,36 @@ module.exports = {
         ]
       },
       {
+        name: "facts",
+        description: "Get a random fact",
+        type: ApplicationCommandOptionType.Subcommand
+      },
+      {
         name: "format",
         description: "Reformat your text to any style from the list",
-        type: ApplicationCommandOptionType.SubcommandGroup,
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
-            name: "varied",
-            description: "mAkE y0uR tExT uSeS vArIEd CaSeS",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
+            name: "style",
+            description: "The style of the text",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            choices: [
+              { name: "vArIeD cAsE", value: "varied" },
+              { name: "sᴍᴀʟʟ ᴄᴀᴘs", value: "smallcaps" },
+              { name: "ᵗᶦⁿʸ ˢᵘᵖᵉʳˢᶜʳᶦᵖᵗ (tiny superscript)", value: "superscript" },
+              { name: "uʍopǝpᴉsdn (upsidedown)", value: "upsidedown" },
+              { name: "ｆｕｌｌｗｉｄｔｈ (fullwidth)", value: "fullwidth" },
+              { name: "1337 (leet)", value: "leet" },
+              { name: "丁卂尸卂ん乇丂乇 (japanese)", value: "japanese" }
             ]
           },
           {
-            name: "smallcaps",
-            description: "Mᴀᴋᴇ ʏᴏᴜʀ ᴛᴇxᴛ ᴜsᴇ sᴍᴀʟʟ ᴄᴀᴘs",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
-            ]
-          },
-          {
-            name: "superscript",
-            description: "ᵐᵃᵏᵉ ʸᵒᵘʳ ᵗᵉˣᵗ ᵗᶦⁿʸ (make your text tiny)",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
-            ]
-          },
-          {
-            name: "upsidedown",
-            description: "uʍopǝpᴉsdn ʇxǝʇ ɹnoʎ uɹnʇ (turn your text upsidedown)",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
-            ]
-          },
-          {
-            name: "fullwidth",
-            description: "Ｍａｋｅ　ｙｏｕｒ　ｔｅｘｔ　ｆｕｌｌ　ｗｉｄｔｈ",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
-            ]
-          },
-          {
-            name: "leet",
-            description: "1337ify y0uЯ 73x7 (leetify your text)",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
-            ]
-          },
-          {
-            name: "japanese",
-            description: "从卂长乇　丫口凵尺　丅乇乂丅　乚口口长丂　乚工长乇　丁卂尸卂ん乇丂乇 (make your text looks like japanese)",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "text",
-                description: "The text to be formatted [string]",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              }
-            ]
-          },
+            name: "text",
+            description: "The text to be formatted [string]",
+            type: ApplicationCommandOptionType.String,
+            required: true
+          }
         ]
       },
       {
@@ -150,21 +85,7 @@ module.exports = {
                 name: "variant",
                 description: "The variant of the mememan to use [Leave blank to pick random]",
                 type: ApplicationCommandOptionType.String,
-                choices: [
-                  { name: "acceleration yes", value: "acceleration_yes" },
-                  { name: "bylingal", value: "bylingal" },
-                  { name: "fier", value: "fier" },
-                  { name: "helth", value: "helth" },
-                  { name: "kemist", value: "kemist" },
-                  { name: "meth", value: "meth" },
-                  { name: "ort", value: "ort" },
-                  { name: "sconce", value: "sconce" },
-                  { name: "shef", value: "shef" },
-                  { name: "spanesh", value: "spanesh" },
-                  { name: "stonks", value: "stonks" },
-                  { name: "tehc", value: "tehc" },
-                  { name: "teknologi expirt", value: "teknologi_expirt" },
-                ]
+                autocomplete: true,
               }
             ]
           }
@@ -214,93 +135,19 @@ module.exports = {
           },
         ]
       },
-      {
-        name: "facts",
-        description: "Get a random fact",
-        type: ApplicationCommandOptionType.Subcommand
-      }
     ]
   },
 
   async execute(interaction) {
     switch(interaction.options._group) {
-      case "format": {
-        text = interaction.options.getString("text")
-        result = ""
-        replacements = {
-          og: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-          sc: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-          ss: " !\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁνᵂˣʸᶻÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖᑫʳˢᵗᵘᵛʷˣʸᶻáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-          ud: " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{",
-          fw: "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝",
-          lt: " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-          jp: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
-        }
-
-        var replace = null
-
-        switch(interaction.options._subcommand) {
-          case "varied": {
-            turn = false
-            for (i = 0; i < text.length; i++) {
-              if (text[i] == " ") {
-                result += " "
-                turn = !turn
-              } else {
-                turn ? cond = i % 2 == 0 : cond = i % 2 !== 0
-                cond ? result += text[i].toUpperCase() : result += text[i].toLowerCase()
-              }
-            }
-            break
-          }
-
-          case "smallcaps": {
-            replace = replacements.sc
-            break
-          }
-      
-          case "superscript": {
-            replace = replacements.ss
-            break
-          }
-
-          case "upsidedown": {
-            replace = replacements.ud
-            break
-          }
-
-          case "fullwidth": {
-            replace = replacements.fw
-            break
-          }
-
-          case "leet": {
-            replace = replacements.lt
-            break
-          }
-
-          case "japanese": {
-            replace = replacements.jp
-            break
-          }
-        }
-
-        for (i = 0; i < text.length; i++) {
-          result += replace[replacements.og.indexOf(text[i])]
-        }
-
-        await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
-        break
-      }
-
       case "meme": {
         const fs = require("fs")
         const Canvas = require("canvas")
         const sizeOf = require("image-size")
         const canvasTxt = require("canvas-txt").default
+        Canvas.registerFont("./Resources/Meme/Mememan/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
 
         await interaction.deferReply()
-        Canvas.registerFont("./Resources/Meme/Mememan/Ascender Sans Regular.ttf", { family: "Ascender Sans" })
 
         const text = interaction.options.getString("text")
         const variants = fs.readdirSync("./Resources/Meme/Mememan/").filter((file) => file.endsWith(".png"))
@@ -309,18 +156,25 @@ module.exports = {
         const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
         const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
         const ctx = canvas.getContext("2d")
-        const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
+        
+        const offset = 0.4
 
-        ctx.drawImage(bg, 0, dimensions.height * 0.35, dimensions.width, dimensions.height)
+        const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
+        ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
+
         ctx.fillStyle = "#ffffff"
-        ctx.fillRect(0, 0, dimensions.width, dimensions.height * 0.35)
+        ctx.fillRect(0, 0, dimensions.width, dimensions.height * offset)
+
         ctx.fillStyle = "#000000"
-        canvasTxt.fontSize = Math.min(dimensions.height * 0.120, dimensions.width * 0.085) * (0.975 ** Math.floor(text.length / 7.5))
-        canvasTxt.font = "Ascender Sans"
-        canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * 0.35 + (canvasTxt.fontSize / 2))
+        canvasTxt.font = "LeagueSpartan"
+        canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
+        canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * offset + (canvasTxt.fontSize / 2))
 
         const attachment = new MessageAttachment(canvas.toBuffer(), "meme.png")
-        await interaction.editReply({ files: [attachment] })
+        await interaction.editReply({ files: [attachment], embeds: [{
+          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+          image: { url: "attachment://meme.png" }
+        }] })
         break
       }
 
@@ -342,7 +196,7 @@ module.exports = {
             title = "Daily Wordle"
             break
           }
-          
+
           case "replay": {
             const id = interaction.options.getInteger("id")
             answer = wordle.answers[id]
@@ -369,15 +223,15 @@ module.exports = {
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
           footer: { text: "6 guesses remaining" },
           description: `<@${interaction.user.id}>'s Session\n\`\`\`ansi
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
+  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
   ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
 
-  ${ansi.dark}Q${ansi.reset} ${ansi.dark}W${ansi.reset} ${ansi.dark}E${ansi.reset} ${ansi.dark}R${ansi.reset} ${ansi.dark}T${ansi.reset} ${ansi.dark}Y${ansi.reset} ${ansi.dark}U${ansi.reset} ${ansi.dark}I${ansi.reset} ${ansi.dark}O${ansi.reset} ${ansi.dark}P${ansi.reset}  
-   ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}   
+  ${ansi.dark}Q${ansi.reset} ${ansi.dark}W${ansi.reset} ${ansi.dark}E${ansi.reset} ${ansi.dark}R${ansi.reset} ${ansi.dark}T${ansi.reset} ${ansi.dark}Y${ansi.reset} ${ansi.dark}U${ansi.reset} ${ansi.dark}I${ansi.reset} ${ansi.dark}O${ansi.reset} ${ansi.dark}P${ansi.reset}
+   ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}
      ${ansi.dark}Z${ansi.reset} ${ansi.dark}X${ansi.reset} ${ansi.dark}C${ansi.reset} ${ansi.dark}V${ansi.reset} ${ansi.dark}B${ansi.reset} ${ansi.dark}N${ansi.reset} ${ansi.dark}M${ansi.reset}     
 \`\`\``
         }
@@ -403,11 +257,11 @@ module.exports = {
       default: {
         switch (interaction.options._subcommand) {
           case "achievement": {
-            var defaultTitle = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
+            var titles = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
 
-            interaction.options.getString("icon") !== "0" ? icon = interaction.options.getString("icon") : icon = Math.floor(Math.random() * 39)
             content = interaction.options.getString("content")
-            interaction.options.getString("title") !== null ? title = interaction.options.getString("title") : title = defaultTitle[Math.floor(Math.random() * defaultTitle.length)]
+            icon = interaction.options.getString("icon") !== "0" ? interaction.options.getString("icon") : Math.floor(Math.random() * 39)
+            title = interaction.options.getString("title") !== null ? interaction.options.getString("title") : titles[Math.floor(Math.random() * titles.length)]
 
             achievementEmbed = {
               color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
@@ -446,14 +300,82 @@ module.exports = {
               title: "Facts",
               color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
               description: "Fresh out of the oven.",
-              fields: [
-                { name: "The fact of the second is...", value: facts[Math.floor(Math.random() * facts.length)], inline: false }
-              ],
+              fields: [{ name: "The fact of the second is...", value: facts[Math.floor(Math.random() * facts.length)], inline: false }],
               authors: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
               footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` }
             }
 
             await interaction.reply({ embeds: [factEmbed] })
+            break
+          }
+
+          case "format": {
+            // console.log(interaction.options)
+            style = interaction.options.getString("style")
+            text = interaction.options.getString("text")
+            replacements = {
+              og: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+              sc: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+              ss: " !\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁνᵂˣʸᶻÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖᑫʳˢᵗᵘᵛʷˣʸᶻáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+              ud: " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{",
+              fw: "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝",
+              lt: " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
+              jp: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
+            }
+
+            let replace, result
+
+            switch(style) {
+              case "varied": {
+                turn = false
+                for (i = 0; i < text.length; i++) {
+                  if (text[i] == " ") {
+                    result += " "
+                    turn = !turn
+                  } else {
+                    cond = turn ? i % 2 == 0 : i % 2 !== 0
+                    result += cond ? text[i].toUpperCase() : text[i].toLowerCase()
+                  }
+                }
+                return await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
+              }
+
+              case "smallcaps": {
+                replace = replacements.sc
+                break
+              }
+
+              case "superscript": {
+                replace = replacements.ss
+                break
+              }
+
+              case "upsidedown": {
+                replace = replacements.ud
+                break
+              }
+
+              case "fullwidth": {
+                replace = replacements.fw
+                break
+              }
+
+              case "leet": {
+                replace = replacements.lt
+                break
+              }
+
+              case "japanese": {
+                replace = replacements.jp
+                break
+              }
+            }
+
+            for (i = 0; i < text.length; i++) {
+              result += replace[replacements.og.indexOf(text[i])]
+            }
+
+            await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
             break
           }
         }
@@ -462,7 +384,7 @@ module.exports = {
   },
 
   async button(interaction) {
-    if (interaction.customId.startsWith("wordle_")) {
+    if (interaction.message.interaction.commandName == "wordle") {
       if (!interaction.message.embeds[0].data.description.includes(interaction.user.id)) {return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })}
       await interaction.showModal({
         title: "Wordle",
@@ -484,66 +406,77 @@ module.exports = {
   },
 
   async autocomplete(interaction) {
+    const fs = require("fs")
     const Fuse = require("fuse.js")
 
-    choices = [
-      { name: "arrow",            value: "34" },
-      { name: "bed",              value: "9"  },
-      { name: "cake",             value: "10" },
-      { name: "cobweb",           value: "16" },
-      { name: "crafting_table",   value: "13" },
-      { name: "creeper",          value: "4"  },
-      { name: "diamond",          value: "2"  },
-      { name: "diamond_sword",    value: "3"  },
-      { name: "arrow",            value: "34" },
-      { name: "book",             value: "19" },
-      { name: "bow",              value: "33" },
-      { name: "bucket",           value: "36" },
-      { name: "chest",            value: "17" },
-      { name: "coal_block",       value: "31" },
-      { name: "cookie",           value: "7"  },
-      { name: "diamond_armor",    value: "26" },
-      { name: "fire",             value: "15" },
-      { name: "flint_and_steel",  value: "27" },
-      { name: "furnace",          value: "18" },
-      { name: "gold_ingot",       value: "23" },
-      { name: "grass_block",      value: "1"  },
-      { name: "heart",            value: "8"  },
-      { name: "iron_armor",       value: "35" },
-      { name: "iron_door",        value: "25" },
-      { name: "iron_ingot",       value: "22" },
-      { name: "iron_sword",       value: "32" },
-      { name: "lava",             value: "38" },
-      { name: "milk",             value: "39" },
-      { name: "oak_door",         value: "24" },
-      { name: "pig",              value: "5"  },
-      { name: "planks",           value: "21" },
-      { name: "potion",           value: "28" },
-      { name: "rail",             value: "12" },
-      { name: "redstone",         value: "14" },
-      { name: "sign",             value: "11" },
-      { name: "spawn_egg",        value: "30" },
-      { name: "splash",           value: "29" },
-      { name: "stone",            value: "20" },
-      { name: "tnt",              value: "6"  },
-      { name: "water",            value: "37" },
-    ]
+    switch (interaction.options._subcommand) {
+      case "achievement": {
+        choices = [
+          { name: "arrow",            value: "34" },
+          { name: "bed",              value: "9"  },
+          { name: "cake",             value: "10" },
+          { name: "cobweb",           value: "16" },
+          { name: "crafting_table",   value: "13" },
+          { name: "creeper",          value: "4"  },
+          { name: "diamond",          value: "2"  },
+          { name: "diamond_sword",    value: "3"  },
+          { name: "arrow",            value: "34" },
+          { name: "book",             value: "19" },
+          { name: "bow",              value: "33" },
+          { name: "bucket",           value: "36" },
+          { name: "chest",            value: "17" },
+          { name: "coal_block",       value: "31" },
+          { name: "cookie",           value: "7"  },
+          { name: "diamond_armor",    value: "26" },
+          { name: "fire",             value: "15" },
+          { name: "flint_and_steel",  value: "27" },
+          { name: "furnace",          value: "18" },
+          { name: "gold_ingot",       value: "23" },
+          { name: "grass_block",      value: "1"  },
+          { name: "heart",            value: "8"  },
+          { name: "iron_armor",       value: "35" },
+          { name: "iron_door",        value: "25" },
+          { name: "iron_ingot",       value: "22" },
+          { name: "iron_sword",       value: "32" },
+          { name: "lava",             value: "38" },
+          { name: "milk",             value: "39" },
+          { name: "oak_door",         value: "24" },
+          { name: "pig",              value: "5"  },
+          { name: "planks",           value: "21" },
+          { name: "potion",           value: "28" },
+          { name: "rail",             value: "12" },
+          { name: "redstone",         value: "14" },
+          { name: "sign",             value: "11" },
+          { name: "spawn_egg",        value: "30" },
+          { name: "splash",           value: "29" },
+          { name: "stone",            value: "20" },
+          { name: "tnt",              value: "6"  },
+          { name: "water",            value: "37" },
+        ]
+        break
+      }
 
-    options = {
-      distance: 24,
-      keys: [
-        "name",
-        "value"
-      ]
+      case "mememan": {
+        choices = []
+        const mememanFiles = fs.readdirSync("./Resources/Meme/Mememan/").filter(file => file.endsWith(".png"))
+        mememanFiles.forEach(file => {
+          choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
+        })
+        break
+      }
     }
 
     res = [{ name: "random", value: "0" }]
+    pattern = interaction.options.getFocused()
+    const fuse = new Fuse(choices, { distance: 24, keys: ["name", "value"] })
 
-    const fuse = new Fuse(choices, options)
-    pattern = interaction.options.getString("icon")
-
-    if (pattern.length > 0) {fuse.search(pattern).forEach(item => res.push(item.item))}
-    else {for (i = 0; i < 24; i++) {res.push(choices[i])}}
+    if (pattern.length > 0) {fuse.search(pattern).forEach(choice => res.push(choice.item))}
+    else {
+      for (i = 0; i < choices.length; i++) {
+        if (i > 23) break
+        res.push(choices[i])
+      }
+    }
 
     interaction.respond(res)
   },

@@ -36,7 +36,7 @@ module.exports = {
               label: "Confirm",
               emoji: {
                 name: "trash",
-                id: "927050313943380089"
+                id: emojis.trash.id
               },
               custom_id: `${amount <= 100 ? amount : 100}`
             }
@@ -44,9 +44,7 @@ module.exports = {
         }
       ]
 
-      amount <= 100
-        ? interaction.reply({ content: `Press \`Confirm\` to delete \`${amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
-        : interaction.reply({ content: "Press `Confirm` to delete `100` messages or `Dismiss message` to cancel. (100 max clear safety)", components: components, ephemeral: true })
+      interaction.reply({ content: `Press \`Confirm\` to delete \`${amount > 100 ? 100 : amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
     } else {
       await interaction.reply({ content: `Permissions needed to use the \`clear\` command:\n${manageMsgs ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Messages\`\n${manageGuild ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Server\``, ephemeral: true })
       index.log(`${nordChalk.yellow("Permissions")} [ ${manageMsgs ? nordChalk.green("Manage Messages") : nordChalk.red("Manage Messages")} | ${manageGuild ? nordChalk.green("Manage Server") : nordChalk.red("Manage Server")} ]`, "WARN")

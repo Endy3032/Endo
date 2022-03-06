@@ -411,9 +411,14 @@ botActivities = [
 
 // Functions
 async function rep(interaction, object) {
-  interaction.replied || interaction.deferred
-    ? await interaction.followUp(object)
-    : await interaction.reply(object)
+  if (interaction.isAutocomplete) return
+  try {
+    interaction.replied || interaction.deferred
+      ? await interaction.followUp(object)
+      : await interaction.reply(object)
+  } catch (err) {
+    console.error(`Can't respond to the interaction - ${err}`)
+  }
 }
 
 async function bootLog(tag, content) {
@@ -434,14 +439,14 @@ async function bootLog(tag, content) {
 }
 
 module.exports = {
-  colors: discordColors,
-  nordChalk: nordChalk,
-  emojis: botEmojis,
   activities: botActivities,
-  HSV: HSV,
-  RGB: RGB,
-  CMYK: CMYK,
-  Convert: Convert,
+  bootLog: bootLog,
+  colors: discordColors,
+  emojis: botEmojis,
+  nordChalk: nordChalk,
   rep: rep,
-  bootLog: bootLog
+  Convert: Convert,
+  CMYK: CMYK,
+  HSV: HSV,
+  RGB: RGB
 }
