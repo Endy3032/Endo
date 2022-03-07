@@ -539,11 +539,11 @@ module.exports = {
         ctx.fillStyle = wordle.colors.correct
         ansArray.splice(ansArray.indexOf(guess[i]), 1)
         if (!buttonID[2].includes(guess[i])) {buttonID[2] += guess[i]}
-        buttonID[3].replace(guess[i], "")
+        buttonID[3].replaceAll(guess[i], "")
       } else if (answer.includes(guess[i]) && ansArray.includes(guess[i])) {
         ctx.fillStyle = wordle.colors.present
         ansArray.splice(ansArray.indexOf(guess[i]), 1)
-        if (!buttonID[2].includes(guess[i])) {buttonID[3] += guess[i]}
+        if (!buttonID[2].includes(guess[i]) && !buttonID[3].includes(guess[i])) {buttonID[3] += guess[i]}
       } else {
         ctx.fillStyle = wordle.colors.absent
       }
