@@ -257,8 +257,14 @@ module.exports = {
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
                 label: "Guess",
-                custom_id: `wordle_${answer.toUpperCase()}`
+                custom_id: `wordle_${answer.toUpperCase()}__`
               },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Danger,
+                label: "Give Up",
+                custom_id: "wordle_giveup"
+              }
             ]
           }
         ]
@@ -400,22 +406,29 @@ module.exports = {
   async button(interaction) {
     if (interaction.customId.startsWith("wordle")) {
       if (!interaction.message.embeds[0].data.author.name.includes(interaction.user.tag)) {return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })}
-      await interaction.showModal({
-        title: "Wordle",
-        custom_id: "wordle",
-        components: [{
-          type: ComponentType.ActionRow,
+      if (interaction.customId.endsWith("giveup")) {
+        embed = interaction.message.embeds[0]
+        embed.data.title += " - You Gave Up"
+        embed.data.footer = { text: `Answer: ${interaction.message.components[0].components[0].data.custom_id.substring(7, 12)}` }
+        await interaction.update({ components: [], embeds: [embed], files: [] })
+      } else {
+        await interaction.showModal({
+          title: "Wordle",
+          custom_id: "wordle",
           components: [{
-            type: ComponentType.TextInput,
-            custom_id: "guess",
-            label: "Your Guess",
-            style: TextInputStyle.Short,
-            min_length: 5,
-            max_length: 5,
-            required: true
+            type: ComponentType.ActionRow,
+            components: [{
+              type: ComponentType.TextInput,
+              custom_id: "guess",
+              label: "Your Guess",
+              style: TextInputStyle.Short,
+              min_length: 5,
+              max_length: 5,
+              required: true
+            }]
           }]
-        }]
-      })
+        })
+      }
     }
   },
 
@@ -575,6 +588,12 @@ module.exports = {
             label: "Guess",
             custom_id: String(buttonID.join("_"))
           },
+          {
+            type: ComponentType.Button,
+            style: ButtonStyle.Danger,
+            label: "Give Up",
+            custom_id: "wordle_giveup"
+          }
         ]
       }
     ]
