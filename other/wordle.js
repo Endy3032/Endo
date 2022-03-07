@@ -12958,8 +12958,50 @@ function getWord() {
   return answers[Math.floor(a/86400000) - 18797]
 }
 
+colors = {
+  background: "#121213",
+  tilebg: "#3A3A3C",
+  keybg: "#818384",
+  present: "#B59F3B",
+  absent: "#2A2A2C",
+  correct: "#538D4E",
+  text: "#FFFFFF"
+}
+
+// colors = {
+//   background: "#0E1420",
+//   tilebg: "#2E3440",
+//   keybg: "#1E2430",
+//   present: "#EBCB8B",
+//   absent: "#2E3440",
+//   correct: "#A3BE8C",
+//   text: "#ECEFF4"
+// }
+
+const canvas = {
+  width: 750,
+  height: 1000,
+  space: 10,
+  size: 90,
+  keyFont: 32,
+  tileFont: 56
+}
+
+width = canvas.width
+height = canvas.height
+space = canvas.space
+size = canvas.size
+
+canvas.tileStartingX = (width - size * 5 - space*4) / 2
+canvas.tileStartingY = space
+canvas.keyWidth = (width - 11 * space)/10
+canvas.keyStartingY = height - (space + size) * 3
+canvas.keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], ["A", "S", "D", "F", "G", "H", "J", "K", "L"], ["Z", "X", "C", "V", "B", "N", "M"]]
+
 module.exports = {
   answers: answers,
   allowed: allowed,
-  getWord: getWord
+  getWord: getWord,
+  colors: colors,
+  canvas: canvas
 }

@@ -60,6 +60,8 @@ keepAlive()
 
 module.exports.log = log
 
+process.setMaxListeners(0)
+
 // console.log(client.commands)
 // DELETE ALL COMMANDS
 // client.application.commands.set([])

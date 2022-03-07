@@ -1,5 +1,16 @@
+const axios = require("axios").default
 const { colors } = require("../other/misc.js")
 const { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageAttachment, TextInputStyle } = require("discord.js")
+
+// #region Canvas Related Stuff
+const fs = require("fs")
+const Canvas = require("canvas")
+const sizeOf = require("image-size")
+const wordle = require("../other/wordle")
+const canvasTxt = require("canvas-txt").default
+Canvas.registerFont("./Resources/Wordle/ClearSans-Bold.ttf", { family: "ClearSans" })
+Canvas.registerFont("./Resources/Mememan/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
+// #endregion
 
 module.exports = {
   cmd: {
@@ -141,25 +152,18 @@ module.exports = {
   async execute(interaction) {
     switch(interaction.options._group) {
       case "meme": {
-        const fs = require("fs")
-        const Canvas = require("canvas")
-        const sizeOf = require("image-size")
-        const canvasTxt = require("canvas-txt").default
-        Canvas.registerFont("./Resources/Meme/Mememan/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
-
         await interaction.deferReply()
 
         const text = interaction.options.getString("text")
-        const variants = fs.readdirSync("./Resources/Meme/Mememan/").filter((file) => file.endsWith(".png"))
+        const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".png"))
         const variant = interaction.options.getString("variant") || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
 
-        const dimensions = sizeOf(`./Resources/Meme/Mememan/${variant}.png`)
+        const dimensions = sizeOf(`./Resources/Mememan/${variant}.png`)
         const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
         const ctx = canvas.getContext("2d")
-        
         const offset = 0.4
 
-        const bg = await Canvas.loadImage(`./Resources/Meme/Mememan/${variant}.png`)
+        const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.png`)
         ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
 
         ctx.fillStyle = "#ffffff"
@@ -179,15 +183,35 @@ module.exports = {
       }
 
       case "wordle": {
-        const wordle = require("../other/wordle")
-        var answer = ""
+        let answer
+        const { width, height, space, size, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
 
-        ansi = {
-          dark: "\u001b[0;40;37m",
-          orange: "\u001b[0;41;37m",
-          greyple: "\u001b[0;42;37m",
-          blurple: "\u001b[0;45;37m",
-          reset: "\u001b[0m"
+        const canvas = Canvas.createCanvas(width, height)
+        const ctx = canvas.getContext("2d")
+        canvasTxt.font = "ClearSans"
+        canvasTxt.fontSize = wordle.canvas.keyFont
+
+        ctx.fillStyle = wordle.colors.background
+        ctx.fillRect(0, 0, width, height)
+
+        ctx.fillStyle = wordle.colors.tilebg
+        for (y = 0; y < 6; y++) {
+          for (x = 0; x < 5; x++) {
+            ctx.fillRect(tileStartingX + x * (size + space), tileStartingY + y * (size + space), size, size)
+          }
+        }
+
+        for (y = 0; y < 3; y++) {
+          for (x = 0; x < keys[y].length; x++) {
+            ctx.fillStyle = wordle.colors.keybg
+            keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
+            keyX = keyStartingX + x * (keyWidth + space)
+            keyY = keyStartingY + y * (size + space)
+            ctx.fillRect(keyX, keyY, keyWidth, size)
+
+            ctx.fillStyle = wordle.colors.text
+            canvasTxt.drawText(ctx, keys[y][x], keyX, keyY, keyWidth, size - canvasTxt.fontSize / 3)
+          }
         }
 
         switch (interaction.options._subcommand) {
@@ -218,22 +242,11 @@ module.exports = {
         }
 
         embed = {
-          title: `${title}`,
-          timestamp: new Date().toISOString(),
-          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+          title: title,
+          author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
+          image: { url: "attachment://wordle.png" },
           footer: { text: "6 guesses remaining" },
-          description: `<@${interaction.user.id}>'s Session\n\`\`\`ansi
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}
-  ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}  
-
-  ${ansi.dark}Q${ansi.reset} ${ansi.dark}W${ansi.reset} ${ansi.dark}E${ansi.reset} ${ansi.dark}R${ansi.reset} ${ansi.dark}T${ansi.reset} ${ansi.dark}Y${ansi.reset} ${ansi.dark}U${ansi.reset} ${ansi.dark}I${ansi.reset} ${ansi.dark}O${ansi.reset} ${ansi.dark}P${ansi.reset}
-   ${ansi.dark}A${ansi.reset} ${ansi.dark}S${ansi.reset} ${ansi.dark}D${ansi.reset} ${ansi.dark}F${ansi.reset} ${ansi.dark}G${ansi.reset} ${ansi.dark}H${ansi.reset} ${ansi.dark}J${ansi.reset} ${ansi.dark}K${ansi.reset} ${ansi.dark}L${ansi.reset}
-     ${ansi.dark}Z${ansi.reset} ${ansi.dark}X${ansi.reset} ${ansi.dark}C${ansi.reset} ${ansi.dark}V${ansi.reset} ${ansi.dark}B${ansi.reset} ${ansi.dark}N${ansi.reset} ${ansi.dark}M${ansi.reset}     
-\`\`\``
+          timestamp: new Date().toISOString(),
         }
 
         components = [
@@ -244,13 +257,14 @@ module.exports = {
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
                 label: "Guess",
-                custom_id: `wordle_${answer}`
+                custom_id: `wordle_${answer.toUpperCase()}`
               },
             ]
           }
         ]
 
-        await interaction.reply({ embeds: [embed], components: components })
+        const attachment = new MessageAttachment(canvas.toBuffer(), "wordle.png")
+        await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
         break
       }
 
@@ -385,7 +399,7 @@ module.exports = {
 
   async button(interaction) {
     if (interaction.customId.startsWith("wordle")) {
-      if (!interaction.message.embeds[0].data.description.includes(interaction.user.id)) {return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })}
+      if (!interaction.message.embeds[0].data.author.name.includes(interaction.user.tag)) {return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })}
       await interaction.showModal({
         title: "Wordle",
         custom_id: "wordle",
@@ -458,7 +472,7 @@ module.exports = {
 
       case "mememan": {
         choices = []
-        const mememanFiles = fs.readdirSync("./Resources/Meme/Mememan/").filter(file => file.endsWith(".png"))
+        const mememanFiles = fs.readdirSync("./Resources/Mememan/").filter(file => file.endsWith(".png"))
         mememanFiles.forEach(file => {
           choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
         })
@@ -482,52 +496,98 @@ module.exports = {
   },
 
   async modal(interaction) {
-    const wordle = require("../other/wordle")
-    const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), interaction.message.components[0].components[0].data.custom_id.substring(7).toUpperCase()]
-    var [embed, result] = [interaction.message.embeds[0], ""]
-    let { description } = embed
-
-    if (guess.length !== 5) return interaction.reply("Invalid word length!")
+    const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), interaction.message.components[0].components[0].data.custom_id.substring(7, 12)]
+    if (guess.length !== 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
     if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
 
-    ansi = {
-      dark: "\u001b[0;40;37m",
-      orange: "\u001b[0;41;37m",
-      greyple: "\u001b[0;42;37m",
-      blurple: "\u001b[0;45;37m",
-      reset: "\u001b[0m",
+    const { Image } = require("canvas")
+    let [embed, ansArray] = [interaction.message.embeds[0], answer.split("")]
+    const { width, height, space, size, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
+
+    buttonID = interaction.message.components[0].components[0].data.custom_id
+    if (buttonID == `wordle_${answer}`) {buttonID = `wordle_${answer}__`}
+    buttonID = buttonID.split("_")
+
+    const canvas = Canvas.createCanvas(width, height)
+    const ctx = canvas.getContext("2d")
+    canvasTxt.font = "ClearSans"
+    canvasTxt.fontSize = wordle.canvas.tileFont
+
+    const img = new Image()
+    const response = await axios.get(embed.data.image.url, { responseType: "arraybuffer" })
+    const imgWordle = Buffer.from(response.data, "utf-8")
+    img.onload = () => ctx.drawImage(img, 0, 0, width, height)
+    img.src = imgWordle
+
+    const guessCount = Math.abs(parseInt(embed.data.footer.text.charAt(0)) - 7)
+    for (i = 0; i < 5; i++) {
+      canvasTxt.fontSize = wordle.canvas.tileFont
+      if (guess[i] === answer[i] && ansArray.includes(guess[i])) {
+        ctx.fillStyle = wordle.colors.correct
+        ansArray.splice(ansArray.indexOf(guess[i]), 1)
+        if (!buttonID[2].includes(guess[i])) {buttonID[2] += guess[i]}
+        buttonID[3].replace(guess[i], "")
+      } else if (answer.includes(guess[i]) && ansArray.includes(guess[i])) {
+        ctx.fillStyle = wordle.colors.present
+        ansArray.splice(ansArray.indexOf(guess[i]), 1)
+        if (!buttonID[2].includes(guess[i])) {buttonID[3] += guess[i]}
+      } else {
+        ctx.fillStyle = wordle.colors.absent
+      }
+
+      tileX = tileStartingX + i * (size + space)
+      tileY = tileStartingY + (guessCount - 1) * (size + space)
+
+      ctx.fillRect(tileX, tileY, size, size)
+
+      if (ctx.fillStyle !== wordle.colors.present && buttonID[3].includes(guess[i])) ctx.fillStyle = wordle.colors.present
+      if (ctx.fillStyle !== wordle.colors.correct && buttonID[2].includes(guess[i])) ctx.fillStyle = wordle.colors.correct
+
+      var x
+      var y = keys.findIndex((keyRow) => {
+        x = keyRow.indexOf(guess[i])
+        return x !== -1
+      })
+
+      keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
+      keyX = keyStartingX + x * (keyWidth + space)
+      keyY = keyStartingY + y * (size + space)
+
+      ctx.fillRect(keyX, keyY, keyWidth, size)
+
+      ctx.fillStyle = wordle.colors.text
+      canvasTxt.drawText(ctx, guess[i], tileX, tileY - canvasTxt.fontSize / 8, size, size)
+      canvasTxt.fontSize = wordle.canvas.keyFont
+      canvasTxt.drawText(ctx, guess[i], keyX, keyY, keyWidth, size - canvasTxt.fontSize / 3)
     }
-    ansi.blank = `${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset} ${ansi.dark}   ${ansi.reset}`
+
+    embed.data.footer = { text: `${6 - guessCount}${embed.data.footer.text.substring(1)}` }
+    embed.data.image = { url: `attachment://wordle${guessCount}.png` }
+    attachment = new MessageAttachment(canvas.toBuffer(), `wordle${guessCount}.png`)
+
+    const components = [
+      {
+        type: ComponentType.ActionRow,
+        components: [
+          {
+            type: ComponentType.Button,
+            style: ButtonStyle.Primary,
+            label: "Guess",
+            custom_id: String(buttonID.join("_"))
+          },
+        ]
+      }
+    ]
 
     if (guess == answer) {
-      embed.data.footer = null
       embed.data.title += " - You Won!"
-      embed.data.description = description.replace(ansi.blank, `${ansi.blurple} ${guess[0]}   ${guess[1]}   ${guess[2]}   ${guess[3]}   ${guess[4]} ${ansi.reset}`.trim())
-      return await interaction.update({ embeds: [embed], components: [] })
-    }
-
-    for (i = 0; i < guess.length; i++) {
-      if (guess[i] === answer[i]) {
-        result += `${ansi.blurple} ${guess[i]} ${ansi.reset} `
-        description = description.replace(`${ansi.dark}${guess[i]}${ansi.reset}`, `${ansi.blurple}${guess[i]}${ansi.reset}`)
-        description = description.replace(`${ansi.greyple}${guess[i]}${ansi.reset}`, `${ansi.blurple}${guess[i]}${ansi.reset}`)
-      } else if (answer.includes(guess[i])) {
-        result += `${ansi.greyple} ${guess[i]} ${ansi.reset} `
-        description = description.replace(`${ansi.dark}${guess[i]}${ansi.reset}`, `${ansi.greyple}${guess[i]}${ansi.reset}`)
-      } else {
-        result += `${ansi.orange} ${guess[i]} ${ansi.reset} `
-        description = description.replace(`${ansi.dark}${guess[i]}${ansi.reset}`, `${ansi.orange}${guess[i]}${ansi.reset}`)
-      }
-    }
-
-    embed.data.footer.text = `${parseInt(embed.data.footer.text.charAt(0)) - 1} ${embed.data.footer.text.substring(2)}`
-    embed.data.description = description.replace(ansi.blank, result.trim())
-    if (embed.data.footer.text.charAt(0) == "0") {
-      embed.data.footer = null
+    } else if (embed.data.footer.text.charAt(0) == "0") {
       embed.data.title += " - You Lost :("
-      return await interaction.update({ embeds: [embed], components: [] })
+    } else {
+      return await interaction.update({ components: components, embeds: [embed], files: [attachment] })
     }
-    await interaction.update({ embeds: [embed] })
+    embed.data.footer = { text: `Answer: ${answer}` }
+    await interaction.update({ components: [], embeds: [embed], files: [attachment] })
   }
 }
 
