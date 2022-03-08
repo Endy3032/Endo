@@ -409,7 +409,7 @@ module.exports = {
       if (interaction.customId.endsWith("giveup")) {
         embed = interaction.message.embeds[0]
         embed.data.title += " - You Gave Up"
-        embed.data.footer = { text: `Answer: ${interaction.message.components[0].components[0].data.custom_id.substring(7, 12)}` }
+        embed.data.footer = { text: `Answer: ${interaction.message.components[0].components[0].data.custom_id.slice(7, 12)}` }
         await interaction.update({ components: [], embeds: [embed], files: [] })
       } else {
         await interaction.showModal({
@@ -509,7 +509,7 @@ module.exports = {
   },
 
   async modal(interaction) {
-    const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), interaction.message.components[0].components[0].data.custom_id.substring(7, 12)]
+    const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), interaction.message.components[0].components[0].data.custom_id.slice(7, 12)]
     if (guess.length !== 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
     if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
 
@@ -574,7 +574,7 @@ module.exports = {
       canvasTxt.drawText(ctx, guess[i], keyX, keyY, keyWidth, size - canvasTxt.fontSize / 3)
     }
 
-    embed.data.footer = { text: `${6 - guessCount}${embed.data.footer.text.substring(1)}` }
+    embed.data.footer = { text: `${6 - guessCount}${embed.data.footer.text.slice(1)}` }
     embed.data.image = { url: `attachment://wordle${guessCount}.png` }
     attachment = new MessageAttachment(canvas.toBuffer(), `wordle${guessCount}.png`)
 

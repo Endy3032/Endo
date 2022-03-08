@@ -192,9 +192,9 @@ const Convert = {
   _RGBtoHEX : function (RGB) {
     hex = "#"
 
-    hr = `000${RGB.r.toString(16)}`.substr(-2)
-    hg = `000${RGB.g.toString(16)}`.substr(-2)
-    hb = `000${RGB.b.toString(16)}`.substr(-2)
+    hr = `000${RGB.r.toString(16)}`.slice(-2)
+    hg = `000${RGB.g.toString(16)}`.slice(-2)
+    hb = `000${RGB.b.toString(16)}`.slice(-2)
 
     hex += hr + hg + hb
 
@@ -421,7 +421,7 @@ async function rep(interaction, object) {
   }
 }
 
-async function bootLog(tag, content) {
+async function deployLog(tag, content) {
   logTime = new Date().toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric",
@@ -440,7 +440,7 @@ async function bootLog(tag, content) {
 
 module.exports = {
   activities: botActivities,
-  bootLog: bootLog,
+  deployLog: deployLog,
   colors: discordColors,
   emojis: botEmojis,
   nordChalk: nordChalk,

@@ -14,9 +14,9 @@ module.exports = {
       {
         type: ApplicationCommandOptionType.Integer,
         name: "times",
-        description: "The number of times to repeat the message [integer 1~10, default 3]",
-        "min-value": 1,
-        "max-value": 10,
+        description: "The number of times to repeat the message [integer 1~5, default 3]",
+        "min_value": 1,
+        "max_value": 5,
         required: false
       }
     ]

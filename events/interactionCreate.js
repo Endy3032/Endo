@@ -1,6 +1,5 @@
 const os = require("os")
 require("dotenv").config()
-const index = require("../index.js")
 const { emojis, nordChalk, rep } = require("../other/misc.js")
 
 module.exports = {
@@ -26,9 +25,9 @@ module.exports = {
       : interaction.isButton() ? `Pushed ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
       : interaction.isSelectMenu() ? `Selected ${nordChalk.bright.cyan(`[${commandName}/[${interaction.values.join("|")}]]`)}`
       : interaction.isModalSubmit() ? `Submitted ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
-      : "Unknown Interaction", () => {index.log(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)}
+      : "Unknown Interaction", () => {console.botLog(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)}
 
-      index.log(message)
+      console.botLog(message)
     }
 
     const command = interaction.client.commands.get(commandName)
@@ -56,7 +55,7 @@ module.exports = {
     try {await execute(interaction)}
     catch (err) {
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-      index.log(nordChalk.error(String(err)), "ERROR")
+      console.botLog(nordChalk.error(String(err)), "ERROR")
       // try {
       //   const msg = await interaction.fetchReply()
       //   console.log(msg.content)
@@ -67,7 +66,7 @@ module.exports = {
 
     handleError = (err) => {
       rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-      index.log(nordChalk.error(String(err)), "ERROR")
+      console.botLog(nordChalk.error(String(err)), "ERROR")
     }
 
     process.once("uncaughtException", handleError)

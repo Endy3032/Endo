@@ -1,4 +1,3 @@
-require("events").EventEmitter.defaultMaxListeners = 6
 const fs = require("fs")
 const keepAlive = require("./server")
 const stripAnsi = require("strip-ansi")
@@ -8,9 +7,9 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js")
 const client = new Client({ intents: [GatewayIntentBits.Guilds] })
 var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 
-async function log(content, logLevel = "INFO") {
+console.botLog = async function log(content, logLevel = "INFO") {
   const date = new Date()
-  epoch = Math.floor(date.getTime() / 1000)
+  const epoch = Math.floor(date.getTime() / 1000)
   const channel = client.channels.cache.get(process.env.LOG)
 
   logLevelColors = {
@@ -33,10 +32,14 @@ async function log(content, logLevel = "INFO") {
     fractionalSecondDigits: 2
   }).replace(",", "")
 
-  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](`${logLevel} `.substring(0, 5))} ${nordChalk.blue(`| ${content}`)}`.replaceAll("\n", nordChalk.blue("\n                             | "))
+  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](`${logLevel} `.slice(0, 5))} ${nordChalk.blue(`| ${content}`)}`.replaceAll("\n", nordChalk.blue("\n                             | "))
   console.log(consoleLog)
   logStream.write(stripAnsi(`${consoleLog}\n`))
-  channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>]\n${content}`))
+  try {channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>]\n${content}`))} catch {null}
+}
+
+console.tagLog = async function(tag, content) {
+  console.botLog(`${nordChalk.bright.cyan(`[${tag}]`)} ${content}`)
 }
 
 client.commands = new Collection()
@@ -57,8 +60,6 @@ eventFiles.forEach((file) => {
 
 client.login(process.env.TOKEN)
 keepAlive()
-
-module.exports.log = log
 
 process.setMaxListeners(0)
 

@@ -12,7 +12,10 @@
     "dev": "nodemon index.js",
     "ceploy": "node other/deploy.js",
     "teploy": "node other/deploy.js --mode='test'",
-    "geploy": "node other/deploy.js --mode='guilds' && npm run dev"
+    "geploy": "node other/deploy.js --mode='guilds'",
+    "cerun": "node other/deploy.js && npm run dev",
+    "terun": "node other/deploy.js --mode='test' && npm run dev",
+    "gerun": "node other/deploy.js --mode='guilds' && npm run dev"
   },
   "keywords": [],
   "author": "Endy3032",
@@ -43,6 +46,7 @@
     "typescript": "^4.6.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.7",
     "eslint": "^8.10.0",
     "node": "^16.13.2"
   }

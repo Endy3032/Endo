@@ -2,8 +2,8 @@ require("dotenv").config()
 var flags = require("flags")
 
 const fs = require("fs")
+const { deployLog } = require("./misc")
 const { REST } = require("@discordjs/rest")
-const { bootLog } = require("../other/misc")
 const { Routes } = require("discord-api-types/v9")
 
 flags.defineString("mode", "global", "The mode to deploy the commands.")
@@ -11,7 +11,7 @@ flags.parse()
 
 const mode = flags.get("mode")
 const rest = new REST({ version: "9" }).setToken(process.env.TOKEN)
-bootLog("Deploy", "Refreshing application commands...")
+deployLog("Deploy", "Refreshing application commands...")
 
 if (mode != "guilds") {
   const commands = [] //.map(command => command.toJSON());
@@ -41,7 +41,7 @@ if (mode != "guilds") {
           : Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
         { body: commands },
       )
-      bootLog("Deploy", `Registered ${commandFiles.length} ${mode} commands.`)
+      deployLog("Deploy", `Registered ${commandFiles.length} ${mode} commands.`)
     } catch (err) {console.error(err)}
   })()
 } else {
@@ -71,7 +71,7 @@ if (mode != "guilds") {
           Routes.applicationGuildCommands(process.env.CLIENT, guildId),
           { body: commands },
         )
-        bootLog("Deploy", `Registered ${commandFiles.length} guild[${guildId}] commands.`)
+        deployLog("Deploy", `Registered ${commandFiles.length} guild[${guildId}] commands.`)
       }
       catch (error) {console.error(error)}
     })()

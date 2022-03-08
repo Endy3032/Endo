@@ -47,7 +47,7 @@ module.exports = {
       interaction.reply({ content: `Press \`Confirm\` to delete \`${amount > 100 ? 100 : amount}\` messages or \`Dismiss message\` to cancel.`, components: components, ephemeral: true })
     } else {
       await interaction.reply({ content: `Permissions needed to use the \`clear\` command:\n${manageMsgs ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Messages\`\n${manageGuild ? emojis.checkmark.shorthand : emojis.crossmark.shorthand} \`Manage Server\``, ephemeral: true })
-      index.log(`${nordChalk.yellow("Permissions")} [ ${manageMsgs ? nordChalk.green("Manage Messages") : nordChalk.red("Manage Messages")} | ${manageGuild ? nordChalk.green("Manage Server") : nordChalk.red("Manage Server")} ]`, "WARN")
+      console.botLog(`${nordChalk.yellow("Permissions")} [ ${manageMsgs ? nordChalk.green("Manage Messages") : nordChalk.red("Manage Messages")} | ${manageGuild ? nordChalk.green("Manage Server") : nordChalk.red("Manage Server")} ]`, "WARN")
     }
   },
 
@@ -55,12 +55,10 @@ module.exports = {
     amount = interaction.customId
 
     await interaction.channel.bulkDelete(amount)
-      .then(index.log(`Cleared ${amount} messages`), await interaction.deferUpdate())
+      .then(console.botLog(`Cleared ${amount} messages`), await interaction.deferUpdate())
       .catch(console.error)
   }
 }
-
-const index = require("../index") // Prevent circular import leading to deployment issues
 
 // module.exports.help = {
 //   name: module.exports.data.name,

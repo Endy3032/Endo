@@ -1,4 +1,5 @@
 var axios = require("axios").default
+const { evaluate } = require("mathjs")
 const { ApplicationCommandOptionType, ChannelType } = require("discord.js")
 const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
 // const { splitBar } = require("string-progressbar")
@@ -27,24 +28,24 @@ module.exports = {
                 name: "red",
                 description: "The red value of the RGB color [integer 0~255]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 255,
+                "min_value": 0,
+                "max_value": 255,
                 required: true
               },
               {
                 name: "green",
                 description: "The green value of the RGB color [integer 0~255]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 255,
+                "min_value": 0,
+                "max_value": 255,
                 required: true
               },
               {
                 name: "blue",
                 description: "The blue value of the RGB color [integer 0~255]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 255,
+                "min_value": 0,
+                "max_value": 255,
                 required: true
               }
             ]
@@ -71,24 +72,24 @@ module.exports = {
                 name: "hue",
                 description: "The hue value of the HSV color [integer 0~360]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 360,
+                "min_value": 0,
+                "max_value": 360,
                 required: true
               },
               {
                 name: "saturation",
                 description: "The saturation value of the HSV color [integer 0~100]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 100,
+                "min_value": 0,
+                "max_value": 100,
                 required: true
               },
               {
                 name: "value",
                 description: "The value value of the HSV color [integer 0~100]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 100,
+                "min_value": 0,
+                "max_value": 100,
                 required: true
               }
             ]
@@ -102,32 +103,32 @@ module.exports = {
                 name: "cyan",
                 description: "The cyan value of the CMYK color [integer 0~100]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 100,
+                "min_value": 0,
+                "max_value": 100,
                 required: true
               },
               {
                 name: "magenta",
                 description: "The magenta value of the CMYK color [integer 0~100]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 100,
+                "min_value": 0,
+                "max_value": 100,
                 required: true
               },
               {
                 name: "yellow",
                 description: "The yellow value of the CMYK color [integer 0~100]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 100,
+                "min_value": 0,
+                "max_value": 100,
                 required: true
               },
               {
                 name: "key",
                 description: "The key value of the CMYK color [integer 0~100]",
                 type: ApplicationCommandOptionType.Integer,
-                "min-value": 0,
-                "max-value": 100,
+                "min_value": 0,
+                "max_value": 100,
                 required: true
               }
             ]
@@ -180,6 +181,67 @@ module.exports = {
         name: "poll",
         description: "Make a poll!",
         type: ApplicationCommandOptionType.Subcommand
+      },
+      {
+        name: "random",
+        description: "Roll a dice, flip a coin, do anything!",
+        type: ApplicationCommandOptionType.SubcommandGroup,
+        options: [
+          {
+            name: "coin",
+            description: "Flip a coin",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [{
+              name: "amount",
+              description: "The amount of coins to flip [integer 1~10]",
+              type: ApplicationCommandOptionType.Integer,
+              "min_value": 1,
+              "max_value": 10,
+              required: true
+            }]
+          },
+          {
+            name: "dice",
+            description: "Roll dices",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [{
+              name: "amount",
+              description: "The amount of dice to roll [integer 1~10]",
+              type: ApplicationCommandOptionType.Integer,
+              "min_value": 1,
+              "max_value": 10,
+              required: true
+            }]
+          },
+          {
+            name: "number",
+            description: "Generate random numbers",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "amount",
+                description: "The amount of numbers to generate [integer 1~10]",
+                type: ApplicationCommandOptionType.Integer,
+                "min_value": 1,
+                "max_value": 10,
+                required: true
+              },
+              {
+                name: "min",
+                description: "The minimum limit for the numbers [integer]",
+                type: ApplicationCommandOptionType.Integer,
+                "min_value": 0,
+                required: false
+              },
+              {
+                name: "max",
+                description: "The maximum limit for the numbers [integer]",
+                "max_value": 20000,
+                type: ApplicationCommandOptionType.Integer,
+              }
+            ]
+          },
+        ]
       },
       {
         name: "weather",
@@ -260,7 +322,7 @@ module.exports = {
 
           case "hex": {
             hex = interaction.options.getString("value")
-            hex.startsWith("#") && hex.length == 7 ? hex = hex.substring(1, 7) : hex
+            hex.startsWith("#") && hex.length == 7 ? hex = hex.slice(1, 7) : hex
 
             rgb = Convert.toRGB(hex)
             hsv = Convert.toHSV(rgb)
@@ -313,7 +375,7 @@ module.exports = {
 
         colorEmbed = {
           title: "Color Conversion",
-          color: parseInt(hex.substring(1), 16),
+          color: parseInt(hex.slice(1), 16),
           author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
           footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` },
           fields: [
@@ -324,7 +386,7 @@ module.exports = {
             { name: "\u200b", value: "\u200b", inline: true },
             { name: "CMYK", value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true }
           ],
-          thumbnail: { url: `https://dummyimage.com/128/${hex.substring(1, 7)}/${hex.substring(1, 7)}.png` },
+          thumbnail: { url: `https://dummyimage.com/128/${hex.slice(1, 7)}/${hex.slice(1, 7)}.png` },
           timestamp: new Date().toISOString(),
         }
 
@@ -378,7 +440,7 @@ module.exports = {
             nitroType = ["None", "Nitro Classic", "Nitro"]
 
             await interaction.reply({ embeds: [{
-              color: parseInt(user.hexAccentColor ? user.hexAccentColor.substring(1) : colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : colors[Math.floor(Math.random() * colors.length)], 16),
               author: { name: "User Info" },
               footer: { text: "Created On" },
               timestamp: user.createdAt.toISOString(),
@@ -395,6 +457,34 @@ module.exports = {
             break
           }
         }
+        break
+      }
+
+      case "random": {
+        const mode = interaction.options._subcommand
+        const amount = interaction.options.getInteger("amount")
+        const min = interaction.options.getInteger("min") || 0
+        const max = interaction.options.getInteger("max") || 100
+        embed = {
+          title: mode == "coin" ? "Coin flip" : mode == "dice" ? "Dice roll" : "Random numbers",
+          description: ""
+        }
+
+        if (mode == "coin") {
+          choices = ["Head", "Tail"]
+        } else if (mode == "dice") {
+          choices = [1, 2, 3, 4, 5, 6]
+        } else if (mode == "number") {
+          for (i = 0; i < amount; i++) embed.description += `${Math.floor(Math.random() * (max - min) + min)}, `
+          embed.description = embed.description.slice(0, -2)
+          await interaction.reply({ embeds: [embed] })
+          break
+        }
+
+        for (i = 0; i < amount; i++) embed.description += `${choices[Math.floor(Math.random() * choices.length)]}, `
+        embed.description = embed.description.slice(0, -2)
+
+        await interaction.reply({ embeds: [embed] })
         break
       }
 
@@ -444,13 +534,13 @@ module.exports = {
 
                 times.forEach((time, ind) => {
                   time = String(time)
-                  hr = parseInt(time.substring(0, 2)) - data.tz
-                  mn = parseInt(time.substring(3, 5))
+                  hr = parseInt(time.slice(0, 2)) - data.tz
+                  mn = parseInt(time.slice(3, 5))
                   if (time.endsWith("PM"))
                     hr += 12
                   astro_time.push(new Date(base.getTime() + (hr * 3600 + mn * 60) * 1000).getTime() / 1000)
                   if (time.startsWith("0"))
-                    time = time.substring(1)
+                    time = time.slice(1)
                   times[ind] = time
                 })
 
@@ -512,10 +602,10 @@ module.exports = {
 
       default: {
         switch (interaction.options._subcommand) {
-          case "eval": {
+          case "calculate": {
             const expression = interaction.options.getString("expression")
-            symbols = ["π", "τ", ["a", "b"]]
-            symvals = [Math.PI, Math.PI * 2, 1]
+            symbols = ["π", "τ"]
+            symvals = [Math.PI, Math.PI * 2]
 
             let scope = {}
             symbols.forEach((value, i) => {
@@ -531,7 +621,7 @@ module.exports = {
             try {
               result = evaluate(expression, scope)
               if (typeof result == "object") {result = result.entries.join("; ")}
-              index.log(`${expression} = ${result}`)
+              console.botLog(`${expression} = ${result}`)
 
               await interaction.reply({ embeds: [{
                 title: "Calculation",
@@ -678,8 +768,8 @@ module.exports = {
             //   amount = Math.floor(Math.random() * 1000)
 
             //   fields = [
-            //     { name: `${opt1.charAt(0).toUpperCase() + opt1.substring(1)} • 0/${amount} Votes • ${split1[1]}%`, value: `[${split1[0]}]`, inline: false },
-            //     { name: `${opt2.charAt(0).toUpperCase() + opt2.substring(1)} • 0/${amount} Votes • ${split2[1]}%`, value: `[${split2[0]}]`, inline: false },
+            //     { name: `${opt1.charAt(0).toUpperCase() + opt1.slice(1)} • 0/${amount} Votes • ${split1[1]}%`, value: `[${split1[0]}]`, inline: false },
+            //     { name: `${opt2.charAt(0).toUpperCase() + opt2.slice(1)} • 0/${amount} Votes • ${split2[1]}%`, value: `[${split2[0]}]`, inline: false },
             //   ]
 
             //   components = [
@@ -700,24 +790,24 @@ module.exports = {
 
             //   if (opt3) {
             //     const split3 = splitBar(100, 0, 25)
-            //     fields.push({ name: `${opt3.charAt(0).toUpperCase() + opt3.substring(1)} • 0/${amount} Votes • ${split3[1]}%`, value: `[${split3[0]}]`, inline: false })
+            //     fields.push({ name: `${opt3.charAt(0).toUpperCase() + opt3.slice(1)} • 0/${amount} Votes • ${split3[1]}%`, value: `[${split3[0]}]`, inline: false })
             //     components[0].components.push({ "type": 2, "style": 2, "label": opt3, "custom_id": "poll_3_0" })
             //   }
 
             //   if (opt4) {
             //     const split4 = splitBar(100, 0, 25)
-            //     fields.push({ name: `${opt4.charAt(0).toUpperCase() + opt4.substring(1)} • 0/${amount} Votes • ${split4[1]}%`, value: `[${split4[0]}]`, inline: false })
+            //     fields.push({ name: `${opt4.charAt(0).toUpperCase() + opt4.slice(1)} • 0/${amount} Votes • ${split4[1]}%`, value: `[${split4[0]}]`, inline: false })
             //     components[0].components.push({ "type": 2, "style": 2, "label": opt4, "custom_id": "poll_4_0" })
             //   }
 
             //   if (opt5) {
             //     const split5 = splitBar(100, 0, 25)
-            //     fields.push({ name: `${opt5.charAt(0).toUpperCase() + opt5.substring(1)} • 0/${amount} Votes • ${split5[1]}%`, value: `[${split5[0]}]`, inline: false })
+            //     fields.push({ name: `${opt5.charAt(0).toUpperCase() + opt5.slice(1)} • 0/${amount} Votes • ${split5[1]}%`, value: `[${split5[0]}]`, inline: false })
             //     components[0].components.push({ "type": 2, "style": 2, "label": opt5, "custom_id": "poll_5_0" })
             //   }
 
             //   embed = {
-            //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.substring(1)}`,
+            //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.slice(1)}`,
             //     color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
             //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
             //     fields: fields,
@@ -738,10 +828,10 @@ module.exports = {
     if (interaction.message.interaction.commandName == "poll") {
       embed = interaction.message.embeds[0]
       user = embed.description.split(" ").at(-1)
-      user = user.substring(2, user.length - 1)
+      user = user.slice(2, user.length - 1)
       switch (true) {
         case interaction.customId.startsWith("poll"): {
-          switch (interaction.customId.substring(5)) {
+          switch (interaction.customId.slice(5)) {
             case "close": {
               console.log("close")
               if (interaction.user.id == user) {await interaction.message.edit({ components: [] })}
