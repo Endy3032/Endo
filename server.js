@@ -6,8 +6,8 @@ const { createWriteStream } = require("fs")
 const server = express()
 const port = 3032
 
-var httplog = createWriteStream("./logs/http.log", { flags: "a" })
-server.use(morgan("[:date[web]] \":method :url\" :status :user-agent", { stream: os.hostname().includes("local") ? httplog : null }))
+var httplog = !os.hostname().includes("local") ? createWriteStream("./logs/http.log", { flags: "a" }) : null
+server.use(morgan("[:date[web]] \":method :url\" :status :user-agent", { stream: httplog }))
 
 server.all("/", (_, res) => {
   res.send("Website coming in the future\nStay tuned")
