@@ -155,15 +155,15 @@ module.exports = {
         await interaction.deferReply()
 
         const text = interaction.options.getString("text")
-        const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".png"))
+        const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".jpg"))
         const variant = interaction.options.getString("variant") || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
 
-        const dimensions = sizeOf(`./Resources/Mememan/${variant}.png`)
+        const dimensions = sizeOf(`./Resources/Mememan/${variant}.jpg`)
         const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
         const ctx = canvas.getContext("2d")
         const offset = 0.4
 
-        const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.png`)
+        const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.jpg`)
         ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
 
         ctx.fillStyle = "#ffffff"
@@ -174,10 +174,10 @@ module.exports = {
         canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
         canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * offset + (canvasTxt.fontSize / 2))
 
-        const attachment = new MessageAttachment(canvas.toBuffer(), "meme.png")
+        const attachment = new MessageAttachment(canvas.toBuffer(), "meme.jpg")
         await interaction.editReply({ files: [attachment], embeds: [{
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          image: { url: "attachment://meme.png" }
+          image: { url: "attachment://meme.jpg" }
         }] })
         break
       }
@@ -485,7 +485,7 @@ module.exports = {
 
       case "mememan": {
         choices = []
-        const mememanFiles = fs.readdirSync("./Resources/Mememan/").filter(file => file.endsWith(".png"))
+        const mememanFiles = fs.readdirSync("./Resources/Mememan/").filter(file => file.endsWith(".jpg"))
         mememanFiles.forEach(file => {
           choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
         })

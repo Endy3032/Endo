@@ -45,14 +45,14 @@ if (mode != "guilds") {
     } catch (err) {console.error(err)}
   })()
 } else {
-  const guildFolders = fs.readdirSync("./guilds")
+  const guildFolders = fs.readdirSync("./commands/guilds")
 
   guildFolders.forEach(guildId => {
     const commands = []
     const commandFiles = fs.readdirSync(`./guilds/${guildId}`).filter(file => file.endsWith(".js"))
 
     commandFiles.forEach(command => {
-      let { cmd } = require(`../guilds/${guildId}/${command}`)
+      let { cmd } = require(`../commands/guilds/${guildId}/${command}`)
 
       if (cmd.type == 1 || cmd.type == null) {
         cmd.description = `[G] ${cmd.description}`
