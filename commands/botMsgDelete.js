@@ -14,6 +14,6 @@ module.exports = {
     const channel = await interaction.user.createDM()
     const msg = await channel.messages.fetch(id)
     await msg.delete()
-    await interaction.followUp({ content: "Deleted the message!", ephemeral: true })
+    await interaction.reply({ content: "Deleted the message!", ephemeral: true })
   }
 }
