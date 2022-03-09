@@ -32,44 +32,41 @@ module.exports = {
 
     const command = interaction.client.commands.get(commandName)
 
-    if (interaction.isChatInputCommand()) {
-      execute = command.execute
-      type = "Command"
-    } else if (interaction.isButton()) {
-      execute = command.button
-      type = "Button"
-    } else if (interaction.isSelectMenu()) {
-      execute = command.selectMenu
-      type = "Select"
-    } else if (interaction.isContextMenuCommand()) {
-      execute = command.ctxMenu
-      type = "CtxMenu"
-    } else if (interaction.isAutocomplete()) {
-      execute = command.autocomplete
-      type = "Autocomplete"
-    } else if (interaction.isModalSubmit()) {
-      execute = command.modal
-      type = "Modal"
-    }
-
-    try {await execute(interaction)}
-    catch (err) {
-      rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-      console.botLog(nordChalk.error(String(err)), "ERROR")
-      // try {
-      //   const msg = await interaction.fetchReply()
-      //   console.log(msg.content)
-      // } catch {
-      //   console.log("Unable to fetch response")
-      // }
-    }
-
     handleError = (err) => {
-      rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
+      try {rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })}
+      catch {rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })}
       console.botLog(nordChalk.error(String(err)), "ERROR")
+    }
+
+    try {
+      if (interaction.isChatInputCommand()) {
+        execute = command.execute
+        type = "Command"
+      } else if (interaction.isButton()) {
+        execute = command.button
+        type = "Button"
+      } else if (interaction.isSelectMenu()) {
+        execute = command.selectMenu
+        type = "Select"
+      } else if (interaction.isContextMenuCommand()) {
+        execute = command.ctxMenu
+        type = "CtxMenu"
+      } else if (interaction.isAutocomplete()) {
+        execute = command.autocomplete
+        type = "Autocomplete"
+      } else if (interaction.isModalSubmit()) {
+        execute = command.modal
+        type = "Modal"
+      }
+    } catch (err) {
+      console.botLog(nordChalk.error(String(err)), "ERROR")
+      return await interaction.reply({ content: `${emojis.crossmark.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })
     }
 
     process.once("uncaughtException", handleError)
     process.once("unhandledRejection", handleError)
+
+    try {await execute(interaction)}
+    catch (err) {handleError(err)}
   }
 }

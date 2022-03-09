@@ -2,9 +2,9 @@ const fs = require("fs")
 const keepAlive = require("./server")
 const stripAnsi = require("strip-ansi")
 const { nordChalk } = require("./other/misc")
-const { Client, Collection, GatewayIntentBits } = require("discord.js")
+const { Client, Collection, GatewayIntentBits, Partials } = require("discord.js")
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] })
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] })
 var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 
 console.botLog = async function log(content, logLevel = "INFO") {
