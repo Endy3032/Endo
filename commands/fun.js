@@ -158,16 +158,16 @@ module.exports = {
         let canvas, separator = "§§"
         const text = interaction.options.getString("text")
         const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".jpg"))
-        const variant = interaction.options.getString("variant") !== "random" ? interaction.options.getString("variant").replaceAll(" ", "_") : variants[Math.floor(Math.random() * variants.length)]
+        const variant = interaction.options.getString("variant") !== "random" ? interaction.options.getString("variant").replaceAll(" ", "_") : variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
         canvasTxt.font = "LeagueSpartan"
 
-        const dimensions = sizeOf(`./Resources/Mememan/${variant}`)
+        const dimensions = sizeOf(`./Resources/Mememan/${variant}.jpg`)
         if (variant == "panik_kalm_panik") {
           const texts = text.split(separator)
           canvas = Canvas.createCanvas(dimensions.width, dimensions.height)
           const ctx = canvas.getContext("2d")
           
-          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}`)
+          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.jpg`)
           ctx.drawImage(bg, 0, 0, dimensions.width, dimensions.height)
           
           texts.forEach((text, ind) => {
@@ -179,7 +179,7 @@ module.exports = {
           const ctx = canvas.getContext("2d")
           const offset = 0.4
   
-          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}`)
+          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.jpg`)
           ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
   
           ctx.fillStyle = "#ffffff"
