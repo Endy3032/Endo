@@ -87,17 +87,18 @@ module.exports = {
             type: ApplicationCommandOptionType.Subcommand,
             options: [
               {
+                name: "variant",
+                description: "The variant of the mememan to use [Leave blank to pick random]",
+                type: ApplicationCommandOptionType.String,
+                autocomplete: true,
+                required: true
+              },
+              {
                 name: "text",
                 description: "The text to make the meme",
                 type: ApplicationCommandOptionType.String,
                 required: true
               },
-              {
-                name: "variant",
-                description: "The variant of the mememan to use [Leave blank to pick random]",
-                type: ApplicationCommandOptionType.String,
-                autocomplete: true,
-              }
             ]
           }
         ]
@@ -154,30 +155,46 @@ module.exports = {
       case "meme": {
         await interaction.deferReply()
 
+        let canvas, separator = "§§"
         const text = interaction.options.getString("text")
         const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".jpg"))
-        const variant = interaction.options.getString("variant") || variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
-
-        const dimensions = sizeOf(`./Resources/Mememan/${variant}.jpg`)
-        const canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
-        const ctx = canvas.getContext("2d")
-        const offset = 0.4
-
-        const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.jpg`)
-        ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
-
-        ctx.fillStyle = "#ffffff"
-        ctx.fillRect(0, 0, dimensions.width, dimensions.height * offset)
-
-        ctx.fillStyle = "#000000"
+        const variant = interaction.options.getString("variant") !== "random" ? interaction.options.getString("variant").replaceAll(" ", "_") : variants[Math.floor(Math.random() * variants.length)]
         canvasTxt.font = "LeagueSpartan"
-        canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
-        canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * offset + (canvasTxt.fontSize / 2))
+
+        const dimensions = sizeOf(`./Resources/Mememan/${variant}`)
+        if (variant == "panik_kalm_panik") {
+          const texts = text.split(separator)
+          canvas = Canvas.createCanvas(dimensions.width, dimensions.height)
+          const ctx = canvas.getContext("2d")
+          
+          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}`)
+          ctx.drawImage(bg, 0, 0, dimensions.width, dimensions.height)
+          
+          texts.forEach((text, ind) => {
+            canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
+            canvasTxt.drawText(ctx, text, 0, dimensions.height / 3 * ind - (canvasTxt.fontSize / 2), dimensions.width / 2, dimensions.height / 3 + (canvasTxt.fontSize / 2))
+          })
+        } else {
+          canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
+          const ctx = canvas.getContext("2d")
+          const offset = 0.4
+  
+          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}`)
+          ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
+  
+          ctx.fillStyle = "#ffffff"
+          ctx.fillRect(0, 0, dimensions.width, dimensions.height * offset)
+  
+          ctx.fillStyle = "#000000"
+          canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
+          canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * offset + (canvasTxt.fontSize / 2))
+        }
 
         const attachment = new MessageAttachment(canvas.toBuffer(), "meme.jpg")
         await interaction.editReply({ files: [attachment], embeds: [{
           color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          image: { url: "attachment://meme.jpg" }
+          image: { url: "attachment://meme.jpg" },
+          footer: variant == "panik_kalm_panik" && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null
         }] })
         break
       }
@@ -330,7 +347,7 @@ module.exports = {
           }
 
           case "format": {
-            // console.log(interaction.options)
+            // console.log(options)
             style = interaction.options.getString("style")
             text = interaction.options.getString("text")
             replacements = {
@@ -493,7 +510,7 @@ module.exports = {
       }
     }
 
-    res = [{ name: "random", value: "0" }]
+    res = [{ name: "random", value: "random" }]
     pattern = interaction.options.getFocused()
     const fuse = new Fuse(choices, { distance: 24, keys: ["name", "value"] })
 

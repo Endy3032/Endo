@@ -1,0 +1,231 @@
+const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
+
+module.exports = {
+  cmd: {
+    name: "fetch",
+    description: "Fetches data from a source on the internet",
+    type: ApplicationCommandType.ChatInput,
+    options: [
+      // #region crypto
+      // {
+      //   name: "crypto",
+      //   description: "Gather details about cryptocurrencies",
+      //   type: ApplicationCommandType.SubcommandGroup,
+      //   options: [
+      //     {
+      //       name: "nomics",
+      //       description: "Get data from Nomics",
+      //       type: ApplicationCommandType.Subcommand,
+      //       options: [
+      //         {
+      //           name: "currency",
+      //           description: "The currency to get data for",
+      //           type: ApplicationCommandType.String,
+      //           autocomplete: true,
+      //           required: true,
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       name: "coinmarketcap",
+      //       description: "Get data from CoinMarketCap",
+      //       type: ApplicationCommandType.Subcommand,
+      //       options: [
+      //         {
+      //           name: "currency",
+      //           description: "The currency to get data for",
+      //           type: ApplicationCommandType.String,
+      //           autocomplete: true,
+      //           required: true,
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       name: "coingecko",
+      //       description: "Get data from CoinGecko",
+      //       type: ApplicationCommandType.Subcommand,
+      //       options: [
+      //         {
+      //           name: "currency",
+      //           description: "The currency to get data for",
+      //           type: ApplicationCommandType.String,
+      //           autocomplete: true,
+      //           required: true,
+      //         }
+      //       ]
+      //     },
+      //   ]
+      // },
+      // #endregion
+      {
+        name: "weather",
+        description: "Get the current weather for any places from www.weatherapi.com",
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "location",
+            description: "The location to get the weather data [string]",
+            type: ApplicationCommandOptionType.String,
+            required: true
+          },
+          {
+            name: "options",
+            description: "Options to change the output",
+            type: ApplicationCommandOptionType.String,
+            required: false,
+            choices: [
+              { name: "Use Imperial (˚F)", value: "imp" },
+              { name: "Includes Air Quality", value: "aq" },
+              { name: "Both", value: "both" }
+            ]
+          }
+          // #region current
+          // {
+          //   name: "current",
+          //   description: "Get the weather from the chosen provider",
+          //   type: ApplicationCommandOptionType.Subcommand,
+          //   options: [
+          //   ]
+          // },
+          // #endregion
+          // #region forecast
+          // {
+          //   name: "forecast",
+          //   description: "Get the forecast from the chosen provider",
+          //   type: ApplicationCommandOptionType.Subcommand,
+          //   options: [
+          //     {
+          //       name: "location",
+          //       description: "The location to get the weather data [string]",
+          //       type: ApplicationCommandOptionType.String,
+          //       required: true
+          //     },
+          //     {
+          //       name: "options",
+          //       description: "Several options to change the output",
+          //       type: ApplicationCommandOptionType.String,
+          //       required: false,
+          //       choices: [
+          //         { name: "Use Imperial (˚F)", value: "imp" },
+          //         { name: "Includes Air Quality", value: "aq" },
+          //         { name: "Both", value: "both" }
+          //       ]
+          //     }
+          //   ]
+          // }
+          // #endregion
+        ]
+      },
+    ]
+  },
+
+  async execute(interaction) {
+    switch (interaction._subcommand) {
+      case "weather": {
+        await interaction.deferReply()
+
+        location = interaction.options.getString("location")
+        options = interaction.options.getString("options")
+
+        if (options == "imp" || options == "both") {
+          unit = "imperial"
+          dist = "mi"
+          symbol = "˚F"
+          speed = "mi/h"
+        } else {
+          unit = "metric"
+          dist = "km"
+          symbol = "˚C"
+          speed = "m/s"
+        }
+
+        request = {
+          method: "GET",
+          url: encodeURI("https://api.weatherapi.com/v1/forecast.json"),
+          params: { key: process.env.WEATHERAPI, q: location, days: 1, aqi: "yes" }
+        }
+
+        await axios.request(request)
+          .then(response => {
+            data = response.data
+
+            now = new Date()
+            data.deviceTime = new Date(now - now.getSeconds() * 1000 - now.getMilliseconds())
+            data.localTime = new Date(data.location.localtime)
+            data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
+
+            data.location.region == ""
+              ? data.title = `${data.location.name} - ${data.location.country} (UTC${data.tz !== 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz !== 0 ? data.tz : ""})`
+              : data.title = `${data.location.name} - ${data.location.region} - ${data.location.country} (UTC${data.tz !== 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz !== 0 ? data.tz : ""})`
+
+            times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
+            base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
+            astro_time = []
+            aqi_ratings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
+
+            times.forEach((time, ind) => {
+              time = String(time)
+              hr = parseInt(time.slice(0, 2)) - data.tz
+              mn = parseInt(time.slice(3, 5))
+              if (time.endsWith("PM"))
+                hr += 12
+              astro_time.push(new Date(base.getTime() + (hr * 3600 + mn * 60) * 1000).getTime() / 1000)
+              if (time.startsWith("0"))
+                time = time.slice(1)
+              times[ind] = time
+            })
+
+            // Data Provided by <:WeatherAPI:932557801153241088> [WeatherAPI](https://www.weatherapi.com/)
+            weatherEmbed = {
+              title: data.title,
+              description: `${data.current.condition.text}\n\`\`\`Weather\`\`\``,
+              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              fields: [
+                { name: "Temperature   ", value: `${(unit == "metric" ? data.current.temp_c : data.current.temp_f) + symbol}`, inline: true },
+                { name: "Feels Like   ", value: `${(unit == "metric" ? data.current.feelslike_c : data.current.feelslike_f) + symbol}`, inline: true },
+                { name: "Min/Max Temp", value: `${unit == "metric" ? data.forecast.forecastday[0].day.mintemp_c + symbol + "/" + data.forecast.forecastday[0].day.maxtemp_c + symbol : data.forecast.forecastday[0].day.mintemp_f + symbol + "/" + data.forecast.forecastday[0].day.maxtemp_f + symbol}`, inline: true },
+                { name: "Pressure", value: `${unit == "metric" ? data.current.pressure_mb + " hPa" : data.current.pressure_in + " in"}`, inline: true },
+                { name: "Humidity", value: `${data.current.humidity}%`, inline: true },
+                { name: "Clouds", value: `${data.current.cloud}%`, inline: true },
+                { name: "Wind", value: `${(unit == "metric" ? data.current.wind_kph : data.current.wind_mph) + speed} ${data.current.wind_degree}˚`, inline: true },
+                { name: "Gust", value: `${(unit == "metric" ? data.current.gust_kph : data.current.gust_mph) + speed}`, inline: true },
+                { name: "Visibility", value: `${(unit == "metric" ? data.current.vis_km : data.current.vis_miles) + dist}%`, inline: true },
+                { name: "Sunrise", value: `<t:${astro_time[0]}:T>\n${times[0]} Local`, inline: true },
+                { name: "Sunset", value: `<t:${astro_time[1]}:T>\n${times[1]} Local`, inline: true },
+                { name: "UV Index", value: `${data.current.uv}`, inline: true },
+                { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illumination`, inline: true },
+                { name: "Moonrise", value: `<t:${astro_time[2]}:T>\n${times[2]} Local`, inline: true },
+                { name: "Moonset", value: `<t:${astro_time[3]}:T>\n${times[3]} Local`, inline: true },
+              ],
+              thumbnail: { url: `https:${data.current.condition.icon}` },
+              footer: { text: "Data Provided by WeatherAPI", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
+              timestamp: new Date().toISOString(),
+            }
+
+            if (options == "aq" || options == "both") {
+              weatherEmbed.fields.push(
+                { name: "\u200b", value: "```Air Quality```", inline: false },
+                { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },
+                { name: "UK Defra Rating", value: `${aqi_ratings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk`, inline: true },
+                { name: "\u200b", value: "\u200b", inline: true },
+                { name: "CO", value: `${data.current.air_quality.co.toFixed(1)} μg/m³`, inline: true },
+                { name: "O₃", value: `${data.current.air_quality.o3.toFixed(1)} μg/m³`, inline: true },
+                { name: "NO₂", value: `${data.current.air_quality.no2.toFixed(1)} μg/m³`, inline: true },
+                { name: "SO₂", value: `${data.current.air_quality.so2.toFixed(1)} μg/m³`, inline: true },
+                { name: "PM 2.5", value: `${data.current.air_quality.pm2_5.toFixed(1)} μg/m³`, inline: true },
+                { name: "PM 10", value: `${data.current.air_quality.pm10.toFixed(1)} μg/m³`, inline: true },
+              )
+            }
+
+            interaction.editReply({ embeds: [weatherEmbed] })
+          })
+          .catch(e => {
+            e.response.data.error.message == "No matching location found."
+              ? interaction.editReply({ content: `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`, ephemeral: true })
+              : interaction.editReply({ content: `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`, ephemeral: true })
+          })
+        break
+      }
+    }
+  }
+}
