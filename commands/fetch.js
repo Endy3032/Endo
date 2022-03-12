@@ -1,3 +1,5 @@
+const axios = require("axios").default
+const { getLyrics } = require("genius-lyrics-api")
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
 
 module.exports = {
@@ -58,13 +60,25 @@ module.exports = {
       // },
       // #endregion
       {
+        name: "lyrics",
+        description: "Fetch lyrics from Genius",
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [{
+          name: "song",
+          description: "The song to search for",
+          type: ApplicationCommandOptionType.String,
+          autocomplete: true,
+          required: true,
+        }]
+      },
+      {
         name: "weather",
-        description: "Get the current weather for any places from www.weatherapi.com",
+        description: "Fetch the current weather for any places from www.weatherapi.com",
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "location",
-            description: "The location to get the weather data [string]",
+            description: "The location to fetch the weather data [string]",
             type: ApplicationCommandOptionType.String,
             required: true
           },
@@ -120,10 +134,35 @@ module.exports = {
   },
 
   async execute(interaction) {
-    switch (interaction._subcommand) {
-      case "weather": {
-        await interaction.deferReply()
+    await interaction.deferReply()
+    switch (interaction.options._subcommand) {
+      case "lyrics": {
+        const id = interaction.options.getString("song")
+        const request = {
+          method: "GET",
+          url: `https://api.genius.com/songs/${id}`,
+          params: { access_token: process.env.GeniusClientAccess },
+        }
 
+        lyrics = await getLyrics(`https://genius.com/songs/${id}`)
+
+        await axios.request(request)
+          .then(response => {
+            data = response.data.response.song
+
+            interaction.editReply({ embeds: [{
+              title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 97) + "..." : title,
+              thumbnail: { url: data.song_art_image_url },
+              description: lyrics,
+              footer: { text: `Album • ${data.album.name} | Release Date` },
+              timestamp: new Date(data.release_date).toISOString(),
+            }] })
+          })
+
+        break
+      }
+
+      case "weather": {
         location = interaction.options.getString("location")
         options = interaction.options.getString("options")
 
@@ -142,7 +181,7 @@ module.exports = {
         request = {
           method: "GET",
           url: encodeURI("https://api.weatherapi.com/v1/forecast.json"),
-          params: { key: process.env.WEATHERAPI, q: location, days: 1, aqi: "yes" }
+          params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" }
         }
 
         await axios.request(request)
@@ -224,6 +263,36 @@ module.exports = {
               ? interaction.editReply({ content: `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`, ephemeral: true })
               : interaction.editReply({ content: `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`, ephemeral: true })
           })
+        break
+      }
+    }
+  },
+
+  async autocomplete(interaction) {
+    switch (interaction.options._subcommand) {
+      case "lyrics": {
+        const song = interaction.options.getFocused()
+        if (song.length == 0) {return interaction.respond([{ name: "Enter something to get started", value: "empty" }])}
+
+        const request = {
+          method: "GET",
+          url: "https://api.genius.com/search",
+          params: { access_token: process.env.GeniusClientAccess, q: song },
+        }
+
+        await axios.request(request)
+          .then(response => {
+            options = []
+            response.data.response.hits.forEach(hit => {
+              option = {
+                name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 97) + "..." : optName,
+                value: `${hit.result.id}`
+              }
+              options.push(option)
+            })
+          })
+
+        await interaction.respond(options)
         break
       }
     }

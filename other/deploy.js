@@ -10,7 +10,7 @@ flags.defineString("mode", "global", "The mode to deploy the commands.")
 flags.parse()
 
 const mode = flags.get("mode")
-const rest = new REST({ version: "9" }).setToken(process.env.TOKEN)
+const rest = new REST({ version: "9" }).setToken(process.env.Token)
 deployLog("Deploy", "Refreshing application commands...")
 
 if (mode != "guilds") {
@@ -37,8 +37,8 @@ if (mode != "guilds") {
     try {
       await rest.put(
         mode == "global"
-          ? Routes.applicationCommands(process.env.CLIENT)
-          : Routes.applicationGuildCommands(process.env.CLIENT, process.env.GUILD),
+          ? Routes.applicationCommands(process.env.Client)
+          : Routes.applicationGuildCommands(process.env.Client, process.env.Guild),
         { body: commands },
       )
       deployLog("Deploy", `Registered ${commandFiles.length} ${mode} commands.`)
@@ -68,7 +68,7 @@ if (mode != "guilds") {
     (async () => {
       try {
         await rest.put(
-          Routes.applicationGuildCommands(process.env.CLIENT, guildId),
+          Routes.applicationGuildCommands(process.env.Client, guildId),
           { body: commands },
         )
         deployLog("Deploy", `Registered ${commandFiles.length} guild[${guildId}] commands.`)

@@ -5,7 +5,7 @@ const { emojis, nordChalk, rep } = require("../other/misc.js")
 module.exports = {
   name: "interactionCreate",
   async execute(interaction) {
-    if ((os.hostname().includes("local") && interaction.guildId !== process.env.GUILD) || (interaction.guildId == process.env.GUILD && !os.hostname().includes("local"))) {
+    if ((os.hostname().includes("local") && interaction.guildId !== process.env.Guild) || (interaction.guildId == process.env.Guild && !os.hostname().includes("local"))) {
       return
     }
 

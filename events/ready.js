@@ -59,7 +59,7 @@ module.exports = {
 
 /*
 const Guilds = client.guilds.cache.map(guild => (guild.id))
-const channel = client.channels.cache.get(process.env.LOG)
+const channel = client.channels.cache.get(process.env.Log)
 
 console.log(Guilds[0])
 const guildd = client.guilds.cache.get(String(Guilds[0]))

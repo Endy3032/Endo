@@ -10,7 +10,7 @@ var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 console.botLog = async function log(content, logLevel = "INFO") {
   const date = new Date()
   const epoch = Math.floor(date.getTime() / 1000)
-  const channel = client.channels.cache.get(process.env.LOG)
+  const channel = client.channels.cache.get(process.env.Log)
 
   logLevelColors = {
     INFO: nordChalk.info,
@@ -58,7 +58,7 @@ eventFiles.forEach((file) => {
     : client.on(event.name, (...args) => event.execute(...args))
 })
 
-client.login(process.env.TOKEN)
+client.login(process.env.Token)
 keepAlive()
 
 process.setMaxListeners(0)
