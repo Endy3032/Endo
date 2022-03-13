@@ -194,8 +194,6 @@ module.exports = {
                   })
                 })
 
-                console.log(data[0])
-
                 const phonetics = [...new Set(data[0].phonetics.filter(phonetic => phonetic.text).map(phonetic => phonetic.text))].join(" - ")
 
                 interaction.editReply({ embeds: [{

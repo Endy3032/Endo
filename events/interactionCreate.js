@@ -8,10 +8,13 @@ module.exports = {
     isLocal = os.hostname().includes("local")
     isTestGuild = interaction.guildId == process.env.Guild
     isReplitTest = interaction.channelId == "952520918645755924"
-    if ((isLocal && !isTestGuild) || !(isLocal && !isTestGuild)) {
-      if ((isLocal && isReplitTest) || (!isLocal && !isReplitTest)) {
-        return
-      }
+
+    if (isLocal && (!isTestGuild || isReplitTest)) {
+      return
+    }
+
+    if (!isLocal && isTestGuild && !isReplitTest) {
+      return
     }
 
     commandName =

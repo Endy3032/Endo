@@ -347,7 +347,6 @@ module.exports = {
           }
 
           case "format": {
-            // console.log(options)
             style = interaction.options.getString("style")
             text = interaction.options.getString("text")
             replacements = {
