@@ -155,7 +155,7 @@ module.exports = {
               title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 97) + "..." : title,
               thumbnail: { url: data.song_art_image_url },
               description: lyrics,
-              footer: { text: `Album • ${data.album.name} | Release Date` },
+              footer: { text: `Album • ${data.album?.name || "None"} | Release Date` },
               timestamp: new Date(data.release_date).toISOString(),
             }] })
           })
