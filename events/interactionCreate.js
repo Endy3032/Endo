@@ -5,8 +5,13 @@ const { emojis, nordChalk, rep } = require("../other/misc.js")
 module.exports = {
   name: "interactionCreate",
   async execute(interaction) {
-    if ((os.hostname().includes("local") && interaction.guildId !== process.env.Guild || interaction.channelId == "952520918645755924") || (!os.hostname().includes("local")) && interaction.guildId == process.env.Guild && !interaction.channelId == "952520918645755924") {
-      return
+    isLocal = os.hostname().includes("local")
+    isTestGuild = interaction.guildId == process.env.Guild
+    isReplitTest = interaction.channelId == "952520918645755924"
+    if ((isLocal && !isTestGuild) || !(isLocal && !isTestGuild)) {
+      if ((isLocal && isReplitTest) || (!isLocal && !isReplitTest)) {
+        return
+      }
     }
 
     commandName =
