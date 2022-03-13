@@ -293,7 +293,7 @@ module.exports = {
           })
 
         res = []
-        const fuse = new Fuse(options, { distance: 10, keys: ["name", "value"] })
+        const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
         fuse.search(song).forEach(option => res.push(option.item))
         res.push(...options.filter(option => !res.includes(option)))
 
