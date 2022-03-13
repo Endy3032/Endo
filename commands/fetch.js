@@ -146,6 +146,7 @@ module.exports = {
         }
 
         lyrics = await getLyrics(`https://genius.com/songs/${id}`)
+          .catch(() => {return interaction.editReply(`The song ${id} was not found. Select one from the autocompleted list next time.`)})
 
         await axios.request(request)
           .then(response => {
