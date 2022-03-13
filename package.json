@@ -22,15 +22,14 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.13.0-dev.1646395406.6f7a366",
-    "@discordjs/opus": "^0.7.0",
     "@discordjs/rest": "^0.3.0",
-    "@discordjs/voice": "^0.8.0",
     "@sapphire/snowflake": "^3.2.0",
     "axios": "^0.26.1",
+    "bree": "^8.0.1",
     "canvas": "^2.9.0",
     "canvas-txt": "^3.0.0",
     "chalk": "^4.1.2",
-    "discord-api-types": "^0.28.0",
+    "discord-api-types": "^0.29.0",
     "discord.js": "^14.0.0-dev.1646395406.6f7a366",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
@@ -44,11 +43,11 @@
     "string-progressbar": "^1.0.4",
     "strip-ansi": "^6.0.1",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.2"
+    "typescript": "^4.6.2",
+    "urban-dictionary": "^3.0.2"
   },
   "devDependencies": {
-    "@faker-js/faker": "^6.0.0-beta.0",
-    "eslint": "^8.10.0",
+    "eslint": "^8.11.0",
     "node": "^16.13.2"
   }
 }

@@ -1,5 +1,6 @@
 const Fuse = require("fuse.js")
 const axios = require("axios").default
+const urban = require("urban-dictionary")
 const { getLyrics } = require("genius-lyrics-api")
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
 
@@ -60,6 +61,30 @@ module.exports = {
       //   ]
       // },
       // #endregion
+      {
+        name: "definition",
+        description: "Fetch a definition from dictionaries",
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "dictionary",
+            description: "The dictionary to use",
+            type: ApplicationCommandOptionType.String,
+            choices: [
+              { name: "Dictionary API", value: "dictapi" },
+              { name: "Urban Dictionary", value: "urban" },
+            ],
+            required: true
+          },
+          {
+            name: "word",
+            description: "The word to fetch the definition",
+            type: ApplicationCommandOptionType.String,
+            autocomplete: true,
+            required: true,
+          }
+        ]
+      },
       {
         name: "lyrics",
         description: "Fetch lyrics from Genius",
@@ -137,6 +162,83 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply()
     switch (interaction.options._subcommand) {
+      case "definition": {
+        const dictionary = interaction.options.getString("dictionary")
+        const word = interaction.options.getString("word")
+
+        switch (dictionary) {
+          case "dictapi": {
+            const request = {
+              method: "GET",
+              url: `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
+            }
+
+            await axios.request(request)
+              .then(response => {
+                desc = ""
+                data = response.data
+                data.forEach(entry => {
+                  entry.meanings.forEach(meaning => {
+                    desc += `\`\`\`${meaning.partOfSpeech.charAt(0).toUpperCase() + meaning.partOfSpeech.slice(1)}\`\`\``
+                    desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
+                    desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
+                    desc += "\n**Meanings:**\n"
+
+                    meaning.definitions.forEach((def, ind) => {
+                      desc += `\`[${ind + 1}]\` ${def.definition}\n`
+                      desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
+                      desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
+                      desc += def.example ? `**• Example:** ${def.example}\n` : ""
+                      desc += "\n"
+                    })
+                  })
+                })
+
+                console.log(data[0])
+
+                const phonetics = [...new Set(data[0].phonetics.filter(phonetic => phonetic.text).map(phonetic => phonetic.text))].join(" - ")
+
+                interaction.editReply({ embeds: [{
+                  title: `${data[0].word} - ${phonetics}`,
+                  description: desc,
+                  footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
+                }] })
+              })
+              .catch(err => {
+                console.botLog(err, "ERROR")
+                interaction.editReply(`The word ${word} was not found in the dictionary`)
+              })
+            break
+          }
+
+          case "urban": {
+            await urban.define(word)
+              .then(results => {
+                result = results[0]
+                descriptionBefore = `**Definition(s)**\n${result.definition}`
+                descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
+
+                if (descriptionBefore.length + descriptionAfter.length > 4096) {
+                  descriptionBefore = descriptionBefore.slice(0, 4093 - descriptionAfter.length) + "..."
+                }
+
+                description = descriptionBefore + descriptionAfter
+
+                interaction.editReply({ embeds: [{
+                  title: word,
+                  url: result.permalink,
+                  description: description,
+                  author: { name: `Urban Dictionary - ${result.author}` },
+                  footer: { text: `Definition ID • ${result.defid} | Written on` },
+                  timestamp: new Date(result.written_on).toISOString()
+                }] })
+              })
+            break
+          }
+        }
+        break
+      }
+
       case "lyrics": {
         const id = interaction.options.getString("song")
         const request = {
@@ -272,6 +374,27 @@ module.exports = {
 
   async autocomplete(interaction) {
     switch (interaction.options._subcommand) {
+      case "definition": {
+        dict = interaction.options.getString("dictionary")
+        current = interaction.options.getFocused()
+        if (dict == "dictapi") {
+          return await interaction.respond([{ name: `Current word: ${current} - DictionaryAPI doesn't support autocomplete!`, value: `${current}` }])
+        } else {
+          await urban.autocomplete(current)
+            .then(results => {
+              results = results.map(result => {
+                return { name: `${result}`, value: `${result}` }
+              })
+              res = []
+              const fuse = new Fuse(results, { distance: 24, keys: ["name", "value"] })
+              fuse.search(current).forEach(option => {res.push(option.item)})
+              interaction.respond(res)
+            })
+            .catch(() => {return interaction.respond([{ name: "Keep typing to get results!", value: "blankentry" }])})
+        }
+        break
+      }
+
       case "lyrics": {
         const song = interaction.options.getFocused()
         if (song.length == 0) {return interaction.respond([{ name: "Enter something to get started", value: "empty" }])}
