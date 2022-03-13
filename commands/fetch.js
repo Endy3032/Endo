@@ -1,3 +1,4 @@
+const Fuse = require("fuse.js")
 const axios = require("axios").default
 const { getLyrics } = require("genius-lyrics-api")
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
@@ -284,15 +285,19 @@ module.exports = {
           .then(response => {
             options = []
             response.data.response.hits.forEach(hit => {
-              option = {
+              options.push({
                 name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 97) + "..." : optName,
                 value: `${hit.result.id}`
-              }
-              options.push(option)
+              })
             })
           })
 
-        await interaction.respond(options)
+        res = []
+        const fuse = new Fuse(options, { distance: 10, keys: ["name", "value"] })
+        fuse.search(song).forEach(option => res.push(option.item))
+        res.push(...options.filter(option => !res.includes(option)))
+
+        await interaction.respond(res)
         break
       }
     }
