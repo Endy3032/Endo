@@ -155,7 +155,7 @@ module.exports = {
             interaction.editReply({ embeds: [{
               title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 97) + "..." : title,
               thumbnail: { url: data.song_art_image_url },
-              description: lyrics,
+              description: lyrics || "No lyrics",
               footer: { text: `Album • ${data.album?.name || "None"} | Release Date` },
               timestamp: new Date(data.release_date).toISOString(),
             }] })
