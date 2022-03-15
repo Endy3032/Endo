@@ -1,7 +1,7 @@
 var axios = require("axios").default
 const { evaluate } = require("mathjs")
 const { ApplicationCommandOptionType, ChannelType } = require("discord.js")
-const { colors, RGB, HSV, CMYK, Convert } = require("../other/misc.js")
+const { colors, RGB, HSV, CMYK, Convert, superEscape } = require("../other/misc.js")
 // const { splitBar } = require("string-progressbar")
 
 module.exports = {
@@ -457,8 +457,8 @@ module.exports = {
                 title: "Calculation",
                 color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
                 fields: [
-                  { name: "Expression", value: expression, inline: false },
-                  { name: "Result", value: result, inline: false }
+                  { name: "Expression", value: `${superEscape(expression)}`, inline: false },
+                  { name: "Result", value: `${superEscape(result)}`, inline: false }
                 ]
               }] })
             } catch (err) {

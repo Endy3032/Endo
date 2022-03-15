@@ -1,9 +1,9 @@
 const chalk = require("chalk")
-const { ActivityType } = require("discord.js")
+const { ActivityType, Util } = require("discord.js")
 
 const chalkLog = new chalk.Instance({ level: 3 })
 
-// Colors
+// #region Colors
 class HSV {
   constructor(h, s, v) {
     h <= 0 ? h = 0 : h > 360 ? h = 360 : h
@@ -341,8 +341,9 @@ nordChalk = {
     debug: chalkLog.bold.hex("C07760")
   }
 }
+// #endregion
 
-// Bot's Stuff
+// #region Bot's Stuff
 botEmojis = {
   checkmark: { shorthand: "<:checkmark:924151198339174430>", id: "944867707202301952" },
   crossmark: { shorthand: "<:crossmark:944867707201937409>", id: "944867707201937409" },
@@ -408,8 +409,9 @@ botActivities = [
     status: "idle"
   },
 ]
+// #endregion
 
-// Functions
+// #region Functions
 async function rep(interaction, object) {
   if (interaction.isAutocomplete) return
   try {
@@ -438,6 +440,11 @@ async function deployLog(tag, content) {
   console.log(`${nordChalk.blue(`${logTime} ${nordChalk.info("INFO")}  | ${nordChalk.bright.cyan(`[${tag}]`)} ${content}`)}`)
 }
 
+function superEscape(text) {
+  return Util.escapeMarkdown(String(text), { codeBlock: true, inlineCode: true, bold: true, italic: true, underline: true, strikethrough: true, spoiler: true, codeBlockContent: true, inlineCodeContent: true })
+}
+// #endregion
+
 module.exports = {
   activities: botActivities,
   deployLog: deployLog,
@@ -445,6 +452,7 @@ module.exports = {
   emojis: botEmojis,
   nordChalk: nordChalk,
   rep: rep,
+  superEscape: superEscape,
   Convert: Convert,
   CMYK: CMYK,
   HSV: HSV,
