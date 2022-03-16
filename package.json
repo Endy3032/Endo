@@ -10,12 +10,12 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "ceploy": "node other/deploy.js",
-    "teploy": "node other/deploy.js --mode='test'",
-    "geploy": "node other/deploy.js --mode='guilds'",
-    "cerun": "node other/deploy.js && npm run dev",
-    "terun": "node other/deploy.js --mode='test' && npm run dev",
-    "gerun": "node other/deploy.js --mode='guilds' && npm run dev"
+    "ceploy": "node deploy.js",
+    "teploy": "node deploy.js --mode='test'",
+    "geploy": "node deploy.js --mode='guilds'",
+    "cerun": "node deploy.js && npm run dev",
+    "terun": "node deploy.js --mode='test' && npm run dev",
+    "gerun": "node deploy.js --mode='guilds' && npm run dev"
   },
   "keywords": [],
   "author": "Endy3032",
