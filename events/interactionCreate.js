@@ -1,6 +1,6 @@
 const os = require("os")
 require("dotenv").config()
-const { emojis, nordChalk, rep } = require("../other/misc.js")
+const { emojis, nordChalk, rep } = require("../modules")
 
 module.exports = {
   name: "interactionCreate",

@@ -1,4 +1,4 @@
-const { colors } = require("../other/misc.js")
+const { colors } = require("../modules")
 const { ApplicationCommandOptionType } = require("discord.js")
 
 module.exports = {
@@ -61,10 +61,3 @@ module.exports = {
     }] })
   }
 }
-
-// module.exports.help = {
-//   name: module.exports.data.name,
-//   description: module.exports.data.description,
-//   arguments: "<expression [str]>",
-//   usage: '`/' + module.exports.data.name + ' <expression>`'
-// }

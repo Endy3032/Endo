@@ -1,7 +1,7 @@
 var axios = require("axios").default
 const { evaluate } = require("mathjs")
 const { ApplicationCommandOptionType, ChannelType } = require("discord.js")
-const { colors, RGB, HSV, CMYK, Convert, superEscape } = require("../other/misc.js")
+const { colors, convert, RGB, HSV, CMYK, superEscape } = require("../modules")
 // const { splitBar } = require("string-progressbar")
 
 module.exports = {
@@ -256,9 +256,9 @@ module.exports = {
             b = interaction.options.getInteger("blue")
 
             rgb = new RGB(r, g, b)
-            hex = Convert.toHEX(rgb)
-            hsv = Convert.toHSV(rgb)
-            cmyk = Convert.toCMYK(rgb)
+            hex = convert.toHEX(rgb)
+            hsv = convert.toHSV(rgb)
+            cmyk = convert.toCMYK(rgb)
 
             break
           }
@@ -267,9 +267,9 @@ module.exports = {
             hex = interaction.options.getString("value")
             hex.startsWith("#") && hex.length == 7 ? hex = hex.slice(1, 7) : hex
 
-            rgb = Convert.toRGB(hex)
-            hsv = Convert.toHSV(rgb)
-            cmyk = Convert.toCMYK(rgb)
+            rgb = convert.toRGB(hex)
+            hsv = convert.toHSV(rgb)
+            cmyk = convert.toCMYK(rgb)
             hex = `#${hex}`
 
             break
@@ -281,9 +281,9 @@ module.exports = {
             v = interaction.options.getInteger("value")
 
             hsv = new HSV(h, s, v)
-            rgb = Convert.toRGB(hsv)
-            hex = Convert.toHEX(rgb)
-            cmyk = Convert.toCMYK(rgb)
+            rgb = convert.toRGB(hsv)
+            hex = convert.toHEX(rgb)
+            cmyk = convert.toCMYK(rgb)
 
             break
           }
@@ -295,9 +295,9 @@ module.exports = {
             k = interaction.options.getInteger("key")
 
             cmyk = new CMYK(c, m, y, k)
-            rgb = Convert.toRGB(cmyk)
-            hex = Convert.toHEX(rgb)
-            hsv = Convert.toHSV(rgb)
+            rgb = convert.toRGB(cmyk)
+            hex = convert.toHEX(rgb)
+            hsv = convert.toHSV(rgb)
 
             break
           }
@@ -308,9 +308,9 @@ module.exports = {
             b = Math.floor(Math.random() * 255)
 
             rgb = new RGB(r, g, b)
-            hex = Convert.toHEX(rgb)
-            hsv = Convert.toHSV(rgb)
-            cmyk = Convert.toCMYK(rgb)
+            hex = convert.toHEX(rgb)
+            hsv = convert.toHSV(rgb)
+            cmyk = convert.toCMYK(rgb)
 
             break
           }
@@ -674,10 +674,3 @@ module.exports = {
     }
   }
 }
-
-// module.exports.help = {
-//   name: module.exports.data.name,
-//   description: module.exports.data.description,
-//   arguments: "<location>",
-//   usage: "`/" + module.exports.data.name + " <location>`"
-// }

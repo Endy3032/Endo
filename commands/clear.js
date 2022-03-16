@@ -1,4 +1,4 @@
-const { emojis, nordChalk } = require("../other/misc")
+const { emojis, nordChalk } = require("../modules")
 const { ApplicationCommandOptionType, ButtonStyle, ComponentType, PermissionFlagsBits } = require("discord.js")
 
 module.exports = {
@@ -59,10 +59,3 @@ module.exports = {
       .catch(console.error)
   }
 }
-
-// module.exports.help = {
-//   name: module.exports.data.name,
-//   description: module.exports.data.description,
-//   arguments: "<amount [int 1~100]>",
-//   usage: '`/' + module.exports.data.name + ' <amount>`'
-// }

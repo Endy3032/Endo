@@ -1,6 +1,6 @@
 const os = require("os")
 const axios = require("axios").default
-const { activities, nordChalk } = require("../other/misc")
+const { activities, nordChalk } = require("../modules")
 
 module.exports = {
   name: "ready",

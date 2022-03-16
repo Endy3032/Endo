@@ -42,10 +42,3 @@ module.exports = {
     }
   },
 }
-
-// module.exports.help = {
-//   name: module.exports.data.name,
-//   description: module.exports.data.description,
-//   arguments: "none",
-//   usage: '`/' + module.exports.data.name + '`'
-// }

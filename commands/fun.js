@@ -1,12 +1,12 @@
 const axios = require("axios").default
-const { colors } = require("../other/misc.js")
+const { colors } = require("../modules")
 const { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageAttachment, TextInputStyle } = require("discord.js")
 
 // #region Canvas Related Stuff
 const fs = require("fs")
 const Canvas = require("canvas")
 const sizeOf = require("image-size")
-const wordle = require("../other/wordle")
+const wordle = require("../Resources/Wordle")
 const canvasTxt = require("canvas-txt").default
 Canvas.registerFont("./Resources/Wordle/ClearSans-Bold.ttf", { family: "ClearSans" })
 Canvas.registerFont("./Resources/Mememan/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
@@ -359,7 +359,8 @@ module.exports = {
               jp: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
             }
 
-            let replace, result
+            let replace
+            result = ""
 
             switch(style) {
               case "varied": {
@@ -625,11 +626,3 @@ module.exports = {
     await interaction.update({ components: [], embeds: [embed], files: [attachment] })
   }
 }
-
-// module.exports.help = {
-//   name: module.exports.data.name,
-//   description: module.exports.data.description,
-//   arguments: "<location>",
-//   usage: '`/' + module.exports.data.name + ' <location>`'
-// }
-

@@ -1,7 +1,7 @@
 const fs = require("fs")
 const keepAlive = require("./server")
 const stripAnsi = require("strip-ansi")
-const { nordChalk } = require("./other/misc")
+const { nordChalk } = require("./modules")
 const { Client, Collection, GatewayIntentBits, Partials } = require("discord.js")
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] })

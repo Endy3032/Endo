@@ -1,0 +1,11 @@
+module.exports.activities = require("./activities")
+module.exports.convert = require("./colorConversions").convert
+module.exports.RGB = require("./colorConversions").RGB
+module.exports.HSV = require("./colorConversions").HSV
+module.exports.CMYK = require("./colorConversions").CMYK
+module.exports.nordChalk = require("./colors").nordChalk
+module.exports.colors = require("./colors").colors
+module.exports.deployLog = require("./deployLog")
+module.exports.emojis = require("./emojis")
+module.exports.rep = require("./rep")
+module.exports.superEscape = require("./superEscape")

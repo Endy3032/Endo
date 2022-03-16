@@ -2,7 +2,7 @@ require("dotenv").config()
 var flags = require("flags")
 
 const fs = require("fs")
-const { deployLog } = require("./misc")
+const { deployLog } = require("../modules")
 const { REST } = require("@discordjs/rest")
 const { Routes } = require("discord-api-types/v9")
 

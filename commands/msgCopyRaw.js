@@ -1,4 +1,4 @@
-const { superEscape } = require("../other/misc")
+const { superEscape } = require("../modules")
 const { ApplicationCommandType } = require("discord.js")
 
 module.exports = {
