@@ -158,7 +158,7 @@ module.exports = {
         let canvas, separator = "§§"
         const text = interaction.options.getString("text")
         const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".jpg"))
-        const variant = interaction.options.getString("variant") !== "random" ? interaction.options.getString("variant").replaceAll(" ", "_") : variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
+        const variant = interaction.options.getString("variant") != "random" ? interaction.options.getString("variant").replaceAll(" ", "_") : variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
         canvasTxt.font = "LeagueSpartan"
 
         const dimensions = sizeOf(`./Resources/Mememan/${variant}.jpg`)
@@ -297,8 +297,8 @@ module.exports = {
             var titles = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
 
             content = interaction.options.getString("content")
-            icon = interaction.options.getString("icon") !== "0" ? interaction.options.getString("icon") : Math.floor(Math.random() * 39)
-            title = interaction.options.getString("title") !== null ? interaction.options.getString("title") : titles[Math.floor(Math.random() * titles.length)]
+            icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : Math.floor(Math.random() * 39)
+            title = interaction.options.getString("title") != null ? interaction.options.getString("title") : titles[Math.floor(Math.random() * titles.length)]
 
             achievementEmbed = {
               color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
@@ -370,7 +370,7 @@ module.exports = {
                     result += " "
                     turn = !turn
                   } else {
-                    cond = turn ? i % 2 == 0 : i % 2 !== 0
+                    cond = turn ? i % 2 == 0 : i % 2 != 0
                     result += cond ? text[i].toUpperCase() : text[i].toLowerCase()
                   }
                 }
@@ -527,7 +527,7 @@ module.exports = {
 
   async modal(interaction) {
     const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), interaction.message.components[0].components[0].data.custom_id.slice(7, 12)]
-    if (guess.length !== 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
+    if (guess.length != 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
     if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
 
     const { Image } = require("canvas")
@@ -552,7 +552,7 @@ module.exports = {
     const guessCount = Math.abs(parseInt(embed.data.footer.text.charAt(0)) - 7)
     for (i = 0; i < 5; i++) {
       canvasTxt.fontSize = wordle.canvas.tileFont
-      if (guess[i] === answer[i] && ansArray.includes(guess[i])) {
+      if (guess[i] == answer[i] && ansArray.includes(guess[i])) {
         ctx.fillStyle = wordle.colors.correct
         ansArray.splice(ansArray.indexOf(guess[i]), 1)
         if (!buttonID[2].includes(guess[i])) {buttonID[2] += guess[i]}
@@ -570,13 +570,13 @@ module.exports = {
 
       ctx.fillRect(tileX, tileY, size, size)
 
-      if (ctx.fillStyle !== wordle.colors.present && buttonID[3].includes(guess[i])) ctx.fillStyle = wordle.colors.present
-      if (ctx.fillStyle !== wordle.colors.correct && buttonID[2].includes(guess[i])) ctx.fillStyle = wordle.colors.correct
+      if (ctx.fillStyle != wordle.colors.present && buttonID[3].includes(guess[i])) ctx.fillStyle = wordle.colors.present
+      if (ctx.fillStyle != wordle.colors.correct && buttonID[2].includes(guess[i])) ctx.fillStyle = wordle.colors.correct
 
       var x
       var y = keys.findIndex((keyRow) => {
         x = keyRow.indexOf(guess[i])
-        return x !== -1
+        return x != -1
       })
 
       keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2

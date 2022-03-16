@@ -365,11 +365,11 @@ module.exports = {
                 { name: "Content Filter", value: filterLevel[guild.explicitContentFilter], inline: true },
                 { name: "Verified", value: guild.verified ? "Yes" : "No", inline: true },
                 { name: "General Stats", value: `${guild.memberCount} Members\n${guild.roles.cache.size} Roles\n${emojiCount} Emojis`, inline: true },
-                { name: "Channel Stats", value: `${categoryCount !== 0 ? `${categoryCount} Categories\n` : ""}${textCount !== 0 ? `${textCount} Text\n` : ""}${voiceCount !== 0 ? `${voiceCount} Voice\n` : ""}${stageCount !== 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
-                { name: "AFK Channel", value: guild.afkChannelId !== null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
+                { name: "Channel Stats", value: `${categoryCount != 0 ? `${categoryCount} Categories\n` : ""}${textCount != 0 ? `${textCount} Text\n` : ""}${voiceCount != 0 ? `${voiceCount} Voice\n` : ""}${stageCount != 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
+                { name: "AFK Channel", value: guild.afkChannelId != null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
               ],
               thumbnail: { url: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=4096` },
-              image: guild.banner !== null ? { url: `https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096` } : null
+              image: guild.banner != null ? { url: `https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096` } : null
             }
 
             await interaction.reply({ embeds: [serverEmbed] })

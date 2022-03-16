@@ -296,8 +296,8 @@ module.exports = {
             data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
 
             data.location.region == ""
-              ? data.title = `${data.location.name} - ${data.location.country} (UTC${data.tz !== 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz !== 0 ? data.tz : ""})`
-              : data.title = `${data.location.name} - ${data.location.region} - ${data.location.country} (UTC${data.tz !== 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz !== 0 ? data.tz : ""})`
+              ? data.title = `${data.location.name} - ${data.location.country} (UTC${data.tz != 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz != 0 ? data.tz : ""})`
+              : data.title = `${data.location.name} - ${data.location.region} - ${data.location.country} (UTC${data.tz != 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz != 0 ? data.tz : ""})`
 
             times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
             base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
