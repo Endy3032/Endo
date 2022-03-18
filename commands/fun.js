@@ -1,5 +1,5 @@
 const axios = require("axios").default
-const { colors } = require("../modules")
+const { colors, random } = require("../modules")
 const { ApplicationCommandOptionType, ButtonStyle, ComponentType, MessageAttachment, TextInputStyle } = require("discord.js")
 
 // #region Canvas Related Stuff
@@ -9,7 +9,7 @@ const sizeOf = require("image-size")
 const wordle = require("../Resources/Wordle")
 const canvasTxt = require("canvas-txt").default
 Canvas.registerFont("./Resources/Wordle/ClearSans-Bold.ttf", { family: "ClearSans" })
-Canvas.registerFont("./Resources/Mememan/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
+Canvas.registerFont("./Resources/Meme/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
 // #endregion
 
 module.exports = {
@@ -79,27 +79,26 @@ module.exports = {
       {
         name: "meme",
         description: "Make your own meme",
-        type: ApplicationCommandOptionType.SubcommandGroup,
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
-            name: "mememan",
-            description: "Make your own Mememan meme",
-            type: ApplicationCommandOptionType.Subcommand,
-            options: [
-              {
-                name: "variant",
-                description: "The variant of the mememan to use [Leave blank to pick random]",
-                type: ApplicationCommandOptionType.String,
-                autocomplete: true,
-                required: true
-              },
-              {
-                name: "text",
-                description: "The text to make the meme",
-                type: ApplicationCommandOptionType.String,
-                required: true
-              },
-            ]
+            name: "text",
+            description: "The text to make the meme",
+            type: ApplicationCommandOptionType.String,
+            required: true
+          },
+          {
+            name: "variant",
+            description: "The variant of the meme to use (leave blank for random)",
+            type: ApplicationCommandOptionType.String,
+            autocomplete: true,
+            required: false
+          },
+          {
+            name: "custom_image",
+            description: "Make a meme the uploaded image (overrides variant)",
+            type: ApplicationCommandOptionType.Attachment,
+            required: false
           }
         ]
       },
@@ -152,53 +151,6 @@ module.exports = {
 
   async execute(interaction) {
     switch(interaction.options._group) {
-      case "meme": {
-        await interaction.deferReply()
-
-        let canvas, separator = "§§"
-        const text = interaction.options.getString("text")
-        const variants = fs.readdirSync("./Resources/Mememan/").filter((file) => file.endsWith(".jpg"))
-        const variant = interaction.options.getString("variant") != "random" ? interaction.options.getString("variant").replaceAll(" ", "_") : variants[Math.floor(Math.random() * variants.length)].slice(0, -4)
-        canvasTxt.font = "LeagueSpartan"
-
-        const dimensions = sizeOf(`./Resources/Mememan/${variant}.jpg`)
-        if (variant == "panik_kalm_panik") {
-          const texts = text.split(separator)
-          canvas = Canvas.createCanvas(dimensions.width, dimensions.height)
-          const ctx = canvas.getContext("2d")
-          
-          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.jpg`)
-          ctx.drawImage(bg, 0, 0, dimensions.width, dimensions.height)
-          
-          texts.forEach((text, ind) => {
-            canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
-            canvasTxt.drawText(ctx, text, 0, dimensions.height / 3 * ind - (canvasTxt.fontSize / 2), dimensions.width / 2, dimensions.height / 3 + (canvasTxt.fontSize / 2))
-          })
-        } else {
-          canvas = Canvas.createCanvas(dimensions.width, dimensions.height * 1.35)
-          const ctx = canvas.getContext("2d")
-          const offset = 0.4
-  
-          const bg = await Canvas.loadImage(`./Resources/Mememan/${variant}.jpg`)
-          ctx.drawImage(bg, 0, dimensions.height * offset, dimensions.width, dimensions.height)
-  
-          ctx.fillStyle = "#ffffff"
-          ctx.fillRect(0, 0, dimensions.width, dimensions.height * offset)
-  
-          ctx.fillStyle = "#000000"
-          canvasTxt.fontSize = Math.min(dimensions.height * 0.13, dimensions.width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
-          canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), dimensions.width, dimensions.height * offset + (canvasTxt.fontSize / 2))
-        }
-
-        const attachment = new MessageAttachment(canvas.toBuffer(), "meme.jpg")
-        await interaction.editReply({ files: [attachment], embeds: [{
-          color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
-          image: { url: "attachment://meme.jpg" },
-          footer: variant == "panik_kalm_panik" && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null
-        }] })
-        break
-      }
-
       case "wordle": {
         let answer
         const { width, height, space, size, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
@@ -248,10 +200,10 @@ module.exports = {
           case "random": {
             const mode = interaction.options.getString("mode")
             if (mode == "random") {
-              answer = wordle.allowed[Math.floor(Math.random() * wordle.allowed.length)]
+              answer = random.pickFromArray(wordle.allowed)
               title = "Random Wordle"
             } else if (mode == "daily") {
-              answer = wordle.answers[Math.floor(Math.random() * wordle.answers.length)]
+              answer = random.pickFromArray(wordle.answers)
               title = "Random Daily Wordle"
             }
             break
@@ -298,10 +250,10 @@ module.exports = {
 
             content = interaction.options.getString("content")
             icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : Math.floor(Math.random() * 39)
-            title = interaction.options.getString("title") != null ? interaction.options.getString("title") : titles[Math.floor(Math.random() * titles.length)]
+            title = interaction.options.getString("title") != null ? interaction.options.getString("title") : random.pickFromArray(titles)
 
             achievementEmbed = {
-              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(random.pickFromArray(colors), 16),
               image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
             }
 
@@ -333,16 +285,14 @@ module.exports = {
               "Most of these facts are written by Adnagaporp#1965"
             ]
 
-            factEmbed = {
+            await interaction.reply({ embeds: [{
               title: "Facts",
-              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(random.pickFromArray(colors), 16),
               description: "Fresh out of the oven.",
-              fields: [{ name: "The fact of the second is...", value: facts[Math.floor(Math.random() * facts.length)], inline: false }],
+              fields: [{ name: "The fact of the second is...", value: random.pickFromArray(facts), inline: false }],
               authors: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
               footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` }
-            }
-
-            await interaction.reply({ embeds: [factEmbed] })
+            }] })
             break
           }
 
@@ -415,6 +365,68 @@ module.exports = {
             await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
             break
           }
+
+          case "meme": {
+            await interaction.deferReply()
+
+            let canvas
+            const separator = "§§"
+
+            canvasTxt.font = "LeagueSpartan"
+            const text = interaction.options.getString("text")
+            const image = interaction.options.getAttachment("custom_image")
+            const variants = fs.readdirSync("./Resources/Meme/").filter((file) => file.endsWith(".jpg"))            
+            const variant = interaction.options.getString("variant")
+
+            if (image) {
+              const response = await axios.get(image.url, { responseType: "arraybuffer" })
+              img = Buffer.from(response.data, "utf-8")
+            } else if (variant == "random" || variant == null) {
+              img = `./Resources/Meme/${random.pickFromArray(variants)}`
+            } else {
+              img = `./Resources/Meme/${interaction.options.getString("variant").replaceAll(" ", "_")}.jpg`
+            }
+
+            const dimensions = sizeOf(img)
+            const height = dimensions.height > 250 ? dimensions.width : 250
+            const width = height / dimensions.height * dimensions.width
+
+            if (img == "panik_kalm_panik") {
+              const texts = text.split(separator)
+              canvas = Canvas.createCanvas(width, height)
+              const ctx = canvas.getContext("2d")
+
+              const bg = await Canvas.loadImage(img)
+              ctx.drawImage(bg, 0, 0, width, height)
+
+              texts.forEach((text, ind) => {
+                canvasTxt.fontSize = Math.min(height * 0.13, width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
+                canvasTxt.drawText(ctx, text, 0, height / 3 * ind - (canvasTxt.fontSize / 2), width / 2, height / 3 + (canvasTxt.fontSize / 2))
+              })
+            } else {
+              canvas = Canvas.createCanvas(width, height * 1.35)
+              const ctx = canvas.getContext("2d")
+              const offset = 0.4
+
+              const bg = await Canvas.loadImage(img)
+              ctx.drawImage(bg, 0, height * offset, width, height)
+
+              ctx.fillStyle = "#ffffff"
+              ctx.fillRect(0, 0, width, height * offset)
+
+              ctx.fillStyle = "#000000"
+              canvasTxt.fontSize = Math.min(height * 0.13, width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
+              canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), width, height * offset + (canvasTxt.fontSize / 2))
+            }
+
+            const attachment = new MessageAttachment(canvas.toBuffer(), "meme.jpg")
+            await interaction.editReply({ files: [attachment], embeds: [{
+              color: parseInt(random.pickFromArray(colors), 16),
+              image: { url: "attachment://meme.jpg" },
+              footer: img.includes("panik_kalm_panik") && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null
+            }] })
+            break
+          }
         }
       }
     }
@@ -454,6 +466,15 @@ module.exports = {
     const Fuse = require("fuse.js")
 
     switch (interaction.options._subcommand) {
+      case "meme": {
+        choices = []
+        const memeFiles = fs.readdirSync("./Resources/Meme/").filter(file => file.endsWith(".jpg"))
+        memeFiles.forEach(file => {
+          choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
+        })
+        break
+      }
+
       case "achievement": {
         choices = [
           { name: "arrow",            value: "34" },
@@ -499,20 +520,11 @@ module.exports = {
         ]
         break
       }
-
-      case "mememan": {
-        choices = []
-        const mememanFiles = fs.readdirSync("./Resources/Mememan/").filter(file => file.endsWith(".jpg"))
-        mememanFiles.forEach(file => {
-          choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
-        })
-        break
-      }
     }
 
-    res = [{ name: "random", value: "random" }]
+    res = []
     pattern = interaction.options.getFocused()
-    const fuse = new Fuse(choices, { distance: 24, keys: ["name", "value"] })
+    const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
 
     if (pattern.length > 0) {fuse.search(pattern).forEach(choice => res.push(choice.item))}
     else {

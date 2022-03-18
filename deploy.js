@@ -4,13 +4,13 @@ var flags = require("flags")
 const fs = require("fs")
 const { deployLog } = require("./modules")
 const { REST } = require("@discordjs/rest")
-const { Routes } = require("discord-api-types/v9")
+const { Routes } = require("discord-api-types/v10")
 
 flags.defineString("mode", "global", "The mode to deploy the commands.")
 flags.parse()
 
 const mode = flags.get("mode")
-const rest = new REST({ version: "9" }).setToken(process.env.Token)
+const rest = new REST({ version: "10" }).setToken(process.env.Token)
 deployLog("Deploy", "Refreshing application commands...")
 
 if (mode != "guilds") {
@@ -18,7 +18,7 @@ if (mode != "guilds") {
   const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"))
 
   commandFiles.forEach(command => {
-    const { cmd } = require(`../commands/${command}`)
+    const { cmd } = require(`./commands/${command}`)
 
     if (mode == "test") {
       if (cmd.type == 1 || cmd.type == null) {
@@ -52,7 +52,7 @@ if (mode != "guilds") {
     const commandFiles = fs.readdirSync(`./guilds/${guildId}`).filter(file => file.endsWith(".js"))
 
     commandFiles.forEach(command => {
-      let { cmd } = require(`../commands/guilds/${guildId}/${command}`)
+      let { cmd } = require(`./commands/guilds/${guildId}/${command}`)
 
       if (cmd.type == 1 || cmd.type == null) {
         cmd.description = `[G] ${cmd.description}`

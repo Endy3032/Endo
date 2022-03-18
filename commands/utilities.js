@@ -1,7 +1,7 @@
 var axios = require("axios").default
 const { evaluate } = require("mathjs")
 const { ApplicationCommandOptionType, ChannelType } = require("discord.js")
-const { colors, convert, RGB, HSV, CMYK, superEscape } = require("../modules")
+const { colors, convert, RGB, HSV, CMYK, random,superEscape } = require("../modules")
 // const { splitBar } = require("string-progressbar")
 
 module.exports = {
@@ -353,7 +353,7 @@ module.exports = {
             filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
 
             serverEmbed = {
-              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(random.pickFromArray(colors), 16),
               description: guild.description ? `Server Description: ${guild.description}` : "Server Description: None",
               author: { name: guild.name, iconURL: guild.iconURL() },
               footer: { text: `Server ID • ${guild.id}` },
@@ -382,7 +382,7 @@ module.exports = {
             nitroType = ["None", "Nitro Classic", "Nitro"]
 
             await interaction.reply({ embeds: [{
-              color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : random.pickFromArray(colors), 16),
               author: { name: "User Info" },
               footer: { text: "Created On" },
               timestamp: user.createdAt.toISOString(),
@@ -423,7 +423,7 @@ module.exports = {
           break
         }
 
-        for (i = 0; i < amount; i++) embed.description += `${choices[Math.floor(Math.random() * choices.length)]}, `
+        for (i = 0; i < amount; i++) embed.description += `${random.pickFromArray(choices)}, `
         embed.description = embed.description.slice(0, -2)
 
         await interaction.reply({ embeds: [embed] })
@@ -455,7 +455,7 @@ module.exports = {
 
               await interaction.reply({ embeds: [{
                 title: "Calculation",
-                color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+                color: parseInt(random.pickFromArray(colors), 16),
                 fields: [
                   { name: "Expression", value: `${superEscape(expression)}`, inline: false },
                   { name: "Result", value: `${superEscape(result)}`, inline: false }
@@ -472,7 +472,7 @@ module.exports = {
 
             pingEmbed = {
               title: "Pong!",
-              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(random.pickFromArray(colors), 16),
               fields: [
                 { name: "Websocket Latency", value: `${interaction.client.ws.ping}ms`, inline: false },
                 { name: "Roundtrip Latency", value: `${sent.createdTimestamp - interaction.createdTimestamp}ms`, inline: false }
@@ -638,7 +638,7 @@ module.exports = {
 
             //   embed = {
             //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.slice(1)}`,
-            //     color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+            //     color: parseInt(random.pickFromArray(colors), 16),
             //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
             //     fields: fields,
             //     footer: { text: "Last updated" },

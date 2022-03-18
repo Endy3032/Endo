@@ -1,6 +1,6 @@
 const os = require("os")
 const axios = require("axios").default
-const { activities, nordChalk } = require("../modules")
+const { activities, nordChalk, random } = require("../modules")
 
 module.exports = {
   name: "ready",
@@ -22,7 +22,7 @@ module.exports = {
 
     setInterval(() => {
       if (!os.hostname().includes("local")) {
-        activity = activities[Math.floor(Math.random() * activities.length)]
+        activity = random.pickFromArray(activities)
         client.user.setPresence(activity)
 
         act_type = activity.activities[0]["type"]
@@ -38,7 +38,7 @@ module.exports = {
     }, 300000)
 
     pinger()
-    client.user.setPresence(activities[Math.floor(Math.random() * activities.length)])
+    client.user.setPresence(random.pickFromArray(activities))
     // clientcmd = client.application.commands.fetch()
     // .then(cmds => console.log(cmds))
 

@@ -320,7 +320,7 @@ module.exports = {
             weatherEmbed = {
               title: data.title,
               description: `${data.current.condition.text}\n\`\`\`Weather\`\`\``,
-              color: parseInt(colors[Math.floor(Math.random() * colors.length)], 16),
+              color: parseInt(random.pickFromArray(colors), 16),
               fields: [
                 { name: "Temperature   ", value: `${(unit == "metric" ? data.current.temp_c : data.current.temp_f) + symbol}`, inline: true },
                 { name: "Feels Like   ", value: `${(unit == "metric" ? data.current.feelslike_c : data.current.feelslike_f) + symbol}`, inline: true },
