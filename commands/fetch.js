@@ -165,6 +165,7 @@ module.exports = {
       case "definition": {
         const dictionary = interaction.options.getString("dictionary")
         const word = interaction.options.getString("word")
+        if (word == "blankentry") {return await interaction.editReply("You must specify a word to search for")}
 
         switch (dictionary) {
           case "dictapi": {
@@ -231,6 +232,10 @@ module.exports = {
                   timestamp: new Date(result.written_on).toISOString()
                 }] })
               })
+              .catch(err => {
+                console.botLog(err, "ERROR")
+                interaction.editReply(`The word ${word} was not found in the dictionary`)
+              })
             break
           }
         }
@@ -246,7 +251,7 @@ module.exports = {
         }
 
         lyrics = await getLyrics(`https://genius.com/songs/${id}`)
-          .catch(() => {return interaction.editReply(`The song ${id} was not found. Select one from the autocompleted list next time.`)})
+          .catch(() => {return interaction.editReply(`The song ${id} was not found. Select one from the list next time.`)})
 
         await axios.request(request)
           .then(response => {
@@ -256,7 +261,7 @@ module.exports = {
               title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 97) + "..." : title,
               thumbnail: { url: data.song_art_image_url },
               description: lyrics || "No lyrics",
-              footer: { text: `Album • ${data.album?.name || "None"} | Release Date` },
+              footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
               timestamp: new Date(data.release_date).toISOString(),
             }] })
           })
@@ -375,8 +380,9 @@ module.exports = {
       case "definition": {
         dict = interaction.options.getString("dictionary")
         current = interaction.options.getFocused()
+        curObject = { name: `${current || "Keep typing to get results!"}`, value: `${current || "blankentry"}` }
         if (dict == "dictapi") {
-          return await interaction.respond([{ name: `Current word: ${current} - DictionaryAPI doesn't support autocomplete!`, value: `${current}` }])
+          return await interaction.respond([curObject])
         } else {
           await urban.autocomplete(current)
             .then(results => {
@@ -386,9 +392,10 @@ module.exports = {
               res = []
               const fuse = new Fuse(results, { distance: 24, keys: ["name", "value"] })
               fuse.search(current).forEach(option => {res.push(option.item)})
+              if (!res.includes(curObject)) res.unshift(curObject)
               interaction.respond(res)
             })
-            .catch(() => {return interaction.respond([{ name: "Keep typing to get results!", value: "blankentry" }])})
+            .catch(() => {return interaction.respond([curObject])})
         }
         break
       }
