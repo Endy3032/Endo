@@ -4,15 +4,18 @@ const { ApplicationCommandOptionType, ButtonStyle, ComponentType, PermissionFlag
 module.exports = {
   cmd: {
     name: "clear",
-    description: "Clear messages in the channel",
+    description: "Clear messages",
     options: [
       {
-        type: ApplicationCommandOptionType.Integer,
         name: "amount",
         description: "Amount of messages to clear [integer 1~100]",
-        required: true,
+        type: ApplicationCommandOptionType.Integer,
         min_value: 1,
-        max_value: 100
+        max_value: 100,
+        required: true,
+      },
+      {
+
       }
     ]
   },

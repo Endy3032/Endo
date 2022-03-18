@@ -4,12 +4,12 @@ const { ApplicationCommandOptionType } = require("discord.js")
 module.exports = {
   cmd: {
     name: "8ball",
-    description: "Ask the 8-Ball anything and it shall respond",
+    description: "Get a response from the magic 8-Ball",
     options: [
       {
-        type: ApplicationCommandOptionType.String,
         name: "question",
-        description: "The question to ask the 8-Ball [string]",
+        description: "The question to ask [string]",
+        type: ApplicationCommandOptionType.String,
         required: true
       }
     ]

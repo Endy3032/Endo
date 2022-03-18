@@ -57,7 +57,6 @@ module.exports = {
             name: "style",
             description: "The style of the text",
             type: ApplicationCommandOptionType.String,
-            required: true,
             choices: [
               { name: "vArIeD cAsE", value: "varied" },
               { name: "sᴍᴀʟʟ ᴄᴀᴘs", value: "smallcaps" },
@@ -66,7 +65,8 @@ module.exports = {
               { name: "ｆｕｌｌｗｉｄｔｈ (fullwidth)", value: "fullwidth" },
               { name: "1337 (leet)", value: "leet" },
               { name: "丁卂尸卂ん乇丂乇 (japanese)", value: "japanese" }
-            ]
+            ],
+            required: true,
           },
           {
             name: "text",
@@ -212,8 +212,8 @@ module.exports = {
 
         embed = {
           title: title,
-          author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
           image: { url: "attachment://wordle.png" },
+          author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
           footer: { text: "6 guesses remaining" },
           timestamp: new Date().toISOString(),
         }
@@ -252,12 +252,10 @@ module.exports = {
             icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : Math.floor(Math.random() * 39)
             title = interaction.options.getString("title") != null ? interaction.options.getString("title") : random.pickFromArray(titles)
 
-            achievementEmbed = {
+            await interaction.reply({ embeds: [{
               color: parseInt(random.pickFromArray(colors), 16),
               image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
-            }
-
-            await interaction.reply({ embeds: [achievementEmbed] })
+            }] })
             break
           }
 

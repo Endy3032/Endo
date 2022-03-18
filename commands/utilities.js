@@ -141,9 +141,9 @@ module.exports = {
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
-            type: ApplicationCommandOptionType.String,
             name: "expression",
             description: "The expression to calculate [string]",
+            type: ApplicationCommandOptionType.String,
             required: true
           }
         ]
@@ -316,11 +316,9 @@ module.exports = {
           }
         }
 
-        colorEmbed = {
+        await interaction.reply({ embeds: [{
           title: "Color Conversion",
           color: parseInt(hex.slice(1), 16),
-          author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
-          footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` },
           fields: [
             { name: "RGB", value: `${rgb.r}, ${rgb.g}, ${rgb.b}`, inline: true },
             { name: "\u200b", value: "\u200b", inline: true },
@@ -330,10 +328,10 @@ module.exports = {
             { name: "CMYK", value: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`, inline: true }
           ],
           thumbnail: { url: `https://dummyimage.com/128/${hex.slice(1, 7)}/${hex.slice(1, 7)}.png` },
+          author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
+          footer: { text: `${interaction.client.user.username}#${interaction.client.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user.id}/${interaction.client.user.avatar}.png` },
           timestamp: new Date().toISOString(),
-        }
-
-        await interaction.reply({ embeds: [colorEmbed] })
+        }] })
         break
       }
 
@@ -352,11 +350,9 @@ module.exports = {
             verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
             filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
 
-            serverEmbed = {
+            await interaction.reply({ embeds: [{
               color: parseInt(random.pickFromArray(colors), 16),
               description: guild.description ? `Server Description: ${guild.description}` : "Server Description: None",
-              author: { name: guild.name, iconURL: guild.iconURL() },
-              footer: { text: `Server ID • ${guild.id}` },
               fields: [
                 { name: "Owner", value: `<@${owner.id}>`, inline: true },
                 { name: "Creation Date", value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:D>`, inline: true },
@@ -368,11 +364,11 @@ module.exports = {
                 { name: "Channel Stats", value: `${categoryCount != 0 ? `${categoryCount} Categories\n` : ""}${textCount != 0 ? `${textCount} Text\n` : ""}${voiceCount != 0 ? `${voiceCount} Voice\n` : ""}${stageCount != 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
                 { name: "AFK Channel", value: guild.afkChannelId != null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
               ],
+              image: guild.banner != null ? { url: `https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096` } : null,
               thumbnail: { url: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=4096` },
-              image: guild.banner != null ? { url: `https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}.jpg?size=4096` } : null
-            }
-
-            await interaction.reply({ embeds: [serverEmbed] })
+              author: { name: guild.name, iconURL: guild.iconURL() },
+              footer: { text: `Server ID • ${guild.id}` },
+            }] })
             break
           }
 
@@ -383,9 +379,6 @@ module.exports = {
 
             await interaction.reply({ embeds: [{
               color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : random.pickFromArray(colors), 16),
-              author: { name: "User Info" },
-              footer: { text: "Created On" },
-              timestamp: user.createdAt.toISOString(),
               fields: [
                 { name: "Name", value: user.username, inline: true },
                 { name: "Tag", value: user.discriminator, inline: true },
@@ -393,8 +386,11 @@ module.exports = {
                 { name: "Banner", value: !user.banner ? user.hexAccentColor || "Default Color" : "Banner Image", inline: true },
                 { name: "Nitro Type", value: nitroType[user.premium_type] || "None", inline: true },
               ],
+              image: user.banner ? { url: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.png` } : null,
               thumbnail: { url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096` },
-              image: user.banner ? { url: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.png` } : null
+              author: { name: "User Info" },
+              footer: { text: "Created On" },
+              timestamp: user.createdAt.toISOString(),
             }] })
             break
           }
@@ -470,16 +466,14 @@ module.exports = {
           case "ping": {
             const sent = await interaction.reply({ content: "Pinging...", fetchReply: true })
 
-            pingEmbed = {
+            await interaction.editReply({ content: null, embeds: [{
               title: "Pong!",
               color: parseInt(random.pickFromArray(colors), 16),
               fields: [
                 { name: "Websocket Latency", value: `${interaction.client.ws.ping}ms`, inline: false },
                 { name: "Roundtrip Latency", value: `${sent.createdTimestamp - interaction.createdTimestamp}ms`, inline: false }
               ]
-            }
-
-            await interaction.editReply({ content: null, embeds: [pingEmbed] })
+            }] })
             break
           }
 

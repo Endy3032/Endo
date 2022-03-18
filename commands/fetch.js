@@ -74,7 +74,7 @@ module.exports = {
               { name: "Dictionary API", value: "dictapi" },
               { name: "Urban Dictionary", value: "urban" },
             ],
-            required: true
+            required: true,
           },
           {
             name: "word",
@@ -106,18 +106,18 @@ module.exports = {
             name: "location",
             description: "The location to fetch the weather data [string]",
             type: ApplicationCommandOptionType.String,
-            required: true
+            required: true,
           },
           {
             name: "options",
             description: "Options to change the output",
             type: ApplicationCommandOptionType.String,
-            required: false,
             choices: [
               { name: "Use Imperial (˚F)", value: "imp" },
               { name: "Includes Air Quality", value: "aq" },
-              { name: "Both", value: "both" }
-            ]
+              { name: "Both", value: "both" },
+            ],
+            required: false,
           }
           // #region current
           // {
@@ -144,12 +144,12 @@ module.exports = {
           //       name: "options",
           //       description: "Several options to change the output",
           //       type: ApplicationCommandOptionType.String,
-          //       required: false,
           //       choices: [
           //         { name: "Use Imperial (˚F)", value: "imp" },
           //         { name: "Includes Air Quality", value: "aq" },
-          //         { name: "Both", value: "both" }
-          //       ]
+          //         { name: "Both", value: "both" },
+          //       ],
+          //       required: false,
           //     }
           //   ]
           // }
@@ -259,8 +259,8 @@ module.exports = {
 
             interaction.editReply({ embeds: [{
               title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 97) + "..." : title,
-              thumbnail: { url: data.song_art_image_url },
               description: lyrics || "No lyrics",
+              thumbnail: { url: data.song_art_image_url },
               footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
               timestamp: new Date(data.release_date).toISOString(),
             }] })
@@ -324,8 +324,8 @@ module.exports = {
             // Data Provided by <:WeatherAPI:932557801153241088> [WeatherAPI](https://www.weatherapi.com/)
             weatherEmbed = {
               title: data.title,
-              description: `${data.current.condition.text}\n\`\`\`Weather\`\`\``,
               color: parseInt(random.pickFromArray(colors), 16),
+              description: `${data.current.condition.text}\n\`\`\`Weather\`\`\``,
               fields: [
                 { name: "Temperature   ", value: `${(unit == "metric" ? data.current.temp_c : data.current.temp_f) + symbol}`, inline: true },
                 { name: "Feels Like   ", value: `${(unit == "metric" ? data.current.feelslike_c : data.current.feelslike_f) + symbol}`, inline: true },

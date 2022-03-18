@@ -6,15 +6,15 @@ module.exports = {
     description: "Repeat something",
     options: [
       {
-        type: ApplicationCommandOptionType.String,
         name: "message",
         description: "The message to repeat [string]",
+        type: ApplicationCommandOptionType.String,
         required: true
       },
       {
-        type: ApplicationCommandOptionType.Integer,
         name: "times",
         description: "The number of times to repeat the message [integer 1~5, default 3]",
+        type: ApplicationCommandOptionType.Integer,
         "min_value": 1,
         "max_value": 5,
         required: false
