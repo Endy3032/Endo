@@ -6,14 +6,10 @@ module.exports = {
   name: "interactionCreate",
   async execute(interaction) {
     isLocal = os.hostname().includes("local")
-    isTestGuild = interaction.guildId == process.env.Guild
-    isReplitTest = interaction.channelId == "952520918645755924"
+    isTestGuild = interaction.guildId == process.env.TestGuild
+    isReplitTest = interaction.channelId == process.env.TestChannel
 
-    if (isLocal && (!isTestGuild || isReplitTest)) {
-      return
-    }
-
-    if (!isLocal && isTestGuild && !isReplitTest) {
+    if ((isLocal && (!isTestGuild || isReplitTest)) || (!isLocal && isTestGuild && !isReplitTest)) {
       return
     }
 

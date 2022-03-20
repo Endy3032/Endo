@@ -1,12 +1,15 @@
-module.exports.activities = require("./activities")
-module.exports.convert = require("./colorConversions").convert
-module.exports.RGB = require("./colorConversions").RGB
-module.exports.HSV = require("./colorConversions").HSV
-module.exports.CMYK = require("./colorConversions").CMYK
-module.exports.nordChalk = require("./colors").nordChalk
-module.exports.colors = require("./colors").colors
-module.exports.deployLog = require("./deployLog")
-module.exports.emojis = require("./emojis")
-module.exports.rep = require("./rep")
-module.exports.superEscape = require("./superEscape")
-module.exports.random = require("./random")
+module.exports = {
+  activities: require("./activities"),
+  colors: require("./colors").colors,
+  convert: require("./colorConversions").convert,
+  deployLog: require("./deployLog"),
+  emojis: require("./emojis"),
+  nordChalk: require("./colors").nordChalk,
+  permissionCheck: require("./permissionCheck"),
+  random: require("./random"),
+  rep: require("./rep"),
+  superEscape: require("./superEscape"),
+  RGB: require("./colorConversions").RGB,
+  HSV: require("./colorConversions").HSV,
+  CMYK: require("./colorConversions").CMYK,
+}

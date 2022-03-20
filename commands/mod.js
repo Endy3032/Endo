@@ -1,5 +1,5 @@
-const { emojis, nordChalk } = require("../modules")
-const { ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } = require("discord.js")
+const { emojis, permissionCheck } = require("../modules")
+const { ApplicationCommandOptionType, ButtonStyle, ChannelType, ComponentType, PermissionFlagsBits } = require("discord.js")
 
 module.exports = {
   cmd: {
@@ -84,7 +84,7 @@ module.exports = {
             ]
           },
           {
-            name: "voice-channel",
+            name: "voice",
             description: "Create a voice channel",
             type: ApplicationCommandOptionType.Subcommand,
             options: [
@@ -163,19 +163,52 @@ module.exports = {
             ]
           }
         ]
+      },
+      {
+        name: "purge",
+        description: "Purge messages",
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "amount",
+            description: "Amount of messages to purge [Integer 1~100]",
+            type: ApplicationCommandOptionType.Integer,
+            min_value: 1,
+            max_value: 100,
+            required: true,
+          },
+          {
+            name: "option",
+            description: "Option to filter messages",
+            type: ApplicationCommandOptionType.String,
+            choices: [
+              { name: "Bots Only", value: "bots" },
+              { name: "Users Only", value: "users" },
+              // { name: "Texts Only", value: "texts" },
+              // { name: "Mentions Only", value: "mentions" },
+              // { name: "Links Only", value: "links" },
+              // { name: "Embeds Only", value: "embeds" },
+              // { name: "Attachments Only", value: "attachments" },
+            ],
+            required: false,
+          },
+          {
+            name: "user",
+            description: "Specific user to purge messages",
+            type: ApplicationCommandOptionType.User,
+            required: false,
+          },
+        ]
       }
     ]
   },
 
   async execute(interaction) {
+    if (!interaction.guild) return await interaction.reply({ content: `${emojis.crossmark.shorthand} This command can only be used in a server`, ephemeral: true })
+
     switch (interaction.options._group) {
       case "create": {
-        if (!interaction.guild) return await interaction.reply({ content: `${emojis.crossmark.shorthand} This command can only be used in a server`, ephemeral: true })
-
-        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
-          console.botLog(`${nordChalk.yellow("Permissions")} [ ${nordChalk.red("Manage Channels")} ]`, "WARN")
-          return await interaction.reply({ content: `Permissions needed to use the \`${interaction.commandName}/${interaction.options._group}/${interaction.options._subcommand}\` command:\n${emojis.crossmark.shorthand} \`Manage Channels\``, ephemeral: true })
-        }
+        if (await permissionCheck(interaction, PermissionFlagsBits.ManageChannels)) return
 
         switch (interaction.options._subcommand) {
           case "text": {
@@ -220,13 +253,15 @@ module.exports = {
         }
 
         await interaction.guild.channels.create(channelName, options)
-          .then(channel => {channel.setPosition(position); interaction.reply({ content: `${emojis.checkmark.shorthand} Created ${interaction.options._subcommad} <#${channel.id}>`, ephemeral: true })})
-          .catch(err => {interaction.reply({ content: `${emojis.crossmark.shorthand} Failed to create ${channelName}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+          .then(channel => {channel.setPosition(position); interaction.reply({ content: `${emojis.checkmark.shorthand} Created ${interaction.options._subcommand} channel <#${channel.id}>`, ephemeral: true })})
+          .catch(err => {interaction.reply({ content: `${emojis.crossmark.shorthand} Something went wrong while creating ${channelName}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
 
         break
       }
 
       case "delete": {
+        if (await permissionCheck(interaction, PermissionFlagsBits.ManageChannels)) return
+
         switch (interaction.options._subcommand) {
           case "channel": {
             const channel = interaction.options.getChannel("channel")
@@ -237,6 +272,69 @@ module.exports = {
               .catch(err => {interaction.reply({ content: `${emojis.crossmark.shorthand} Failed to delete ${channel.name}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
             break
           }
+        }
+        break
+      }
+
+      default: {
+        switch (interaction.options._subcommand) {
+          case "purge": {
+            if (await permissionCheck(interaction, PermissionFlagsBits.ManageMessages, PermissionFlagsBits.ManageGuild)) return
+
+            const amount = interaction.options.getInteger("amount")
+            const option = interaction.options.getString("option")
+            const user = interaction.options.getUser("user")
+            content = `Press \`Confirm\` to delete \`${amount > 100 ? 100 : amount}\` messages.`
+            if (option && user) {
+              content += `\n**Option & User:** ${option}, ${user}`
+            } else {
+              content += option ? `\n**Option:** ${option}` : user ? `\n**User:** ${user}` : ""
+            }
+
+            interaction.reply({ content: content, components: [{
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  style: ButtonStyle.Danger,
+                  label: "Confirm",
+                  emoji: {
+                    name: "trash",
+                    id: emojis.trash.id
+                  },
+                  custom_id: `purge_${amount <= 100 ? amount : 100}_${option || "none"}_${user?.id || "none"}`
+                }
+              ]
+            }], ephemeral: true })
+            break
+          }
+        }
+        break
+      }
+    }
+  },
+
+  async button(interaction) {
+    customID = interaction.customId
+    const [commandName, amount, option, user] = customID.split("_")
+    await interaction.deferUpdate()
+    switch (commandName) {
+      case "purge": {
+        if (option == "none" && user == "none") {
+          await interaction.channel.bulkDelete(amount, true)
+            .then(console.botLog(`Cleared ${amount} messages`))
+            .catch(console.error)
+        } else {
+          messages = await interaction.channel.messages.fetch({ limit: amount })
+          if (option != "none") {
+            option == "bots"
+              ? clearList = messages.filter(message => message.author.bot)
+              : clearList = messages.filter(message => !message.author.bot)
+          } else if (user != "none") {
+            clearList = messages.filter(message => message.author.id == user)
+          }
+    
+          await interaction.channel.bulkDelete(clearList)
         }
         break
       }

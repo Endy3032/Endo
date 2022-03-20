@@ -1,6 +1,6 @@
 const { ActivityType } = require("discord.js")
 
-activities = [
+module.exports = [
   {
     activities: [{ name: "discord.js", type: ActivityType.Playing }],
     status: "idle"
@@ -58,5 +58,3 @@ activities = [
     status: "idle"
   },
 ]
-
-module.exports = activities

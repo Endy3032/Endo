@@ -1,4 +1,4 @@
-function deployLog(tag, content) {
+module.exports = function (tag, content) {
   logTime = new Date().toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric",
@@ -14,5 +14,3 @@ function deployLog(tag, content) {
 
   console.log(`${nordChalk.blue(`${logTime} ${nordChalk.info("INFO")}  | ${nordChalk.bright.cyan(`[${tag}]`)} ${content}`)}`)
 }
-
-module.exports = deployLog

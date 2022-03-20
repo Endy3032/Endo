@@ -198,7 +198,7 @@ module.exports = {
                 const phonetics = [...new Set(data[0].phonetics.filter(phonetic => phonetic.text).map(phonetic => phonetic.text))].join(" - ")
 
                 interaction.editReply({ embeds: [{
-                  title: `${data[0].word} - ${phonetics}`,
+                  title: `${data[0].word} - ${phonetics || "Phonetics Unavailable"}`,
                   description: desc,
                   footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
                 }] })

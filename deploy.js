@@ -38,7 +38,7 @@ if (mode != "guilds") {
       await rest.put(
         mode == "global"
           ? Routes.applicationCommands(process.env.Client)
-          : Routes.applicationGuildCommands(process.env.Client, process.env.Guild),
+          : Routes.applicationGuildCommands(process.env.Client, process.env.TestGuild),
         { body: commands },
       )
       deployLog("Deploy", `Registered ${commandFiles.length} ${mode} commands.`)

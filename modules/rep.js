@@ -1,4 +1,4 @@
-async function rep(interaction, object) {
+module.exports = async (interaction, object) => {
   if (interaction.isAutocomplete) return
   try {
     interaction.replied || interaction.deferred
@@ -8,5 +8,3 @@ async function rep(interaction, object) {
     console.error(`Can't respond to the interaction - ${err}`)
   }
 }
-
-module.exports = rep
