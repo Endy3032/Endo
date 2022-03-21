@@ -37,8 +37,8 @@ module.exports = {
     const command = interaction.client.commands.get(commandName)
 
     handleError = (err) => {
-      try {rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [${type} Error]`, ephemeral: true })}
-      catch {rep(interaction, { content: `${emojis.crossmark.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })}
+      try {rep(interaction, { content: `${emojis.error.shorthand} This interaction failed [${type} Error]`, ephemeral: true })}
+      catch {rep(interaction, { content: `${emojis.error.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })}
       console.botLog(nordChalk.error(String(err)), "ERROR")
     }
 
@@ -64,7 +64,7 @@ module.exports = {
       }
     } catch (err) {
       console.botLog(nordChalk.error(String(err)), "ERROR")
-      return await interaction.reply({ content: `${emojis.crossmark.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })
+      return await interaction.reply({ content: `${emojis.error.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })
     }
 
     process.once("uncaughtException", handleError)

@@ -204,7 +204,7 @@ module.exports = {
   },
 
   async execute(interaction) {
-    if (!interaction.guild) return await interaction.reply({ content: `${emojis.crossmark.shorthand} This command can only be used in a server`, ephemeral: true })
+    if (!interaction.guild) return await interaction.reply({ content: `${emojis.error.shorthand} This command can only be used in a server`, ephemeral: true })
 
     switch (interaction.options._group) {
       case "create": {
@@ -250,11 +250,41 @@ module.exports = {
             options = { type: ChannelType.GuildCategory, position: position, reason: reason }
             break
           }
+
+          case "voice": {
+            channelName = interaction.options.getString("name")
+            const type = interaction.options.getInteger("type") || ChannelType.GuildVoice
+            const below = interaction.options.getChannel("below")
+            const bitrate = interaction.options.getInteger("bitrate") * 1000 || 64000
+            const userLimit = interaction.options.getInteger("user-limit") || 0
+            const reason = interaction.options.getString("reason") || `Created by ${interaction.user.tag}`
+
+            if (below?.isCategory()) {
+              parentID = below.id
+              try {position = below.children.cache.map(child => child.isVoice() && child.rawPosition).reduce((prev, curr) => {return (curr < prev ? curr : prev)})}
+              catch {position = 0}
+            } else if (below?.isVoice()) {
+              parentID = below.parentId
+              position = below.rawPosition + 1
+            } else {
+              parentID = position = null
+            }
+
+            options = { type: type, bitrate: bitrate, "user-limit": userLimit, parent: parentID, reason: reason }
+            break
+          }
         }
 
         await interaction.guild.channels.create(channelName, options)
-          .then(channel => {channel.setPosition(position); interaction.reply({ content: `${emojis.checkmark.shorthand} Created ${interaction.options._subcommand} channel <#${channel.id}>`, ephemeral: true })})
-          .catch(err => {interaction.reply({ content: `${emojis.crossmark.shorthand} Something went wrong while creating ${channelName}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+          .then(channel => {channel.setPosition(position); interaction.reply({ content: `${emojis.success.shorthand} Created ${interaction.options._subcommand} channel <#${channel.id}>`, ephemeral: true })})
+          .catch(err => {
+            if (String(err).toString().includes(50024)) {
+              options.type = ChannelType.GuildVoice
+              interaction.guild.channels.create(channelName, options)
+                .then(channel => {channel.setPosition(position); interaction.reply({ content: `${emojis.warn.shorthand} This server can't create Stage channels yet, fallback to voice channel instead <#${channel.id}>`, ephemeral: true })})
+            }
+            else {interaction.reply({ content: `${emojis.error.shorthand} Something went wrong while creating ${channelName}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")}
+          })
 
         break
       }
@@ -266,10 +296,16 @@ module.exports = {
           case "channel": {
             const channel = interaction.options.getChannel("channel")
             const reason = interaction.options.getString("reason") || `Deleted by ${interaction.user.tag}`
-
-            await channel.delete(reason)
-              .then(interaction.reply({ content: `${emojis.checkmark.shorthand} Deleted ${channel.name}`, ephemeral: true }))
-              .catch(err => {interaction.reply({ content: `${emojis.crossmark.shorthand} Failed to delete ${channel.name}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+            interaction.reply({ content: `${emojis.trash.shorthand} Do you want to delete #${channel.name}${reason != `Deleted by ${interaction.user.tag}` ? ` with the reason \`${reason}\`` : ""}?`, components: [{
+              type: ComponentType.ActionRow,
+              components: [{
+                type: ComponentType.Button,
+                style: ButtonStyle.Danger,
+                label: "Confirm",
+                emoji: { name: emojis.trash.name, id: emojis.trash.id },
+                custom_id: `delete_${channel.id}`
+              }]
+            }], ephemeral: true })
             break
           }
         }
@@ -293,18 +329,15 @@ module.exports = {
 
             interaction.reply({ content: content, components: [{
               type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  style: ButtonStyle.Danger,
-                  label: "Confirm",
-                  emoji: {
-                    name: "trash",
-                    id: emojis.trash.id
-                  },
-                  custom_id: `purge_${amount <= 100 ? amount : 100}_${option || "none"}_${user?.id || "none"}`
-                }
-              ]
+              components: [{
+                type: ComponentType.Button,
+                style: ButtonStyle.Danger,
+                label: "Confirm",
+                emoji: { name: emojis.trash.name,
+                  id: emojis.trash.id
+                },
+                custom_id: `purge_${amount <= 100 ? amount : 100}_${option || "none"}_${user?.id || "none"}`
+              }]
             }], ephemeral: true })
             break
           }
@@ -319,22 +352,35 @@ module.exports = {
     const [commandName, amount, option, user] = customID.split("_")
     await interaction.deferUpdate()
     switch (commandName) {
+      case "delete": {
+        reason = interaction.message.content.split("`")[1]
+        channel = interaction.client.channels.cache.get(interaction.customId.slice(7))
+        if (channel == undefined) {return await interaction.followUp({ content: "This channel has been deleted already. Feel free to discard both messages.", ephemeral: true })}
+
+        await channel.delete(reason)
+          .then(interaction.followUp({ content: `${emojis.success.shorthand} Deleted #${channel.name}`, ephemeral: true }))
+          .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Failed to delete ${channel.name}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+        break
+      }
+
       case "purge": {
         if (option == "none" && user == "none") {
           await interaction.channel.bulkDelete(amount, true)
-            .then(console.botLog(`Cleared ${amount} messages`))
-            .catch(console.error)
+            .then(() => {content = `Purged ${amount} messages`; interaction.followUp({ content: content, ephemeral: true }); console.botLog(content)})
+            .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
         } else {
           messages = await interaction.channel.messages.fetch({ limit: amount })
-          if (option != "none") {
-            option == "bots"
-              ? clearList = messages.filter(message => message.author.bot)
-              : clearList = messages.filter(message => !message.author.bot)
-          } else if (user != "none") {
-            clearList = messages.filter(message => message.author.id == user)
-          }
-    
-          await interaction.channel.bulkDelete(clearList)
+          clearList = messages.filter(message => {
+            cri1 = cri2 = cri3 = false
+            if (option == "bots") cri1 = message.author.bot
+            if (option == "users") cri2 = !message.author.bot
+            if (user != "none") cri3 = (message.author.id == user)
+            return cri1 || cri2 || cri3
+          })
+
+          await interaction.channel.bulkDelete(clearList, true)
+            .then(() => {content = `${emojis.success.shorthand} Found and purged ${clearList.size}/${amount} messages`; interaction.followUp({ content: content, ephemeral: true }); console.botLog(content)})
+            .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
         }
         break
       }

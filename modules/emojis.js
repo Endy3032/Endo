@@ -1,6 +1,14 @@
-module.exports = {
-  checkmark: { shorthand: "<:checkmark:924151198339174430>", id: "944867707202301952" },
-  crossmark: { shorthand: "<:crossmark:944867707201937409>", id: "944867707201937409" },
-  trash: { shorthand: "<:trash:927050313943380089>", id: "927050313943380089" },
-  WeatherAPI: { shorthand: "<:WeatherAPI:932557801153241088>", id: "932557801153241088" },
+let emojis = {
+  success: { name: "success", id: "955083320247615528" },
+  warn: { name: "warn", id: "955083320159502417" },
+  error: { name: "error", id: "955083320193081364" },
+  trash: { name: "trash", id: "927050313943380089" },
+  WeatherAPI: { name: "WeatherAPI", id: "932557801153241088" },
 }
+
+Object.keys(emojis).forEach(emoji => {
+  // emojis[emoji].name = emoji
+  emojis[emoji].shorthand = `<:${emojis[emoji].name}:${emojis[emoji].id}>`
+})
+
+module.exports = emojis

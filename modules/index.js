@@ -5,6 +5,7 @@ module.exports = {
   deployLog: require("./deployLog"),
   emojis: require("./emojis"),
   nordChalk: require("./colors").nordChalk,
+  permissions: require("./permissions"),
   permissionCheck: require("./permissionCheck"),
   random: require("./random"),
   rep: require("./rep"),
