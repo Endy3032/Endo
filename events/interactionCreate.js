@@ -8,10 +8,8 @@ module.exports = {
     isLocal = os.hostname().includes("local")
     isTestGuild = interaction.guildId == process.env.TestGuild
     isReplitTest = interaction.channelId == process.env.TestChannel
-
-    if ((isLocal && (!isTestGuild || isReplitTest)) || (!isLocal && isTestGuild && !isReplitTest)) {
-      return
-    }
+    if (isLocal && (!isTestGuild || isReplitTest)) return
+    if (!isLocal && isTestGuild && !isReplitTest) return
 
     commandName =
     interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
