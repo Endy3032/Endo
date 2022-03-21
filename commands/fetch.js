@@ -1,5 +1,6 @@
 const Fuse = require("fuse.js")
 const axios = require("axios").default
+const { random } = require("../modules")
 const urban = require("urban-dictionary")
 const { getLyrics } = require("genius-lyrics-api")
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
@@ -203,8 +204,8 @@ module.exports = {
                   footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
                 }] })
               })
-              .catch(err => {
-                console.botLog(err, "ERROR")
+              .catch(() => {
+                console.botLog(`The word ${word} was not found in the dictionary`, "WARN")
                 interaction.editReply(`The word ${word} was not found in the dictionary`)
               })
             break
@@ -232,8 +233,8 @@ module.exports = {
                   timestamp: new Date(result.written_on).toISOString()
                 }] })
               })
-              .catch(err => {
-                console.botLog(err, "ERROR")
+              .catch(() => {
+                console.botLog(`The word ${word} was not found in the dictionary`, "WARN")
                 interaction.editReply(`The word ${word} was not found in the dictionary`)
               })
             break
@@ -366,6 +367,7 @@ module.exports = {
             interaction.editReply({ embeds: [weatherEmbed] })
           })
           .catch(e => {
+            console.log(e)
             e.response.data.error.message == "No matching location found."
               ? interaction.editReply({ content: `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`, ephemeral: true })
               : interaction.editReply({ content: `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`, ephemeral: true })

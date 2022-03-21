@@ -1,5 +1,6 @@
 const os = require("os")
 require("dotenv").config()
+const stripAnsi = require("strip-ansi")
 const { emojis, nordChalk, rep } = require("../modules")
 
 module.exports = {
@@ -17,18 +18,26 @@ module.exports = {
     : null
 
     if (!interaction.isAutocomplete()) {
-      message = nordChalk.bright.cyan(`[${interaction.user.tag} | ${interaction.guildId ? `${interaction.guild.name}#${interaction.channel.name}` : "DM"}] `)
+      author = nordChalk.bright.cyan(`[${interaction.user.tag} | ${interaction.guildId ? `${interaction.guild.name}#${interaction.channel.name}` : "DM"}] `)
 
-      message +=
+      intLog =
       interaction.isChatInputCommand() && interaction.options._group ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${interaction.options._group}/${interaction.options._subcommand}]`)}`
       : interaction.isChatInputCommand() && interaction.options._subcommand ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${interaction.options._subcommand}]`)}`
       : interaction.isChatInputCommand() || interaction.isContextMenuCommand() ? `Triggered ${nordChalk.bright.cyan(`[${commandName}]`)}`
       : interaction.isButton() ? `Pushed ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
       : interaction.isSelectMenu() ? `Selected ${nordChalk.bright.cyan(`[${commandName}/[${interaction.values.join("|")}]]`)}`
       : interaction.isModalSubmit() ? `Submitted ${nordChalk.bright.cyan(`[${commandName}/${interaction.customId}]`)}`
-      : "Unknown Interaction", () => {console.botLog(`${interaction}\nThis interaction type hasn't been logged yet. <@554680253876928512>`)}
+      : "Unknown Interaction"
 
-      console.botLog(message)
+      discordTimestamp = Math.floor(interaction.createdTimestamp / 1000)
+      embed = {
+        description: stripAnsi(`**Timestamp** • <t:${discordTimestamp}:d> <t:${discordTimestamp}:T>\n**Interaction** • ${intLog}`),
+        author: { name: interaction.user.tag, icon_url: interaction.user.avatarURL() },
+        footer: { text: interaction.guild ? `${interaction.guild.name} #${interaction.channel.name}` : "**DM**", icon_url: interaction.guild.iconURL() },
+        timestamp: new Date(interaction.createdTimestamp).toISOString()
+      }
+
+      console.botLog(author + intLog, "INFO", embed)
     }
 
     const command = interaction.client.commands.get(commandName)
@@ -36,7 +45,7 @@ module.exports = {
     handleError = (err) => {
       try {rep(interaction, { content: `${emojis.error.shorthand} This interaction failed [${type} Error]`, ephemeral: true })}
       catch {rep(interaction, { content: `${emojis.error.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })}
-      console.botLog(nordChalk.error(String(err)), "ERROR")
+      console.botLog(nordChalk.error(err.stack), "ERROR")
     }
 
     try {
@@ -60,14 +69,14 @@ module.exports = {
         type = "Modal"
       }
     } catch (err) {
-      console.botLog(nordChalk.error(String(err)), "ERROR")
+      console.botLog(nordChalk.error(err.stack), "ERROR")
       return await interaction.reply({ content: `${emojis.error.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })
     }
 
+    try {await execute(interaction)}
+    catch (err) {return handleError(err)}
+
     process.once("uncaughtException", handleError)
     process.once("unhandledRejection", handleError)
-
-    try {await execute(interaction)}
-    catch (err) {handleError(err)}
   }
 }

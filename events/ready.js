@@ -20,24 +20,26 @@ module.exports = {
       })
     }
 
-    setInterval(() => {
-      if (!os.hostname().includes("local")) {
+    function reloadPresence() {
+      if (os.hostname().includes("local")) {
         activity = random.pickFromArray(activities)
         client.user.setPresence(activity)
-
+  
         act_type = activity.activities[0]["type"]
         act_name = activity.activities[0]["name"]
         type_str = ["Playing", "Streaming", "Listening to", "Watching"]
-
+  
         if (act_name == "lofi") {
           axios.get(`https://noembed.com/embed?url=${activity.activities[0].url}`)
-            .then(res => console.botLog(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name} ${nordChalk.bright.cyan(`[${activity.activities[0]["url"].replace("www.youtube.com/watch?v=", "youtu.be/")} - ${res.data.title}]`)}`))
-        } else console.botLog(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name}`)
+            .then(res => {console.botLog(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name} ${nordChalk.bright.cyan(`${res.data.title} • ${activity.activities[0]["url"].replace("www.youtube.com/watch?v=", "youtu.be/")}`)}`)})
+        } else console.botLog(`${nordChalk.bright.cyan("[Status]")} ${type_str[act_type]} ${act_name}`, "INFO", { description: `**Status** • ${type_str[act_type]} ${act_name}` })
       }
-      pinger()
-    }, 300000)
+    }
 
+    setInterval(() => { pinger(); reloadPresence() }, 300000)
     pinger()
+    reloadPresence()
+
     client.user.setPresence(random.pickFromArray(activities))
     // clientcmd = client.application.commands.fetch()
     // .then(cmds => console.log(cmds))

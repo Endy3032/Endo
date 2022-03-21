@@ -7,7 +7,7 @@ const { Client, Collection, GatewayIntentBits, Partials } = require("discord.js"
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] })
 var logStream = fs.createWriteStream("./logs/botlog.log", { flags: "a" })
 
-console.botLog = async function log(content, logLevel = "INFO") {
+console.botLog = async (content, logLevel = "INFO", embed = null) => {
   const date = new Date()
   const epoch = Math.floor(date.getTime() / 1000)
   const channel = client.channels.cache.get(process.env.Log)
@@ -32,13 +32,38 @@ console.botLog = async function log(content, logLevel = "INFO") {
     fractionalSecondDigits: 2
   }).replace(",", "")
 
+  content = content.replaceAll("\n    ", "\n  ").replaceAll("/Users/enderhoang", "~")
   consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](logLevel.padEnd(5, " "))} ${nordChalk.blue(`| ${content}`)}`.replaceAll("\n", nordChalk.blue("\n                             | "))
+
   console.log(consoleLog)
   logStream.write(stripAnsi(`${consoleLog}\n`))
-  try {channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>]\n${content}`))} catch {null}
+
+  content = stripAnsi(content.replaceAll("[ ", "[").replaceAll(" ]", "]"))
+
+  if (logLevel == "ERROR") {
+    try {channel.send(`<t:${epoch}:d> <t:${epoch}:T>\`\`\`${content}\`\`\``)} catch {null}
+    return
+  }
+
+  if (content.includes("youtu.be")) {
+    try {channel.send(`**Timestamp** • <t:${epoch}:d> <t:${epoch}:T>\n**Status** • Streaming lofi - ${content.split(" Streaming lofi ")[1]}`)} catch {null}
+    return
+  }
+
+  if (embed == null) {
+    embed = {
+      description: `**Timestamp** • <t:${epoch}:d> <t:${epoch}:T>\n**${logLevel.charAt(0).toUpperCase() + logLevel.slice(1).toLowerCase()}**${logLevel.includes("WARN") ? `\`\`\`${content}\`\`\`` : ` • ${content}`}`,
+      timestamp: date.toISOString()
+    }
+  }
+
+  if (embed.timestamp == null) embed.timestamp = date.toISOString()
+
+  if (!embed.description.includes("**Timestamp** • ")) embed.description = `**Timestamp** • <t:${epoch}:d> <t:${epoch}:T>\n${embed.description}`
+  try {channel.send({ embeds: [embed] })} catch {null}
 }
 
-console.tagLog = async function(tag, content) {
+console.tagLog = async (tag, content) => {
   console.botLog(`${nordChalk.bright.cyan(`[${tag}]`)} ${content}`)
 }
 

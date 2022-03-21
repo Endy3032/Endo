@@ -283,7 +283,7 @@ module.exports = {
               interaction.guild.channels.create(channelName, options)
                 .then(channel => {channel.setPosition(position); interaction.reply({ content: `${emojis.warn.shorthand} This server can't create Stage channels yet, fallback to voice channel instead <#${channel.id}>`, ephemeral: true })})
             }
-            else {interaction.reply({ content: `${emojis.error.shorthand} Something went wrong while creating ${channelName}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")}
+            else {interaction.reply({ content: `${emojis.error.shorthand} Something went wrong while creating ${channelName}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err.stack, "ERROR")}
           })
 
         break
@@ -359,7 +359,7 @@ module.exports = {
 
         await channel.delete(reason)
           .then(interaction.followUp({ content: `${emojis.success.shorthand} Deleted #${channel.name}`, ephemeral: true }))
-          .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Failed to delete ${channel.name}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+          .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Failed to delete ${channel.name}\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err.stack, "ERROR")})
         break
       }
 
@@ -367,7 +367,7 @@ module.exports = {
         if (option == "none" && user == "none") {
           await interaction.channel.bulkDelete(amount, true)
             .then(() => {content = `Purged ${amount} messages`; interaction.followUp({ content: content, ephemeral: true }); console.botLog(content)})
-            .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+            .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err.stack, "ERROR")})
         } else {
           messages = await interaction.channel.messages.fetch({ limit: amount })
           clearList = messages.filter(message => {
@@ -380,7 +380,7 @@ module.exports = {
 
           await interaction.channel.bulkDelete(clearList, true)
             .then(() => {content = `${emojis.success.shorthand} Found and purged ${clearList.size}/${amount} messages`; interaction.followUp({ content: content, ephemeral: true }); console.botLog(content)})
-            .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err, "ERROR")})
+            .catch(err => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err.stack, "ERROR")})
         }
         break
       }
