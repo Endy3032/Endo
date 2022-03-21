@@ -1,7 +1,7 @@
 var axios = require("axios").default
 const { evaluate } = require("mathjs")
 const { ApplicationCommandOptionType, ChannelType } = require("discord.js")
-const { colors, convert, RGB, HSV, CMYK, random,superEscape } = require("../modules")
+const { colors, convert, RGB, HSV, CMYK, random, superEscape, timestampStyler } = require("../modules")
 // const { splitBar } = require("string-progressbar")
 
 module.exports = {
@@ -243,6 +243,69 @@ module.exports = {
           },
         ]
       },
+      {
+        name: "timestamp",
+        description: "Get the current timestamp or from a provided date",
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "year",
+            description: "The timestamp's year [Integer -271821~275760]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": -271821,
+            "max_value": 275760,
+            required: true
+          },
+          {
+            name: "month",
+            description: "The timestamp's month [Integer 1~12]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 1,
+            "max_value": 12,
+            required: false
+          },
+          {
+            name: "day",
+            description: "The timestamp's day [Integer 1~31]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 1,
+            "max_value": 31,
+            required: false
+          },
+          {
+            name: "hour",
+            description: "The timestamp's hours [Integer 0~23]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 0,
+            "max_value": 23,
+            required: false
+          },
+          {
+            name: "minute",
+            description: "The timestamp's minutes [Integer 0~59]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 0,
+            "max_value": 59,
+            required: false
+          },
+          {
+            name: "second",
+            description: "The timestamp's seconds [Integer 0~59]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 0,
+            "max_value": 59,
+            required: false
+          },
+          {
+            name: "millisecond",
+            description: "The timestamp's milliseconds [Integer 0~999]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 0,
+            "max_value": 999,
+            required: false
+          },
+        ]
+      }
     ]
   },
 
@@ -640,6 +703,21 @@ module.exports = {
             //   }
 
             //   await interaction.reply({ embeds: [embed], components: components })
+            break
+          }
+
+          case "timestamp": {
+            const ms = interaction.options.getInteger("millisecond") || 0
+            const s = interaction.options.getInteger("second") || 0
+            const m = interaction.options.getInteger("minute") || 0
+            const h = interaction.options.getInteger("hour") || 0
+            const d = interaction.options.getInteger("day") || 1
+            const mo = (interaction.options.getInteger("month") || 1) - 1
+            const y = interaction.options.getInteger("year")
+            date = new Date(y, mo, d, h, m, s, ms)
+            if (date == "Invalid Date") {date = new Date(y < 0 ? -8640000000000000 : 8640000000000000)}
+            timestamp = date.getTime()
+            await interaction.reply({ content: `**Date** • ${date}\n**Timestamp** • ${Math.floor(timestamp/1000)}(${String(date.getMilliseconds()).padStart(3, "0")})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`, ephemeral: true })
             break
           }
         }

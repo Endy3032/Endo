@@ -10,6 +10,7 @@ module.exports = {
   random: require("./random"),
   rep: require("./rep"),
   superEscape: require("./superEscape"),
+  timestampStyler: require("./timestampStyler"),
   RGB: require("./colorConversions").RGB,
   HSV: require("./colorConversions").HSV,
   CMYK: require("./colorConversions").CMYK,

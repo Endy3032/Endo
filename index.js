@@ -32,7 +32,7 @@ console.botLog = async function log(content, logLevel = "INFO") {
     fractionalSecondDigits: 2
   }).replace(",", "")
 
-  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](`${logLevel} `.slice(0, 5))} ${nordChalk.blue(`| ${content}`)}`.replaceAll("\n", nordChalk.blue("\n                             | "))
+  consoleLog = `${nordChalk.blue(logTime)} ${logLevelColors[logLevel](logLevel.padEnd(5, " "))} ${nordChalk.blue(`| ${content}`)}`.replaceAll("\n", nordChalk.blue("\n                             | "))
   console.log(consoleLog)
   logStream.write(stripAnsi(`${consoleLog}\n`))
   try {channel.send(stripAnsi(`[<t:${epoch}:d> <t:${epoch}:T>]\n${content}`))} catch {null}
