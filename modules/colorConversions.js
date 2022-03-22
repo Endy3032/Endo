@@ -224,7 +224,7 @@ const Convert = {
   }
 }
 
-module.exports.convert = Convert
-module.exports.RGB = RGB
-module.exports.HSV = HSV
-module.exports.CMYK = CMYK
+module.exports = {
+  convert: Convert,
+  RGB, HSV, CMYK
+}

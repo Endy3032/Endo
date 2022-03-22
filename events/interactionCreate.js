@@ -31,7 +31,7 @@ module.exports = {
 
       discordTimestamp = Math.floor(interaction.createdTimestamp / 1000)
       embed = {
-        description: stripAnsi(`**Timestamp** • <t:${discordTimestamp}:d> <t:${discordTimestamp}:T>\n**Interaction** • ${intLog}`),
+        description: stripAnsi(`**Epoch** • ${discordTimestamp}\n**Interaction** • ${intLog}`),
         author: { name: interaction.user.tag, icon_url: interaction.user.avatarURL() },
         footer: { text: interaction.guild ? `${interaction.guild.name} #${interaction.channel.name}` : "**DM**", icon_url: interaction.guild.iconURL() },
         timestamp: new Date(interaction.createdTimestamp).toISOString()

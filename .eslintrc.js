@@ -5,16 +5,18 @@ module.exports = {
     node: true,
   },
   extends: "eslint:recommended",
+  // sourceType: "module",
   parserOptions: {
     ecmaVersion: "latest",
   },
   rules: {
-    indent: ["warn", 2, { SwitchCase: 1, flatTernaryExpressions: true }],
-    "linebreak-style": ["warn", "unix"],
-    quotes: ["warn", "double"],
     semi: ["error", "never"],
+    quotes: ["warn", "double"],
     "no-undef": ["off", "never"],
+    "no-unneeded-ternary": "error",
+    "linebreak-style": ["warn", "unix"],
+    "no-whitespace-before-property": "warn",
     "object-curly-spacing": ["warn", "always"],
-    "no-whitespace-before-property": "warn"
+    indent: ["warn", 2, { SwitchCase: 1, flatTernaryExpressions: true }],
   }
 }

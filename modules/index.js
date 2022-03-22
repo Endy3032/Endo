@@ -1,5 +1,6 @@
 module.exports = {
   activities: require("./activities"),
+  capitalize: require("./capitalize"),
   colors: require("./colors").colors,
   convert: require("./colorConversions").convert,
   deployLog: require("./deployLog"),

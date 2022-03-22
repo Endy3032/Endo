@@ -1,8 +1,8 @@
 const Fuse = require("fuse.js")
 const axios = require("axios").default
-const { random } = require("../modules")
 const urban = require("urban-dictionary")
 const { getLyrics } = require("genius-lyrics-api")
+const { capitalize, random } = require("../modules")
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
 
 module.exports = {
@@ -181,7 +181,7 @@ module.exports = {
                 data = response.data
                 data.forEach(entry => {
                   entry.meanings.forEach(meaning => {
-                    desc += `\`\`\`${meaning.partOfSpeech.charAt(0).toUpperCase() + meaning.partOfSpeech.slice(1)}\`\`\``
+                    desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
                     desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
                     desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
                     desc += "\n**Meanings:**\n"
