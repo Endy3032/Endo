@@ -23,8 +23,15 @@ export async function execute(interaction: Interaction) {
   : interaction.isContextMenuCommand() ? interaction.commandName.replace("[D] ", "")
   : null
 
-  const group = (interaction as ChatInputCommandInteraction).options.getSubcommandGroup() || null
-  const subcmd = (interaction as ChatInputCommandInteraction).options.getSubcommand() || null
+  let subcmd: string | null, group: string | null
+
+  try {
+    subcmd = (interaction as ChatInputCommandInteraction).options.getSubcommand() || null
+    group = (interaction as ChatInputCommandInteraction).options.getSubcommandGroup() || null
+  } catch {
+    subcmd = null
+    group = null
+  }
 
   if (!interaction.isAutocomplete()) {
     const author = nordChalk.bright.cyan(`[${interaction.user.tag} | ${`${interaction.guild?.name}#${(interaction.channel as BaseGuildTextChannel).name}` || "DM"}] `)

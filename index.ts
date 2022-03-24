@@ -1,5 +1,5 @@
 import "dotenv/config"
-import keepAlive from "./server.js"
+import keepAlive from "./server"
 import stripAnsi from "strip-ansi"
 import { APIEmbed } from "discord-api-types/v10"
 import { capitalize, nordChalk } from "./modules"
@@ -66,14 +66,12 @@ commandFiles.forEach(async file => {
 const eventFiles = readdirSync("./events").filter((file) => file.endsWith(".ts"))
 eventFiles.forEach(async file => {
   const event = await import(`./events/${file}`)
-  console.log(event)
   event.once
     ? client.once(event.name, (...args) => event.execute(...args))
     : client.on(event.name, (...args) => event.execute(...args))
 })
 
 client.login(process.env.Token as string)
-  .then((response) => {console.log(response, "Done")})
 keepAlive()
 
 process.setMaxListeners(0)

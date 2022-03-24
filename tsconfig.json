@@ -8,7 +8,8 @@
     "module": "ESNext",
     "typeRoots": ["./node_modules/@types", "typings"],
 
-    "noEmit": true,
+    // "noEmit": true,
+    "outDir": "./dist",
     "strict": true,
     "allowJs": true,
     "checkJs": true,
@@ -23,5 +24,11 @@
     "logs",
     "Resources",
     "node_modules"
-  ]
+  ],
+  "files": [
+    "index.ts",
+    "deploy.ts",
+    "server.ts"
+  ],
+  "include": ["commands/*", "events/*", "modules/*", "Resources/**/*"]
 }

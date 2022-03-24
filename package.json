@@ -10,7 +10,7 @@
   "main": "index",
   "scripts": {
     "start": "node --experimental-specifier-resolution=node --loader ts-node/esm index.ts",
-    "dev": "nodemon .",
+    "dev": "nodemon --experimental-specifier-resolution=node --loader ts-node/esm",
     "ceploy": "ts-node deploy.ts",
     "teploy": "ts-node deploy.ts --mode='test'",
     "geploy": "ts-node deploy.ts --mode='guilds'",

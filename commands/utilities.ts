@@ -392,8 +392,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           { name: "CMYK", value: `${cmyk?.c}, ${cmyk?.m}, ${cmyk?.y}, ${cmyk?.k}`, inline: true }
         ],
         thumbnail: { url: `https://dummyimage.com/128/${hex?.slice(1, 7)}/${hex?.slice(1, 7)}.png` },
-        author: { name: `${interaction.user.tag}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
-        footer: { text: `${interaction.client.user?.tag}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user?.id}/${interaction.client.user?.avatar}.png` },
         timestamp: new Date().toISOString(),
       }] })
       break

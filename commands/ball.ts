@@ -48,7 +48,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const question = interaction.options.getString("question") as string
   const response = question.endsWith("\u200a") || question.startsWith("\u200a") ? random.pickFromArray(responses.yes)
     : question.endsWith("\u200b") || question.startsWith("\u200b") ? random.pickFromArray(responses.no)
-    : responses[index][random.pickFromArray(responses[Object.keys(responses)[index]])]
+    : random.pickFromArray(responses[Object.keys(responses)[index]])
 
   await interaction.reply({ embeds: [{
     title: "Magic 8-Ball",
