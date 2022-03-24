@@ -1,5 +1,5 @@
-module.exports = (timestamp, mode) => {
-  ts = Math.floor(timestamp / 1000)
+export default (timestamp: number, mode: string) => {
+  const ts = Math.floor(timestamp / 1000)
   switch (mode) {
     case "stime": return `<t:${ts}:t>`
     case "ltime": return `<t:${ts}:T>`

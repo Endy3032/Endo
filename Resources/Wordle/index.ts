@@ -1,4 +1,4 @@
-answers = [
+const answers = [
   "cigar",
   "rebut",
   "sissy",
@@ -2310,7 +2310,7 @@ answers = [
   "shave",
 ]
 
-allowed = [
+const allowed = [
   "aahed",
   "aalii",
   "aargh",
@@ -12954,11 +12954,11 @@ allowed = [
 allowed.push(...answers)
 
 function getWord() {
-  const a = new Date()
+  const a = new Date().getTime()
   return answers[Math.floor(a/86400000) - 18797]
 }
 
-colors = {
+const colors = {
   background: "#121213",
   tilebg: "#3A3A3C",
   keybg: "#818384",
@@ -12978,30 +12978,35 @@ colors = {
 //   text: "#ECEFF4"
 // }
 
-const canvas = {
-  width: 750,
-  height: 1000,
-  space: 10,
-  size: 90,
-  keyFont: 32,
-  tileFont: 56
+interface WordleCanvas {
+  width: number
+  height: number
+  space: number
+  size: number
+  keyFont: number
+  tileFont: number
+  tileStartingX: number
+  tileStartingY: number
+  keyWidth: number
+  keyStartingY: number
+  keys: string[][]
 }
 
-width = canvas.width
-height = canvas.height
-space = canvas.space
-size = canvas.size
+const width = 750
+const height = 1000
+const space = 10
+const size = 90
+const keyFont = 32
+const tileFont = 56
+const tileStartingX = (width - size * 5 - space*4) / 2
+const tileStartingY = space
+const keyWidth = (width - 11 * space)/10
+const keyStartingY = height - (space + size) * 3
+const keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], ["A", "S", "D", "F", "G", "H", "J", "K", "L"], ["Z", "X", "C", "V", "B", "N", "M"]]
 
-canvas.tileStartingX = (width - size * 5 - space*4) / 2
-canvas.tileStartingY = space
-canvas.keyWidth = (width - 11 * space)/10
-canvas.keyStartingY = height - (space + size) * 3
-canvas.keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], ["A", "S", "D", "F", "G", "H", "J", "K", "L"], ["Z", "X", "C", "V", "B", "N", "M"]]
-
-module.exports = {
-  answers: answers,
-  allowed: allowed,
-  getWord: getWord,
-  colors: colors,
-  canvas: canvas
+const canvas: WordleCanvas = {
+  width, height, space, size, keyFont, tileFont,
+  tileStartingX, tileStartingY, keyWidth, keyStartingY, keys
 }
+
+export default { answers, allowed, getWord, colors, canvas }

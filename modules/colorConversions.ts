@@ -1,5 +1,8 @@
 class HSV {
-  constructor(h, s, v) {
+  h: number
+  s: number
+  v: number
+  constructor(h: number, s: number, v: number) {
     h <= 0 ? h = 0 : h > 360 ? h = 360 : h
     s <= 0 ? s = 0 : s > 100 ? s = 100 : s
     v <= 0 ? v = 0 : v > 100 ? v = 100 : v
@@ -11,7 +14,10 @@ class HSV {
 }
 
 class RGB {
-  constructor(r, g, b) {
+  r: number
+  g: number
+  b: number
+  constructor(r: number, g: number, b: number) {
     r < 0 ? r = 0 : r > 255 ? r = 255 : r
     g < 0 ? g = 0 : g > 255 ? g = 255 : g
     b < 0 ? b = 0 : b > 255 ? b = 255 : b
@@ -23,7 +29,11 @@ class RGB {
 }
 
 class CMYK {
-  constructor(c, m, y, k) {
+  c: number
+  m: number
+  y: number
+  k: number
+  constructor(c: number, m: number, y: number, k: number) {
     c < 0 ? c = 0 : c > 100 ? c = 100 : c
     m < 0 ? m = 0 : m > 100 ? m = 100 : m
     y < 0 ? y = 0 : y > 100 ? y = 100 : y
@@ -37,16 +47,16 @@ class CMYK {
 }
 
 const Convert = {
-  _RGBtoHSV : (RGB) => {
-    hsv = new HSV(0, 0, 0)
+  _RGBtoHSV : (RGB: { r: number; g: number; b: number }) => {
+    const hsv = new HSV(0, 0, 0)
 
-    r = RGB.r / 255
-    g = RGB.g / 255
-    b = RGB.b / 255
+    const r = RGB.r / 255
+    const g = RGB.g / 255
+    const b = RGB.b / 255
 
-    min = Math.min(r, g, b)
-    max = Math.max(r, g, b)
-    delta = max - min
+    const min = Math.min(r, g, b)
+    const max = Math.max(r, g, b)
+    const delta = max - min
 
     hsv.v = max
 
@@ -55,9 +65,9 @@ const Convert = {
       hsv.s = 0
     } else {
       hsv.s = delta / max
-      del_R = (((max - r) / 6) + (delta / 2)) / delta
-      del_G = (((max - g) / 6) + (delta / 2)) / delta
-      del_B = (((max - b) / 6) + (delta / 2)) / delta
+      const del_R = (((max - r) / 6) + (delta / 2)) / delta
+      const del_G = (((max - g) / 6) + (delta / 2)) / delta
+      const del_B = (((max - b) / 6) + (delta / 2)) / delta
 
       r == max ? hsv.h = del_B - del_G
         : g == max ? hsv.h = (1 / 3) + del_R - del_B
@@ -76,23 +86,24 @@ const Convert = {
     return hsv
   },
 
-  _HSVtoRGB : function  (HSV) {
-    rgb = new RGB(0, 0, 0)
+  _HSVtoRGB : function  (HSV: { h: number; s: number; v: number }) {
+    const rgb = new RGB(0, 0, 0)
 
-    h = HSV.h / 360
-    s = HSV.s / 100
-    v = HSV.v / 100
+    const h = HSV.h / 360
+    const s = HSV.s / 100
+    const v = HSV.v / 100
 
     if (s == 0) {
       rgb.r = v * 255
       rgb.g = v * 255
-      rgb.v = v * 255
+      rgb.b = v * 255
     } else {
-      var_h = h * 6
-      var_i = Math.floor(var_h)
-      var_1 = v * (1 - s)
-      var_2 = v * (1 - s * (var_h - var_i))
-      var_3 = v * (1 - s * (1 - (var_h - var_i)))
+      const var_h = h * 6
+      const var_i = Math.floor(var_h)
+      const var_1 = v * (1 - s)
+      const var_2 = v * (1 - s * (var_h - var_i))
+      const var_3 = v * (1 - s * (1 - (var_h - var_i)))
+      let var_r: number, var_g: number, var_b: number
 
       if (var_i == 0) {
         var_r = v
@@ -132,12 +143,12 @@ const Convert = {
     return rgb
   },
 
-  _RGBtoCMYK : function (RGB) {
-    cmyk = new CMYK(0, 0, 0, 0)
+  _RGBtoCMYK : function (RGB: { r: number; g: number; b: number }) {
+    const cmyk = new CMYK(0, 0, 0, 0)
 
-    r = RGB.r / 255
-    g = RGB.g / 255
-    b = RGB.b / 255
+    const r = RGB.r / 255
+    const g = RGB.g / 255
+    const b = RGB.b / 255
 
     cmyk.k = Math.min( 1 - r, 1 - g, 1 - b )
     cmyk.c = ( 1 - r - cmyk.k ) / ( 1 - cmyk.k )
@@ -152,13 +163,13 @@ const Convert = {
     return cmyk
   },
 
-  _CMYKtoRGB : function (CMYK) {
-    rgb = new RGB(0, 0, 0)
+  _CMYKtoRGB : function (CMYK: { c: number; m: number; y: number; k: number }) {
+    const rgb = new RGB(0, 0, 0)
 
-    c = CMYK.c / 100
-    m = CMYK.m / 100
-    y = CMYK.y / 100
-    k = CMYK.k / 100
+    const c = CMYK.c / 100
+    const m = CMYK.m / 100
+    const y = CMYK.y / 100
+    const k = CMYK.k / 100
 
     rgb.r = 1 - Math.min( 1, c * ( 1 - k ) + k )
     rgb.g = 1 - Math.min( 1, m * ( 1 - k ) + k )
@@ -171,8 +182,8 @@ const Convert = {
     return rgb
   },
 
-  _HEXtoRGB : function (HEX) {
-    rgb = new RGB(0, 0, 0)
+  _HEXtoRGB : function (HEX: string) {
+    const rgb = new RGB(0, 0, 0)
 
     HEX = HEX.replace("#", "")
 
@@ -183,40 +194,40 @@ const Convert = {
     return rgb
   },
 
-  _RGBtoHEX : function (RGB) {
-    hex = "#"
+  _RGBtoHEX : function (RGB: { r: { toString: (arg0: number) => any }; g: { toString: (arg0: number) => any }; b: { toString: (arg0: number) => any } }) {
+    let hex = "#"
 
-    hr = `000${RGB.r.toString(16)}`.slice(-2)
-    hg = `000${RGB.g.toString(16)}`.slice(-2)
-    hb = `000${RGB.b.toString(16)}`.slice(-2)
+    const hr = `000${RGB.r.toString(16)}`.slice(-2)
+    const hg = `000${RGB.g.toString(16)}`.slice(-2)
+    const hb = `000${RGB.b.toString(16)}`.slice(-2)
 
     hex += hr + hg + hb
 
     return hex
   },
 
-  toRGB : function (o) {
+  toRGB : function (o: any) {
     if (o instanceof RGB) {return o}
     else if (o instanceof HSV) {return this._HSVtoRGB(o)}
     else if (o instanceof CMYK) {return this._CMYKtoRGB(o)}
     else {return this._HEXtoRGB(o)}
   },
 
-  toHSV : function (o) {
+  toHSV : function (o: any) {
     if (o instanceof HSV) {return o}
     else if (o instanceof RGB) {return this._RGBtoHSV(o)}
     else if (o instanceof CMYK) {return this._RGBtoHSV(this._CMYKtoRGB(o))}
-    else {return this._HEXtoHSV(this._HEXtoRGB(o))}
+    else {return this._RGBtoHSV(this._HEXtoRGB(o))}
   },
 
-  toCMYK : function (o) {
+  toCMYK : function (o: any) {
     if (o instanceof CMYK) {return o}
     else if (o instanceof RGB) {return this._RGBtoCMYK(o)}
     else if (o instanceof HSV) {return this._RGBtoCMYK(this._HSVtoRGB(o))}
     else {return this._RGBtoCMYK(this._HEXtoRGB(o))}
   },
 
-  toHEX : function (o) {
+  toHEX : function (o: any) {
     if (o instanceof RGB) {return this._RGBtoHEX(o)}
     else if (o instanceof HSV) {return this._RGBtoHEX(this._HSVtoRGB(o))}
     else if (o instanceof CMYK) {return this._RGBtoHEX(this._CMYKtoRGB(o))}
@@ -224,7 +235,4 @@ const Convert = {
   }
 }
 
-module.exports = {
-  convert: Convert,
-  RGB, HSV, CMYK
-}
+export { Convert as convert, RGB, HSV, CMYK }

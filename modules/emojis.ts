@@ -1,4 +1,8 @@
-let emojis = {
+interface Emojis {
+  [key: string]: { name: string, id: string, shorthand?: string}
+}
+
+const emojis: Emojis = {
   success: { name: "success", id: "955083320247615528" },
   warn: { name: "warn", id: "955083320159502417" },
   error: { name: "error", id: "955083320193081364" },
@@ -7,8 +11,7 @@ let emojis = {
 }
 
 Object.keys(emojis).forEach(emoji => {
-  // emojis[emoji].name = emoji
   emojis[emoji].shorthand = `<:${emojis[emoji].name}:${emojis[emoji].id}>`
 })
 
-module.exports = emojis
+export default emojis
