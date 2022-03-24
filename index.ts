@@ -1,4 +1,5 @@
-import keepAlive from "./server"
+import "dotenv/config"
+import keepAlive from "./server.js"
 import stripAnsi from "strip-ansi"
 import { APIEmbed } from "discord-api-types/v10"
 import { capitalize, nordChalk } from "./modules"
@@ -30,12 +31,12 @@ console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) =>
 
   if (logLevel == "error") {
     return channel.send(`**Timestamp** • ${epoch}\`\`\`${content}\`\`\``)
-      .catch(err => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``))
+      .catch((err: Error) => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``))
   }
 
   if (content.includes("youtu.be")) {
     return channel.send(`**Timestamp** • ${epoch}\n**Status** • Streaming lofi - ${content.split(" Streaming lofi ")[1]}`)
-      .catch(err => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``))
+      .catch((err: Error) => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``))
   }
 
   if (!embed) {
@@ -47,7 +48,8 @@ console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) =>
 
   if (!embed.timestamp) embed.timestamp = date.toISOString()
   if (!embed.description?.includes("**Timestamp** • ")) embed.description = `**Timestamp** • ${epoch}\n${embed.description}`
-  try {channel.send({ embeds: [embed] })} catch{(err: { stack: any }) => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``)}
+  try {channel.send({ embeds: [embed] })}
+  catch {(err: { stack: any }) => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``)}
 }
 
 console.tagLog = async (tag: string, content: string) => {
@@ -55,22 +57,23 @@ console.tagLog = async (tag: string, content: string) => {
 }
 
 client.commands = new Collection()
-const commandFiles = readdirSync("./commands").filter((file) => file.endsWith(".js"))
-commandFiles.forEach((file) => {
-  const command = require(`./commands/${file}`)
+const commandFiles = readdirSync("./commands").filter((file) => file.endsWith(".ts"))
+commandFiles.forEach(async file => {
+  const command = await import(`./commands/${file}`)
   client.commands.set(command.cmd.name, command)
 })
 
-const eventFiles = readdirSync("./events").filter((file) => file.endsWith(".js"))
-eventFiles.forEach((file) => {
-  const event = require(`./events/${file}`)
-
+const eventFiles = readdirSync("./events").filter((file) => file.endsWith(".ts"))
+eventFiles.forEach(async file => {
+  const event = await import(`./events/${file}`)
+  console.log(event)
   event.once
     ? client.once(event.name, (...args) => event.execute(...args))
     : client.on(event.name, (...args) => event.execute(...args))
 })
 
 client.login(process.env.Token as string)
+  .then((response) => {console.log(response, "Done")})
 keepAlive()
 
 process.setMaxListeners(0)

@@ -1,5 +1,6 @@
 import "dotenv/config"
-var flags = require("flags")
+import flags from "flags"
+// var flags = require("flags")
 
 import fs from "fs"
 import { deployLog } from "./modules"
@@ -14,22 +15,20 @@ const rest = new REST({ version: "10" }).setToken(process.env.Token as string)
 deployLog("Deploy", "Refreshing application commands...")
 
 if (mode != "guilds") {
-  let commands = [] as any //.map(command => command.toJSON());
+  const commands = [] as any //.map(command => command.toJSON());
   const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"))
 
-  commandFiles.forEach(command => {
-    let { cmd } = require(`./commands/${command}`)
-
-    if (mode == "test") {
-      if (cmd.type == 1 || cmd.type == null) {
-        cmd.description = `[Development] ${cmd.description} [Development]`
-        if (cmd.options) {cmd.options.forEach((option: { description: string; options: any[] }) => {
-          option.description = `[Development] ${option.description} [Development]`
-          if (option.options) option.options.forEach(option => {option.description = `[Development] ${option.description} [Development]`})
-        })}
-      } else if (cmd.type == 2 || cmd.type == 3) cmd.name = `[D] ${cmd.name}`
+  commandFiles.forEach(async command => {
+    const { cmd } = await import(`./commands/${command}`)
+    if (mode != "test") return commands.push(cmd)
+    if (cmd.type == 2 || cmd.type == 3) {
+      cmd.name = `[D] ${cmd.name}`
+      return commands.push(cmd)
     }
 
+    cmd.description = `[Development] ${cmd.description} [Development]`
+    cmd.options?.forEach((option: { description: string; options: any[] }) => option.description = `[Development] ${option.description} [Development]`)
+    cmd.options?.options?.forEach((option: { description: string; options: any[] }) => {option.description = `[Development] ${option.description} [Development]`})
     commands.push(cmd)
   });
 
@@ -47,20 +46,31 @@ if (mode != "guilds") {
 } else {
   const guildFolders = fs.readdirSync("./commands/guilds")
 
-  guildFolders.forEach(guildId => {
-    let commands = [] as any
-    const commandFiles = fs.readdirSync(`./guilds/${guildId}`).filter(file => file.endsWith(".js"))
+  guildFolders.forEach(guildID => {
+    const commands = [] as any
+    const commandFiles = fs.readdirSync(`./guilds/${guildID}`).filter(file => file.endsWith(".js"))
 
-    commandFiles.forEach(command => {
-      let { cmd } = require(`./commands/guilds/${guildId}/${command}`)
+    commandFiles.forEach(async command => {
+      // const { cmd } = require(`./commands/guilds/${guildId}/${command}`)
 
-      if (cmd.type == 1 || cmd.type == null) {
-        cmd.description = `[G] ${cmd.description}`
-        if (cmd.options) {cmd.options.forEach(option => {
-          option.description = `[G] ${option.description}`
-          if (option.options) option.options.forEach(option => {option.description = `[G] ${option.description}`})
-        })}
-      } else if (cmd.type == 2 || cmd.type == 3) cmd.name = `[G] ${cmd.name}`
+      // if (cmd.type == 1 || cmd.type == null) {
+      //   cmd.description = `[G] ${cmd.description}`
+      //   if (cmd.options) {cmd.options.forEach(option => {
+      //     option.description = `[G] ${option.description}`
+      //     if (option.options) option.options.forEach(option => {option.description = `[G] ${option.description}`})
+      //   })}
+      // } else if (cmd.type == 2 || cmd.type == 3) cmd.name = `[G] ${cmd.name}`
+
+      // commands.push(cmd)
+      const { cmd } = await import(`./commands/guilds/${guildID}/${command}`)
+      if (cmd.type == 2 || cmd.type == 3) {
+        cmd.name = `[G] ${cmd.name}`
+        return commands.push(cmd)
+      }
+
+      cmd.description = `[G] ${cmd.description} [G]`
+      cmd.options?.forEach((option: { description: string; options: any[] }) => option.description = `[G] ${option.description} [G]`)
+      cmd.options?.options?.forEach((option: { description: string; options: any[] }) => {option.description = `[G] ${option.description} [G]`})
 
       commands.push(cmd)
     });
@@ -68,12 +78,12 @@ if (mode != "guilds") {
     (async () => {
       try {
         await rest.put(
-          Routes.applicationGuildCommands(process.env.Client as string, guildId),
+          Routes.applicationGuildCommands(process.env.Client as string, guildID),
           { body: commands },
         )
-        deployLog("Deploy", `Registered ${commandFiles.length} guild[${guildId}] commands.`)
+        deployLog("Deploy", `Registered ${commandFiles.length} guild[${guildID}] commands.`)
       }
-      catch (error) {console.error(error)}
+      catch (err) {console.error(err)}
     })()
   })
 }

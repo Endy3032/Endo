@@ -1,11 +1,9 @@
-// const { emojis, nordChalk } = require("./index")
 import emojis from "./emojis"
 import perms from "./permissions"
 import { nordChalk } from "./colors"
 import { ChatInputCommandInteraction, PermissionsBitField } from "discord.js"
 
-
-export default async (interaction: ChatInputCommandInteraction, ...permissions: [bigint]) => {
+export default async (interaction: ChatInputCommandInteraction, ...permissions: bigint[]) => {
   if (!interaction.guild) {
     await interaction.reply({ content: `${emojis.error.shorthand} This command can only be used in a server`, ephemeral: true })
     return true

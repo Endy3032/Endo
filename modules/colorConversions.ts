@@ -48,15 +48,15 @@ class CMYK {
 
 const Convert = {
   _RGBtoHSV : (RGB: { r: number; g: number; b: number }) => {
-    let hsv = new HSV(0, 0, 0)
+    const hsv = new HSV(0, 0, 0)
 
-    let r = RGB.r / 255
-    let g = RGB.g / 255
-    let b = RGB.b / 255
+    const r = RGB.r / 255
+    const g = RGB.g / 255
+    const b = RGB.b / 255
 
-    let min = Math.min(r, g, b)
-    let max = Math.max(r, g, b)
-    let delta = max - min
+    const min = Math.min(r, g, b)
+    const max = Math.max(r, g, b)
+    const delta = max - min
 
     hsv.v = max
 
@@ -65,9 +65,9 @@ const Convert = {
       hsv.s = 0
     } else {
       hsv.s = delta / max
-      let del_R = (((max - r) / 6) + (delta / 2)) / delta
-      let del_G = (((max - g) / 6) + (delta / 2)) / delta
-      let del_B = (((max - b) / 6) + (delta / 2)) / delta
+      const del_R = (((max - r) / 6) + (delta / 2)) / delta
+      const del_G = (((max - g) / 6) + (delta / 2)) / delta
+      const del_B = (((max - b) / 6) + (delta / 2)) / delta
 
       r == max ? hsv.h = del_B - del_G
         : g == max ? hsv.h = (1 / 3) + del_R - del_B
@@ -87,23 +87,23 @@ const Convert = {
   },
 
   _HSVtoRGB : function  (HSV: { h: number; s: number; v: number }) {
-    let rgb = new RGB(0, 0, 0)
+    const rgb = new RGB(0, 0, 0)
 
-    let h = HSV.h / 360
-    let s = HSV.s / 100
-    let v = HSV.v / 100
+    const h = HSV.h / 360
+    const s = HSV.s / 100
+    const v = HSV.v / 100
 
     if (s == 0) {
       rgb.r = v * 255
       rgb.g = v * 255
       rgb.b = v * 255
     } else {
-      let var_h = h * 6
-      let var_i = Math.floor(var_h)
-      let var_1 = v * (1 - s)
-      let var_2 = v * (1 - s * (var_h - var_i))
-      let var_3 = v * (1 - s * (1 - (var_h - var_i)))
-      let var_r, var_g, var_b
+      const var_h = h * 6
+      const var_i = Math.floor(var_h)
+      const var_1 = v * (1 - s)
+      const var_2 = v * (1 - s * (var_h - var_i))
+      const var_3 = v * (1 - s * (1 - (var_h - var_i)))
+      let var_r: number, var_g: number, var_b: number
 
       if (var_i == 0) {
         var_r = v
@@ -144,11 +144,11 @@ const Convert = {
   },
 
   _RGBtoCMYK : function (RGB: { r: number; g: number; b: number }) {
-    let cmyk = new CMYK(0, 0, 0, 0)
+    const cmyk = new CMYK(0, 0, 0, 0)
 
-    let r = RGB.r / 255
-    let g = RGB.g / 255
-    let b = RGB.b / 255
+    const r = RGB.r / 255
+    const g = RGB.g / 255
+    const b = RGB.b / 255
 
     cmyk.k = Math.min( 1 - r, 1 - g, 1 - b )
     cmyk.c = ( 1 - r - cmyk.k ) / ( 1 - cmyk.k )
@@ -164,12 +164,12 @@ const Convert = {
   },
 
   _CMYKtoRGB : function (CMYK: { c: number; m: number; y: number; k: number }) {
-    let rgb = new RGB(0, 0, 0)
+    const rgb = new RGB(0, 0, 0)
 
-    let c = CMYK.c / 100
-    let m = CMYK.m / 100
-    let y = CMYK.y / 100
-    let k = CMYK.k / 100
+    const c = CMYK.c / 100
+    const m = CMYK.m / 100
+    const y = CMYK.y / 100
+    const k = CMYK.k / 100
 
     rgb.r = 1 - Math.min( 1, c * ( 1 - k ) + k )
     rgb.g = 1 - Math.min( 1, m * ( 1 - k ) + k )
@@ -183,7 +183,7 @@ const Convert = {
   },
 
   _HEXtoRGB : function (HEX: string) {
-    let rgb = new RGB(0, 0, 0)
+    const rgb = new RGB(0, 0, 0)
 
     HEX = HEX.replace("#", "")
 
@@ -197,9 +197,9 @@ const Convert = {
   _RGBtoHEX : function (RGB: { r: { toString: (arg0: number) => any }; g: { toString: (arg0: number) => any }; b: { toString: (arg0: number) => any } }) {
     let hex = "#"
 
-    let hr = `000${RGB.r.toString(16)}`.slice(-2)
-    let hg = `000${RGB.g.toString(16)}`.slice(-2)
-    let hb = `000${RGB.b.toString(16)}`.slice(-2)
+    const hr = `000${RGB.r.toString(16)}`.slice(-2)
+    const hg = `000${RGB.g.toString(16)}`.slice(-2)
+    const hb = `000${RGB.b.toString(16)}`.slice(-2)
 
     hex += hr + hg + hb
 
@@ -236,4 +236,3 @@ const Convert = {
 }
 
 export { Convert as convert, RGB, HSV, CMYK }
-module.exports = { convert: Convert, RGB, HSV, CMYK }

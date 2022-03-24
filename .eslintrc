@@ -1,0 +1,38 @@
+{
+  "env": {
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  // "resolutions": {
+  //   "@typescript-eslint/eslint-plugin": "2.23.0",
+  //   "@typescript-eslint/parser": "2.23.0",
+  //   "@typescript-eslint/typescript-estree": "2.23.0"
+  // },
+  "rules": {
+    "@typescript-eslint/ban-types": ["off", "never"],
+    "@typescript-eslint/no-explicit-any": "off",
+    "enforceForRenamedProperties": "off",
+    "indent": ["warn", 2, { "SwitchCase": 1, "flatTernaryExpressions": true }],
+    "linebreak-style": ["warn", "unix"],
+    "no-undef": ["off", "never"],
+    "no-unneeded-ternary": "error",
+    "no-var": "off",
+    "no-whitespace-before-property": "warn",
+    "object-curly-spacing": ["warn", "always"],
+    "prefer-destructuring": "warn",
+    "quotes": ["warn", "double"],
+    "semi": ["error", "never"]
+  }
+}

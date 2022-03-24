@@ -1,5 +1,5 @@
-import chalk from "chalk"
-const chalkLog = new chalk.Instance({ level: 3 })
+import { Chalk } from "chalk"
+const chalkLog = new Chalk({ level: 3 })
 
 export const colors = [
   "5865F2", "57F287", "FEE75C", "EB459E", "ED4245",

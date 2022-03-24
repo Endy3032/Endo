@@ -8,4 +8,3 @@ const permissions = Object.assign(...Object.values(PermissionFlagsBits).map((val
 })) as unknown as [string, string])
 
 export default permissions
-module.exports = permissions
