@@ -8,9 +8,8 @@
   },
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node --transpile-only .",
-    "dev": "nodemon -e ts --exec \"ts-node --transpile-only .\"",
-    "devtest": "nodemon --experimental-specifier-resolution=node --loader ts-node/esm .",
+    "start": "ts-node --swc --transpile-only .",
+    "dev": "nodemon -e ts --exec \"ts-node .\"",
     "ceploy": "ts-node deploy.ts",
     "teploy": "ts-node deploy.ts --mode='test'",
     "geploy": "ts-node deploy.ts --mode='guilds'",

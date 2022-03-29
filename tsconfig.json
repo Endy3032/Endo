@@ -30,8 +30,5 @@
     "deploy.ts",
     "server.ts"
   ],
-  "include": ["Commands/*", "Events/*", "Modules/*", "Resources/**/*"],
-  "ts-node": {
-    "swc": true
-  }
+  "include": ["Commands/*", "Events/*", "Modules/*", "Resources/**/*"]
 }
