@@ -5,7 +5,7 @@
   "compilerOptions": {
     "lib": ["es2021"],
     "target": "es2021",
-    "module": "ESNext",
+    "module": "commonjs",
     "typeRoots": ["./node_modules/@types", "Typings"],
 
     // "noEmit": true,

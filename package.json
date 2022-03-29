@@ -6,11 +6,11 @@
     "type": "git",
     "url": "https://github.com/Endy3032/EndyJS.git"
   },
-  "type": "module",
-  "main": "index",
+  "main": "index.ts",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm index.ts",
+    "start": "ts-node .",
     "dev": "nodemon --experimental-specifier-resolution=node --loader ts-node/esm",
+    "devtest": "nodemon --experimental-specifier-resolution=node --loader ts-node/esm",
     "ceploy": "ts-node deploy.ts",
     "teploy": "ts-node deploy.ts --mode='test'",
     "geploy": "ts-node deploy.ts --mode='guilds'",
@@ -29,7 +29,8 @@
     "bree": "^8.0.2",
     "canvas": "^2.9.1",
     "canvas-txt": "^3.0.0",
-    "chalk": "^5.0.1",
+    "chalk": "^4.1.2",
+    "color-convert": "^2.0.1",
     "discord-api-types": "^0.29.0",
     "discord.js": "^14.0.0-dev.1647259751.2297c2b",
     "dotenv": "^16.0.0",
@@ -42,7 +43,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.15",
     "string-progressbar": "^1.0.4",
-    "strip-ansi": "^7.0.1",
+    "strip-ansi": "^6.0.1",
     "ts-node": "^10.7.0",
     "urban-dictionary": "^3.0.2"
   },

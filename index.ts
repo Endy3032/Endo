@@ -7,7 +7,7 @@ import { createWriteStream, readdirSync } from "fs"
 import { Client, Collection, GatewayIntentBits, Partials, BaseGuildTextChannel } from "discord.js"
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] })
-const logStream = createWriteStream("./logs/botlog.log", { flags: "a" })
+const logStream = createWriteStream("./Logs/discord.log", { flags: "a" })
 
 console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) => {
   const date = new Date()
