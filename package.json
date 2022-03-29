@@ -8,9 +8,9 @@
   },
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node .",
-    "dev": "nodemon --loader ts-node/esm .",
-    "devtest": "nodemon --experimental-specifier-resolution=node --loader ts-node/esm",
+    "start": "ts-node --transpile-only .",
+    "dev": "nodemon -e ts --exec \"ts-node --transpile-only .\"",
+    "devtest": "nodemon --experimental-specifier-resolution=node --loader ts-node/esm .",
     "ceploy": "ts-node deploy.ts",
     "teploy": "ts-node deploy.ts --mode='test'",
     "geploy": "ts-node deploy.ts --mode='guilds'",
@@ -48,6 +48,7 @@
     "urban-dictionary": "^3.0.2"
   },
   "devDependencies": {
+    "@swc/core": "^1.2.161",
     "@tsconfig/node16": "^1.0.2",
     "@types/canvas-txt": "^3.0.0",
     "@types/color-convert": "^2.0.0",

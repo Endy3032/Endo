@@ -4,7 +4,7 @@ import "dotenv/config"
 import flags from "flags"
 import { deployLog } from "./Modules"
 import { REST } from "@discordjs/rest"
-import { APIApplicationCommand, APIApplicationCommandOption, Routes } from "discord-api-types/v10"
+import { APIApplicationCommand, APIApplicationCommandOption } from "discord-api-types/v10"
 import { ApplicationCommandOptionType } from "discord.js"
 
 flags.defineString("mode", "global", "The mode to deploy the commands.")
