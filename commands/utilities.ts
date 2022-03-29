@@ -1,9 +1,19 @@
 import axios from "axios"
 import { evaluate } from "mathjs"
+import convert from "color-convert"
+import { RGB } from "color-convert/conversions"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
-import { colors, convert, RGB, HSV, CMYK, random, superEscape, timestampStyler } from "../Modules"
+import { colors, random, superEscape, timestampStyler } from "../Modules"
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Message } from "discord.js"
 // const { splitBar } = require("string-progressbar")
+
+function convertColors(color: RGB) {
+  const hex = convert.rgb.hex(color)
+  const hsl = convert.rgb.hsl(color)
+  const hsv = convert.rgb.hsv(color)
+  const cmyk = convert.rgb.cmyk(color)
+  return { hex, hsl, hsv, cmyk }
+}
 
 export const cmd = {
   name: "utils",
@@ -51,6 +61,21 @@ export const cmd = {
           ]
         },
         {
+          name: "decimal",
+          description: "Input decimal color type",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "value",
+              description: "The value of the color [integer 0~16777215]",
+              type: ApplicationCommandOptionType.Integer,
+              "min_value": 0,
+              "max_value": 16777215,
+              required: true
+            },
+          ]
+        },
+        {
           name: "hex",
           description: "Input Hex color type",
           type: ApplicationCommandOptionType.Subcommand,
@@ -59,6 +84,37 @@ export const cmd = {
               name: "value",
               description: "The hex value of the color [string]",
               type: ApplicationCommandOptionType.String,
+              required: true
+            }
+          ]
+        },
+        {
+          name: "hsl",
+          description: "Input HSL color type",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "hue",
+              description: "The hue value of the HSV color [integer 0~360]",
+              type: ApplicationCommandOptionType.Integer,
+              "min_value": 0,
+              "max_value": 360,
+              required: true
+            },
+            {
+              name: "saturation",
+              description: "The saturation value of the HSV color [integer 0~100]",
+              type: ApplicationCommandOptionType.Integer,
+              "min_value": 0,
+              "max_value": 100,
+              required: true
+            },
+            {
+              name: "value",
+              description: "The lightness value of the HSV color [integer 0~100]",
+              type: ApplicationCommandOptionType.Integer,
+              "min_value": 0,
+              "max_value": 100,
               required: true
             }
           ]
@@ -312,30 +368,39 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   switch (interaction.options.getSubcommandGroup()) {
     case "color": {
-      let rgb: RGB | undefined, hex: string | undefined, hsv: HSV | undefined, cmyk: CMYK | undefined
+      let rgb: RGB | undefined
+
       switch (interaction.options.getSubcommand()) {
         case "rgb": {
           const r = interaction.options.getInteger("red") as number
           const g = interaction.options.getInteger("green") as number
           const b = interaction.options.getInteger("blue") as number
 
-          rgb = new RGB(r, g, b)
-          hex = convert.toHEX(rgb)
-          hsv = convert.toHSV(rgb)
-          cmyk = convert.toCMYK(rgb)
+          rgb = [r, g, b]
+          break
+        }
 
+        case "decimal": {
+          const tempHex = interaction.options.getInteger("value")?.toString(16).padStart(6, "0") as string
+
+          rgb = convert.hex.rgb(tempHex)
           break
         }
 
         case "hex": {
-          hex = interaction.options.getString("value") as string
+          let hex = interaction.options.getString("value") as string
           hex.startsWith("#") && hex.length == 7 ? hex = hex.slice(1, 7) : hex
 
-          rgb = convert.toRGB(hex)
-          hsv = convert.toHSV(rgb)
-          cmyk = convert.toCMYK(rgb)
-          hex = `#${hex}`
+          rgb = convert.hex.rgb(hex)
+          break
+        }
 
+        case "hsl": {
+          const h = interaction.options.getInteger("hue") as number
+          const s = interaction.options.getInteger("saturation") as number
+          const l = interaction.options.getInteger("lightness") as number
+
+          rgb = convert.hsl.rgb([h, s, l])
           break
         }
 
@@ -344,11 +409,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const s = interaction.options.getInteger("saturation") as number
           const v = interaction.options.getInteger("value") as number
 
-          hsv = new HSV(h, s, v)
-          rgb = convert.toRGB(hsv)
-          hex = convert.toHEX(rgb)
-          cmyk = convert.toCMYK(rgb)
-
+          rgb = convert.hsv.rgb([h, s, v])
           break
         }
 
@@ -358,11 +419,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const y = interaction.options.getInteger("yellow") as number
           const k = interaction.options.getInteger("key") as number
 
-          cmyk = new CMYK(c, m, y, k)
-          rgb = convert.toRGB(cmyk)
-          hex = convert.toHEX(rgb)
-          hsv = convert.toHSV(rgb)
-
+          rgb = convert.cmyk.rgb([c, m, y, k])
           break
         }
 
@@ -371,27 +428,26 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const g = Math.floor(Math.random() * 255) as number
           const b = Math.floor(Math.random() * 255) as number
 
-          rgb = new RGB(r, g, b)
-          hex = convert.toHEX(rgb)
-          hsv = convert.toHSV(rgb)
-          cmyk = convert.toCMYK(rgb)
-
+          rgb = [r, g, b]
           break
         }
       }
+
+      rgb = rgb as RGB
+      const { cmyk, hex, hsl, hsv } = convertColors(rgb)
 
       await interaction.reply({ embeds: [{
         title: "Color Conversion",
         color: parseInt((hex as string).slice(1), 16),
         fields: [
-          { name: "RGB", value: `${rgb?.r}, ${rgb?.g}, ${rgb?.b}`, inline: true },
-          { name: "\u200b", value: "\u200b", inline: true },
-          { name: "HEX", value: `${hex}`, inline: true },
-          { name: "HSV", value: `${hsv?.h}, ${hsv?.s}, ${hsv?.v}`, inline: true },
-          { name: "\u200b", value: "\u200b", inline: true },
-          { name: "CMYK", value: `${cmyk?.c}, ${cmyk?.m}, ${cmyk?.y}, ${cmyk?.k}`, inline: true }
+          { name: "RGB", value: `${rgb[0]}, ${rgb[1]}, ${rgb[2]}`, inline: true },
+          { name: "CMYK", value: `${cmyk[0]}, ${cmyk[1]}, ${cmyk[2]}, ${cmyk[3]}`, inline: true },
+          { name: "Decimal", value: `${parseInt(hex, 16)}`, inline: true },
+          { name: "HEX", value: `#${hex}`, inline: true },
+          { name: "HSL", value: `${hsl[0]}, ${hsl[1]}, ${hsl[2]}`, inline: true },
+          { name: "HSV", value: `${hsv[0]}, ${hsv[1]}, ${hsv[2]}`, inline: true },
         ],
-        thumbnail: { url: `https://dummyimage.com/128/${hex?.slice(1, 7)}/${hex?.slice(1, 7)}.png` },
+        thumbnail: { url: `https://dummyimage.com/128/${hex}/${hex}.png` },
         timestamp: new Date().toISOString(),
       }] })
       break

@@ -1,89 +1,68 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+import fs from "fs"
 import "dotenv/config"
 import flags from "flags"
-// var flags = require("flags")
-
-import fs from "fs"
 import { deployLog } from "./Modules"
 import { REST } from "@discordjs/rest"
-import { Routes } from "discord-api-types/v10"
+import { APIApplicationCommand, APIApplicationCommandOption, Routes } from "discord-api-types/v10"
+import { ApplicationCommandOptionType } from "discord.js"
 
 flags.defineString("mode", "global", "The mode to deploy the commands.")
 flags.parse()
-
 const mode = flags.get("mode")
+
 const rest = new REST({ version: "10" }).setToken(process.env.Token as string)
 deployLog("Deploy", "Refreshing application commands...")
 
-if (mode != "guilds") {
-  const commands = [] as any //.map(command => command.toJSON());
-  const commandFiles = fs.readdirSync("./Commands").filter(file => file.endsWith(".js"))
-
-  commandFiles.forEach(async command => {
-    const { cmd } = await import(`./Commands/${command}`)
-    if (mode != "test") return commands.push(cmd)
-    if (cmd.type == 2 || cmd.type == 3) {
-      cmd.name = `[D] ${cmd.name}`
-      return commands.push(cmd)
+function replaceDescription(cmd: APIApplicationCommand, tag: string) {
+  if (cmd.type == 2 || cmd.type == 3) {cmd.name = `[${tag.charAt(0)}] ${cmd.name}`; return cmd}
+  cmd.description = `[${tag}] ${cmd.description} [${tag}]`
+  cmd.options?.forEach((sub1: APIApplicationCommandOption) => {
+    if (sub1.type == ApplicationCommandOptionType.Subcommand) {
+      sub1.description = `[${tag}] ${sub1.description} [${tag}]`
+    } else if (sub1.type == ApplicationCommandOptionType.SubcommandGroup) {
+      sub1.options?.forEach(sub2 => {
+        sub2.description = `[${tag}] ${sub2.description} [${tag}]`
+      })
     }
+  })
 
-    cmd.description = `[Development] ${cmd.description} [Development]`
-    cmd.options?.forEach((option: { description: string; options: any[] }) => option.description = `[Development] ${option.description} [Development]`)
-    cmd.options?.options?.forEach((option: { description: string; options: any[] }) => {option.description = `[Development] ${option.description} [Development]`})
+  return cmd
+}
+
+async function registerCommands(cmd: APIApplicationCommand[], client: string, guildID: string | null = null) {
+  const route: `/${string}` = `/applications/${client}/${guildID != null ? `guilds/${guildID}/` : ""}commands`
+  try {
+    await rest.put(route, { body: cmd })
+      .then(() => deployLog("Deploy", `Registered ${cmd.length} ${mode} commands.`))
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+if (mode != "guilds") {
+  var commands = [] as APIApplicationCommand[] //.map(command => command.toJSON());
+  const commandFiles = fs.readdirSync("./Commands").filter(file => file.endsWith(".ts"))
+
+  commandFiles.forEach(command => {
+    let { cmd } = require(`./Commands/${command}`)
+    if (mode == "test") cmd = replaceDescription(cmd, "Dev")
     commands.push(cmd)
-  });
+  })
 
-  (async () => {
-    try {
-      await rest.put(
-        mode == "global"
-          ? Routes.applicationCommands(process.env.Client as string)
-          : Routes.applicationGuildCommands(process.env.Client as string, process.env.TestGuild as string),
-        { body: commands },
-      )
-      deployLog("Deploy", `Registered ${commandFiles.length} ${mode} commands.`)
-    } catch (err) {console.error(err)}
-  })()
+  registerCommands(commands, process.env.Client as string, mode == "test" ? process.env.TestGuild as string : null)
 } else {
   const guildFolders = fs.readdirSync("./Commands/guilds")
-
   guildFolders.forEach(guildID => {
-    const commands = [] as any
-    const commandFiles = fs.readdirSync(`./guilds/${guildID}`).filter(file => file.endsWith(".js"))
+    var commands = [] as APIApplicationCommand[]
+    const commandFiles = fs.readdirSync(`./Commands/guilds/${guildID}`).filter(file => file.endsWith(".ts"))
 
-    commandFiles.forEach(async command => {
-      // const { cmd } = require(`./Commands/guilds/${guildId}/${command}`)
-
-      // if (cmd.type == 1 || cmd.type == null) {
-      //   cmd.description = `[G] ${cmd.description}`
-      //   if (cmd.options) {cmd.options.forEach(option => {
-      //     option.description = `[G] ${option.description}`
-      //     if (option.options) option.options.forEach(option => {option.description = `[G] ${option.description}`})
-      //   })}
-      // } else if (cmd.type == 2 || cmd.type == 3) cmd.name = `[G] ${cmd.name}`
-
-      // commands.push(cmd)
-      const { cmd } = await import(`./Commands/guilds/${guildID}/${command}`)
-      if (cmd.type == 2 || cmd.type == 3) {
-        cmd.name = `[G] ${cmd.name}`
-        return commands.push(cmd)
-      }
-
-      cmd.description = `[G] ${cmd.description} [G]`
-      cmd.options?.forEach((option: { description: string; options: any[] }) => option.description = `[G] ${option.description} [G]`)
-      cmd.options?.options?.forEach((option: { description: string; options: any[] }) => {option.description = `[G] ${option.description} [G]`})
-
+    commandFiles.forEach(command => {
+      let { cmd } = require(`./Commands/guilds/${guildID}/${command}`)
+      cmd = replaceDescription(cmd, "G")
       commands.push(cmd)
-    });
+    })
 
-    (async () => {
-      try {
-        await rest.put(
-          Routes.applicationGuildCommands(process.env.Client as string, guildID),
-          { body: commands },
-        )
-        deployLog("Deploy", `Registered ${commandFiles.length} guild[${guildID}] commands.`)
-      }
-      catch (err) {console.error(err)}
-    })()
+    registerCommands(commands, process.env.Client as string, guildID)
   })
 }
