@@ -22,7 +22,7 @@ export async function execute(client: Client) {
   }
 
   function reloadPresence() {
-    if (os.hostname().includes("local")) {
+    if (!os.hostname().includes("local")) {
       const activity = random.pickFromArray(activities as [any])
       const act_type = activity.activities[0]["type"]
       const act_name = activity.activities[0]["name"]
