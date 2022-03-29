@@ -1,4 +1,4 @@
-import { emojis, permissionCheck } from "../modules"
+import { emojis, permissionCheck } from "../Modules"
 import { ApplicationCommandOptionType, ButtonInteraction, ButtonStyle, CategoryChannel, ChannelType, ChatInputCommandInteraction, ComponentType, GuildChannel, GuildChannelCreateOptions, GuildTextBasedChannel, PermissionFlagsBits, TextChannel, VoiceChannel } from "discord.js"
 
 export const cmd = {

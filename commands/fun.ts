@@ -1,6 +1,6 @@
 import axios from "axios"
 import Fuse from "fuse.js"
-import { colors, random } from "../modules"
+import { colors, random } from "../Modules"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
 import { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from "discord-api-types/v10"
 import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"

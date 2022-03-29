@@ -3,7 +3,7 @@ import flags from "flags"
 // var flags = require("flags")
 
 import fs from "fs"
-import { deployLog } from "./modules"
+import { deployLog } from "./Modules"
 import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v10"
 
@@ -16,10 +16,10 @@ deployLog("Deploy", "Refreshing application commands...")
 
 if (mode != "guilds") {
   const commands = [] as any //.map(command => command.toJSON());
-  const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"))
+  const commandFiles = fs.readdirSync("./Commands").filter(file => file.endsWith(".js"))
 
   commandFiles.forEach(async command => {
-    const { cmd } = await import(`./commands/${command}`)
+    const { cmd } = await import(`./Commands/${command}`)
     if (mode != "test") return commands.push(cmd)
     if (cmd.type == 2 || cmd.type == 3) {
       cmd.name = `[D] ${cmd.name}`
@@ -44,14 +44,14 @@ if (mode != "guilds") {
     } catch (err) {console.error(err)}
   })()
 } else {
-  const guildFolders = fs.readdirSync("./commands/guilds")
+  const guildFolders = fs.readdirSync("./Commands/guilds")
 
   guildFolders.forEach(guildID => {
     const commands = [] as any
     const commandFiles = fs.readdirSync(`./guilds/${guildID}`).filter(file => file.endsWith(".js"))
 
     commandFiles.forEach(async command => {
-      // const { cmd } = require(`./commands/guilds/${guildId}/${command}`)
+      // const { cmd } = require(`./Commands/guilds/${guildId}/${command}`)
 
       // if (cmd.type == 1 || cmd.type == null) {
       //   cmd.description = `[G] ${cmd.description}`
@@ -62,7 +62,7 @@ if (mode != "guilds") {
       // } else if (cmd.type == 2 || cmd.type == 3) cmd.name = `[G] ${cmd.name}`
 
       // commands.push(cmd)
-      const { cmd } = await import(`./commands/guilds/${guildID}/${command}`)
+      const { cmd } = await import(`./Commands/guilds/${guildID}/${command}`)
       if (cmd.type == 2 || cmd.type == 3) {
         cmd.name = `[G] ${cmd.name}`
         return commands.push(cmd)

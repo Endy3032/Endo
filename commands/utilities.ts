@@ -1,7 +1,7 @@
 import axios from "axios"
 import { evaluate } from "mathjs"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
-import { colors, convert, RGB, HSV, CMYK, random, superEscape, timestampStyler } from "../modules"
+import { colors, convert, RGB, HSV, CMYK, random, superEscape, timestampStyler } from "../Modules"
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Message } from "discord.js"
 // const { splitBar } = require("string-progressbar")
 

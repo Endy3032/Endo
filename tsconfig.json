@@ -6,7 +6,7 @@
     "lib": ["es2021"],
     "target": "es2021",
     "module": "ESNext",
-    "typeRoots": ["./node_modules/@types", "typings"],
+    "typeRoots": ["./node_modules/@types", "Typings"],
 
     // "noEmit": true,
     "outDir": "./dist",
@@ -30,5 +30,5 @@
     "deploy.ts",
     "server.ts"
   ],
-  "include": ["commands/*", "events/*", "modules/*", "Resources/**/*"]
+  "include": ["Commands/*", "Events/*", "Modules/*", "Resources/**/*"]
 }

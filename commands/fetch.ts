@@ -1,7 +1,7 @@
 import Fuse from "fuse.js"
 import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
-import { capitalize, colors, emojis, random } from "../modules"
+import { capitalize, colors, emojis, random } from "../Modules"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { ApplicationCommandType, ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
 

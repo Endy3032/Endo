@@ -1,4 +1,4 @@
-import { colors, random } from "../modules"
+import { colors, random } from "../Modules"
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js"
 
 export const cmd = {

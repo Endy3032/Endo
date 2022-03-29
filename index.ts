@@ -2,7 +2,7 @@ import "dotenv/config"
 import keepAlive from "./server"
 import stripAnsi from "strip-ansi"
 import { APIEmbed } from "discord-api-types/v10"
-import { capitalize, nordChalk } from "./modules"
+import { capitalize, nordChalk } from "./Modules"
 import { createWriteStream, readdirSync } from "fs"
 import { Client, Collection, GatewayIntentBits, Partials, BaseGuildTextChannel } from "discord.js"
 
@@ -57,15 +57,15 @@ console.tagLog = async (tag: string, content: string) => {
 }
 
 client.commands = new Collection()
-const commandFiles = readdirSync("./commands").filter((file) => file.endsWith(".ts"))
+const commandFiles = readdirSync("./Commands").filter((file) => file.endsWith(".ts"))
 commandFiles.forEach(async file => {
-  const command = await import(`./commands/${file}`)
+  const command = await import(`./Commands/${file}`)
   client.commands.set(command.cmd.name, command)
 })
 
-const eventFiles = readdirSync("./events").filter((file) => file.endsWith(".ts"))
+const eventFiles = readdirSync("./Events").filter((file) => file.endsWith(".ts"))
 eventFiles.forEach(async file => {
-  const event = await import(`./events/${file}`)
+  const event = await import(`./Events/${file}`)
   event.once
     ? client.once(event.name, (...args) => event.execute(...args))
     : client.on(event.name, (...args) => event.execute(...args))

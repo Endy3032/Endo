@@ -1,4 +1,4 @@
-import { superEscape } from "../modules"
+import { superEscape } from "../Modules"
 import { ApplicationCommandType, Message, MessageContextMenuCommandInteraction } from "discord.js"
 
 export const cmd = {

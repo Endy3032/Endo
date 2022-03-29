@@ -2,7 +2,7 @@ import os from "os"
 import "dotenv/config"
 import stripAnsi from "strip-ansi"
 import { APIMessage } from "discord-api-types/v10"
-import { emojis, nordChalk, rep } from "../modules"
+import { emojis, nordChalk, rep } from "../Modules"
 import { Interaction, BaseGuildTextChannel, ChatInputCommandInteraction, CommandInteraction, Message, MessageComponentInteraction, ModalMessageModalSubmitInteraction, ModalSubmitInteraction } from "discord.js"
 
 interface Command {
