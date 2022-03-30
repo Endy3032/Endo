@@ -12982,7 +12982,7 @@ interface WordleCanvas {
   width: number
   height: number
   space: number
-  size: number
+  side: number
   keyFont: number
   tileFont: number
   tileStartingX: number
@@ -12995,17 +12995,17 @@ interface WordleCanvas {
 const width = 750
 const height = 1000
 const space = 10
-const size = 90
+const side = 90
 const keyFont = 32
 const tileFont = 56
-const tileStartingX = (width - size * 5 - space*4) / 2
+const tileStartingX = (width - side * 5 - space*4) / 2
 const tileStartingY = space
 const keyWidth = (width - 11 * space)/10
-const keyStartingY = height - (space + size) * 3
+const keyStartingY = height - (space + side) * 3
 const keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], ["A", "S", "D", "F", "G", "H", "J", "K", "L"], ["Z", "X", "C", "V", "B", "N", "M"]]
 
 const canvas: WordleCanvas = {
-  width, height, space, size, keyFont, tileFont,
+  width, height, space, side, keyFont, tileFont,
   tileStartingX, tileStartingY, keyWidth, keyStartingY, keys
 }
 

@@ -64,7 +64,7 @@ export async function execute(interaction: Interaction) {
     console.botLog(nordChalk.error(err.stack), "ERROR")
   }
 
-  var type: string
+  var type: string | undefined
   let exec: any
   if (interaction.isChatInputCommand()) {
     exec = command.execute
@@ -85,6 +85,7 @@ export async function execute(interaction: Interaction) {
     exec = command.modal
     type = "Modal"
   }
+
   await exec(interaction)
     .catch((err: any) => {
       console.botLog(nordChalk.error(err.stack), "ERROR")

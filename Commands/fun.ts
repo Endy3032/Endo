@@ -6,13 +6,41 @@ import { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from "d
 import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"
 // #region Canvas Related Stuff
 import fs from "fs"
-import Canvas from "canvas"
 import { imageSize } from "image-size"
-import canvasTxt from "canvas-txt"
 import wordle from "../Resources/Wordle"
-Canvas.registerFont("./Resources/Wordle/ClearSans-Bold.ttf", { family: "ClearSans" })
-Canvas.registerFont("./Resources/Meme/LeagueSpartan-Regular.ttf", { family: "LeagueSpartan" })
+import { Canvas, CanvasRenderingContext2D, FontLibrary, loadImage } from "skia-canvas"
+FontLibrary.use({
+  LeagueSpartan: ["./Resources/Meme/LeagueSpartan-Regular.ttf"],
+  ClearSans: ["./Resources/Wordle/ClearSans-Bold.ttf"]
+})
 // #endregion
+
+function getCtx(canvas: Canvas) {
+  const ctx = canvas.getContext("2d")
+  ctx.textBaseline = "top"
+  ctx.textAlign = "center"
+  ctx.textWrap = true
+  return ctx
+}
+
+function getFontSize(text: string, width: number, height: number) {
+  return Math.min(height * 0.11, width * 0.09) * (0.975 ** Math.floor(text.length / 10))
+}
+
+function getMidY(ctx: CanvasRenderingContext2D, text: string, width: number, height: number) {
+  const measurements = ctx.measureText(text, width)
+  const textHeight = measurements.actualBoundingBoxDescent - measurements.actualBoundingBoxAscent
+  return (height - textHeight) / 2
+}
+
+async function sendMeme(interaction: ChatInputCommandInteraction, canvas: Canvas, variant: string, text: string, separator: string) {
+  const attachment = new MessageAttachment(await canvas.png, "meme.png")
+  await interaction.editReply({ files: [attachment], embeds: [{
+    color: parseInt(random.pickFromArray(colors), 16),
+    image: { url: "attachment://meme.png" },
+    footer: variant.includes("panik_kalm_panik") && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null
+  }] as APIEmbed[] })
+}
 
 export const cmd = {
   name: "fun",
@@ -153,12 +181,11 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   switch(interaction.options.getSubcommandGroup()) {
     case "wordle": {
-      const { width, height, space, size, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
+      const { width, height, space, side, keyFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
 
-      const canvas = Canvas.createCanvas(width, height)
-      const ctx = canvas.getContext("2d")
-      canvasTxt.font = "ClearSans"
-      canvasTxt.fontSize = wordle.canvas.keyFont
+      const canvas = new Canvas(width, height)
+      const ctx = getCtx(canvas)
+      ctx.font = `normal ${keyFont}px ClearSans`
 
       ctx.fillStyle = wordle.colors.background
       ctx.fillRect(0, 0, width, height)
@@ -166,7 +193,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       ctx.fillStyle = wordle.colors.tilebg
       for (let y = 0; y < 6; y++) {
         for (let x = 0; x < 5; x++) {
-          ctx.fillRect(tileStartingX + x * (size + space), tileStartingY + y * (size + space), size, size)
+          ctx.fillRect(tileStartingX + x * (side + space), tileStartingY + y * (side + space), side, side)
         }
       }
 
@@ -175,11 +202,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           ctx.fillStyle = wordle.colors.keybg
           const keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
           const keyX = keyStartingX + x * (keyWidth + space)
-          const keyY = keyStartingY + y * (size + space)
-          ctx.fillRect(keyX, keyY, keyWidth, size)
+          const keyY = keyStartingY + y * (side + space)
+          ctx.fillRect(keyX, keyY, keyWidth, side)
 
           ctx.fillStyle = wordle.colors.text
-          canvasTxt.drawText(ctx, keys[y][x], keyX, keyY, keyWidth, size - canvasTxt.fontSize / 3)
+          ctx.fillText(keys[y][x], keyX + keyWidth / 2, keyY + getMidY(ctx, keys[y][x], keyWidth, side), keyWidth)
         }
       }
 
@@ -238,7 +265,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         ]
       }]
 
-      const attachment = new MessageAttachment(canvas.toBuffer(), "wordle.png")
+      const attachment = new MessageAttachment(await canvas.png, "wordle.png")
       await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
       break
     }
@@ -367,62 +394,60 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         case "meme": {
           await interaction.deferReply()
 
-          let canvas: Canvas.Canvas, img: string | Buffer// | string[]
           const separator = "§§"
+          let img: string | Buffer
 
-          canvasTxt.font = "LeagueSpartan"
           const text = interaction.options.getString("text") as string
           const image = interaction.options.getAttachment("custom_image")
-          const variants= fs.readdirSync("./Resources/Meme/").filter((file) => file.endsWith(".jpg"))
-          const variant = interaction.options.getString("variant")
+          const variants = fs.readdirSync("./Resources/Meme/").filter((file) => file.endsWith(".jpg"))
+          const variant = interaction.options.getString("variant")?.replaceAll(" ", "_") || random.pickFromArray(variants)
 
           if (image) {
             const response = await axios.get(image.url, { responseType: "arraybuffer" })
             img = Buffer.from(response.data, "utf-8")
-          } else if (variant == "random" || variant == null) {
-            img = `./Resources/Meme/${random.pickFromArray(variants)}`
           } else {
-            img = `./Resources/Meme/${interaction.options.getString("variant")?.replaceAll(" ", "_")}.jpg`
+            img = `./Resources/Meme/${variant}.jpg`
           }
-
+          const offset = 0.4
           const dimensions = imageSize(img) as { width: number, height: number }
-          const height = (dimensions.height > 250 ? dimensions.width : 250) as number
+          const height = (dimensions.height > 250 ? dimensions.height : 250) as number
           const width = height / dimensions.height * dimensions.width
 
-          if (img == "panik_kalm_panik") {
-            const texts = text.split(separator)
-            canvas = Canvas.createCanvas(width, height)
-            const ctx = canvas.getContext("2d")
+          let canvas = new Canvas(width, height * (1 + offset))
 
-            const bg = await Canvas.loadImage(img)
+          if (variant == "panik_kalm_panik") {
+            canvas = new Canvas(width, height)
+            const ctx = getCtx(canvas)
+            
+            const bg = await loadImage(img)
             ctx.drawImage(bg, 0, 0, width, height)
-
+            
+            const texts = text.split(separator)
             texts.forEach((text, ind) => {
-              canvasTxt.fontSize = Math.min(height * 0.13, width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
-              canvasTxt.drawText(ctx, text, 0, height / 3 * ind - (canvasTxt.fontSize / 2), width / 2, height / 3 + (canvasTxt.fontSize / 2))
+              const fontSize = getFontSize(text, width, height)
+              ctx.font = `normal ${fontSize}px/${fontSize * (1 + offset / 2)}px LeagueSpartan`
+              ctx.fillText(text, width / 4, getMidY(ctx, text, width / 2, height / 3) + height / 3 * ind, width * 0.45)
             })
-          } else {
-            canvas = Canvas.createCanvas(width, height * 1.35)
-            const ctx = canvas.getContext("2d")
-            const offset = 0.4
 
-            const bg = await Canvas.loadImage(img)
+            await sendMeme(interaction, canvas, variant, text, separator)
+          } else {
+            const ctx = getCtx(canvas)
+
+            const bg = await loadImage(img)
             ctx.drawImage(bg, 0, height * offset, width, height)
 
-            ctx.fillStyle = "#ffffff"
+            ctx.fillStyle = "#fff"
             ctx.fillRect(0, 0, width, height * offset)
 
-            ctx.fillStyle = "#000000"
-            canvasTxt.fontSize = Math.min(height * 0.13, width * 0.09) * (0.975 ** Math.floor(text.length / 7.5))
-            canvasTxt.drawText(ctx, text, 0, -(canvasTxt.fontSize / 2), width, height * offset + (canvasTxt.fontSize / 2))
-          }
+            ctx.fillStyle = "#888"
+            ctx.fillRect(0, 0, width, height * offset / 2)
 
-          const attachment = new MessageAttachment(canvas.toBuffer(), "meme.jpg")
-          await interaction.editReply({ files: [attachment], embeds: [{
-            color: parseInt(random.pickFromArray(colors), 16),
-            image: { url: "attachment://meme.jpg" },
-            footer: img.includes("panik_kalm_panik") && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null
-          }] as APIEmbed[] })
+            ctx.fillStyle = "#000"
+            const fontSize = getFontSize(text, width, height)
+            ctx.font = `normal ${fontSize}px/${fontSize * (1 + offset / 2)}px LeagueSpartan`
+            ctx.fillText(text, width / 2, getMidY(ctx, text, width, height * offset), width)
+            await sendMeme(interaction, canvas, variant as string, text, separator)
+          }
           break
         }
       }
@@ -458,12 +483,13 @@ export async function button(interaction: ButtonInteraction) {
     }
   }
 }
+
 export async function autocomplete(interaction: AutocompleteInteraction) {
   const fs = await import("fs")
   let choices: { name: string, value: string }[] = []
   switch (interaction.options.getSubcommand()) {
-    case "meme": {
-      const choices: { name: string, value: string }[] = []
+    case "meme":
+    case "meme-skia": {
       const memeFiles = fs.readdirSync("./Resources/Meme/").filter((file: string) => file.endsWith(".jpg"))
       memeFiles.forEach((file: string) => {
         choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
@@ -518,49 +544,44 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
     }
   }
 
-  const res: { name: string, value: string }[] = []
+  var res: { name: string, value: string }[] = []
   const pattern = interaction.options.getFocused() as string
   const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
 
   if (pattern.length > 0) {fuse.search(pattern).forEach((choice: { item: { name: string; value: string } }) => res.push(choice.item))}
   else {
     for (let i = 0; i < choices.length; i++) {
-      if (i > 23) break
+      if (i > 24) break
       res.push(choices[i])
     }
   }
 
-  interaction.respond(res)
+
+  await interaction.respond(res)
+    .catch((err) => {console.error(err)})
 }
 
 export async function modal(interaction: ModalMessageModalSubmitInteraction) {
   const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), (interaction.message?.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId?.slice(7, 12) as string]
   if (guess.length != 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
   if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
-  
-  const { Image } = await import("canvas")
 
   const [embed, ansArray] = [new UnsafeEmbedBuilder((interaction.message?.embeds[0] as Embed).data).toJSON(), answer.split("")]
-  const { width, height, space, size, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
+  const { width, height, space, side, keyFont, tileFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
 
   let buttonID = (interaction.message?.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId as string
   if (buttonID == `wordle_${answer}`) {buttonID = `wordle_${answer}__`}
   const buttonIDs = buttonID.split("_") as string[]
 
-  const canvas = Canvas.createCanvas(width, height)
-  const ctx = canvas.getContext("2d")
-  canvasTxt.font = "ClearSans"
-  canvasTxt.fontSize = wordle.canvas.tileFont
+  const canvas = new Canvas(width, height)
+  const ctx = getCtx(canvas)
+  ctx.font = `normal ${tileFont}px ClearSans`
 
-  const img = new Image()
-  const response = await axios.get(embed.image?.url as string, { responseType: "arraybuffer" })
-  const imgWordle = Buffer.from(response.data, "utf-8")
-  img.onload = () => ctx.drawImage(img, 0, 0, width, height)
-  img.src = imgWordle
+  const img = await loadImage(embed.image?.url as string)
+  ctx.drawImage(img, 0, 0, width, height)
 
   const guessCount = Math.abs(parseInt(embed.footer?.text.charAt(0) as string) - 7)
   for (let i = 0; i < 5; i++) {
-    canvasTxt.fontSize = wordle.canvas.tileFont
     if (guess[i] == answer[i] && ansArray.includes(guess[i])) {
       ctx.fillStyle = wordle.colors.correct
       ansArray.splice(ansArray.indexOf(guess[i]), 1)
@@ -574,10 +595,10 @@ export async function modal(interaction: ModalMessageModalSubmitInteraction) {
       ctx.fillStyle = wordle.colors.absent
     }
 
-    const tileX = tileStartingX + i * (size + space)
-    const tileY = tileStartingY + (guessCount - 1) * (size + space)
+    const tileX = tileStartingX + i * (side + space)
+    const tileY = tileStartingY + (guessCount - 1) * (side + space)
 
-    ctx.fillRect(tileX, tileY, size, size)
+    ctx.fillRect(tileX, tileY, side, side)
 
     if (ctx.fillStyle != wordle.colors.present && buttonIDs[3].includes(guess[i])) ctx.fillStyle = wordle.colors.present
     if (ctx.fillStyle != wordle.colors.correct && buttonIDs[2].includes(guess[i])) ctx.fillStyle = wordle.colors.correct
@@ -590,19 +611,19 @@ export async function modal(interaction: ModalMessageModalSubmitInteraction) {
 
     const keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
     const keyX = keyStartingX + (x as number) * (keyWidth + space)
-    const keyY = keyStartingY + y * (size + space)
+    const keyY = keyStartingY + y * (side + space)
 
-    ctx.fillRect(keyX, keyY, keyWidth, size)
+    ctx.fillRect(keyX, keyY, keyWidth, side)
 
     ctx.fillStyle = wordle.colors.text
-    canvasTxt.drawText(ctx, guess[i], tileX, tileY - canvasTxt.fontSize / 8, size, size)
-    canvasTxt.fontSize = wordle.canvas.keyFont
-    canvasTxt.drawText(ctx, guess[i], keyX, keyY, keyWidth, size - canvasTxt.fontSize / 3)
+    ctx.fillText(guess[i], tileX, tileY - tileFont / 8)
+    ctx.font = ctx.font = `normal ${keyFont}px ClearSans`
+    ctx.fillText(guess[i], keyX, keyY, keyWidth)
   }
 
   embed.footer = { text: `${6 - guessCount}${embed.footer?.text.slice(1)}` }
   embed.image = { url: `attachment://wordle${guessCount}.png` }
-  const attachment = new MessageAttachment(canvas.toBuffer(), `wordle${guessCount}.png`)
+  const attachment = new MessageAttachment(await canvas.png, `wordle${guessCount}.png`)
 
   const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
     type: ComponentType.ActionRow,
