@@ -400,13 +400,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const text = interaction.options.getString("text") as string
           const image = interaction.options.getAttachment("custom_image")
           const variants = fs.readdirSync("./Resources/Meme/").filter((file) => file.endsWith(".jpg"))
-          const variant = interaction.options.getString("variant")?.replaceAll(" ", "_") || random.pickFromArray(variants)
+          const variant = `${interaction.options.getString("variant")?.replaceAll(" ", "_")}.jpg` || random.pickFromArray(variants)
 
           if (image) {
             const response = await axios.get(image.url, { responseType: "arraybuffer" })
             img = Buffer.from(response.data, "utf-8")
           } else {
-            img = `./Resources/Meme/${variant}.jpg`
+            img = `./Resources/Meme/${variant}`
           }
           const offset = 0.4
           const dimensions = imageSize(img) as { width: number, height: number }
