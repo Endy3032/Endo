@@ -86,12 +86,12 @@ export async function execute(interaction: Interaction) {
     type = "Modal"
   }
 
+  process.once("uncaughtException", handleError)
+  process.once("unhandledRejection", handleError)
+
   await exec(interaction)
     .catch((err: any) => {
       console.botLog(nordChalk.error(err.stack), "ERROR")
       return rep ((interaction as CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction), { content: `${emojis.error.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
     })
-
-  process.once("uncaughtException", handleError)
-  process.once("unhandledRejection", handleError)
 }

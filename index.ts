@@ -4,11 +4,23 @@ import stripAnsi from "strip-ansi"
 import { APIEmbed } from "discord-api-types/v10"
 import { capitalize, nordChalk } from "./Modules"
 import { createWriteStream, readdirSync } from "fs"
-import { Client, Collection, GatewayIntentBits, Partials, BaseGuildTextChannel } from "discord.js"
+import { Client, Collection, GatewayIntentBits, Options, Partials, BaseGuildTextChannel } from "discord.js"
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages], partials: [Partials.Channel] })
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages], partials: [Partials.Channel],
+  makeCache: Options.cacheWithLimits({
+    BaseGuildEmojiManager: 25,
+    GuildEmojiManager: 25,
+    GuildMemberManager: 25,
+    MessageManager: 50,
+    ThreadManager: 10,
+    ThreadMemberManager: 25,
+    UserManager: 50,
+    VoiceStateManager: 0
+  })
+})
+
 const logStream = createWriteStream("./Logs/discord.log", { flags: "a" })
-
 console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) => {
   const date = new Date()
   const epoch = date.getTime()
