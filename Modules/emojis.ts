@@ -3,9 +3,9 @@ interface Emojis {
 }
 
 const emojis: Emojis = {
-  success: { name: "success", id: "955083320247615528" },
-  warn: { name: "warn", id: "955083320159502417" },
-  error: { name: "error", id: "955083320193081364" },
+  success: { name: "success", id: "959424285217271859" },
+  warn: { name: "warn", id: "959424285162766377" },
+  error: { name: "error", id: "959424285275992074" },
   trash: { name: "trash", id: "927050313943380089" },
   WeatherAPI: { name: "WeatherAPI", id: "932557801153241088" },
 }
