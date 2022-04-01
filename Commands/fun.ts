@@ -181,92 +181,93 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   switch(interaction.options.getSubcommandGroup()) {
     case "wordle": {
-      const { width, height, space, side, keyFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
+      // const { width, height, space, side, keyFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
 
-      const canvas = new Canvas(width, height)
-      const ctx = getCtx(canvas)
-      ctx.font = `normal ${keyFont}px ClearSans`
+      // const canvas = new Canvas(width, height)
+      // const ctx = getCtx(canvas)
+      // ctx.font = `normal ${keyFont}px ClearSans`
 
-      ctx.fillStyle = wordle.colors.background
-      ctx.fillRect(0, 0, width, height)
+      // ctx.fillStyle = wordle.colors.background
+      // ctx.fillRect(0, 0, width, height)
 
-      ctx.fillStyle = wordle.colors.tilebg
-      for (let y = 0; y < 6; y++) {
-        for (let x = 0; x < 5; x++) {
-          ctx.fillRect(tileStartingX + x * (side + space), tileStartingY + y * (side + space), side, side)
-        }
-      }
+      // ctx.fillStyle = wordle.colors.tilebg
+      // for (let y = 0; y < 6; y++) {
+      //   for (let x = 0; x < 5; x++) {
+      //     ctx.fillRect(tileStartingX + x * (side + space), tileStartingY + y * (side + space), side, side)
+      //   }
+      // }
 
-      for (let y = 0; y < 3; y++) {
-        for (let x = 0; x < keys[y].length; x++) {
-          ctx.fillStyle = wordle.colors.keybg
-          const keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
-          const keyX = keyStartingX + x * (keyWidth + space)
-          const keyY = keyStartingY + y * (side + space)
-          ctx.fillRect(keyX, keyY, keyWidth, side)
+      // for (let y = 0; y < 3; y++) {
+      //   for (let x = 0; x < keys[y].length; x++) {
+      //     ctx.fillStyle = wordle.colors.keybg
+      //     const keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
+      //     const keyX = keyStartingX + x * (keyWidth + space)
+      //     const keyY = keyStartingY + y * (side + space)
+      //     ctx.fillRect(keyX, keyY, keyWidth, side)
 
-          ctx.fillStyle = wordle.colors.text
-          ctx.fillText(keys[y][x], keyX + keyWidth / 2, keyY + getMidY(ctx, keys[y][x], keyWidth, side), keyWidth)
-        }
-      }
+      //     ctx.fillStyle = wordle.colors.text
+      //     ctx.fillText(keys[y][x], keyX + keyWidth / 2, keyY + getMidY(ctx, keys[y][x], keyWidth, side), keyWidth)
+      //   }
+      // }
 
-      let title: string | undefined, answer: string | undefined
+      // let title: string | undefined, answer: string | undefined
 
-      switch (interaction.options.getSubcommand()) {
-        case "daily": {
-          answer = wordle.getWord()
-          title = "Daily Wordle"
-          break
-        }
+      // switch (interaction.options.getSubcommand()) {
+      //   case "daily": {
+      //     answer = wordle.getWord()
+      //     title = "Daily Wordle"
+      //     break
+      //   }
 
-        case "replay": {
-          const id = interaction.options.getInteger("id") as number
-          answer = wordle.answers[id]
-          title = `Wordle #${id}`
-          break
-        }
+      //   case "replay": {
+      //     const id = interaction.options.getInteger("id") as number
+      //     answer = wordle.answers[id]
+      //     title = `Wordle #${id}`
+      //     break
+      //   }
 
-        case "random": {
-          const mode = interaction.options.getString("mode")
-          if (mode == "random") {
-            answer = random.pickFromArray(wordle.allowed)
-            title = "Random Wordle"
-          } else if (mode == "daily") {
-            answer = random.pickFromArray(wordle.answers)
-            title = "Random Daily Wordle"
-          }
-          break
-        }
-      }
+      //   case "random": {
+      //     const mode = interaction.options.getString("mode")
+      //     if (mode == "random") {
+      //       answer = random.pickFromArray(wordle.allowed)
+      //       title = "Random Wordle"
+      //     } else if (mode == "daily") {
+      //       answer = random.pickFromArray(wordle.answers)
+      //       title = "Random Daily Wordle"
+      //     }
+      //     break
+      //   }
+      // }
 
-      const embed = {
-        title: title,
-        image: { url: "attachment://wordle.png" },
-        author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
-        footer: { text: "6 guesses remaining" },
-        timestamp: new Date().toISOString(),
-      }
+      // const embed = {
+      //   title: title,
+      //   image: { url: "attachment://wordle.png" },
+      //   author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
+      //   footer: { text: "6 guesses remaining" },
+      //   timestamp: new Date().toISOString(),
+      // }
 
-      const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
-        type: ComponentType.ActionRow,
-        components: [
-          {
-            type: ComponentType.Button,
-            style: ButtonStyle.Primary,
-            label: "Guess",
-            custom_id: `wordle_${(answer as string).toUpperCase()}__`
-          },
-          {
-            type: ComponentType.Button,
-            style: ButtonStyle.Danger,
-            label: "Give Up",
-            custom_id: "wordle_giveup"
-          }
-        ]
-      }]
+      // const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
+      //   type: ComponentType.ActionRow,
+      //   components: [
+      //     {
+      //       type: ComponentType.Button,
+      //       style: ButtonStyle.Primary,
+      //       label: "Guess",
+      //       custom_id: `wordle_${(answer as string).toUpperCase()}__`
+      //     },
+      //     {
+      //       type: ComponentType.Button,
+      //       style: ButtonStyle.Danger,
+      //       label: "Give Up",
+      //       custom_id: "wordle_giveup"
+      //     }
+      //   ]
+      // }]
 
-      const attachment = new MessageAttachment(await canvas.png, "wordle.png")
-      await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
+      // const attachment = new MessageAttachment(await canvas.png, "wordle.png")
+      // await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
+      await interaction.reply({ content: "Wordle is currently disabled temporarily due to a bug of the library I'm using", ephemeral: true })
       break
     }
 

@@ -46,7 +46,7 @@
     "urban-dictionary": "^3.0.2"
   },
   "devDependencies": {
-    "@swc/core": "^1.2.161",
+    "@swc/core": "^1.2.162",
     "@tsconfig/node16": "^1.0.2",
     "@types/canvas-txt": "^3.0.0",
     "@types/color-convert": "^2.0.0",

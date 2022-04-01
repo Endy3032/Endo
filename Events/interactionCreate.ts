@@ -10,12 +10,19 @@ interface Command {
 }
 
 export const name = "interactionCreate"
+const handleError = (interaction: Interaction, err: Error, type?: string) => {
+  rep((interaction as CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction), { content: `${emojis.error.shorthand} This interaction failed [${type || "Unknown"} Error]`, ephemeral: true })
+  console.botLog(nordChalk.error(err.stack), "ERROR")
+}
 
 export async function execute(interaction: Interaction) {
   const isLocal = os.hostname().includes("local")
   const isTestGuild = interaction.guildId == process.env.TestGuild
   const isReplitTest = interaction.channelId == process.env.TestChannel
   if ((isLocal && (!isTestGuild || isReplitTest)) || (!isLocal && isTestGuild && !isReplitTest)) return
+
+  process.once("uncaughtException", (err: Error) => handleError(interaction, err, "d_UE"))
+  process.once("unhandledRejection", (err: Error) => handleError(interaction, err, "d_UR"))
 
   const commandName: string | null =
   interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
@@ -58,12 +65,6 @@ export async function execute(interaction: Interaction) {
 
   const command = interaction.client.commands.get(commandName as never) as unknown as Command
 
-  const handleError = (err: Error, type: string) => {
-    try {rep((interaction as CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction), { content: `${emojis.error.shorthand} This interaction failed [${type} Error]`, ephemeral: true })}
-    catch {rep((interaction as CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction), { content: `${emojis.error.shorthand} This interaction failed [Unknown Error]`, ephemeral: true })}
-    console.botLog(nordChalk.error(err.stack), "ERROR")
-  }
-
   var type: string | undefined
   let exec: any
   if (interaction.isChatInputCommand()) {
@@ -86,12 +87,6 @@ export async function execute(interaction: Interaction) {
     type = "Modal"
   }
 
-  process.once("uncaughtException", handleError)
-  process.once("unhandledRejection", handleError)
-
   await exec(interaction)
-    .catch((err: any) => {
-      console.botLog(nordChalk.error(err.stack), "ERROR")
-      return rep ((interaction as CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction), { content: `${emojis.error.shorthand} This interaction failed [${type} Error]`, ephemeral: true })
-    })
+    .catch((err: any) => handleError(interaction, err, type))
 }
