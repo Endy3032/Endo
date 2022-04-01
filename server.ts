@@ -8,7 +8,7 @@ const server = express()
 
 if (!existsSync("./Logs")) {mkdirSync("./Logs")}
 var networkLog = !os.hostname().includes("local") ? createWriteStream("./Logs/network.log", { flags: "a" }) : null
-server.use(morgan("[:date[web]] \":method :url\" :status :user-agent", { stream: networkLog }))
+server.use(morgan("[:date[web]] \":method\" :user-agent", { stream: networkLog }))
 
 server.all("/", (_, res) => res.sendStatus(200))
 
