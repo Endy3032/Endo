@@ -21,15 +21,15 @@
   "author": "Endy3032",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/builders": "^0.13.0-dev.1648515278-ac4bc3a",
+    "@discordjs/builders": "^0.13.0-dev.1649030892-5748dbe",
     "@discordjs/rest": "^0.3.0",
-    "@sapphire/snowflake": "^3.2.0",
+    "@sapphire/snowflake": "^3.2.1",
     "axios": "^0.26.1",
     "bree": "^8.0.2",
     "chalk": "^4.1.2",
     "color-convert": "^2.0.1",
     "discord-api-types": "^0.30.0",
-    "discord.js": "^14.0.0-dev.1648515273-ac4bc3a",
+    "discord.js": "^14.0.0-dev.1649030898-5748dbe",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "flags": "^0.1.3",
@@ -46,7 +46,7 @@
     "urban-dictionary": "^3.0.2"
   },
   "devDependencies": {
-    "@swc/core": "^1.2.162",
+    "@swc/core": "^1.2.163",
     "@tsconfig/node16": "^1.0.2",
     "@types/canvas-txt": "^3.0.0",
     "@types/color-convert": "^2.0.0",

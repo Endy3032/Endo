@@ -210,64 +210,63 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       //   }
       // }
 
-      // let title: string | undefined, answer: string | undefined
+      let title: string | undefined, answer: string | undefined
 
-      // switch (interaction.options.getSubcommand()) {
-      //   case "daily": {
-      //     answer = wordle.getWord()
-      //     title = "Daily Wordle"
-      //     break
-      //   }
+      switch (interaction.options.getSubcommand()) {
+        case "daily": {
+          answer = wordle.getWord()
+          title = "Daily Wordle"
+          break
+        }
 
-      //   case "replay": {
-      //     const id = interaction.options.getInteger("id") as number
-      //     answer = wordle.answers[id]
-      //     title = `Wordle #${id}`
-      //     break
-      //   }
+        case "replay": {
+          const id = interaction.options.getInteger("id") as number
+          answer = wordle.answers[id]
+          title = `Wordle #${id}`
+          break
+        }
 
-      //   case "random": {
-      //     const mode = interaction.options.getString("mode")
-      //     if (mode == "random") {
-      //       answer = random.pickFromArray(wordle.allowed)
-      //       title = "Random Wordle"
-      //     } else if (mode == "daily") {
-      //       answer = random.pickFromArray(wordle.answers)
-      //       title = "Random Daily Wordle"
-      //     }
-      //     break
-      //   }
-      // }
+        case "random": {
+          const mode = interaction.options.getString("mode")
+          if (mode == "random") {
+            answer = random.pickFromArray(wordle.allowed)
+            title = "Random Wordle"
+          } else if (mode == "daily") {
+            answer = random.pickFromArray(wordle.answers)
+            title = "Random Daily Wordle"
+          }
+          break
+        }
+      }
 
-      // const embed = {
-      //   title: title,
-      //   image: { url: "attachment://wordle.png" },
-      //   author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
-      //   footer: { text: "6 guesses remaining" },
-      //   timestamp: new Date().toISOString(),
-      // }
+      const embed = {
+        title: title,
+        image: { url: "attachment://wordle.png" },
+        author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
+        footer: { text: "6 guesses remaining" },
+        timestamp: new Date().toISOString(),
+      }
 
-      // const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
-      //   type: ComponentType.ActionRow,
-      //   components: [
-      //     {
-      //       type: ComponentType.Button,
-      //       style: ButtonStyle.Primary,
-      //       label: "Guess",
-      //       custom_id: `wordle_${(answer as string).toUpperCase()}__`
-      //     },
-      //     {
-      //       type: ComponentType.Button,
-      //       style: ButtonStyle.Danger,
-      //       label: "Give Up",
-      //       custom_id: "wordle_giveup"
-      //     }
-      //   ]
-      // }]
+      const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
+        type: ComponentType.ActionRow,
+        components: [
+          {
+            type: ComponentType.Button,
+            style: ButtonStyle.Primary,
+            label: "Guess",
+            custom_id: `wordle_${(answer as string).toUpperCase()}__`
+          },
+          {
+            type: ComponentType.Button,
+            style: ButtonStyle.Danger,
+            label: "Give Up",
+            custom_id: "wordle_giveup"
+          }
+        ]
+      }]
 
-      // const attachment = new MessageAttachment(await canvas.png, "wordle.png")
-      // await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
-      await interaction.reply({ content: "Wordle is currently disabled temporarily due to a bug of the library I'm using", ephemeral: true })
+      const attachment = new MessageAttachment("./Resources/Wordle/WordleBase.png", "wordle.png")
+      await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
       break
     }
 
