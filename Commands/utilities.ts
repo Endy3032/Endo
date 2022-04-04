@@ -3,7 +3,7 @@ import { evaluate } from "mathjs"
 import convert from "color-convert"
 import { RGB } from "color-convert/conversions"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
-import { colors, random, superEscape, timestampStyler } from "../Modules"
+import { colors, emojis, random, superEscape, timestampStyler } from "../Modules"
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Message } from "discord.js"
 // const { splitBar } = require("string-progressbar")
 
@@ -64,29 +64,25 @@ export const cmd = {
           name: "decimal",
           description: "Input decimal color type",
           type: ApplicationCommandOptionType.Subcommand,
-          options: [
-            {
-              name: "value",
-              description: "The value of the color [integer 0~16777215]",
-              type: ApplicationCommandOptionType.Integer,
-              "min_value": 0,
-              "max_value": 16777215,
-              required: true
-            },
-          ]
+          options: [{
+            name: "value",
+            description: "The value of the color [integer 0~16777215]",
+            type: ApplicationCommandOptionType.Integer,
+            "min_value": 0,
+            "max_value": 16777215,
+            required: true
+          }]
         },
         {
           name: "hex",
           description: "Input Hex color type",
           type: ApplicationCommandOptionType.Subcommand,
-          options: [
-            {
-              name: "value",
-              description: "The hex value of the color [string]",
-              type: ApplicationCommandOptionType.String,
-              required: true
-            }
-          ]
+          options: [{
+            name: "value",
+            description: "The hex value of the color [string]",
+            type: ApplicationCommandOptionType.String,
+            required: true
+          }]
         },
         {
           name: "hsl",
@@ -195,14 +191,12 @@ export const cmd = {
       name: "calculate",
       description: "Calculate an expression and return the result",
       type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: "expression",
-          description: "The expression to calculate [string]",
-          type: ApplicationCommandOptionType.String,
-          required: true
-        }
-      ]
+      options: [{
+        name: "expression",
+        description: "The expression to calculate [string]",
+        type: ApplicationCommandOptionType.String,
+        required: true
+      }]
     },
     {
       name: "info",
@@ -457,7 +451,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       switch (interaction.options.getSubcommand()) {
         case "server": {
           const { guild } = interaction
-          if (!guild) return interaction.reply({ content: "This command can only be used in a server.", ephemeral: true })
+          if (!guild) return interaction.reply({ content: `${emojis.warn.shorthand} This command can only be used in servers.`, ephemeral: true })
           const owner = await guild.fetchOwner()
           const channels = guild.channels.cache
           const textCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildText).size
@@ -492,8 +486,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
 
         case "user": {
-          let user = interaction.options.getUser("target") || interaction.user
-          user = await user.fetch()
+          const user = await (interaction.options.getUser("target") || interaction.user).fetch()
 
           await interaction.reply({ embeds: [{
             color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : random.pickFromArray(colors), 16),

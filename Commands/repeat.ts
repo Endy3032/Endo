@@ -1,3 +1,4 @@
+import { emojis } from "../Modules"
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js"
 
 export const cmd = {
@@ -22,7 +23,7 @@ export const cmd = {
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  if (!interaction.guild) return await interaction.reply("This command can only be used in server channels.")
+  if (!interaction.guild) return await interaction.reply(`${emojis.warn.shorthand} This command can only be used in servers.`)
 
   function repeat(msg: string, x: number) {
     setTimeout(function() {interaction.channel?.send(msg)}, 750 * x)

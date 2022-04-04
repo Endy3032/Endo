@@ -169,12 +169,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
       switch (dictionary) {
         case "dictapi": {
-          const request: AxiosRequestConfig = {
-            method: "GET",
-            url: `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
-          }
-
-          await axios.request(request)
+          await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
             .then((response: AxiosResponse) => {
               let desc = ""
               const { data } = response
@@ -204,8 +199,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               }] })
             })
             .catch(() => {
-              console.botLog(`The word ${word} was not found in the dictionary`, "WARN")
-              interaction.editReply(`${emojis.warn.shorthand} The word ${word} was not found in the dictionary`)
+              console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
+              interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
             })
           break
         }
@@ -226,15 +221,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               interaction.editReply({ embeds: [{
                 title: word,
                 url: result.permalink,
-                description: description,
+                description,
                 author: { name: `Urban Dictionary - ${result.author}` },
                 footer: { text: `Definition ID • ${result.defid} | Written on` },
                 timestamp: new Date(result.written_on).toISOString()
               }] })
             })
             .catch(() => {
-              console.botLog(`The word ${word} was not found in the dictionary`, "WARN")
-              interaction.editReply(`${emojis.warn.shorthand} The word ${word} was not found in the dictionary`)
+              console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
+              interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
             })
           break
         }
@@ -273,79 +268,60 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     case "weather": {
       const location = interaction.options.getString("location")
       const options = interaction.options.getString("options")
-      let unit: string, dist: string, symbol: string, speed: string
+      const [unit, dist, symbol, speed] = ["imp", "both"].includes(options as string)
+        ? ["imperial", "mi", "˚F", "mi/h"]
+        : ["metric", "km", "˚C", "m/s"]
 
-      if (options == "imp" || options == "both") {
-        unit = "imperial"
-        dist = "mi"
-        symbol = "˚F"
-        speed = "mi/h"
-      } else {
-        unit = "metric"
-        dist = "km"
-        symbol = "˚C"
-        speed = "m/s"
-      }
-
-      const request: AxiosRequestConfig = {
-        method: "GET",
-        url: encodeURI("https://api.weatherapi.com/v1/forecast.json"),
-        params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" }
-      }
-
-      await axios.request(request)
+      await axios.get(encodeURI("https://api.weatherapi.com/v1/forecast.json"), { params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" } })
         .then((response: AxiosResponse) => {
           const { data } = response
+          const { location: dataLoc } = data
           const now = new Date()
 
           data.deviceTime = new Date(now.getTime() - now.getSeconds() * 1000 - now.getMilliseconds())
-          data.localTime = new Date(data.location.localtime)
+          data.localTime = new Date(dataLoc.localtime)
           data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
 
-          data.location.region == ""
-            ? data.title = `${data.location.name} - ${data.location.country} (UTC${data.tz != 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz != 0 ? data.tz : ""})`
-            : data.title = `${data.location.name} - ${data.location.region} - ${data.location.country} (UTC${data.tz != 0 ? data.tz > 0 ? " +" : "" : ""}${data.tz != 0 ? data.tz : ""})`
+          data.title = `${dataLoc.name}${dataLoc.region == "" ? "" : ` - ${dataLoc.region}`} - ${dataLoc.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : "-"}${data.tz}` : ""})`
 
           const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
           const base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
           const astro_time: number[] = []
           const aqi_ratings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
 
-          times.forEach((time: string, ind: string | number) => {
-            time = String(time)
-            let hr = parseInt(time.slice(0, 2)) - data.tz
-            const mn = parseInt(time.slice(3, 5))
+          times.forEach((time: string, ind: number) => {
+            var hr = parseInt(time.slice(0, 2)) - data.tz
             if (time.endsWith("PM")) hr += 12
+            const mn = parseInt(time.slice(3, 5))
 
             astro_time.push(new Date(base.getTime() + (hr * 3600 + mn * 60) * 1000).getTime() / 1000)
-
             if (time.startsWith("0")) times[ind] = time.slice(1)
           })
-
+          const isMetric = unit == "metric"
           // Data Provided by <:WeatherAPI:932557801153241088> [WeatherAPI](https://www.weatherapi.com/)
           const weatherEmbed = {
             title: data.title,
             color: parseInt(random.pickFromArray(colors), 16),
-            description: `${data.current.condition.text}\n\`\`\`Weather\`\`\``,
+            description: `${data.current.condition.text}\n\n\`\`\`Weather\`\`\``,
             fields: [
-              { name: "Temperature   ", value: `${(unit == "metric" ? data.current.temp_c : data.current.temp_f) + symbol}`, inline: true },
-              { name: "Feels Like   ", value: `${(unit == "metric" ? data.current.feelslike_c : data.current.feelslike_f) + symbol}`, inline: true },
-              { name: "Min/Max Temp", value: `${unit == "metric" ? data.forecast.forecastday[0].day.mintemp_c + symbol + "/" + data.forecast.forecastday[0].day.maxtemp_c + symbol : data.forecast.forecastday[0].day.mintemp_f + symbol + "/" + data.forecast.forecastday[0].day.maxtemp_f + symbol}`, inline: true },
-              { name: "Pressure", value: `${unit == "metric" ? data.current.pressure_mb + " hPa" : data.current.pressure_in + " in"}`, inline: true },
+              { name: "Temperature   ", value: `${isMetric ? data.current.temp_c : data.current.temp_f}${symbol}`, inline: true },
+              { name: "Feels Like   ", value: `${isMetric ? data.current.feelslike_c : data.current.feelslike_f}${symbol}`, inline: true },
+              { name: "Min/Max Temp", value: `${isMetric ? data.forecast.forecastday[0].day.mintemp_c : data.forecast.forecastday[0].day.mintemp_f}/${isMetric ? data.forecast.forecastday[0].day.maxtemp_c : data.forecase.forecaseday[0].day.maxtemp_f}${symbol}`, inline: true },
+              { name: "Pressure", value: isMetric ? `${data.current.pressure_mb}hPa` : `${data.current.pressure_in}in`, inline: true },
               { name: "Humidity", value: `${data.current.humidity}%`, inline: true },
               { name: "Clouds", value: `${data.current.cloud}%`, inline: true },
-              { name: "Wind", value: `${(unit == "metric" ? data.current.wind_kph : data.current.wind_mph) + speed} ${data.current.wind_degree}˚`, inline: true },
-              { name: "Gust", value: `${(unit == "metric" ? data.current.gust_kph : data.current.gust_mph) + speed}`, inline: true },
-              { name: "Visibility", value: `${(unit == "metric" ? data.current.vis_km : data.current.vis_miles) + dist}%`, inline: true },
-              { name: "Sunrise", value: `<t:${astro_time[0]}:T>\n${times[0]} Local`, inline: true },
-              { name: "Sunset", value: `<t:${astro_time[1]}:T>\n${times[1]} Local`, inline: true },
+              { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚`, inline: true },
+              { name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
+              { name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
+              { name: "Sunrise", value: `<t:${astro_time[0]}:t> Here\n${times[0]} There`, inline: true },
+              { name: "Sunset", value: `<t:${astro_time[1]}:t> Here\n${times[1]} There`, inline: true },
               { name: "UV Index", value: `${data.current.uv}`, inline: true },
-              { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illumination`, inline: true },
-              { name: "Moonrise", value: `<t:${astro_time[2]}:T>\n${times[2]} Local`, inline: true },
-              { name: "Moonset", value: `<t:${astro_time[3]}:T>\n${times[3]} Local`, inline: true },
+              { name: "Moonrise", value: `<t:${astro_time[2]}:t> Here\n${times[2]} There`, inline: true },
+              { name: "Moonset", value: `<t:${astro_time[3]}:t> Here\n${times[3]} There`, inline: true },
+              { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illuminated`, inline: true },
             ],
             thumbnail: { url: `https:${data.current.condition.icon}` },
-            footer: { text: "Data Provided by WeatherAPI", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
+            footer: { text: "Source • WeatherAPI | ", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
             timestamp: new Date().toISOString(),
           }
 
@@ -368,9 +344,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         })
         .catch(e => {
           console.log(e)
-          e.response.data.error.message == "No matching location found."
-            ? interaction.editReply({ content: `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?` })
-            : interaction.editReply({ content: `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}` })
+          interaction.editReply({ content: e.response.data.error.code == 1006
+            ? `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`
+            : `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`
+          })
         })
       break
     }
@@ -384,12 +361,11 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       const current = interaction.options.getFocused() as string
       const curObject = { name: `${current || "Keep typing to get results!"}`, value: `${current || "blankentry"}` }
 
-      if (dict == "dictapi") {
-        return interaction.respond([curObject])
-      }
+      if (dict == "dictapi") return interaction.respond([curObject])
+
       await urban.autocomplete(current)
-        .then((results: readonly unknown[]) => {
-          results = results.map((result: any) => {
+        .then((autocompleteRes: string[]) => {
+          const results = autocompleteRes.map((result: any) => {
             return { name: `${result}`, value: `${result}` }
           })
 
@@ -407,14 +383,8 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       const song = interaction.options.getFocused() as string
       if (song.length == 0) {return interaction.respond([{ name: "Enter something to get started", value: "empty" }])}
 
-      const request: AxiosRequestConfig = {
-        method: "GET",
-        url: "https://api.genius.com/search",
-        params: { access_token: process.env.GeniusClientAccess, q: song },
-      }
-
       const options: { name: string, value: string }[] = []
-      await axios.request(request)
+      await axios.get("https://api.genius.com/search", { params: { access_token: process.env.GeniusClientAccess, q: song }, })
         .then((response: AxiosResponse) => {
           let optName: string
           response.data.response.hits.forEach((hit: { result: { title: any; artist_names: any; id: any } }) => {

@@ -25,7 +25,7 @@ console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) =>
   const date = new Date()
   const epoch = date.getTime()
   const channel = client.channels.cache.get(process.env.Log as string) as BaseGuildTextChannel
-  content = content.replaceAll("    ", "  ").replaceAll(process.cwd(), "EndyJS")
+  content = content.replaceAll(process.cwd(), "EndyJS").replaceAll("    ", "  ")
   logLevel = logLevel.toLowerCase()
 
   const logTime = date.toLocaleString("default", {

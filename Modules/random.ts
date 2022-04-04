@@ -5,4 +5,9 @@ const pickFromArray = (arr: any[], start = 0, end = arr.length as number) => {
   return arr[Math.floor(Math.random() * (end - start + 1)) + start]
 }
 
-export default { pickFromArray }
+const randRange = (num1: number, num2 = 0) => {
+  if (num2 > num1) [num2, num1] = [num1, num2]
+  return Math.floor(Math.random() * (num1 - num2 + 1)) + num2
+}
+
+export default { pickFromArray, randRange }

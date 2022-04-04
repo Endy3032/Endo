@@ -5,7 +5,7 @@ import { ChatInputCommandInteraction, PermissionsBitField } from "discord.js"
 
 export default async (interaction: ChatInputCommandInteraction, ...permissions: bigint[]) => {
   if (!interaction.guild) {
-    await interaction.reply({ content: `${emojis.error.shorthand} This command can only be used in a server`, ephemeral: true })
+    await interaction.reply({ content: `${emojis.warn.shorthand} This command can only be used in servers.`, ephemeral: true })
     return true
   }
 

@@ -203,7 +203,7 @@ export const cmd = {
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  if (!interaction.guild) return await interaction.reply({ content: `${emojis.error.shorthand} This command can only be used in a server`, ephemeral: true })
+  if (!interaction.guild) return await interaction.reply({ content: `${emojis.warn.shorthand} This command can only be used in servers.`, ephemeral: true })
 
   switch (interaction.options.getSubcommandGroup()) {
     case "create": {

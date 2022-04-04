@@ -4,14 +4,12 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "disco
 export const cmd = {
   name: "8ball",
   description: "Get a response from the magic 8-Ball",
-  options: [
-    {
-      name: "question",
-      description: "The question to ask [string]",
-      type: ApplicationCommandOptionType.String,
-      required: true
-    }
-  ]
+  options: [{
+    name: "question",
+    description: "The question to ask [string]",
+    type: ApplicationCommandOptionType.String,
+    required: true
+  }]
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {

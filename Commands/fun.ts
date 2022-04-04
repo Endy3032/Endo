@@ -1,14 +1,15 @@
 import axios from "axios"
 import Fuse from "fuse.js"
 import { colors, random } from "../Modules"
-import { UnsafeEmbedBuilder } from "@discordjs/builders"
 import { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from "discord-api-types/v10"
-import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"
+import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"
+
 // #region Canvas Related Stuff
 import fs from "fs"
 import { imageSize } from "image-size"
 import wordle from "../Resources/Wordle"
 import { Canvas, CanvasRenderingContext2D, FontLibrary, loadImage } from "skia-canvas"
+
 FontLibrary.use({
   LeagueSpartan: ["./Resources/Meme/LeagueSpartan-Regular.ttf"],
   ClearSans: ["./Resources/Wordle/ClearSans-Bold.ttf"]
@@ -214,33 +215,27 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
       switch (interaction.options.getSubcommand()) {
         case "daily": {
-          answer = wordle.getWord()
-          title = "Daily Wordle"
+          [answer, title] = [wordle.getWord(), "Daily Wordle"]
           break
         }
 
         case "replay": {
-          const id = interaction.options.getInteger("id") as number
-          answer = wordle.answers[id]
-          title = `Wordle #${id}`
+          const id = interaction.options.getInteger("id") as number;
+          [answer, title] = [wordle.answers[id], `Wordle #${id}`]
           break
         }
 
         case "random": {
-          const mode = interaction.options.getString("mode")
-          if (mode == "random") {
-            answer = random.pickFromArray(wordle.allowed)
-            title = "Random Wordle"
-          } else if (mode == "daily") {
-            answer = random.pickFromArray(wordle.answers)
-            title = "Random Daily Wordle"
-          }
+          const mode = interaction.options.getString("mode");
+          [answer, title] = mode == "random"
+            ? [random.pickFromArray(wordle.allowed), "Random Wordle"]
+            : [random.pickFromArray(wordle.answers), "Random Daily Wordle"]
           break
         }
       }
 
       const embed = {
-        title: title,
+        title,
         image: { url: "attachment://wordle.png" },
         author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
         footer: { text: "6 guesses remaining" },
@@ -266,17 +261,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       }]
 
       const attachment = new MessageAttachment("./Resources/Wordle/WordleBase.png", "wordle.png")
-      await interaction.reply({ embeds: [embed], components: components, files: [attachment] })
+      await interaction.reply({ embeds: [embed], components, files: [attachment] })
       break
     }
 
     default: {
       switch (interaction.options.getSubcommand()) {
         case "achievement": {
-          var titles = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
-
+          const titles = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
           const content = interaction.options.getString("content") as string
-          const icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : Math.floor(Math.random() * 39)
+          const icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : random.randRange(39)
           const title = interaction.options.getString("title") != null ? interaction.options.getString("title") : random.pickFromArray(titles)
 
           await interaction.reply({ embeds: [{
@@ -311,12 +305,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           ]
 
           await interaction.reply({ embeds: [{
-            title: "Facts",
+            title: "Fact of the second...",
             color: parseInt(random.pickFromArray(colors), 16),
-            description: "Fresh out of the oven.",
-            fields: [{ name: "The fact of the second is...", value: random.pickFromArray(facts), inline: false }],
-            author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.png` },
-            footer: { text: `${interaction.client.user?.username}#${interaction.client.user?.discriminator}`, icon_url: `https://cdn.discordapp.com/avatars/${interaction.client.user?.id}/${interaction.client.user?.avatar}.png` }
+            description: random.pickFromArray(facts),
           }] as APIEmbed[] })
           break
         }
@@ -341,13 +332,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             case "varied": {
               let turn = false
               for (let i = 0; i < text.length; i++) {
-                if (text[i] == " ") {
-                  result += " "
-                  turn = !turn
-                } else {
-                  const cond = turn ? i % 2 == 0 : i % 2 != 0
-                  result += cond ? text[i].toUpperCase() : text[i].toLowerCase()
-                }
+                if (text[i] != " ") return result += (turn ? i % 2 == 0 : i % 2 != 0) ? text[i].toUpperCase() : text[i].toLowerCase()
+                result += " "
+                turn = !turn
               }
               return await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
             }
@@ -454,30 +441,31 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 export async function button(interaction: ButtonInteraction) {
   if (interaction.customId.startsWith("wordle")) {
-    const embed = new UnsafeEmbedBuilder((interaction.message.embeds[0] as Embed).data).toJSON()
+    const embed = new EmbedBuilder((interaction.message.embeds[0] as Embed).data).toJSON()
+
     if (!embed.author?.name.includes(interaction.user.tag)) return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })
     if (interaction.customId.endsWith("giveup")) {
       embed.title += " - You Gave Up"
       embed.footer = { text: `Answer: ${(interaction.message.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId?.slice(7, 12)}` }
-      await interaction.update({ components: [], embeds: [embed as APIEmbed], files: [] })
-    } else {
-      await interaction.showModal({
-        title: "Wordle",
-        custom_id: "wordle",
-        components: [{
-          type: ComponentType.ActionRow,
-          components: [{
-            type: ComponentType.TextInput,
-            custom_id: "guess",
-            label: "Your Guess",
-            style: TextInputStyle.Short,
-            min_length: 5,
-            max_length: 5,
-            required: true
-          }]
-        }]
-      })
+      return await interaction.update({ components: [], embeds: [embed as APIEmbed] })
     }
+
+    await interaction.showModal({
+      title: "Wordle",
+      custom_id: "wordle",
+      components: [{
+        type: ComponentType.ActionRow,
+        components: [{
+          type: ComponentType.TextInput,
+          custom_id: "guess",
+          label: "Your Guess",
+          style: TextInputStyle.Short,
+          min_length: 5,
+          max_length: 5,
+          required: true
+        }]
+      }]
+    })
   }
 }
 
@@ -563,7 +551,7 @@ export async function modal(interaction: ModalMessageModalSubmitInteraction) {
   if (guess.length != 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
   if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
 
-  const [embed, ansArray] = [new UnsafeEmbedBuilder((interaction.message?.embeds[0] as Embed).data).toJSON(), answer.split("")]
+  const [embed, ansArray] = [new EmbedBuilder((interaction.message?.embeds[0] as Embed).data).toJSON(), answer.split("")]
   const { width, height, space, side, keyFont, tileFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
 
   let buttonID = (interaction.message?.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId as string
