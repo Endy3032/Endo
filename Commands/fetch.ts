@@ -282,7 +282,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           data.localTime = new Date(dataLoc.localtime)
           data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
 
-          data.title = `${dataLoc.name}${dataLoc.region == "" ? "" : ` - ${dataLoc.region}`} - ${dataLoc.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : "-"}${data.tz}` : ""})`
+          data.title = `${dataLoc.name}${dataLoc.region == "" ? "" : ` - ${dataLoc.region}`} - ${dataLoc.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""})`
 
           const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
           const base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
@@ -313,19 +313,19 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚`, inline: true },
               { name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
               { name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
-              { name: "Sunrise", value: `<t:${astro_time[0]}:t> Here\n${times[0]} There`, inline: true },
-              { name: "Sunset", value: `<t:${astro_time[1]}:t> Here\n${times[1]} There`, inline: true },
+              { name: "Sunrise", value: `${times[0]}\n(<t:${astro_time[0]}:t> Here)`, inline: true },
+              { name: "Sunset", value: `${times[1]}\n(<t:${astro_time[1]}:t> Here)`, inline: true },
               { name: "UV Index", value: `${data.current.uv}`, inline: true },
-              { name: "Moonrise", value: `<t:${astro_time[2]}:t> Here\n${times[2]} There`, inline: true },
-              { name: "Moonset", value: `<t:${astro_time[3]}:t> Here\n${times[3]} There`, inline: true },
+              { name: "Moonrise", value: `${times[2]}\n(<t:${astro_time[2]}:t> Here)`, inline: true },
+              { name: "Moonset", value: `${times[3]}\n(<t:${astro_time[3]}:t> Here)`, inline: true },
               { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illuminated`, inline: true },
             ],
             thumbnail: { url: `https:${data.current.condition.icon}` },
-            footer: { text: "Source • WeatherAPI | ", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
+            footer: { text: "Source • WeatherAPI | Timestamp", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
             timestamp: new Date().toISOString(),
           }
 
-          if (options == "aq" || options == "both") {
+          if (["aq", "both"].includes(options as string)) {
             weatherEmbed.fields.push(
               { name: "\u200b", value: "```Air Quality```", inline: false },
               { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },

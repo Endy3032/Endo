@@ -332,7 +332,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             case "varied": {
               let turn = false
               for (let i = 0; i < text.length; i++) {
-                if (text[i] != " ") return result += (turn ? i % 2 == 0 : i % 2 != 0) ? text[i].toUpperCase() : text[i].toLowerCase()
+                if (text[i] != " ") {
+                  result += (turn ? i % 2 == 0 : i % 2 != 0) ? text[i].toUpperCase() : text[i].toLowerCase()
+                  continue
+                }
                 result += " "
                 turn = !turn
               }
