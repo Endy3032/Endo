@@ -544,7 +544,6 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
     }
   }
 
-
   await interaction.respond(res)
     .catch((err) => {console.error(err)})
 }
@@ -604,9 +603,10 @@ export async function modal(interaction: ModalMessageModalSubmitInteraction) {
     ctx.fillRect(keyX, keyY, keyWidth, side)
 
     ctx.fillStyle = wordle.colors.text
-    ctx.fillText(guess[i], tileX, tileY - tileFont / 8)
+    ctx.font = ctx.font = `normal ${tileFont}px ClearSans`
+    ctx.fillText(guess[i], tileX + side / 2, tileY - tileFont / 8 + getMidY(ctx, guess[i], side, side))
     ctx.font = ctx.font = `normal ${keyFont}px ClearSans`
-    ctx.fillText(guess[i], keyX, keyY, keyWidth)
+    ctx.fillText(guess[i], keyX + keyWidth / 2, keyY + getMidY(ctx, guess[i], keyWidth, side), keyWidth)
   }
 
   embed.footer = { text: `${6 - guessCount}${embed.footer?.text.slice(1)}` }
