@@ -104,13 +104,6 @@ export const cmd = {
       type: ApplicationCommandOptionType.Subcommand,
       options: [
         {
-          name: "from",
-          description: "The source language",
-          type: ApplicationCommandOptionType.String,
-          autocomplete: true,
-          required: true,
-        },
-        {
           name: "to",
           description: "The translated language",
           type: ApplicationCommandOptionType.String,
@@ -122,7 +115,14 @@ export const cmd = {
           description: "The text to translate",
           type: ApplicationCommandOptionType.String,
           required: true,
-        }
+        },
+        {
+          name: "from",
+          description: "The source language",
+          type: ApplicationCommandOptionType.String,
+          autocomplete: true,
+          required: false,
+        },
       ]
     },
     {
@@ -294,7 +294,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     }
 
     case "translation": {
-      const [src, dst, txt] = [interaction.options.getString("from"), interaction.options.getString("to"), interaction.options.getString("text")] as string[]
+      const [src, dst, txt] = [interaction.options.getString("from") || "auto", interaction.options.getString("to"), interaction.options.getString("text")] as string[]
       googtrans(txt, { from: src, to: dst })
         .then(result => {
           console.log(result)
