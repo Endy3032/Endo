@@ -2,7 +2,7 @@ import os from "os"
 import "dotenv/config"
 import stripAnsi from "strip-ansi"
 import { APIMessage } from "discord-api-types/v10"
-import { emojis, nordChalk, rep } from "../Modules"
+import { handleError, nordChalk } from "../Modules"
 import { Interaction, BaseGuildTextChannel, ChatInputCommandInteraction, CommandInteraction, Message, MessageComponentInteraction, ModalMessageModalSubmitInteraction, ModalSubmitInteraction } from "discord.js"
 
 interface Command {
@@ -10,10 +10,6 @@ interface Command {
 }
 
 export const name = "interactionCreate"
-const handleError = (interaction: Interaction, err: Error, type?: string) => {
-  rep((interaction as CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction), { content: `${emojis.error.shorthand} This interaction failed [${type || "Unknown"} Error]`, ephemeral: true })
-  console.botLog(nordChalk.error(err.stack), "ERROR")
-}
 
 export async function execute(interaction: Interaction) {
   const isLocal = os.hostname().includes("local")

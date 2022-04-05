@@ -3,6 +3,7 @@ import capitalize from "./capitalize"
 import { colors, nordChalk } from "./colors"
 import deployLog from "./deployLog"
 import emojis from "./emojis"
+import handleError from "./handleError"
 import permissionCheck from "./permissionCheck"
 import permissions from "./permissions"
 import random from "./random"
@@ -12,6 +13,6 @@ import timestampStyler from "./timestampStyler"
 
 export {
   activities, capitalize, colors, deployLog, emojis,
-  nordChalk, permissions, permissionCheck, random,
-  rep, superEscape, timestampStyler,
+  handleError, nordChalk, permissions, permissionCheck,
+  random, rep, superEscape, timestampStyler,
 }

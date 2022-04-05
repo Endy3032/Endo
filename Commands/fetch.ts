@@ -1,9 +1,10 @@
 import Fuse from "fuse.js"
 import urban from "urban-dictionary"
+import googtrans from "@vitalets/google-translate-api"
 import { getLyrics } from "genius-lyrics-api"
-import { capitalize, colors, emojis, random } from "../Modules"
+import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
-import { ApplicationCommandType, ApplicationCommandOptionType, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
+import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
 
 export const cmd = {
   name: "fetch",
@@ -96,6 +97,33 @@ export const cmd = {
         autocomplete: true,
         required: true,
       }]
+    },
+    {
+      name: "translation",
+      description: "Fetch a translation from Google Translate",
+      type: ApplicationCommandOptionType.Subcommand,
+      options: [
+        {
+          name: "from",
+          description: "The source language",
+          type: ApplicationCommandOptionType.String,
+          autocomplete: true,
+          required: true,
+        },
+        {
+          name: "to",
+          description: "The translated language",
+          type: ApplicationCommandOptionType.String,
+          autocomplete: true,
+          required: true,
+        },
+        {
+          name: "text",
+          description: "The text to translate",
+          type: ApplicationCommandOptionType.String,
+          required: true,
+        }
+      ]
     },
     {
       name: "weather",
@@ -265,6 +293,26 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       break
     }
 
+    case "translation": {
+      const [src, dst, txt] = [interaction.options.getString("from"), interaction.options.getString("to"), interaction.options.getString("text")] as string[]
+      googtrans(txt, { from: src, to: dst })
+        .then(result => {
+          console.log(result)
+          interaction.editReply({ embeds: [{
+            title: "Translation",
+            fields: [
+              { name: `From ${googtrans.languages[result.from.language.iso]}`, value: `${txt}` },
+              { name: `To ${googtrans.languages[dst]}`, value: `${result.text}` },
+            ]
+          }] })
+        })
+        .catch((err: Error) => {
+          return handleError(interaction, err as Error, "Translation")
+        })
+
+      break
+    }
+
     case "weather": {
       const location = interaction.options.getString("location")
       const options = interaction.options.getString("options")
@@ -369,7 +417,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
             return { name: `${result}`, value: `${result}` }
           })
 
-          const res: { name: string, value: string }[] = []
+          const res: ApplicationCommandOptionChoice[] = []
           const fuse = new Fuse(results, { distance: 24, keys: ["name", "value"] })
           fuse.search(current).forEach(option => {res.push(option.item as { name: string, value: string })})
           if (!res.includes(curObject)) res.unshift(curObject)
@@ -383,7 +431,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       const song = interaction.options.getFocused() as string
       if (song.length == 0) {return interaction.respond([{ name: "Enter something to get started", value: "empty" }])}
 
-      const options: { name: string, value: string }[] = []
+      const options: ApplicationCommandOptionChoice[] = []
       await axios.get("https://api.genius.com/search", { params: { access_token: process.env.GeniusClientAccess, q: song }, })
         .then((response: AxiosResponse) => {
           let optName: string
@@ -395,12 +443,28 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
           })
         })
 
-      const res: { name: string, value: string }[] = []
+      const res: ApplicationCommandOptionChoice[] = []
       const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
       fuse.search(song).forEach(option => res.push(option.item))
-      res.push(...options.filter((option: any) => !res.includes(option)))
+      res.push(...options.filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
 
       interaction.respond(res)
+      break
+    }
+
+    case "translation": {
+      const current = interaction.options.getFocused(true) as ApplicationCommandOptionChoice
+      const { languages } = googtrans
+      const languageList = Object.entries(languages).map(([k, v]) => {
+        return { name: v, value: k }
+      }).slice(0, -2) as { name: string, value: string }[]
+
+      const res: ApplicationCommandOptionChoice[] = current.name == "from" ? [languageList[0]] : []
+      const fuse = new Fuse(languageList.slice(1), { distance: 25, keys: ["name", "value"] })
+      fuse.search(current.value as string).forEach(option => res.push(option.item))
+      res.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
+
+      interaction.respond(res.slice(0, 25))
       break
     }
   }
