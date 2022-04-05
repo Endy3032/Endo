@@ -297,7 +297,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       const [src, dst, txt] = [interaction.options.getString("from") || "auto", interaction.options.getString("to"), interaction.options.getString("text")] as string[]
       googtrans(txt, { from: src, to: dst })
         .then(result => {
-          console.log(result)
           interaction.editReply({ embeds: [{
             title: "Translation",
             fields: [
@@ -391,7 +390,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           interaction.editReply({ embeds: [weatherEmbed] })
         })
         .catch(e => {
-          console.log(e)
+          handleError(interaction, e, "Weather")
           interaction.editReply({ content: e.response.data.error.code == 1006
             ? `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`
             : `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`
