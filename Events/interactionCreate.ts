@@ -37,7 +37,7 @@ export async function execute(interaction: Interaction) {
   }
 
   if (!interaction.isAutocomplete()) {
-    const author = nordChalk.bright.cyan(`[${interaction.user.tag} | ${`${interaction.guild?.name}#${(interaction.channel as BaseGuildTextChannel).name}` || "DM"}] `)
+    const author = nordChalk.bright.cyan(`[${interaction.user.tag} | ${interaction.guild ? `${interaction.guild.name}#${(interaction.channel as BaseGuildTextChannel).name}` : "DM"}] `)
 
     const intLog =
     interaction.isChatInputCommand() && group ? `Triggered ${nordChalk.bright.cyan(`[${commandName}/${group}/${subcmd}]`)}`
