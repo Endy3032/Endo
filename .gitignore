@@ -1,7 +1,7 @@
 # Folders
+dist
 logs
 node_modules*
-dist
 
 # Files
 .env
@@ -10,3 +10,4 @@ dist
 .DS_Store
 forecast.json
 package-lock.json
+Resources/Covid/cache.json

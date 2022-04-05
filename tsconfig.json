@@ -22,7 +22,6 @@
   },
   "exclude": [
     "logs",
-    "Resources",
     "node_modules"
   ],
   "files": [

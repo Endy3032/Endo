@@ -3,7 +3,7 @@ import "dotenv/config"
 import stripAnsi from "strip-ansi"
 import { APIMessage } from "discord-api-types/v10"
 import { handleError, nordChalk } from "../Modules"
-import { Interaction, BaseGuildTextChannel, ChatInputCommandInteraction, CommandInteraction, Message, MessageComponentInteraction, ModalMessageModalSubmitInteraction, ModalSubmitInteraction } from "discord.js"
+import { Interaction, BaseGuildTextChannel, ChatInputCommandInteraction, Message, MessageComponentInteraction, ModalMessageModalSubmitInteraction } from "discord.js"
 
 interface Command {
   [key: string]: { cmd: object, execute: Function, button?: Function, selectMenu?: Function, ctxMenu?: Function, autocomplete?: Function, modal?: Function }

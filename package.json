@@ -10,12 +10,12 @@
   "scripts": {
     "start": "ts-node --swc --transpile-only .",
     "dev": "nodemon -e ts --exec \"ts-node .\"",
-    "ceploy": "ts-node --swc --transpile-only deploy.ts",
-    "teploy": "ts-node --swc --transpile-only deploy.ts --mode='test'",
-    "geploy": "ts-node --swc --transpile-only deploy.ts --mode='guilds'",
-    "cerun": "ts-node --swc --transpile-only deploy.ts && npm run dev",
-    "terun": "ts-node --swc --transpile-only deploy.ts --mode='test' && npm run dev",
-    "gerun": "ts-node --swc --transpile-only deploy.ts --mode='guilds' && npm run dev"
+    "cp": "ts-node --swc --transpile-only deploy.ts",
+    "tp": "ts-node --swc --transpile-only deploy.ts --mode='test'",
+    "gp": "ts-node --swc --transpile-only deploy.ts --mode='guilds'",
+    "cr": "ts-node --swc --transpile-only deploy.ts && npm run dev",
+    "tr": "ts-node --swc --transpile-only deploy.ts --mode='test' && npm run dev",
+    "gr": "ts-node --swc --transpile-only deploy.ts --mode='guilds' && npm run dev"
   },
   "keywords": [],
   "author": "Endy3032",

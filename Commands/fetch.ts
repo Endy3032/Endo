@@ -1,10 +1,12 @@
 import Fuse from "fuse.js"
 import urban from "urban-dictionary"
-import googtrans from "@vitalets/google-translate-api"
 import { getLyrics } from "genius-lyrics-api"
+import locationChoices from "../Resources/Covid/locations"
+import googtrans from "@vitalets/google-translate-api"
 import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
+import { existsSync, readFileSync, writeFileSync } from "fs"
 
 export const cmd = {
   name: "fetch",
@@ -62,6 +64,18 @@ export const cmd = {
     //   ]
     // },
     // #endregion
+    {
+      name: "covid",
+      description: "Get data from the COVID-19 API",
+      type: ApplicationCommandOptionType.Subcommand,
+      options: [{
+        name: "location",
+        description: "The data's location",
+        type: ApplicationCommandOptionType.String,
+        autocomplete: true,
+        required: true,
+      }]
+    },
     {
       name: "definition",
       description: "Fetch a definition from dictionaries",
@@ -190,6 +204,43 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply()
   switch (interaction.options.getSubcommand()) {
+    case "covid": {
+      const location = interaction.options.getString("location") as string
+      const query = location.startsWith("_continent") ? "continent" : "country"
+
+      if (!existsSync("./Resources/Covid/cache.json")) writeFileSync("./Resources/Covid/cache.json", JSON.stringify({}))
+
+      const ts = new Date()
+      const cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
+      if (!cache[location] || cache.timestamp < ts) {
+        cache.timestamp = ts.getTime() + 1000 * 60 * 10
+        cache[location] = {}
+
+        await axios.get(`https://covid-api.mmediagroup.fr/v1/cases?${query}=${location.replace("_continent", "")}`)
+          .then(res => cache[location].cases = res.data.All)
+
+        await axios.get(`https://covid-api.mmediagroup.fr/v1/vaccines?${query}=${location.replace("_continent", "")}`)
+          .then(res => cache[location].vaccines = res.data.All)
+
+        writeFileSync("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2))
+      }
+
+      await interaction.editReply({ embeds: [{
+        title: `Covid Stats - ${cache[location].cases.country} [${cache[location].cases.abbreviation || "_"}/${cache[location].cases.continent || "_"}]`,
+        fields: [
+          { name: "Confirmed Cases", value: `${cache[location].cases.confirmed.toLocaleString("en")}`, inline: true },
+          { name: "Recovered", value: `${cache[location].cases.recovered.toLocaleString("en")}`, inline: true },
+          { name: "Deaths", value: `${cache[location].cases.deaths.toLocaleString("en")}`, inline: true },
+          { name: "Administered Vaccines", value: `${cache[location].vaccines.administered.toLocaleString("en")}`, inline: true },
+          { name: "Vaccinated", value: `${cache[location].vaccines.people_vaccinated.toLocaleString("en")}`, inline: true },
+          { name: "Partially Vaccinated", value: `${cache[location].vaccines.people_partially_vaccinated.toLocaleString("en")}`, inline: true },
+        ],
+        timestamp: ts.toISOString(),
+      }] })
+
+      break
+    }
+
     case "definition": {
       const dictionary = interaction.options.getString("dictionary") as string
       const word = interaction.options.getString("word") as string
@@ -403,6 +454,17 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 export async function autocomplete(interaction: AutocompleteInteraction) {
   switch (interaction.options.getSubcommand()) {
+    case "covid": {
+      const location = interaction.options.getFocused()
+      const res: ApplicationCommandOptionChoice[] = []
+      const fuse = new Fuse(locationChoices.slice(1), { distance: 25, keys: ["name", "value"] })
+      fuse.search(location as string).forEach(option => res.push(option.item))
+      res.push(...locationChoices.slice(1).filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
+
+      interaction.respond(res.slice(0, 25))
+      break
+    }
+
     case "definition": {
       const dict = interaction.options.getString("dictionary")
       const current = interaction.options.getFocused() as string
