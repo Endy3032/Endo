@@ -1,12 +1,12 @@
 import Fuse from "fuse.js"
 import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
-import locationChoices from "../Resources/Covid/locations"
 import googtrans from "@vitalets/google-translate-api"
-import { capitalize, colors, emojis, handleError, random } from "../Modules"
+import { existsSync, readFileSync, writeFile } from "fs"
+import locationChoices from "../Resources/Covid/locations"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
+import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
-import { existsSync, readFileSync, writeFileSync } from "fs"
 
 export const cmd = {
   name: "fetch",
@@ -222,21 +222,24 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         await axios.get(`https://covid-api.mmediagroup.fr/v1/vaccines?${query}=${location.replace("_continent", "")}`)
           .then(res => cache[location].vaccines = res.data.All)
 
-        writeFileSync("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2))
+        writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (res) => {
+          if (res) return console.error(res)
+          interaction.editReply({ embeds: [{
+            title: `Covid Stats - ${cache[location].cases.country} [${cache[location].cases.abbreviation || "_"}/${cache[location].cases.continent || "_"}]`,
+            fields: [
+              { name: "Confirmed Cases", value: `${cache[location].cases.confirmed.toLocaleString("en")}`, inline: true },
+              { name: "Recovered", value: `${cache[location].cases.recovered.toLocaleString("en")}`, inline: true },
+              { name: "Deaths", value: `${cache[location].cases.deaths.toLocaleString("en")}`, inline: true },
+              { name: "Administered Vaccines", value: `${cache[location].vaccines.administered.toLocaleString("en")}`, inline: true },
+              { name: "Vaccinated", value: `${cache[location].vaccines.people_vaccinated.toLocaleString("en")}`, inline: true },
+              { name: "Partially Vaccinated", value: `${cache[location].vaccines.people_partially_vaccinated.toLocaleString("en")}`, inline: true },
+            ],
+            timestamp: ts.toISOString(),
+          }] })
+          
+        })
       }
 
-      await interaction.editReply({ embeds: [{
-        title: `Covid Stats - ${cache[location].cases.country} [${cache[location].cases.abbreviation || "_"}/${cache[location].cases.continent || "_"}]`,
-        fields: [
-          { name: "Confirmed Cases", value: `${cache[location].cases.confirmed.toLocaleString("en")}`, inline: true },
-          { name: "Recovered", value: `${cache[location].cases.recovered.toLocaleString("en")}`, inline: true },
-          { name: "Deaths", value: `${cache[location].cases.deaths.toLocaleString("en")}`, inline: true },
-          { name: "Administered Vaccines", value: `${cache[location].vaccines.administered.toLocaleString("en")}`, inline: true },
-          { name: "Vaccinated", value: `${cache[location].vaccines.people_vaccinated.toLocaleString("en")}`, inline: true },
-          { name: "Partially Vaccinated", value: `${cache[location].vaccines.people_partially_vaccinated.toLocaleString("en")}`, inline: true },
-        ],
-        timestamp: ts.toISOString(),
-      }] })
 
       break
     }
