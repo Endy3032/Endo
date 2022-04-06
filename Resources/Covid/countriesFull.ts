@@ -1,5 +1,4 @@
 // Source: https://github.com/M-Media-Group/country-json/blob/master/src/countries-master.json
-
 export default [
   {
     country: "Afghanistan",

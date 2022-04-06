@@ -2,11 +2,37 @@ import Fuse from "fuse.js"
 import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
 import googtrans from "@vitalets/google-translate-api"
-import { existsSync, readFileSync, writeFile } from "fs"
-import locationChoices from "../Resources/Covid/locations"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
+import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
+import { ctChoices } from "../Resources/Covid/locations"
 import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
+
+const repCovid = async (interaction: ChatInputCommandInteraction, mmgCache: MMediaGroup, msg = "") => {
+  var title = "Covid Stats - Global"
+  var fields = [
+    { name: "\u200b", value: "```Vaccines```", inline: false },
+    { name: "Administered", value: `${mmgCache.administered.toLocaleString("en")}`, inline: true },
+    { name: "Vaccinated", value: `${mmgCache.people_vaccinated.toLocaleString("en")}`, inline: true },
+    { name: "Partially Vaxxed", value: `${mmgCache.people_partially_vaccinated.toLocaleString("en")}`, inline: true },
+    { name: "\u200b", value: "```Cases```", inline: false },
+    { name: "Confirmed", value: `${mmgCache.confirmed.toLocaleString("en")}`, inline: true },
+    { name: "Deaths", value: `${mmgCache.deaths.toLocaleString("en")}`, inline: true },
+  ]
+  if (mmgCache.country) {
+    title.replace("Global", `${mmgCache.country} [${mmgCache.abbreviation || "No Abbreviation"}/${mmgCache.continent || "No Continent"}]`)
+    fields.unshift(
+      { name: "\u200b", value: "```Country Infos```", inline: false },
+      { name: "\u200b", value: "```Vaccines```", inline: false },
+    )
+  }
+  interaction.editReply({ embeds: [{
+    title: title,
+    fields: fields,
+    footer: { text: `${msg.length > 0 ? `${msg}${mmgCache.updated ? " | " : ""}` : " "}${mmgCache.updated ? "Last Updated" : ""}` },
+    timestamp: mmgCache.updated ? new Date(mmgCache.updated).toISOString() : undefined,
+  }] })
+}
 
 export const cmd = {
   name: "fetch",
@@ -205,42 +231,29 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply()
   switch (interaction.options.getSubcommand()) {
     case "covid": {
-      const location = interaction.options.getString("location") as string
-      const query = location.startsWith("_continent") ? "continent" : "country"
-
-      if (!existsSync("./Resources/Covid/cache.json")) writeFileSync("./Resources/Covid/cache.json", JSON.stringify({}))
+      var location = interaction.options.getString("location") as string
+      if (!existsSync("./Resources/Covid/cache.json") || readFileSync("./Resources/Covid/cache.json").toString().length == 0) writeFileSync("./Resources/Covid/cache.json", JSON.stringify({}))
 
       const ts = new Date()
-      const cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
-      if (!cache[location] || cache.timestamp < ts) {
-        cache.timestamp = ts.getTime() + 1000 * 60 * 10
-        cache[location] = {}
+      var cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
+      if (!Object.keys(cache).length || cache.timestamp < ts) {
+        var data = {}
+        const { data: casesData } = await axios.get("https://covid-api.mmediagroup.fr/v1/cases")
+        const { data: vaccinesData } = await axios.get("https://covid-api.mmediagroup.fr/v1/vaccines")
+        const { data: covtrackerData } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/country")
 
-        await axios.get(`https://covid-api.mmediagroup.fr/v1/cases?${query}=${location.replace("_continent", "")}`)
-          .then(res => cache[location].cases = res.data.All)
-
-        await axios.get(`https://covid-api.mmediagroup.fr/v1/vaccines?${query}=${location.replace("_continent", "")}`)
-          .then(res => cache[location].vaccines = res.data.All)
-
-        writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (res) => {
-          if (res) return console.error(res)
-          interaction.editReply({ embeds: [{
-            title: `Covid Stats - ${cache[location].cases.country} [${cache[location].cases.abbreviation || "_"}/${cache[location].cases.continent || "_"}]`,
-            fields: [
-              { name: "Confirmed Cases", value: `${cache[location].cases.confirmed.toLocaleString("en")}`, inline: true },
-              { name: "Recovered", value: `${cache[location].cases.recovered.toLocaleString("en")}`, inline: true },
-              { name: "Deaths", value: `${cache[location].cases.deaths.toLocaleString("en")}`, inline: true },
-              { name: "Administered Vaccines", value: `${cache[location].vaccines.administered.toLocaleString("en")}`, inline: true },
-              { name: "Vaccinated", value: `${cache[location].vaccines.people_vaccinated.toLocaleString("en")}`, inline: true },
-              { name: "Partially Vaccinated", value: `${cache[location].vaccines.people_partially_vaccinated.toLocaleString("en")}`, inline: true },
-            ],
-            timestamp: ts.toISOString(),
-          }] })
-          
+        Object.keys(vaccinesData).filter(country => Object.keys(casesData).includes(country)).forEach(country => {
+          data[country] = Object.assign(casesData[country].All, vaccinesData[country].All)
         })
+
+        cache = { timestamp: ts.getTime() + 1000 * 60 * 30, ...data }
+        writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (err) => {
+          if (err) return console.error(err)
+          repCovid(interaction, cache[location], ":globe_with_meridians:")
+        })
+        return
       }
-
-
+      repCovid(interaction, cache[location])
       break
     }
 
@@ -460,9 +473,9 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
     case "covid": {
       const location = interaction.options.getFocused()
       const res: ApplicationCommandOptionChoice[] = []
-      const fuse = new Fuse(locationChoices.slice(1), { distance: 25, keys: ["name", "value"] })
+      const fuse = new Fuse(ctChoices, { distance: 25, keys: ["name", "value"] })
       fuse.search(location as string).forEach(option => res.push(option.item))
-      res.push(...locationChoices.slice(1).filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
+      res.push(...ctChoices.filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
 
       interaction.respond(res.slice(0, 25))
       break

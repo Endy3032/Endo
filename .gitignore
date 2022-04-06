@@ -10,4 +10,4 @@ node_modules*
 .DS_Store
 forecast.json
 package-lock.json
-Resources/Covid/cache.json
+Resources/Covid/*.json
