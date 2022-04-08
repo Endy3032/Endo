@@ -1,10 +1,10 @@
 import Fuse from "fuse.js"
 import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
+import { choices } from "../Resources/Covid/locations"
 import googtrans from "@vitalets/google-translate-api"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
-import { ctChoices } from "../Resources/Covid/locations"
 import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
 
@@ -260,7 +260,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     case "definition": {
       const dictionary = interaction.options.getString("dictionary") as string
       const word = interaction.options.getString("word") as string
-      if (word == "blankentry") return await interaction.editReply("You must specify a word to search for")
+      if (word == "__") return await interaction.editReply("You must specify a word to search for")
 
       switch (dictionary) {
         case "dictapi": {
@@ -308,7 +308,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               const descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
 
               if (descriptionBefore.length + descriptionAfter.length > 4096) {
-                descriptionBefore = descriptionBefore.slice(0, 4093 - descriptionAfter.length) + "..."
+                descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
               }
 
               const description = descriptionBefore + descriptionAfter
@@ -349,7 +349,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           let title: string
 
           interaction.editReply({ embeds: [{
-            title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 97) + "..." : title,
+            title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 99) + "…" : title,
             description: lyrics || "No lyrics",
             thumbnail: { url: data.song_art_image_url },
             footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
@@ -469,79 +469,73 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 }
 
 export async function autocomplete(interaction: AutocompleteInteraction) {
+  const current = interaction.options.getFocused() as string
+  const initial = { name: `${current || "Keep typing to continue…"}`, value: `${current || "__"}` }
+  let response: ApplicationCommandOptionChoice[] = []
+
   switch (interaction.options.getSubcommand()) {
     case "covid": {
-      const location = interaction.options.getFocused()
-      const res: ApplicationCommandOptionChoice[] = []
-      const fuse = new Fuse(ctChoices, { distance: 25, keys: ["name", "value"] })
-      fuse.search(location as string).forEach(option => res.push(option.item))
-      res.push(...ctChoices.filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
-
-      interaction.respond(res.slice(0, 25))
+      response = current.toString().length == 0 ? [choices[0]] : []
+      const fuse = new Fuse(choices.slice(1), { distance: 25, keys: ["name", "value"] })
+      response.push(...fuse.search(current as string).map(option => option.item))
+      response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+      interaction.respond(response.slice(0, 25))
       break
     }
 
     case "definition": {
       const dict = interaction.options.getString("dictionary")
-      const current = interaction.options.getFocused() as string
-      const curObject = { name: `${current || "Keep typing to get results!"}`, value: `${current || "blankentry"}` }
-
-      if (dict == "dictapi") return interaction.respond([curObject])
+      if (dict == "dictapi") return interaction.respond([initial])
 
       await urban.autocomplete(current)
         .then((autocompleteRes: string[]) => {
-          const results = autocompleteRes.map((result: any) => {
+          const results: ApplicationCommandOptionChoice[] = autocompleteRes.map((result: any) => {
             return { name: `${result}`, value: `${result}` }
           })
 
-          const res: ApplicationCommandOptionChoice[] = []
-          const fuse = new Fuse(results, { distance: 24, keys: ["name", "value"] })
-          fuse.search(current).forEach(option => {res.push(option.item as { name: string, value: string })})
-          if (!res.includes(curObject)) res.unshift(curObject)
-          interaction.respond(res)
+          const fuse = new Fuse(results, { distance: 25, keys: ["name", "value"] })
+          const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
+          if (!response.includes(initial)) response.unshift(initial)
+          interaction.respond(response.slice(0, 25))
         })
-        .catch(() => {return interaction.respond([curObject])})
+        .catch(() => interaction.respond([initial]))
       break
     }
 
     case "lyrics": {
-      const song = interaction.options.getFocused() as string
-      if (song.length == 0) {return interaction.respond([{ name: "Enter something to get started", value: "empty" }])}
+      if (current.length == 0) return interaction.respond([initial])
 
       const options: ApplicationCommandOptionChoice[] = []
-      await axios.get("https://api.genius.com/search", { params: { access_token: process.env.GeniusClientAccess, q: song }, })
+      await axios.get("https://api.genius.com/search", { params: { access_token: process.env.GeniusClientAccess, q: current }, })
         .then((response: AxiosResponse) => {
-          let optName: string
-          response.data.response.hits.forEach((hit: { result: { title: any; artist_names: any; id: any } }) => {
-            options.push({
-              name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 97) + "..." : optName,
+          options.push(...response.data.response.hits.map((hit: { result: { title: any; artist_names: any; id: any } }) => {
+            let optName: string
+            return {
+              name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 99) + "…" : optName,
               value: `${hit.result.id}`
-            })
-          })
+            }
+          }))
         })
 
-      const res: ApplicationCommandOptionChoice[] = []
       const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
-      fuse.search(song).forEach(option => res.push(option.item))
-      res.push(...options.filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
-
-      interaction.respond(res)
+      const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
+      response.push(...options.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+      interaction.respond(response.slice(0, 25))
       break
     }
 
     case "translation": {
-      const current = interaction.options.getFocused(true) as ApplicationCommandOptionChoice
       const { languages } = googtrans
       const languageList = Object.entries(languages).map(([k, v]) => {
         return { name: v, value: k }
-      }).slice(0, -2) as { name: string, value: string }[]
-
-      const res: ApplicationCommandOptionChoice[] = current.name == "from" ? [languageList[0]] : []
+      }).slice(0, -2) as ApplicationCommandOptionChoice[]
+      
+      const current = interaction.options.getFocused(true) as ApplicationCommandOptionChoice
+      response = current.name == "from" ? [languageList[0]] : []
       const fuse = new Fuse(languageList.slice(1), { distance: 25, keys: ["name", "value"] })
-      fuse.search(current.value as string).forEach(option => res.push(option.item))
-      res.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !res.includes(option)))
-
-      interaction.respond(res.slice(0, 25))
+      response.push(...fuse.search(current.value as string).map(option => option.item))
+      response.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+      interaction.respond(response.slice(0, 25))
       break
     }
   }
