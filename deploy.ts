@@ -52,13 +52,13 @@ if (mode != "guilds") {
 
   registerCommands(commands, process.env.Client as string, mode == "test" ? process.env.TestGuild as string : null)
 } else {
-  const guildFolders = fs.readdirSync("./Commands/guilds")
+  const guildFolders = fs.readdirSync("./Commands/Guilds")
   guildFolders.forEach(guildID => {
     var commands = [] as APIApplicationCommand[]
-    const commandFiles = fs.readdirSync(`./Commands/guilds/${guildID}`).filter(file => file.endsWith(".ts"))
+    const commandFiles = fs.readdirSync(`./Commands/Guilds/${guildID}`).filter(file => file.endsWith(".ts"))
 
     commandFiles.forEach(command => {
-      let { cmd } = require(`./Commands/guilds/${guildID}/${command}`)
+      let { cmd } = require(`./Commands/Guilds/${guildID}/${command}`)
       cmd = replaceDescription(cmd, "G")
       commands.push(cmd)
     })
