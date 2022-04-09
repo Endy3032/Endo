@@ -17,8 +17,8 @@ export async function execute(interaction: Interaction) {
   const isReplitTest = interaction.channelId == process.env.TestChannel
   if ((isLocal && (!isTestGuild || isReplitTest)) || (!isLocal && isTestGuild && !isReplitTest)) return
 
-  process.once("uncaughtException", (err: Error) => handleError(interaction, err, "d_UE"))
-  process.once("unhandledRejection", (err: Error) => handleError(interaction, err, "d_UR"))
+  process.once("uncaughtException", (err: Error) => handleError(interaction, err, "Uncaught Exception"))
+  process.once("unhandledRejection", (err: Error) => handleError(interaction, err, "Unhandled Rejection"))
 
   const commandName: string | null =
   interaction.isChatInputCommand() || interaction.isAutocomplete() ? interaction.commandName
