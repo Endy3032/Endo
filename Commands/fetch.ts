@@ -1,36 +1,51 @@
 import Fuse from "fuse.js"
 import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
-import { choices } from "../Resources/Covid/locations"
 import googtrans from "@vitalets/google-translate-api"
+import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
 import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
 
-const repCovid = async (interaction: ChatInputCommandInteraction, mmgCache: MMediaGroup, msg = "") => {
-  var title = "Covid Stats - Global"
+const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
+  let timestamp: Date
+  var title = `Covid Stats - Global ${msg.length > 0 ? `│${msg}` : ""}`
   var fields = [
-    { name: "\u200b", value: "```Vaccines```", inline: false },
-    { name: "Administered", value: `${mmgCache.administered.toLocaleString("en")}`, inline: true },
-    { name: "Vaccinated", value: `${mmgCache.people_vaccinated.toLocaleString("en")}`, inline: true },
-    { name: "Partially Vaxxed", value: `${mmgCache.people_partially_vaccinated.toLocaleString("en")}`, inline: true },
-    { name: "\u200b", value: "```Cases```", inline: false },
-    { name: "Confirmed", value: `${mmgCache.confirmed.toLocaleString("en")}`, inline: true },
-    { name: "Deaths", value: `${mmgCache.deaths.toLocaleString("en")}`, inline: true },
+    { name: "Confirmed", value: `${covCase.totalConfirmed.toLocaleString("en")}`, inline: true },
+    { name: "Deaths", value: `${covCase.totalDeaths.toLocaleString("en")}`, inline: true },
+    { name: "Recovered", value: `${covCase.totalRecovered.toLocaleString("en")}`, inline: true },
   ]
-  if (mmgCache.country) {
-    title.replace("Global", `${mmgCache.country} [${mmgCache.abbreviation || "No Abbreviation"}/${mmgCache.continent || "No Continent"}]`)
-    fields.unshift(
-      { name: "\u200b", value: "```Country Infos```", inline: false },
-      { name: "\u200b", value: "```Vaccines```", inline: false },
+  if (Object.keys(covCase).includes("country")) {
+    covCase = covCase as CountryCovidCase
+    title = title.replace("Global", `${covCase.country} [${covCase.countryCode}]`)
+    fields.push(
+      { name: "Daily Confirmed", value: `${covCase.dailyConfirmed.toLocaleString("en")}`, inline: true },
+      { name: "Daily Deaths", value: `${covCase.dailyDeaths.toLocaleString("en")}`, inline: true },
+      { name: "Active Cases", value: `${covCase.activeCases.toLocaleString("en")}`, inline: true },
+      { name: "Confirmed/1M", value: `${covCase.totalConfirmedPerMillionPopulation.toLocaleString("en")}`, inline: true },
+      { name: "Deaths/1M", value: `${covCase.totalDeathsPerMillionPopulation.toLocaleString("en")}`, inline: true },
+      { name: "Critical", value: `${covCase.totalCritical.toLocaleString("en")}`, inline: true },
+      { name: "Fatality Rate", value: `${covCase.FR}%`, inline: true },
+      { name: "Recovery Rate", value: `${covCase.PR}%`, inline: true }
     )
+    timestamp = new Date(covCase.lastUpdated)
+  } else {
+    covCase = covCase as GlobalCovidCase
+    fields.push(
+      { name: "New Cases", value: `${covCase.totalNewCases.toLocaleString("en")}`, inline: true },
+      { name: "New Deaths", value: `${covCase.totalNewDeaths.toLocaleString("en")}`, inline: true },
+      { name: "New Active Cases", value: `${covCase.totalActiveCases.toLocaleString("en")}`, inline: true },
+      { name: "Total Cases/1M", value: `${covCase.totalCasesPerMillionPop.toLocaleString("en")}`, inline: true },
+    )
+    timestamp = new Date(covCase.created)
   }
+
   interaction.editReply({ embeds: [{
     title: title,
     fields: fields,
-    footer: { text: `${msg.length > 0 ? `${msg}${mmgCache.updated ? " | " : ""}` : " "}${mmgCache.updated ? "Last Updated" : ""}` },
-    timestamp: mmgCache.updated ? new Date(mmgCache.updated).toISOString() : undefined,
+    footer: { text: "Last Updated" },
+    timestamp: timestamp.toISOString(),
   }] })
 }
 
@@ -238,12 +253,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       var cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
       if (!Object.keys(cache).length || cache.timestamp < ts) {
         var data = {}
-        const { data: casesData } = await axios.get("https://covid-api.mmediagroup.fr/v1/cases")
-        const { data: vaccinesData } = await axios.get("https://covid-api.mmediagroup.fr/v1/vaccines")
-        const { data: covtrackerData } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/country")
+        const { data: cases } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/country")
+        const { data: global } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/global")
 
-        Object.keys(vaccinesData).filter(country => Object.keys(casesData).includes(country)).forEach(country => {
-          data[country] = Object.assign(casesData[country].All, vaccinesData[country].All)
+        data["Global"] = global as GlobalCovidCase
+        cases.forEach((country: CountryCovidCase) => {
+          data[country.country] = country
         })
 
         cache = { timestamp: ts.getTime() + 1000 * 60 * 30, ...data }
@@ -475,8 +490,8 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 
   switch (interaction.options.getSubcommand()) {
     case "covid": {
-      response = current.toString().length == 0 ? [choices[0]] : []
-      const fuse = new Fuse(choices.slice(1), { distance: 25, keys: ["name", "value"] })
+      response = []
+      const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
       interaction.respond(response.slice(0, 25))

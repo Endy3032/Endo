@@ -255,4 +255,35 @@ if (!existsSync(jsonFile)) {
   choices = require("./choices.json")
 }
 
-export { choices, countries }
+type BaseCovidCase = {
+  totalConfirmed: Number
+  totalDeaths: Number
+  totalRecovered: Number
+}
+
+interface CountryCovidCase extends BaseCovidCase {
+  countryCode: string
+  country: string
+  countryName: string
+  lat: Number
+  lng: Number
+  dailyConfirmed: Number
+  dailyDeaths: Number
+  activeCases: Number
+  totalCritical: Number
+  totalConfirmedPerMillionPopulation: Number
+  totalDeathsPerMillionPopulation: Number
+  FR: string,
+  PR: string,
+  lastUpdated: string
+}
+
+interface GlobalCovidCase extends BaseCovidCase {
+  totalNewCases: Number
+  totalNewDeaths: Number
+  totalActiveCases: Number
+  totalCasesPerMillionPop: Number
+  created: string
+}
+
+export { choices, countries, CountryCovidCase, GlobalCovidCase }
