@@ -453,12 +453,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const { guild } = interaction
           if (!guild) return interaction.reply({ content: `${emojis.warn.shorthand} This command can only be used in servers.`, ephemeral: true })
           const owner = await guild.fetchOwner()
-          const channels = guild.channels.cache
+          const channels = await guild.channels.fetch()
           const textCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildText).size
           const voiceCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildVoice).size
           const categoryCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildCategory).size
           const stageCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildStageVoice).size
-          const emojiCount = guild.emojis.cache.size
+          const emojiCount = (await guild.emojis.fetch()).size
 
           const verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
           const filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
@@ -473,7 +473,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "Verification", value: verificationLevel[guild.verificationLevel], inline: true },
               { name: "Content Filter", value: filterLevel[guild.explicitContentFilter], inline: true },
               { name: "Verified", value: guild.verified ? "Yes" : "No", inline: true },
-              { name: "General Stats", value: `${guild.memberCount} Members\n${guild.roles.cache.size} Roles\n${emojiCount} Emojis`, inline: true },
+              { name: "General Stats", value: `${guild.memberCount} Members\n${(await guild.roles.fetch()).size} Roles\n${emojiCount} Emojis`, inline: true },
               { name: "Channel Stats", value: `${categoryCount != 0 ? `${categoryCount} Categories\n` : ""}${textCount != 0 ? `${textCount} Text\n` : ""}${voiceCount != 0 ? `${voiceCount} Voice\n` : ""}${stageCount != 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
               { name: "AFK Channel", value: guild.afkChannelId != null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
             ],
