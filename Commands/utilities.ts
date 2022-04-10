@@ -4,7 +4,7 @@ import convert from "color-convert"
 import { RGB } from "color-convert/conversions"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
 import { colors, emojis, maxRes, random, superEscape, timestampStyler } from "../Modules"
-import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Message } from "discord.js"
+import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Emoji, Message } from "discord.js"
 // const { splitBar } = require("string-progressbar")
 
 function convertColors(color: RGB) {
@@ -458,7 +458,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const voiceCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildVoice).size
           const categoryCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildCategory).size
           const stageCount = channels.filter((channel: { type: ChannelType }) => channel.type == ChannelType.GuildStageVoice).size
-          const emojiCount = (await guild.emojis.fetch()).size
+          const guildEmojis = await guild.emojis.fetch()
+          const emojiCount = guildEmojis.size
+          const animCount = guildEmojis.filter((emoji: Emoji) => emoji.animated as boolean).size
 
           const verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
           const filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
@@ -473,7 +475,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "Verification", value: verificationLevel[guild.verificationLevel], inline: true },
               { name: "Content Filter", value: filterLevel[guild.explicitContentFilter], inline: true },
               { name: "Verified", value: guild.verified ? "Yes" : "No", inline: true },
-              { name: "General Stats", value: `${guild.memberCount} Members\n${(await guild.roles.fetch()).size} Roles\n${emojiCount} Emojis`, inline: true },
+              { name: "General Stats", value: `${guild.memberCount} Members\n${(await guild.roles.fetch()).size} Roles\n${emojiCount} Emojis\n┣ ${emojiCount-animCount} static\n╰ ${animCount} animated`, inline: true },
               { name: "Channel Stats", value: `${categoryCount != 0 ? `${categoryCount} Categories\n` : ""}${textCount != 0 ? `${textCount} Text\n` : ""}${voiceCount != 0 ? `${voiceCount} Voice\n` : ""}${stageCount != 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
               { name: "AFK Channel", value: guild.afkChannelId != null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
             ],
