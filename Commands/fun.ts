@@ -410,10 +410,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             canvas = new Canvas(width, height)
             const ctx = getCtx(canvas)
 
-          const bg = await loadImage(img)
+            const bg = await loadImage(img)
             ctx.drawImage(bg, 0, 0, width, height)
 
-          const texts = text.split(separator)
+            const texts = text.split(separator)
             texts.forEach((text, ind) => {
               const fontSize = getFontSize(text, width, height)
               ctx.font = `normal ${fontSize}px/${fontSize * (1 + offset / 2)}px LeagueSpartan`
