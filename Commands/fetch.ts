@@ -545,7 +545,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       const languageList = Object.entries(languages).map(([k, v]) => {
         return { name: v, value: k }
       }).slice(0, -2) as ApplicationCommandOptionChoice[]
-      
+
       const current = interaction.options.getFocused(true) as ApplicationCommandOptionChoice
       response = current.name == "from" ? [languageList[0]] : []
       const fuse = new Fuse(languageList.slice(1), { distance: 25, keys: ["name", "value"] })
@@ -557,7 +557,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 
     case "weather": {
       if (current.length == 0) return interaction.respond([blankInitial])
-      
+
       await axios.get(encodeURI("https://api.weatherapi.com/v1/search.json"), { params: { key: process.env.WeatherAPI, q: current } })
         .then((res: AxiosResponse) => {
           if (res.data.length == 0) return interaction.respond([blankInitial])

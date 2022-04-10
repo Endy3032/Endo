@@ -210,7 +210,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       //     ctx.fillText(keys[y][x], keyX + keyWidth / 2, keyY + getMidY(ctx, keys[y][x], keyWidth, side), keyWidth)
       //   }
       // }
-      
+
       var title = `${interaction.user.tag} | `
       let answer: string | undefined
 
@@ -409,11 +409,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           if (variant == "panik_kalm_panik") {
             canvas = new Canvas(width, height)
             const ctx = getCtx(canvas)
-            
-            const bg = await loadImage(img)
+
+          const bg = await loadImage(img)
             ctx.drawImage(bg, 0, 0, width, height)
-            
-            const texts = text.split(separator)
+
+          const texts = text.split(separator)
             texts.forEach((text, ind) => {
               const fontSize = getFontSize(text, width, height)
               ctx.font = `normal ${fontSize}px/${fontSize * (1 + offset / 2)}px LeagueSpartan`

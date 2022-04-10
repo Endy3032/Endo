@@ -50,12 +50,12 @@ export const nordChalk = {
     night2: chalkLog.hex("4B5262"),
     night3: chalkLog.hex("535C6E"),
     night4: chalkLog.hex("5C667A"),
-    
+
     // Snow Storm
     storm1: chalkLog.hex("E8EEF9"),
     storm2: chalkLog.hex("F5F9F0"),
     storm3: chalkLog.hex("FCFFF4"),
-    
+
     // Frost
     frost1: chalkLog.hex("9FCCCB"),
     frost2: chalkLog.hex("98D0E0"),
