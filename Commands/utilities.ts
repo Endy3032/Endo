@@ -477,8 +477,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "Channel Stats", value: `${categoryCount != 0 ? `${categoryCount} Categories\n` : ""}${textCount != 0 ? `${textCount} Text\n` : ""}${voiceCount != 0 ? `${voiceCount} Voice\n` : ""}${stageCount != 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
               { name: "AFK Channel", value: guild.afkChannelId != null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
             ],
-            image: guild.banner ? { url: maxRes(guild.bannerURL() as string) } : undefined,
-            thumbnail: guild.iconURL() ? { url: maxRes(guild.iconURL() as string) } : undefined,
+            image: { url: maxRes(guild.bannerURL() as string) },
+            thumbnail: { url: maxRes(guild.iconURL() as string) },
             author: { name: guild.name },
             footer: { text: `Server ID • ${guild.id}` },
           }] })
@@ -487,21 +487,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
         case "user": {
           const user = await (interaction.options.getUser("target") || interaction.user).fetch()
-
-          await interaction.reply({ embeds: [{
+          const ts = Math.floor(user.createdAt.getTime() / 1000)
+          const embed = {
             color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : random.pickFromArray(colors), 16),
             fields: [
               { name: "Name", value: user.username, inline: true },
               { name: "Tag", value: user.discriminator, inline: true },
               { name: "ID", value: user.id, inline: true },
-              { name: "Banner", value: !user.banner ? user.hexAccentColor || "Default Color" : "Banner Image", inline: true }
+              { name: "Creation Date", value: `<t:${ts}:f>\n<t:${ts}:R>` }
             ],
             image: { url: maxRes(user.bannerURL() as string) },
             thumbnail: { url: maxRes(user.avatarURL() as string) },
             author: { name: "User Info" },
-            footer: { text: "Created On" },
-            timestamp: user.createdAt.toISOString(),
-          }] })
+          }
+          user.hexAccentColor ? embed.fields.push({ name: "Banner Color", value: `#${user.hexAccentColor}`, inline: true }) : null
+
+          await interaction.reply({ embeds: [embed] })
           break
         }
       }
