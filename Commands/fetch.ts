@@ -142,6 +142,60 @@ export const cmd = {
       ]
     },
     {
+      name: "facts",
+      description: "Get a fact from a magical place called the internet",
+      type: ApplicationCommandOptionType.SubcommandGroup,
+      options: [
+        {
+          name: "date",
+          description: "Get a fact about a date",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "day",
+              description: "The date's day",
+              type: ApplicationCommandOptionType.Integer,
+              min_value: 1,
+              max_value: 31,
+              required: true,
+            },
+            {
+              name: "month",
+              description: "The date's month",
+              type: ApplicationCommandOptionType.Integer,
+              min_value: 1,
+              max_value: 12,
+              required: true,
+            }
+          ]
+        },
+        {
+          name: "number",
+          description: "Get a fact about a number",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "mode",
+              description: "The fact's mode",
+              type: ApplicationCommandOptionType.String,
+              choices: [
+                { name: "Trivia", value: "trivia" },
+                { name: "Math", value: "math" },
+                { name: "Year", value: "year" },
+              ],
+              required: true,
+            },
+            {
+              name: "number",
+              description: "The fact's number",
+              type: ApplicationCommandOptionType.Integer,
+              required: true,
+            }
+          ]
+        },
+      ]
+    },
+    {
       name: "lyrics",
       description: "Fetch lyrics from Genius",
       type: ApplicationCommandOptionType.Subcommand,
@@ -245,240 +299,269 @@ export const cmd = {
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply()
-  switch (interaction.options.getSubcommand()) {
-    case "covid": {
-      var location = interaction.options.getString("location") as string
-      if (!existsSync("./Resources/Covid/cache.json") || readFileSync("./Resources/Covid/cache.json").toString().length == 0) writeFileSync("./Resources/Covid/cache.json", JSON.stringify({}))
+  switch (interaction.options.getSubcommandGroup()) {
+    case "facts": {
+      switch (interaction.options.getSubcommand()) {
+        case "date": {
+          const day = interaction.options.getInteger("day", true)
+          const month = interaction.options.getInteger("month", true)
 
-      const ts = new Date()
-      var cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
-      if (!Object.keys(cache).length || cache.timestamp < ts) {
-        var data = {}
-        const { data: cases } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/country")
-        const { data: global } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/global")
+          // const validFeb = (month == 2 && day <= 29)
+          // const valid30 = ([4, 6, 9, 11].includes(month) && day <= 30)
+          const { data } = await axios.get(`http://numbersapi.com/${month}/${day}/date`)
+          interaction.editReply(data)
+          break
+        }
 
-        data["Global"] = global as GlobalCovidCase
-        cases.forEach((country: CountryCovidCase) => {
-          data[country.country] = country
-        })
+        case "number": {
+          const mode = interaction.options.getString("mode", true)
+          const number = interaction.options.getInteger("number", true)
 
-        cache = { timestamp: ts.getTime() + 1000 * 60 * 30, ...data }
-        writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (err) => {
-          if (err) return console.error(err)
-          repCovid(interaction, cache[location], ":globe_with_meridians:")
-        })
-        return
+          const { data } = await axios.get(`http://numbersapi.com/${number}/${mode}`)
+          interaction.editReply(data)
+        }
       }
-      repCovid(interaction, cache[location])
       break
     }
 
-    case "definition": {
-      const dictionary = interaction.options.getString("dictionary") as string
-      const word = interaction.options.getString("word") as string
-      if (word == "__") return await interaction.editReply("You must specify a word to search for")
-
-      switch (dictionary) {
-        case "dictapi": {
-          await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-            .then((response: AxiosResponse) => {
-              let desc = ""
-              const { data } = response
-              data.forEach((entry: { meanings: any[] }) => {
-                entry.meanings.forEach((meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
-                  desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
-                  desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
-                  desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
-                  desc += "\n**Meanings:**\n"
-
-                  meaning.definitions.forEach((def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any }, ind: number) => {
-                    desc += `\`[${ind + 1}]\` ${def.definition}\n`
-                    desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
-                    desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
-                    desc += def.example ? `**• Example:** ${def.example}\n` : ""
-                    desc += "\n"
+    default: {
+      switch (interaction.options.getSubcommand()) {
+        case "covid": {
+          var location = interaction.options.getString("location") as string
+          if (!existsSync("./Resources/Covid/cache.json") || readFileSync("./Resources/Covid/cache.json").toString().length == 0) writeFileSync("./Resources/Covid/cache.json", JSON.stringify({}))
+    
+          const ts = new Date()
+          var cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
+          if (!Object.keys(cache).length || cache.timestamp < ts) {
+            var data = {}
+            const { data: cases } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/country")
+            const { data: global } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/global")
+    
+            data["Global"] = global as GlobalCovidCase
+            cases.forEach((country: CountryCovidCase) => {
+              data[country.country] = country
+            })
+    
+            cache = { timestamp: ts.getTime() + 1000 * 60 * 30, ...data }
+            writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (err) => {
+              if (err) return console.error(err)
+              repCovid(interaction, cache[location], ":globe_with_meridians:")
+            })
+            return
+          }
+          repCovid(interaction, cache[location])
+          break
+        }
+    
+        case "definition": {
+          const dictionary = interaction.options.getString("dictionary") as string
+          const word = interaction.options.getString("word") as string
+          if (word == "__") return await interaction.editReply("You must specify a word to search for")
+    
+          switch (dictionary) {
+            case "dictapi": {
+              await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+                .then((response: AxiosResponse) => {
+                  let desc = ""
+                  const { data } = response
+                  data.forEach((entry: { meanings: any[] }) => {
+                    entry.meanings.forEach((meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
+                      desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
+                      desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
+                      desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
+                      desc += "\n**Meanings:**\n"
+    
+                      meaning.definitions.forEach((def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any }, ind: number) => {
+                        desc += `\`[${ind + 1}]\` ${def.definition}\n`
+                        desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
+                        desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
+                        desc += def.example ? `**• Example:** ${def.example}\n` : ""
+                        desc += "\n"
+                      })
+                    })
                   })
+    
+                  const phonetics = [...new Set(data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text))].join(" - ")
+    
+                  interaction.editReply({ embeds: [{
+                    title: `${data[0].word} - ${phonetics || "—"}`,
+                    description: desc,
+                    footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
+                  }] })
                 })
+                .catch(() => {
+                  console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
+                  interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
+                })
+              break
+            }
+    
+            case "urban": {
+              await urban.define(word)
+                .then((results: any[]) => {
+                  const [result] = results
+                  let descriptionBefore = `**Definition(s)**\n${result.definition}`
+                  const descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
+    
+                  if (descriptionBefore.length + descriptionAfter.length > 4096) {
+                    descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
+                  }
+    
+                  const description = descriptionBefore + descriptionAfter
+    
+                  interaction.editReply({ embeds: [{
+                    title: word,
+                    url: result.permalink,
+                    description,
+                    author: { name: `Urban Dictionary - ${result.author}` },
+                    footer: { text: `Definition ID • ${result.defid} | Written on` },
+                    timestamp: new Date(result.written_on).toISOString()
+                  }] })
+                })
+                .catch(() => {
+                  console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
+                  interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
+                })
+              break
+            }
+          }
+          break
+        }
+    
+        case "lyrics": {
+          const id = interaction.options.getString("song")
+          const request: AxiosRequestConfig = {
+            method: "GET",
+            url: `https://api.genius.com/songs/${id}`,
+            params: { access_token: process.env.GeniusClientAccess },
+          }
+    
+          const lyrics = await getLyrics(`https://genius.com/songs/${id}`)
+            .catch(() => {return interaction.editReply(`The song ${id} was not found. Select one from the list next time.`)})
+    
+          await axios.request(request)
+            .then((response: AxiosResponse) => {
+              const { song: data } = response.data.response
+              let title: string
+    
+              interaction.editReply({ embeds: [{
+                title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 99) + "…" : title,
+                description: lyrics || "No lyrics",
+                thumbnail: { url: data.song_art_image_url },
+                footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
+                timestamp: new Date(data.release_date).toISOString(),
+              }] })
+            })
+    
+          break
+        }
+    
+        case "translation": {
+          const [src, dst, txt] = [interaction.options.getString("from") || "auto", interaction.options.getString("to"), interaction.options.getString("text")] as string[]
+          googtrans(txt, { from: src, to: dst })
+            .then(result => {
+              interaction.editReply({ embeds: [{
+                title: "Translation",
+                fields: [
+                  { name: `From ${googtrans.languages[result.from.language.iso]}`, value: `${txt}` },
+                  { name: `To ${googtrans.languages[dst]}`, value: `${result.text}` },
+                ]
+              }] })
+            })
+            .catch((err: Error) => {
+              return handleError(interaction, err as Error, "Translation")
+            })
+    
+          break
+        }
+    
+        case "weather": {
+          const location = interaction.options.getString("location")
+          const options = interaction.options.getString("options")
+          const [unit, dist, symbol, speed] = ["imp", "both"].includes(options as string)
+            ? ["imperial", "mi", "˚F", "mi/h"]
+            : ["metric", "km", "˚C", "m/s"]
+    
+          await axios.get(encodeURI("https://api.weatherapi.com/v1/forecast.json"), { params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" } })
+            .then((response: AxiosResponse) => {
+              const { data } = response
+              const { location: dataLoc } = data
+              const now = new Date()
+    
+              data.deviceTime = new Date(now.getTime() - now.getSeconds() * 1000 - now.getMilliseconds())
+              data.localTime = new Date(dataLoc.localtime)
+              data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
+    
+              data.title = `${dataLoc.name}${dataLoc.region == "" ? "" : ` - ${dataLoc.region}`} - ${dataLoc.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""})`
+    
+              const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
+              const base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
+              const astro_time: number[] = []
+              const aqi_ratings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
+    
+              times.forEach((time: string, ind: number) => {
+                var hr = parseInt(time.slice(0, 2)) - data.tz
+                if (time.endsWith("PM")) hr += 12
+                const mn = parseInt(time.slice(3, 5))
+    
+                astro_time.push(new Date(base.getTime() + (hr * 3600 + mn * 60) * 1000).getTime() / 1000)
+                if (time.startsWith("0")) times[ind] = time.slice(1)
               })
-
-              const phonetics = [...new Set(data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text))].join(" - ")
-
-              interaction.editReply({ embeds: [{
-                title: `${data[0].word} - ${phonetics || "—"}`,
-                description: desc,
-                footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
-              }] })
-            })
-            .catch(() => {
-              console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
-              interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
-            })
-          break
-        }
-
-        case "urban": {
-          await urban.define(word)
-            .then((results: any[]) => {
-              const [result] = results
-              let descriptionBefore = `**Definition(s)**\n${result.definition}`
-              const descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
-
-              if (descriptionBefore.length + descriptionAfter.length > 4096) {
-                descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
+              const isMetric = unit == "metric"
+              // Data Provided by <:WeatherAPI:932557801153241088> [WeatherAPI](https://www.weatherapi.com/)
+              const weatherEmbed = {
+                title: data.title,
+                color: parseInt(random.pickFromArray(colors), 16),
+                description: `${data.current.condition.text}\n\n\`\`\`Weather\`\`\``,
+                fields: [
+                  { name: "Temperature   ", value: `${isMetric ? data.current.temp_c : data.current.temp_f}${symbol}`, inline: true },
+                  { name: "Feels Like   ", value: `${isMetric ? data.current.feelslike_c : data.current.feelslike_f}${symbol}`, inline: true },
+                  { name: "Min/Max Temp", value: `${isMetric ? data.forecast.forecastday[0].day.mintemp_c : data.forecast.forecastday[0].day.mintemp_f}/${isMetric ? data.forecast.forecastday[0].day.maxtemp_c : data.forecase.forecaseday[0].day.maxtemp_f}${symbol}`, inline: true },
+                  { name: "Pressure", value: isMetric ? `${data.current.pressure_mb}hPa` : `${data.current.pressure_in}in`, inline: true },
+                  { name: "Humidity", value: `${data.current.humidity}%`, inline: true },
+                  { name: "Clouds", value: `${data.current.cloud}%`, inline: true },
+                  { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚ ${data.current.wind_dir}`, inline: true },
+                  { name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
+                  { name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
+                  { name: "Sunrise", value: `${times[0]}\n(<t:${astro_time[0]}:t> Here)`, inline: true },
+                  { name: "Sunset", value: `${times[1]}\n(<t:${astro_time[1]}:t> Here)`, inline: true },
+                  { name: "UV Index", value: `${data.current.uv}`, inline: true },
+                  { name: "Moonrise", value: `${times[2]}\n(<t:${astro_time[2]}:t> Here)`, inline: true },
+                  { name: "Moonset", value: `${times[3]}\n(<t:${astro_time[3]}:t> Here)`, inline: true },
+                  { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illuminated`, inline: true },
+                ],
+                thumbnail: { url: `https:${data.current.condition.icon}` },
+                footer: { text: "Source • WeatherAPI | Timestamp", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
+                timestamp: new Date().toISOString(),
               }
-
-              const description = descriptionBefore + descriptionAfter
-
-              interaction.editReply({ embeds: [{
-                title: word,
-                url: result.permalink,
-                description,
-                author: { name: `Urban Dictionary - ${result.author}` },
-                footer: { text: `Definition ID • ${result.defid} | Written on` },
-                timestamp: new Date(result.written_on).toISOString()
-              }] })
+    
+              if (["aq", "both"].includes(options as string)) {
+                weatherEmbed.fields.push(
+                  { name: "\u200b", value: "```Air Quality```", inline: false },
+                  { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },
+                  { name: "UK Defra Rating", value: `${aqi_ratings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk`, inline: true },
+                  { name: "\u200b", value: "\u200b", inline: true },
+                  { name: "CO", value: `${data.current.air_quality.co.toFixed(1)} μg/m³`, inline: true },
+                  { name: "O₃", value: `${data.current.air_quality.o3.toFixed(1)} μg/m³`, inline: true },
+                  { name: "NO₂", value: `${data.current.air_quality.no2.toFixed(1)} μg/m³`, inline: true },
+                  { name: "SO₂", value: `${data.current.air_quality.so2.toFixed(1)} μg/m³`, inline: true },
+                  { name: "PM 2.5", value: `${data.current.air_quality.pm2_5.toFixed(1)} μg/m³`, inline: true },
+                  { name: "PM 10", value: `${data.current.air_quality.pm10.toFixed(1)} μg/m³`, inline: true },
+                )
+              }
+    
+              interaction.editReply({ embeds: [weatherEmbed] })
             })
-            .catch(() => {
-              console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
-              interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
+            .catch(e => {
+              handleError(interaction, e, "Weather")
+              interaction.editReply({ content: e.response.data.error.code == 1006
+                ? `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`
+                : `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`
+              })
             })
           break
         }
       }
-      break
-    }
-
-    case "lyrics": {
-      const id = interaction.options.getString("song")
-      const request: AxiosRequestConfig = {
-        method: "GET",
-        url: `https://api.genius.com/songs/${id}`,
-        params: { access_token: process.env.GeniusClientAccess },
-      }
-
-      const lyrics = await getLyrics(`https://genius.com/songs/${id}`)
-        .catch(() => {return interaction.editReply(`The song ${id} was not found. Select one from the list next time.`)})
-
-      await axios.request(request)
-        .then((response: AxiosResponse) => {
-          const { song: data } = response.data.response
-          let title: string
-
-          interaction.editReply({ embeds: [{
-            title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 99) + "…" : title,
-            description: lyrics || "No lyrics",
-            thumbnail: { url: data.song_art_image_url },
-            footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
-            timestamp: new Date(data.release_date).toISOString(),
-          }] })
-        })
-
-      break
-    }
-
-    case "translation": {
-      const [src, dst, txt] = [interaction.options.getString("from") || "auto", interaction.options.getString("to"), interaction.options.getString("text")] as string[]
-      googtrans(txt, { from: src, to: dst })
-        .then(result => {
-          interaction.editReply({ embeds: [{
-            title: "Translation",
-            fields: [
-              { name: `From ${googtrans.languages[result.from.language.iso]}`, value: `${txt}` },
-              { name: `To ${googtrans.languages[dst]}`, value: `${result.text}` },
-            ]
-          }] })
-        })
-        .catch((err: Error) => {
-          return handleError(interaction, err as Error, "Translation")
-        })
-
-      break
-    }
-
-    case "weather": {
-      const location = interaction.options.getString("location")
-      const options = interaction.options.getString("options")
-      const [unit, dist, symbol, speed] = ["imp", "both"].includes(options as string)
-        ? ["imperial", "mi", "˚F", "mi/h"]
-        : ["metric", "km", "˚C", "m/s"]
-
-      await axios.get(encodeURI("https://api.weatherapi.com/v1/forecast.json"), { params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" } })
-        .then((response: AxiosResponse) => {
-          const { data } = response
-          const { location: dataLoc } = data
-          const now = new Date()
-
-          data.deviceTime = new Date(now.getTime() - now.getSeconds() * 1000 - now.getMilliseconds())
-          data.localTime = new Date(dataLoc.localtime)
-          data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
-
-          data.title = `${dataLoc.name}${dataLoc.region == "" ? "" : ` - ${dataLoc.region}`} - ${dataLoc.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""})`
-
-          const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
-          const base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
-          const astro_time: number[] = []
-          const aqi_ratings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
-
-          times.forEach((time: string, ind: number) => {
-            var hr = parseInt(time.slice(0, 2)) - data.tz
-            if (time.endsWith("PM")) hr += 12
-            const mn = parseInt(time.slice(3, 5))
-
-            astro_time.push(new Date(base.getTime() + (hr * 3600 + mn * 60) * 1000).getTime() / 1000)
-            if (time.startsWith("0")) times[ind] = time.slice(1)
-          })
-          const isMetric = unit == "metric"
-          // Data Provided by <:WeatherAPI:932557801153241088> [WeatherAPI](https://www.weatherapi.com/)
-          const weatherEmbed = {
-            title: data.title,
-            color: parseInt(random.pickFromArray(colors), 16),
-            description: `${data.current.condition.text}\n\n\`\`\`Weather\`\`\``,
-            fields: [
-              { name: "Temperature   ", value: `${isMetric ? data.current.temp_c : data.current.temp_f}${symbol}`, inline: true },
-              { name: "Feels Like   ", value: `${isMetric ? data.current.feelslike_c : data.current.feelslike_f}${symbol}`, inline: true },
-              { name: "Min/Max Temp", value: `${isMetric ? data.forecast.forecastday[0].day.mintemp_c : data.forecast.forecastday[0].day.mintemp_f}/${isMetric ? data.forecast.forecastday[0].day.maxtemp_c : data.forecase.forecaseday[0].day.maxtemp_f}${symbol}`, inline: true },
-              { name: "Pressure", value: isMetric ? `${data.current.pressure_mb}hPa` : `${data.current.pressure_in}in`, inline: true },
-              { name: "Humidity", value: `${data.current.humidity}%`, inline: true },
-              { name: "Clouds", value: `${data.current.cloud}%`, inline: true },
-              { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚ ${data.current.wind_dir}`, inline: true },
-              { name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
-              { name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
-              { name: "Sunrise", value: `${times[0]}\n(<t:${astro_time[0]}:t> Here)`, inline: true },
-              { name: "Sunset", value: `${times[1]}\n(<t:${astro_time[1]}:t> Here)`, inline: true },
-              { name: "UV Index", value: `${data.current.uv}`, inline: true },
-              { name: "Moonrise", value: `${times[2]}\n(<t:${astro_time[2]}:t> Here)`, inline: true },
-              { name: "Moonset", value: `${times[3]}\n(<t:${astro_time[3]}:t> Here)`, inline: true },
-              { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illuminated`, inline: true },
-            ],
-            thumbnail: { url: `https:${data.current.condition.icon}` },
-            footer: { text: "Source • WeatherAPI | Timestamp", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
-            timestamp: new Date().toISOString(),
-          }
-
-          if (["aq", "both"].includes(options as string)) {
-            weatherEmbed.fields.push(
-              { name: "\u200b", value: "```Air Quality```", inline: false },
-              { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },
-              { name: "UK Defra Rating", value: `${aqi_ratings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk`, inline: true },
-              { name: "\u200b", value: "\u200b", inline: true },
-              { name: "CO", value: `${data.current.air_quality.co.toFixed(1)} μg/m³`, inline: true },
-              { name: "O₃", value: `${data.current.air_quality.o3.toFixed(1)} μg/m³`, inline: true },
-              { name: "NO₂", value: `${data.current.air_quality.no2.toFixed(1)} μg/m³`, inline: true },
-              { name: "SO₂", value: `${data.current.air_quality.so2.toFixed(1)} μg/m³`, inline: true },
-              { name: "PM 2.5", value: `${data.current.air_quality.pm2_5.toFixed(1)} μg/m³`, inline: true },
-              { name: "PM 10", value: `${data.current.air_quality.pm10.toFixed(1)} μg/m³`, inline: true },
-            )
-          }
-
-          interaction.editReply({ embeds: [weatherEmbed] })
-        })
-        .catch(e => {
-          handleError(interaction, e, "Weather")
-          interaction.editReply({ content: e.response.data.error.code == 1006
-            ? `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`
-            : `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`
-          })
-        })
       break
     }
   }
