@@ -190,6 +190,7 @@ export const cmd = {
           description: "The location to fetch the weather data [string]",
           type: ApplicationCommandOptionType.String,
           required: true,
+          autocomplete: true,
         },
         {
           name: "options",
@@ -485,12 +486,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 export async function autocomplete(interaction: AutocompleteInteraction) {
   const current = interaction.options.getFocused() as string
-  const initial = { name: `${current || "Keep typing to continue…"}`, value: `${current || "__"}` }
+  const blankInitial = { name: "Keep typing to continue…", value: "__" }
+  const initial = { name: current || "Keep typing to continue…", value: current || "__" }
   let response: ApplicationCommandOptionChoice[] = []
 
   switch (interaction.options.getSubcommand()) {
     case "covid": {
-      response = []
       const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
@@ -533,7 +534,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
         })
 
       const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
-      const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
+      response = [...fuse.search(current).map(option => option.item)]
       response.push(...options.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
       interaction.respond(response.slice(0, 25))
       break
@@ -551,6 +552,25 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       response.push(...fuse.search(current.value as string).map(option => option.item))
       response.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
       interaction.respond(response.slice(0, 25))
+      break
+    }
+
+    case "weather": {
+      if (current.length == 0) return interaction.respond([blankInitial])
+      
+      await axios.get(encodeURI("https://api.weatherapi.com/v1/search.json"), { params: { key: process.env.WeatherAPI, q: current } })
+        .then((res: AxiosResponse) => {
+          if (res.data.length == 0) return interaction.respond([blankInitial])
+          const data: ApplicationCommandOptionChoice[] = res.data.map((option: { id: number, name: string, region: string, country: string, lat: number, lon: number, url: string }) => {
+            return { name: `${option.name}, ${option.country}`, value: `${option.lat}, ${option.lon}` }
+          })
+
+          const fuse = new Fuse(data, { distance: data.length, keys: ["name", "value"] })
+          response = [...fuse.search(current).map(option => option.item)]
+          response.push(...data.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+
+          interaction.respond(response.slice(0, 25))
+        })
       break
     }
   }
