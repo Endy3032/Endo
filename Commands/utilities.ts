@@ -465,7 +465,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
           await interaction.reply({ embeds: [{
             color: parseInt(random.pickFromArray(colors), 16),
-            description: guild.description ? `Server Description: ${guild.description}` : "Server Description: None",
+            description: guild.description ? `Server Description: ${guild.description}` : "",
             fields: [
               { name: "Owner", value: `<@${owner.id}>`, inline: true },
               { name: "Creation Date", value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:D>`, inline: true },
