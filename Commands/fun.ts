@@ -113,20 +113,20 @@ export const cmd = {
       options: [
         {
           name: "text",
-          description: "The text to make the meme",
+          description: "The meme's caption",
           type: ApplicationCommandOptionType.String,
           required: true
         },
         {
           name: "variant",
-          description: "The variant of the meme to use (leave blank for random)",
+          description: "The meme's variant (leave blank for random)",
           type: ApplicationCommandOptionType.String,
           autocomplete: true,
           required: false
         },
         {
           name: "custom_image",
-          description: "Make a meme the uploaded image (overrides variant)",
+          description: "Custom image (overrides variant)",
           type: ApplicationCommandOptionType.Attachment,
           required: false
         }
