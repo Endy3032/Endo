@@ -4,6 +4,7 @@ import { colors, nordChalk } from "./colors"
 import deployLog from "./deployLog"
 import emojis from "./emojis"
 import handleError from "./handleError"
+import maxRes from "./maxRes"
 import permissionCheck from "./permissionCheck"
 import permissions from "./permissions"
 import random from "./random"
@@ -13,6 +14,6 @@ import timestampStyler from "./timestampStyler"
 
 export {
   activities, capitalize, colors, deployLog, emojis,
-  handleError, nordChalk, permissions, permissionCheck,
+  handleError, maxRes, nordChalk, permissions, permissionCheck,
   random, rep, superEscape, timestampStyler,
 }

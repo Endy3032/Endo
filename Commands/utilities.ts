@@ -3,7 +3,7 @@ import { evaluate } from "mathjs"
 import convert from "color-convert"
 import { RGB } from "color-convert/conversions"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
-import { colors, emojis, random, superEscape, timestampStyler } from "../Modules"
+import { colors, emojis, maxRes, random, superEscape, timestampStyler } from "../Modules"
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Message } from "discord.js"
 // const { splitBar } = require("string-progressbar")
 
@@ -477,9 +477,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "Channel Stats", value: `${categoryCount != 0 ? `${categoryCount} Categories\n` : ""}${textCount != 0 ? `${textCount} Text\n` : ""}${voiceCount != 0 ? `${voiceCount} Voice\n` : ""}${stageCount != 0 ? `${stageCount} Stages\n` : ""}`, inline: true },
               { name: "AFK Channel", value: guild.afkChannelId != null ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
             ],
-            image: guild.banner ? { url: guild.bannerURL() as string } : undefined,
-            thumbnail: { url: `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=4096` },
-            author: { name: guild.name, icon_url: guild.iconURL() as string | undefined },
+            image: guild.banner ? { url: maxRes(guild.bannerURL() as string) } : undefined,
+            thumbnail: guild.iconURL() ? { url: maxRes(guild.iconURL() as string) } : undefined,
+            author: { name: guild.name },
             footer: { text: `Server ID • ${guild.id}` },
           }] })
           break
@@ -496,8 +496,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "ID", value: user.id, inline: true },
               { name: "Banner", value: !user.banner ? user.hexAccentColor || "Default Color" : "Banner Image", inline: true }
             ],
-            image: { url: user.bannerURL() as string },
-            thumbnail: { url: user.avatarURL() as string },
+            image: { url: maxRes(user.bannerURL() as string) },
+            thumbnail: { url: maxRes(user.avatarURL() as string) },
             author: { name: "User Info" },
             footer: { text: "Created On" },
             timestamp: user.createdAt.toISOString(),

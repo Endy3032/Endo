@@ -210,26 +210,28 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       //     ctx.fillText(keys[y][x], keyX + keyWidth / 2, keyY + getMidY(ctx, keys[y][x], keyWidth, side), keyWidth)
       //   }
       // }
-
-      let title: string | undefined, answer: string | undefined
+      
+      var title = `${interaction.user.tag} | `
+      let answer: string | undefined
 
       switch (interaction.options.getSubcommand()) {
         case "daily": {
-          [answer, title] = [wordle.getWord(), "Daily Wordle"]
+          [answer, title] = [wordle.getWord(), `${title}Daily Wordle`]
           break
         }
 
         case "replay": {
           const id = interaction.options.getInteger("id") as number;
-          [answer, title] = [wordle.answers[id], `Wordle #${id}`]
+          [answer, title] = [wordle.answers[id], `${title}Wordle #${id}`]
           break
         }
 
         case "random": {
-          const mode = interaction.options.getString("mode");
-          [answer, title] = mode == "random"
-            ? [random.pickFromArray(wordle.allowed), "Random Wordle"]
-            : [random.pickFromArray(wordle.answers), "Random Daily Wordle"]
+          const mode = interaction.options.getString("mode")
+          title += "Random Wordle"
+          answer = mode == "random"
+            ? random.pickFromArray(wordle.allowed)
+            : random.pickFromArray(wordle.answers)
           break
         }
       }
@@ -237,7 +239,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       const embed = {
         title,
         image: { url: "attachment://wordle.png" },
-        author: { name: interaction.user.tag, iconURL: interaction.user.avatarURL() },
         footer: { text: "6 guesses remaining" },
         timestamp: new Date().toISOString(),
       }
@@ -446,7 +447,7 @@ export async function button(interaction: ButtonInteraction) {
   if (interaction.customId.startsWith("wordle")) {
     const embed = new EmbedBuilder((interaction.message.embeds[0] as Embed).data).toJSON()
 
-    if (!embed.author?.name.includes(interaction.user.tag)) return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })
+    if (!embed.title?.includes(interaction.user.tag)) return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })
     if (interaction.customId.endsWith("giveup")) {
       embed.title += " - You Gave Up"
       embed.footer = { text: `Answer: ${(interaction.message.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId?.slice(7, 12)}` }
