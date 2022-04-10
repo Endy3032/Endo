@@ -439,7 +439,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               { name: "Pressure", value: isMetric ? `${data.current.pressure_mb}hPa` : `${data.current.pressure_in}in`, inline: true },
               { name: "Humidity", value: `${data.current.humidity}%`, inline: true },
               { name: "Clouds", value: `${data.current.cloud}%`, inline: true },
-              { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚`, inline: true },
+              { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚ ${data.current.wind_dir}`, inline: true },
               { name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
               { name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
               { name: "Sunrise", value: `${times[0]}\n(<t:${astro_time[0]}:t> Here)`, inline: true },
