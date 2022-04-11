@@ -43,7 +43,8 @@ export async function execute(client: Client) {
 
   pinger()
   reloadPresence()
-  setInterval(() => { pinger(); reloadPresence() }, 300000)
+  setInterval(() => { pinger() }, 5 * 60 * 1000)
+  setInterval(() => { reloadPresence() }, 15 * 60 * 1000)
 
   // client?.user?.setPresence(random.pickFromArray(activities))
   // clientcmd = client.application.commands.fetch()

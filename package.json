@@ -23,6 +23,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.13.0-dev.1649117272-905a6a1",
     "@discordjs/rest": "^0.3.0",
+    "@js-temporal/polyfill": "^0.4.0",
     "@sapphire/snowflake": "^3.2.1",
     "@vitalets/google-translate-api": "^8.0.0",
     "axios": "^0.26.1",
