@@ -2,6 +2,7 @@ import axios from "axios"
 import { evaluate } from "mathjs"
 import convert from "color-convert"
 import { RGB } from "color-convert/conversions"
+import { Temporal } from "@js-temporal/polyfill"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
 import { colors, emojis, maxRes, random, superEscape, timestampStyler } from "../Modules"
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Emoji, Message } from "discord.js"
@@ -442,7 +443,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           { name: "HSV", value: `${hsv[0]}, ${hsv[1]}, ${hsv[2]}`, inline: true },
         ],
         thumbnail: { url: `https://dummyimage.com/128/${hex}/${hex}.png` },
-        timestamp: new Date().toISOString(),
+        timestamp: Temporal.Now.instant().toString(),
       }] })
       break
     }
@@ -747,17 +748,17 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         }
 
         case "timestamp": {
-          const ms = interaction.options.getInteger("millisecond") || 0 as number
-          const s = interaction.options.getInteger("second") || 0 as number
-          const m = interaction.options.getInteger("minute") || 0 as number
-          const h = interaction.options.getInteger("hour") || 0 as number
-          const d = interaction.options.getInteger("day") || 1 as number
-          const mo = (interaction.options.getInteger("month") || 1) - 1 as number
-          const y = interaction.options.getInteger("year") as number
-          let date = new Date(y, mo, d, h, m, s, ms)
-          if (date.toString() == "Invalid Date") {date = new Date(y < 0 ? -8640000000000000 : 8640000000000000)}
-          const timestamp = date.getTime()
-          await interaction.reply({ content: `**Date** • ${date}\n**Timestamp** • ${Math.floor(timestamp/1000)}(${String(date.getMilliseconds()).padStart(3, "0")})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`, ephemeral: true })
+          const millisecond = interaction.options.getInteger("millisecond") || 0 as number
+          const second = interaction.options.getInteger("second") || 0 as number
+          const minute = interaction.options.getInteger("minute") || 0 as number
+          const hour = interaction.options.getInteger("hour") || 0 as number
+          const day = interaction.options.getInteger("day") || 1 as number
+          const month = (interaction.options.getInteger("month") || 1) - 1 as number
+          const year = interaction.options.getInteger("year") as number
+          let date: Temporal.ZonedDateTime | Temporal.Instant = Temporal.ZonedDateTime.from({ year, month, day, hour, minute, second, millisecond, timeZone: "UTC" })
+          if (date.toString() == "Invalid Date") {date = Temporal.Instant.fromEpochSeconds(year < 0 ? -8640000000000 : 8640000000000)}
+          const timestamp = date.epochSeconds
+          await interaction.reply({ content: `**Date** • ${date}\n**Timestamp** • ${Math.floor(timestamp/1000)}(${String(date.epochMilliseconds).padStart(3, "0")})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`, ephemeral: true })
           break
         }
       }

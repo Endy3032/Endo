@@ -1,6 +1,7 @@
 import axios from "axios"
 import Fuse from "fuse.js"
 import { colors, random } from "../Modules"
+import { Temporal } from "@js-temporal/polyfill"
 import { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from "discord-api-types/v10"
 import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"
 
@@ -240,7 +241,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         title,
         image: { url: "attachment://wordle.png" },
         footer: { text: "6 guesses remaining" },
-        timestamp: new Date().toISOString(),
+        timestamp: Temporal.Now.instant().toString(),
       }
 
       const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{

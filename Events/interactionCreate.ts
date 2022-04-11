@@ -1,8 +1,9 @@
 import os from "os"
 import "dotenv/config"
 import stripAnsi from "strip-ansi"
-import { APIMessage } from "discord-api-types/v10"
+import { Temporal } from "@js-temporal/polyfill"
 import { handleError, nordChalk } from "../Modules"
+import { APIEmbed, APIMessage } from "discord-api-types/v10"
 import { Interaction, BaseGuildTextChannel, ChatInputCommandInteraction, Message, MessageComponentInteraction, ModalMessageModalSubmitInteraction } from "discord.js"
 
 interface Command {
@@ -49,11 +50,11 @@ export async function execute(interaction: Interaction) {
     : "Unknown Interaction"
 
     const discordTimestamp = Math.floor(interaction.createdTimestamp / 1000)
-    const embed = {
+    const embed: APIEmbed = {
       description: stripAnsi(`**Epoch** • ${discordTimestamp}\n**Interaction** • ${intLog}`),
-      author: { name: interaction.user.tag, icon_url: interaction.user.avatarURL() },
-      footer: { text: `${interaction.guild?.name} #${(interaction.channel as BaseGuildTextChannel).name}` || "**DM**", icon_url: interaction.guild?.iconURL() || null },
-      timestamp: new Date(interaction.createdTimestamp).toISOString()
+      author: { name: interaction.user.tag, icon_url: interaction.user.avatarURL() || undefined },
+      footer: { text: `${interaction.guild?.name} #${(interaction.channel as BaseGuildTextChannel).name}` || "**DM**", icon_url: interaction.guild?.iconURL() || undefined },
+      timestamp: Temporal.Instant.fromEpochMilliseconds(interaction.createdTimestamp).toString()
     }
 
     console.botLog(author + intLog, "INFO", embed)

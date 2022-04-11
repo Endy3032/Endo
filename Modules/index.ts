@@ -11,9 +11,10 @@ import random from "./random"
 import rep from "./rep"
 import superEscape from "./superEscape"
 import timestampStyler from "./timestampStyler"
+import { TimeMetric } from  "./types"
 
 export {
   activities, capitalize, colors, deployLog, emojis,
   handleError, maxRes, nordChalk, permissions, permissionCheck,
-  random, rep, superEscape, timestampStyler,
+  random, rep, superEscape, timestampStyler, TimeMetric
 }

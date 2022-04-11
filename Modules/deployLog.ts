@@ -1,7 +1,8 @@
 import { nordChalk } from "./colors"
+import { Temporal } from "@js-temporal/polyfill"
 
 export default (tag: string, content: string) => {
-  const logTime = new Date().toLocaleString("default", {
+  const logTime = Temporal.Now.instant().toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric",
     month: "2-digit",

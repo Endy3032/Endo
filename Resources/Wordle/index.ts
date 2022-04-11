@@ -1,3 +1,6 @@
+import { TimeMetric } from "../../Modules"
+import { Temporal } from "@js-temporal/polyfill"
+
 const answers = [
   "cigar",
   "rebut",
@@ -12954,8 +12957,8 @@ const allowed = [
 allowed.push(...answers)
 
 function getWord() {
-  const a = new Date().getTime()
-  return answers[Math.floor(a/86400000) - 18797]
+  const a = Temporal.Now.instant().epochSeconds
+  return answers[Math.floor(a/TimeMetric.s2day) - 18796]
 }
 
 const colors = {
@@ -12967,16 +12970,6 @@ const colors = {
   correct: "#538D4E",
   text: "#FFFFFF"
 }
-
-// colors = {
-//   background: "#0E1420",
-//   tilebg: "#2E3440",
-//   keybg: "#1E2430",
-//   present: "#EBCB8B",
-//   absent: "#2E3440",
-//   correct: "#A3BE8C",
-//   text: "#ECEFF4"
-// }
 
 interface WordleCanvas {
   width: number

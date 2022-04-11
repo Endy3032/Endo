@@ -2,6 +2,7 @@ import "dotenv/config"
 import keepAlive from "./server"
 import stripAnsi from "strip-ansi"
 import { APIEmbed } from "discord-api-types/v10"
+import { Temporal } from "@js-temporal/polyfill"
 import { capitalize, nordChalk } from "./Modules"
 import { createWriteStream, readdirSync } from "fs"
 import { Client, Collection, GatewayIntentBits, Options, Partials, BaseGuildTextChannel } from "discord.js"
@@ -22,8 +23,8 @@ const client = new Client({
 
 const logStream = createWriteStream("./Logs/discord.log", { flags: "a" })
 console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) => {
-  const date = new Date()
-  const epoch = date.getTime()
+  const date = Temporal.Now.instant()
+  const epoch = date.epochMilliseconds
   const channel = client.channels.cache.get(process.env.Log as string) as BaseGuildTextChannel
   content = content.replaceAll(process.cwd(), "EndyJS").replaceAll("    ", "  ")
   logLevel = logLevel.toLowerCase()
@@ -54,11 +55,11 @@ console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) =>
   if (!embed) {
     embed = {
       description: `**Timestamp** • ${epoch}\n**${capitalize(logLevel)}**${logLevel.includes("WARN") ? `\`\`\`${content}\`\`\`` : ` • ${content}`}`,
-      timestamp: date.toISOString()
+      timestamp: date.toString()
     }
   }
 
-  if (!embed.timestamp) embed.timestamp = date.toISOString()
+  if (!embed.timestamp) embed.timestamp = date.toString()
   if (!embed.description?.includes("**Timestamp** • ")) embed.description = `**Timestamp** • ${epoch}\n${embed.description}`
   try {channel.send({ embeds: [embed] })}
   catch {(err: { stack: any }) => channel.send(`**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\``)}
