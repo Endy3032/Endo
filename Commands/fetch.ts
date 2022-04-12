@@ -487,9 +487,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             .then((response: AxiosResponse) => {
               const { data } = response
               const { location: dataLoc } = data
-              const now = new Date()
+              const now = Temporal.Now.instant()
 
-              data.deviceTime = new Date(now.getTime() - now.getSeconds() * 1000 - now.getMilliseconds())
+              data.deviceTime = Temporal.Instant.fromEpochSeconds(now.epochSeconds - now.toZonedDateTimeISO("UTC").second)
               data.localTime = new Date(dataLoc.localtime)
               data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
 

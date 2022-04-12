@@ -183,35 +183,6 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   switch(interaction.options.getSubcommandGroup()) {
     case "wordle": {
-      // const { width, height, space, side, keyFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
-
-      // const canvas = new Canvas(width, height)
-      // const ctx = getCtx(canvas)
-      // ctx.font = `normal ${keyFont}px ClearSans`
-
-      // ctx.fillStyle = wordle.colors.background
-      // ctx.fillRect(0, 0, width, height)
-
-      // ctx.fillStyle = wordle.colors.tilebg
-      // for (let y = 0; y < 6; y++) {
-      //   for (let x = 0; x < 5; x++) {
-      //     ctx.fillRect(tileStartingX + x * (side + space), tileStartingY + y * (side + space), side, side)
-      //   }
-      // }
-
-      // for (let y = 0; y < 3; y++) {
-      //   for (let x = 0; x < keys[y].length; x++) {
-      //     ctx.fillStyle = wordle.colors.keybg
-      //     const keyStartingX = (width - (keyWidth * keys[y].length + space * (keys[y].length - 1)))/2
-      //     const keyX = keyStartingX + x * (keyWidth + space)
-      //     const keyY = keyStartingY + y * (side + space)
-      //     ctx.fillRect(keyX, keyY, keyWidth, side)
-
-      //     ctx.fillStyle = wordle.colors.text
-      //     ctx.fillText(keys[y][x], keyX + keyWidth / 2, keyY + getMidY(ctx, keys[y][x], keyWidth, side), keyWidth)
-      //   }
-      // }
-
       var title = `${interaction.user.tag} | `
       let answer: string | undefined
 
@@ -257,7 +228,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             type: ComponentType.Button,
             style: ButtonStyle.Danger,
             label: "Give Up",
-            custom_id: "wordle_giveup"
+            custom_id: `wordle_${(answer as string).toUpperCase()}_giveup`
           }
         ]
       }]
@@ -450,9 +421,7 @@ export async function button(interaction: ButtonInteraction) {
 
     if (!embed.title?.includes(interaction.user.tag)) return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })
     if (interaction.customId.endsWith("giveup")) {
-      embed.title += " - You Gave Up"
-      embed.footer = { text: `Answer: ${(interaction.message.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId?.slice(7, 12)}` }
-      return await interaction.update({ components: [], embeds: [embed as APIEmbed] })
+      return await interaction.update({ content: `**${interaction.user.tag} Gave Up!**\n**Answer:** ${interaction.customId.slice(7, 12)}`, components: [], embeds: [] })
     }
 
     await interaction.showModal({
@@ -637,9 +606,9 @@ export async function modal(interaction: ModalMessageModalSubmitInteraction) {
     embed.title += " - You Won!"
   } else if (embed.footer.text.charAt(0) == "0") {
     embed.title += " - You Lost :("
+    embed.footer = { text: `Answer: ${answer}` }
   } else {
     return await interaction.update({ components: components, embeds: [embed], files: [attachment] })
   }
-  embed.footer = { text: `Answer: ${answer}` }
   await interaction.update({ components: [], embeds: [embed], files: [attachment] })
 }
