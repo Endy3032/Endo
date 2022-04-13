@@ -21,7 +21,7 @@ const client = new Client({
   })
 })
 
-const logStream = createWriteStream("./Logs/discord.log", { flags: "a" })
+const logStream = createWriteStream("./Resources/discord.log", { flags: "a" })
 console.botLog = async (content: string, logLevel = "info", embed?: APIEmbed) => {
   const date = Temporal.Now.instant()
   const epoch = date.epochMilliseconds
