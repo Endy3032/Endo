@@ -1,13 +1,14 @@
 import Fuse from "fuse.js"
+import wikipedia from "wikipedia"
 import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
+import { Temporal } from "@js-temporal/polyfill"
 import googtrans from "@vitalets/google-translate-api"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
 import { capitalize, colors, emojis, handleError, random } from "../Modules"
 import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
-import { Temporal } from "@js-temporal/polyfill"
 
 const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
   let timestamp: Temporal.Instant
@@ -258,41 +259,27 @@ export const cmd = {
           ],
           required: false,
         }
-        // #region current
-        // {
-        //   name: "current",
-        //   description: "Get the weather from the chosen provider",
-        //   type: ApplicationCommandOptionType.Subcommand,
-        //   options: [
-        //   ]
-        // },
-        // #endregion
-        // #region forecast
-        // {
-        //   name: "forecast",
-        //   description: "Get the forecast from the chosen provider",
-        //   type: ApplicationCommandOptionType.Subcommand,
-        //   options: [
-        //     {
-        //       name: "location",
-        //       description: "The location to get the weather data [string]",
-        //       type: ApplicationCommandOptionType.String,
-        //       required: true
-        //     },
-        //     {
-        //       name: "options",
-        //       description: "Several options to change the output",
-        //       type: ApplicationCommandOptionType.String,
-        //       choices: [
-        //         { name: "Use Imperial (˚F)", value: "imp" },
-        //         { name: "Includes Air Quality", value: "aq" },
-        //         { name: "Both", value: "both" },
-        //       ],
-        //       required: false,
-        //     }
-        //   ]
-        // }
-        // #endregion
+      ]
+    },
+    {
+      name: "wikipedia",
+      description: "Fetch a Wikipedia article",
+      type: ApplicationCommandOptionType.SubcommandGroup,
+      options: [
+        {
+          name: "search",
+          description: "Search for a Wikipedia article",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "query",
+              description: "The query to search for",
+              type: ApplicationCommandOptionType.String,
+              autocomplete: true,
+              required: true,
+            }
+          ]
+        }
       ]
     },
   ]
@@ -574,8 +561,12 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
   const initial = { name: current || "Keep typing to continue…", value: current || "__" }
   let response: ApplicationCommandOptionChoice[] = []
 
-  switch (interaction.options.getSubcommand()) {
-    case "covid": {
+  switch (interaction.options.getSubcommandGroup()) {
+    case "wikipedia": {
+      if (current.length == 0) return interaction.respond([initial])
+      const choices: ApplicationCommandOptionChoice[] = (await wikipedia.search(current, { limit: 25 })).results.map(result => {
+        return { name: result.title, value: `${result.pageid}` }
+      })
       const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
@@ -583,78 +574,91 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       break
     }
 
-    case "definition": {
-      const dict = interaction.options.getString("dictionary")
-      if (dict == "dictapi") return interaction.respond([initial])
-
-      await urban.autocomplete(current)
-        .then((autocompleteRes: string[]) => {
-          const results: ApplicationCommandOptionChoice[] = autocompleteRes.map((result: any) => {
-            return { name: `${result}`, value: `${result}` }
-          })
-
-          const fuse = new Fuse(results, { distance: 25, keys: ["name", "value"] })
-          const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
-          if (!response.includes(initial)) response.unshift(initial)
+    default: {
+      switch (interaction.options.getSubcommand()) {
+        case "covid": {
+          const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
+          response.push(...fuse.search(current as string).map(option => option.item))
+          response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
           interaction.respond(response.slice(0, 25))
-        })
-        .catch(() => interaction.respond([initial]))
-      break
-    }
+          break
+        }
 
-    case "lyrics": {
-      if (current.length == 0) return interaction.respond([initial])
+        case "definition": {
+          const dict = interaction.options.getString("dictionary")
+          if (dict == "dictapi") return interaction.respond([initial])
 
-      const options: ApplicationCommandOptionChoice[] = []
-      await axios.get("https://api.genius.com/search", { params: { access_token: process.env.GeniusClientAccess, q: current }, })
-        .then((response: AxiosResponse) => {
-          options.push(...response.data.response.hits.map((hit: { result: { title: any; artist_names: any; id: any } }) => {
-            let optName: string
-            return {
-              name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 99) + "…" : optName,
-              value: `${hit.result.id}`
-            }
-          }))
-        })
+          await urban.autocomplete(current)
+            .then((autocompleteRes: string[]) => {
+              const results: ApplicationCommandOptionChoice[] = autocompleteRes.map((result: any) => {
+                return { name: `${result}`, value: `${result}` }
+              })
 
-      const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
-      response = [...fuse.search(current).map(option => option.item)]
-      response.push(...options.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-      interaction.respond(response.slice(0, 25))
-      break
-    }
+              const fuse = new Fuse(results, { distance: 25, keys: ["name", "value"] })
+              const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
+              if (!response.includes(initial)) response.unshift(initial)
+              interaction.respond(response.slice(0, 25))
+            })
+            .catch(() => interaction.respond([initial]))
+          break
+        }
 
-    case "translation": {
-      const { languages } = googtrans
-      const languageList = Object.entries(languages).map(([k, v]) => {
-        return { name: v, value: k }
-      }).slice(0, -2) as ApplicationCommandOptionChoice[]
+        case "lyrics": {
+          if (current.length == 0) return interaction.respond([initial])
 
-      const current = interaction.options.getFocused(true) as ApplicationCommandOptionChoice
-      response = current.name == "from" ? [languageList[0]] : []
-      const fuse = new Fuse(languageList.slice(1), { distance: 25, keys: ["name", "value"] })
-      response.push(...fuse.search(current.value as string).map(option => option.item))
-      response.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-      interaction.respond(response.slice(0, 25))
-      break
-    }
+          const options: ApplicationCommandOptionChoice[] = []
+          await axios.get("https://api.genius.com/search", { params: { access_token: process.env.GeniusClientAccess, q: current }, })
+            .then((response: AxiosResponse) => {
+              options.push(...response.data.response.hits.map((hit: { result: { title: any; artist_names: any; id: any } }) => {
+                let optName: string
+                return {
+                  name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 99) + "…" : optName,
+                  value: `${hit.result.id}`
+                }
+              }))
+            })
 
-    case "weather": {
-      if (current.length == 0) return interaction.respond([blankInitial])
-
-      await axios.get(encodeURI("https://api.weatherapi.com/v1/search.json"), { params: { key: process.env.WeatherAPI, q: current } })
-        .then((res: AxiosResponse) => {
-          if (res.data.length == 0) return interaction.respond([blankInitial])
-          const data: ApplicationCommandOptionChoice[] = res.data.map((option: { id: number, name: string, region: string, country: string, lat: number, lon: number, url: string }) => {
-            return { name: `${option.name}, ${option.country}`, value: `${option.lat}, ${option.lon}` }
-          })
-
-          const fuse = new Fuse(data, { distance: data.length, keys: ["name", "value"] })
+          const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
           response = [...fuse.search(current).map(option => option.item)]
-          response.push(...data.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-
+          response.push(...options.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
           interaction.respond(response.slice(0, 25))
-        })
+          break
+        }
+
+        case "translation": {
+          const { languages } = googtrans
+          const languageList = Object.entries(languages).map(([k, v]) => {
+            return { name: v, value: k }
+          }).slice(0, -2) as ApplicationCommandOptionChoice[]
+
+          const current = interaction.options.getFocused(true) as ApplicationCommandOptionChoice
+          response = current.name == "from" ? [languageList[0]] : []
+          const fuse = new Fuse(languageList.slice(1), { distance: 25, keys: ["name", "value"] })
+          response.push(...fuse.search(current.value as string).map(option => option.item))
+          response.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+          interaction.respond(response.slice(0, 25))
+          break
+        }
+
+        case "weather": {
+          if (current.length == 0) return interaction.respond([blankInitial])
+
+          await axios.get(encodeURI("https://api.weatherapi.com/v1/search.json"), { params: { key: process.env.WeatherAPI, q: current } })
+            .then((res: AxiosResponse) => {
+              if (res.data.length == 0) return interaction.respond([blankInitial])
+              const data: ApplicationCommandOptionChoice[] = res.data.map((option: { id: number, name: string, region: string, country: string, lat: number, lon: number, url: string }) => {
+                return { name: `${option.name}, ${option.country}`, value: `${option.lat}, ${option.lon}` }
+              })
+
+              const fuse = new Fuse(data, { distance: data.length, keys: ["name", "value"] })
+              response = [...fuse.search(current).map(option => option.item)]
+              response.push(...data.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+
+              interaction.respond(response.slice(0, 25))
+            })
+          break
+        }
+      }
       break
     }
   }

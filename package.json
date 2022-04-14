@@ -44,7 +44,8 @@
     "string-progressbar": "^1.0.4",
     "strip-ansi": "^6.0.1",
     "ts-node": "^10.7.0",
-    "urban-dictionary": "^3.0.2"
+    "urban-dictionary": "^3.0.2",
+    "wikipedia": "^1.1.8"
   },
   "devDependencies": {
     "@swc/core": "^1.2.164",
