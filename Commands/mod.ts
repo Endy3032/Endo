@@ -361,8 +361,14 @@ export async function button(interaction: ButtonInteraction) {
     case "purge": {
       if (option == "none" && user == "none") {
         await (interaction.channel as GuildTextBasedChannel).bulkDelete(amount, true)
-          .then(() => {console.botLog(`Purged ${amount} messages`)})
-          .catch((err: Error) => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err.stack, "ERROR")})
+          .then(() => {
+            interaction.editReply({ content: `${interaction.message.content}\n${emojis.success.shorthand} Purged ${amount} messages` })
+            console.botLog(`Purged ${amount} messages`)
+          })
+          .catch((err: Error) => {
+            interaction.editReply({ content: `${interaction.message.content}\n${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\`` })
+            console.botLog(err.stack, "ERROR")
+          })
       } else {
         const messages = await (interaction.channel as GuildTextBasedChannel).messages.fetch({ limit: amount })
         const clearList = messages.filter(message => {
@@ -375,8 +381,15 @@ export async function button(interaction: ButtonInteraction) {
         })
 
         await (interaction.channel as GuildTextBasedChannel).bulkDelete(clearList, true)
-          .then(() => {const content = `${emojis.success.shorthand} Found and purged ${clearList.size}/${amount} messages`; interaction.followUp({ content: content, ephemeral: true }); console.botLog(content)})
-          .catch((err: Error) => {interaction.followUp({ content: `${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\``, ephemeral: true }); console.botLog(err.stack, "ERROR")})
+          .then(() => {
+            const content = `${emojis.success.shorthand} Found and purged ${clearList.size}/${amount} messages`
+            interaction.editReply({ content: `${interaction.message.content}\n${content}` })
+            console.botLog(content)
+          })
+          .catch((err: Error) => {
+            interaction.editReply({ content: `${interaction.message.content}\n${emojis.error.shorthand} Something went wrong while purging the channel\n\`\`\`${err}\`\`\`` })
+            console.botLog(err.stack, "ERROR")
+          })
       }
       break
     }

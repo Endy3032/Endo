@@ -433,7 +433,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
       await interaction.reply({ embeds: [{
         title: "Color Conversion",
-        color: parseInt((hex as string).slice(1), 16),
+        color: parseInt(hex, 16),
         fields: [
           { name: "RGB", value: `${rgb[0]}, ${rgb[1]}, ${rgb[2]}`, inline: true },
           { name: "CMYK", value: `${cmyk[0]}, ${cmyk[1]}, ${cmyk[2]}, ${cmyk[3]}`, inline: true },

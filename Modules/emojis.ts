@@ -6,7 +6,7 @@ const emojis: Emojis = {
   success: { name: "success", id: "959424285217271859" },
   warn: { name: "warn", id: "959424285162766377" },
   error: { name: "error", id: "959424285275992074" },
-  trash: { name: "trash", id: "927050313943380089" },
+  trash: { name: "trash", id: "962374647104569365" },
   WeatherAPI: { name: "WeatherAPI", id: "932557801153241088" },
 }
 
