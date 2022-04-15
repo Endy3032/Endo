@@ -1,7 +1,7 @@
 import os from "os"
 import { Client } from "discord.js"
-import { activities, nordChalk, random } from "../Modules"
 import axios, { AxiosError, AxiosResponse } from "axios"
+import { activities, nordChalk, random } from "../Modules"
 
 export const name = "ready"
 export const once = true

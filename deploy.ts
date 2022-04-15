@@ -2,7 +2,7 @@
 import fs from "fs"
 import "dotenv/config"
 import flags from "flags"
-import { deployLog } from "./Modules"
+import { nordLog } from "./Modules"
 import { REST } from "@discordjs/rest"
 import { APIApplicationCommand, APIApplicationCommandOption } from "discord-api-types/v10"
 import { ApplicationCommandOptionType } from "discord.js"
@@ -12,7 +12,7 @@ flags.parse()
 const mode = flags.get("mode")
 
 const rest = new REST({ version: "10" }).setToken(process.env.Token as string)
-deployLog("Deploy", "Refreshing application commands...")
+nordLog("Deploy", "Refreshing application commands...")
 
 function replaceDescription(cmd: APIApplicationCommand, tag: string) {
   if (cmd.type == 2 || cmd.type == 3) {cmd.name = `[${tag.charAt(0)}] ${cmd.name}`; return cmd}
@@ -34,7 +34,7 @@ async function registerCommands(cmd: APIApplicationCommand[], client: string, gu
   const route: `/${string}` = `/applications/${client}/${guildID != null ? `guilds/${guildID}/` : ""}commands`
   try {
     await rest.put(route, { body: cmd })
-      .then(() => deployLog("Deploy", `Registered ${cmd.length} ${mode} commands.`))
+      .then(() => nordLog("Deploy", `Registered ${cmd.length} ${mode} commands.`))
   } catch (err) {
     console.error(err)
   }

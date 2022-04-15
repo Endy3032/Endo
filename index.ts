@@ -1,10 +1,11 @@
 import "dotenv/config"
 import keepAlive from "./server"
 import stripAnsi from "strip-ansi"
+import { RateLimitData } from "@discordjs/rest"
 import { APIEmbed } from "discord-api-types/v10"
 import { Temporal } from "@js-temporal/polyfill"
-import { capitalize, nordChalk } from "./Modules"
 import { createWriteStream, readdirSync } from "fs"
+import { capitalize, nordChalk, nordLog } from "./Modules"
 import { Client, Collection, GatewayIntentBits, Options, Partials, BaseGuildTextChannel } from "discord.js"
 
 const client = new Client({
@@ -82,6 +83,10 @@ eventFiles.forEach(async file => {
   event.once
     ? client.once(event.name, (...args) => event.execute(...args))
     : client.on(event.name, (...args) => event.execute(...args))
+})
+
+client.rest.on("rateLimited", (rateLimit: RateLimitData) => {
+  nordLog("RateLimit", `Ends in: ${(rateLimit.timeToReset/1000).toFixed(2)}s\nRequests before blocked: ${rateLimit.limit}\nGlobal rate limit: ${rateLimit.global}`)
 })
 
 client.login(process.env.Token as string)
