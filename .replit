@@ -1,6 +1,3 @@
 [packager]
-language = "node"
+language = "node.js"
 run = "npm start"
-
-[packager.features]
-packageSearch = true
