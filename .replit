@@ -1,2 +1,6 @@
-language = "bash"
+[packager]
+language = "node"
 run = "npm start"
+
+[packager.features]
+packageSearch = true
