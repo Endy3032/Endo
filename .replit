@@ -1,3 +1,2 @@
-[packager]
 language = "node.js"
 run = "npm start"

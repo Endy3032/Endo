@@ -8,9 +8,9 @@
   },
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node --swc --transpile-only .",
+    "start": "ts-node --transpile-only .",
     "dev": "nodemon -e ts --exec \"ts-node .\"",
-    "cp": "ts-node --swc --transpile-only deploy.ts",
+    "cp": "ts-node --transpile-only deploy.ts",
     "tp": "npm run cp -- --mode='test'",
     "gp": "npm run cp -- --mode='guilds'",
     "cr": "npm run cp && npm run dev",
@@ -48,7 +48,6 @@
     "wikipedia": "^1.1.8"
   },
   "devDependencies": {
-    "@swc/core": "^1.2.164",
     "@tsconfig/node16": "^1.0.2",
     "@types/canvas-txt": "^3.0.0",
     "@types/color-convert": "^2.0.0",
