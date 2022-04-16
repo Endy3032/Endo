@@ -6,13 +6,13 @@ import { Temporal } from "@js-temporal/polyfill"
 import googtrans from "@vitalets/google-translate-api"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
-import { capitalize, colors, emojis, handleError, random } from "../Modules"
+import { capitalize, colors, emojis, handleError, random, TimeMetric } from "../Modules"
 import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
 
 const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
   let timestamp: Temporal.Instant
-  var title = `Covid Stats - Global ${msg.length > 0 ? `│${msg}` : ""}`
+  var title = `Covid Stats - Global ${msg.length > 0 ? `${msg}` : ""}`
   var fields = [
     { name: "Confirmed", value: `${covCase.totalConfirmed.toLocaleString("en")}`, inline: true },
     { name: "Deaths", value: `${covCase.totalDeaths.toLocaleString("en")}`, inline: true },
@@ -267,7 +267,7 @@ export const cmd = {
       type: ApplicationCommandOptionType.SubcommandGroup,
       options: [
         {
-          name: "search",
+          name: "article",
           description: "Search for a Wikipedia article",
           type: ApplicationCommandOptionType.Subcommand,
           options: [
@@ -332,11 +332,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             cache = { timestamp: ts.epochMilliseconds + 60 * 30, ...data }
             writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (err) => {
               if (err) return console.error(err)
-              repCovid(interaction, cache[location], ":globe_with_meridians:")
             })
-            return
           }
-          repCovid(interaction, cache[location])
+          repCovid(interaction, cache[location], location == "Global" ? ":globe_with_meridians:" : `:flag_${cache[location].countryCode.toLowerCase()}:`)
           break
         }
 
@@ -469,38 +467,37 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const [unit, dist, symbol, speed] = ["imp", "both"].includes(options as string)
             ? ["imperial", "mi", "˚F", "mi/h"]
             : ["metric", "km", "˚C", "m/s"]
+          const isMetric = unit == "metric"
 
           await axios.get(encodeURI("https://api.weatherapi.com/v1/forecast.json"), { params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" } })
             .then((response: AxiosResponse) => {
               const { data } = response
-              const { location: dataLoc } = data
+              const { location: locData } = data
               const now = Temporal.Now.instant()
 
+              data.localTime = Temporal.Instant.fromEpochSeconds(locData.localtime_epoch)
               data.deviceTime = Temporal.Instant.fromEpochSeconds(now.epochSeconds - now.toZonedDateTimeISO("UTC").second)
-              data.localTime = new Date(dataLoc.localtime)
-              data.tz = Math.round(-((data.deviceTime - data.localTime) / 60000 + data.deviceTime.getTimezoneOffset()) / 60)
+              data.tz = Temporal.TimeZone.from(locData.tz_id).getOffsetNanosecondsFor(data.localTime) / TimeMetric.nano2hour
+              data.title = `${locData.name}${locData.region == "" ? "" : ` - ${locData.region}`} - ${locData.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""})`
 
-              data.title = `${dataLoc.name}${dataLoc.region == "" ? "" : ` - ${dataLoc.region}`} - ${dataLoc.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""})`
-
+              const base = Temporal.Instant.fromEpochSeconds(data.forecast.forecastday[0].date_epoch)
+              const discordTs: number[] = []
+              const aqiRatings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
               const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
-              const base = new Date(data.forecast.forecastday[0].date_epoch * 1000)
-              const astro_time: number[] = []
-              const aqi_ratings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
 
-              times.forEach((time: string, ind: number) => {
+              discordTs.push(...times.map((time: string, ind: number) => {
                 var hr = parseInt(time.slice(0, 2)) - data.tz
                 if (time.endsWith("PM")) hr += 12
                 const mn = parseInt(time.slice(3, 5))
-
-                astro_time.push(new Date(base.getTime() + (hr * 3600 + mn * 60) * 1000).getTime() / 1000)
                 if (time.startsWith("0")) times[ind] = time.slice(1)
-              })
-              const isMetric = unit == "metric"
-              // Data Provided by <:WeatherAPI:932557801153241088> [WeatherAPI](https://www.weatherapi.com/)
+
+                return Temporal.Instant.fromEpochSeconds(base.epochSeconds + hr * TimeMetric.sec2hour + mn * TimeMetric.sec2min).epochSeconds
+              }))
+
               const weatherEmbed = {
                 title: data.title,
                 color: parseInt(random.pickFromArray(colors), 16),
-                description: `${data.current.condition.text}\n\n\`\`\`Weather\`\`\``,
+                description: `Data Provided by ${emojis.WeatherAPI.shorthand} [WeatherAPI](https://www.weatherapi.com/)\`\`\`Weather • ${data.current.condition.text}\`\`\``,
                 fields: [
                   { name: "Temperature   ", value: `${isMetric ? data.current.temp_c : data.current.temp_f}${symbol}`, inline: true },
                   { name: "Feels Like   ", value: `${isMetric ? data.current.feelslike_c : data.current.feelslike_f}${symbol}`, inline: true },
@@ -511,24 +508,20 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                   { name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚ ${data.current.wind_dir}`, inline: true },
                   { name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
                   { name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
-                  { name: "Sunrise", value: `${times[0]}\n(<t:${astro_time[0]}:t> Here)`, inline: true },
-                  { name: "Sunset", value: `${times[1]}\n(<t:${astro_time[1]}:t> Here)`, inline: true },
+                  { name: "Sunrise", value: `${times[0]}\n(<t:${discordTs[0]}:t> Here)`, inline: true },
+                  { name: "Sunset", value: `${times[1]}\n(<t:${discordTs[1]}:t> Here)`, inline: true },
                   { name: "UV Index", value: `${data.current.uv}`, inline: true },
-                  { name: "Moonrise", value: `${times[2]}\n(<t:${astro_time[2]}:t> Here)`, inline: true },
-                  { name: "Moonset", value: `${times[3]}\n(<t:${astro_time[3]}:t> Here)`, inline: true },
+                  { name: "Moonrise", value: `${times[2]}\n(<t:${discordTs[2]}:t> Here)`, inline: true },
+                  { name: "Moonset", value: `${times[3]}\n(<t:${discordTs[3]}:t> Here)`, inline: true },
                   { name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illuminated`, inline: true },
                 ],
                 thumbnail: { url: `https:${data.current.condition.icon}` },
-                footer: { text: "Source • WeatherAPI | Timestamp", icon_url: "https://cdn.discordapp.com/attachments/927068773104619570/927444221403746314/WeatherAPI.png" },
                 timestamp: Temporal.Now.instant().toString(),
               }
 
               if (["aq", "both"].includes(options as string)) {
                 weatherEmbed.fields.push(
-                  { name: "\u200b", value: "```Air Quality```", inline: false },
-                  { name: "US - EPA Rating", value: `${aqi_ratings[0][data.current.air_quality["us-epa-index"]]}`, inline: true },
-                  { name: "UK Defra Rating", value: `${aqi_ratings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk`, inline: true },
-                  { name: "\u200b", value: "\u200b", inline: true },
+                  { name: "\u200b", value: `\`\`\`Air Quality\nUS - EPA Rating • ${aqiRatings[0][data.current.air_quality["us-epa-index"]]}\nUK Defra Rating • ${aqiRatings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk\`\`\``, inline: false },
                   { name: "CO", value: `${data.current.air_quality.co.toFixed(1)} μg/m³`, inline: true },
                   { name: "O₃", value: `${data.current.air_quality.o3.toFixed(1)} μg/m³`, inline: true },
                   { name: "NO₂", value: `${data.current.air_quality.no2.toFixed(1)} μg/m³`, inline: true },
@@ -541,11 +534,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
               interaction.editReply({ embeds: [weatherEmbed] })
             })
             .catch(e => {
+              if (e.response?.data.error.code == 1006) return interaction.editReply({ content: `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?` })
               handleError(interaction, e, "Weather")
-              interaction.editReply({ content: e.response.data.error.code == 1006
-                ? `The location \`${e.config.params.q}\` was not found. Maybe check your spelling?`
-                : `There was an unknown problem responding to your requests.\n**Quick Info**\nStatus: ${e.response.status} - ${e.response.statusText}\nProvided Location: ${e.config.params.q}`
-              })
             })
           break
         }
@@ -570,7 +560,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-      interaction.respond(response.slice(0, 25))
+      if (!interaction.responded) interaction.respond(response.slice(0, 25))
       break
     }
 
@@ -580,7 +570,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
           const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
           response.push(...fuse.search(current as string).map(option => option.item))
           response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-          interaction.respond(response.slice(0, 25))
+          if (!interaction.responded) interaction.respond(response.slice(0, 25))
           break
         }
 
@@ -597,7 +587,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
               const fuse = new Fuse(results, { distance: 25, keys: ["name", "value"] })
               const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
               if (!response.includes(initial)) response.unshift(initial)
-              interaction.respond(response.slice(0, 25))
+              if (!interaction.responded) interaction.respond(response.slice(0, 25))
             })
             .catch(() => interaction.respond([initial]))
           break
@@ -621,7 +611,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
           const fuse = new Fuse(options, { distance: options.length, keys: ["name", "value"] })
           response = [...fuse.search(current).map(option => option.item)]
           response.push(...options.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-          interaction.respond(response.slice(0, 25))
+          if (!interaction.responded) interaction.respond(response.slice(0, 25))
           break
         }
 
@@ -636,7 +626,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
           const fuse = new Fuse(languageList.slice(1), { distance: 25, keys: ["name", "value"] })
           response.push(...fuse.search(current.value as string).map(option => option.item))
           response.push(...languageList.slice(1).filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-          interaction.respond(response.slice(0, 25))
+          if (!interaction.responded) interaction.respond(response.slice(0, 25))
           break
         }
 
@@ -647,14 +637,13 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
             .then((res: AxiosResponse) => {
               if (res.data.length == 0) return interaction.respond([blankInitial])
               const data: ApplicationCommandOptionChoice[] = res.data.map((option: { id: number, name: string, region: string, country: string, lat: number, lon: number, url: string }) => {
-                return { name: `${option.name}, ${option.country}`, value: `${option.lat}, ${option.lon}` }
+                return { name: `${option.name}, ${option.country}`, value: `${option.name},${option.country}`.slice(0, 100) }
               })
 
               const fuse = new Fuse(data, { distance: data.length, keys: ["name", "value"] })
               response = [...fuse.search(current).map(option => option.item)]
               response.push(...data.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-
-              interaction.respond(response.slice(0, 25))
+              if (!interaction.responded) interaction.respond(response.slice(0, 25))
             })
           break
         }
