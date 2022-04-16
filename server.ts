@@ -12,5 +12,5 @@ server.use(morgan("[:date[web]] :method :user-agent", { stream: networkLog }))
 server.all("/", (_, res) => res.sendStatus(200))
 
 export default function keepAlive() {
-  server.listen(port, () => console.tagLog("Server", "Ready"))
+  server.listen(port, () => console.localTagLog("Server", "Ready"))
 }

@@ -8,7 +8,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
 import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
 import { capitalize, colors, emojis, handleError, pickFromArray, TimeMetric } from "../Modules"
-import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
+import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction, ComponentType, APISelectMenuOption } from "discord.js"
 
 const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
   let timestamp: Temporal.Instant
@@ -45,6 +45,7 @@ const repCovid = async (interaction: ChatInputCommandInteraction, covCase: Count
 
   interaction.editReply({ embeds: [{
     title: title,
+    color: parseInt(pickFromArray(colors), 16),
     fields: fields,
     footer: { text: "Last Updated" },
     timestamp: timestamp.toString(),
@@ -314,13 +315,31 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     case "wikipedia": {
       switch (interaction.options.getSubcommand()) {
         case "article": {
-          const articleId = interaction.options.getString("query", true)
-          const page = await wikipedia.page(articleId)
-          const summary = await page.summary()
-          interaction.editReply({ embeds: [{
-            title: summary.title,
-            thumbnail: { url: summary.thumbnail.source }
-          }] })
+          const article = interaction.options.getString("query", true)
+          await wikipedia.page(article)
+            .then(async page => {
+              const summary = await page.summary()
+              const { pages: related } = await page.related()
+
+              interaction.editReply({ components: [{
+                type: ComponentType.ActionRow,
+                components: [{
+                  type: ComponentType.SelectMenu,
+                  placeholder: "Related Articles",
+                  custom_id: "wikipedia-related",
+                  options: [...related.map(page => {
+                    return { label: page.title.slice(0, 100), value: page.pageid.toString().slice(0, 100), description: page.description.slice(0, 100) }
+                  })].slice(0, 25)
+                }]
+              }], embeds: [{
+                title: summary.title,
+                url: page.fullurl,
+                description: `**\`\`\`${summary.description}\`\`\`**\n${summary.extract}`,
+                color: parseInt(pickFromArray(colors), 16),
+                thumbnail: { url: summary.thumbnail.source },
+              }] })
+            })
+            .catch(() => {return interaction.editReply(`No Wikipedia article found for ${article}`)})
           break
         }
       }
@@ -386,6 +405,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
                   interaction.editReply({ embeds: [{
                     title: `${data[0].word} - ${phonetics || "—"}`,
+                    color: parseInt(pickFromArray(colors), 16),
                     description: desc,
                     footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
                   }] })
@@ -413,6 +433,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                   interaction.editReply({ embeds: [{
                     title: word,
                     url: result.permalink,
+                    color: parseInt(pickFromArray(colors), 16),
                     description,
                     author: { name: `Urban Dictionary - ${result.author}` },
                     footer: { text: `Definition ID • ${result.defid} | Written on` },
@@ -448,6 +469,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
               interaction.editReply({ embeds: [{
                 title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 99) + "…" : title,
+                color: parseInt(pickFromArray(colors), 16),
                 description: lyrics || "No lyrics",
                 thumbnail: { url: data.song_art_image_url },
                 footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
@@ -464,6 +486,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             .then(result => {
               interaction.editReply({ embeds: [{
                 title: "Translation",
+                color: parseInt(pickFromArray(colors), 16),
                 fields: [
                   { name: `From ${googtrans.languages[result.from.language.iso]}`, value: `${txt}` },
                   { name: `To ${googtrans.languages[dst]}`, value: `${result.text}` },
@@ -576,7 +599,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
       const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-      if (!interaction.responded) interaction.respond(response.slice(0, 25))
+      if (interaction.isRepliable()) interaction.respond(response.slice(0, 25))
       break
     }
 
