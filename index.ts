@@ -86,7 +86,7 @@ eventFiles.forEach(async file => {
 })
 
 client.rest.on("rateLimited", (rateLimit: RateLimitData) => {
-  nordLog("RateLimit", `Ends in: ${(rateLimit.timeToReset/1000).toFixed(2)}s\nRequests before blocked: ${rateLimit.limit}\nGlobal rate limit: ${rateLimit.global}`)
+  console.botLog(`${nordChalk.cyan("[RateLimit]")} Ends in: ${(rateLimit.timeToReset/1000).toFixed(2)}s\nRequests left ${rateLimit.limit}\nGlobal: ${rateLimit.global}`, "WARN")
 })
 
 client.login(process.env.Token as string)

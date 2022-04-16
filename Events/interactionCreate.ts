@@ -85,5 +85,5 @@ export async function execute(interaction: Interaction) {
   }
 
   await exec(interaction)
-    .catch((err: any) => handleError(interaction, err, type))
+    .catch((err: any) => {return handleError(interaction, err, type)})
 }
