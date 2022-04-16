@@ -325,14 +325,14 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                 type: ComponentType.ActionRow,
                 components: [{
                   type: ComponentType.SelectMenu,
-                  placeholder: "Related Articles",
+                  placeholder: "Related Articles (doesnt work yet)",
                   custom_id: "wikipedia-related",
                   options: [...related.map(page => {
-                    return { label: page.title.slice(0, 100), value: page.pageid.toString().slice(0, 100), description: page.description.slice(0, 100) }
+                    return { label: page.title.replaceAll("_", " ").slice(0, 100), value: page.pageid.toString().slice(0, 100), description: page.description.slice(0, 100) }
                   })].slice(0, 25)
                 }]
               }], embeds: [{
-                title: summary.title,
+                title: summary.title.replaceAll("_", " "),
                 url: page.fullurl,
                 description: `**\`\`\`${summary.description}\`\`\`**\n${summary.extract}`,
                 color: parseInt(pickFromArray(colors), 16),
@@ -593,13 +593,13 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
   switch (interaction.options.getSubcommandGroup()) {
     case "wikipedia": {
       if (current.length == 0) return interaction.respond([initial])
-      const choices: ApplicationCommandOptionChoice[] = (await wikipedia.search(current, { limit: 25 })).results.map(result => {
+      const choices: ApplicationCommandOptionChoice[] = (await wikipedia.search(current, { limit: 20 })).results.map(result => {
         return { name: result.title, value: `${result.pageid}` }
       })
-      const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
+      const fuse = new Fuse(choices, { distance: 20, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-      if (interaction.isRepliable()) interaction.respond(response.slice(0, 25))
+      if (!interaction.responded) interaction.respond(response.slice(0, 20))
       break
     }
 
