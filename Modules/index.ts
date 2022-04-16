@@ -3,6 +3,7 @@ import capitalize from "./capitalize"
 import { colors, nordChalk } from "./colors"
 import emojis from "./emojis"
 import handleError from "./handleError"
+import { localLog, localTagLog } from "./logger"
 import maxRes from "./maxRes"
 import permissionCheck from "./permissionCheck"
 import permissions from "./permissions"
@@ -13,7 +14,7 @@ import timestampStyler from "./timestampStyler"
 import { TimeMetric } from  "./types"
 
 export {
-  activities, capitalize, colors, emojis, handleError,
-  maxRes, nordChalk, permissions, permissionCheck, pickFromArray,
-  randRange, rep, superEscape, timestampStyler, TimeMetric
+  activities, capitalize, colors, emojis, handleError, localLog,
+  localTagLog, maxRes, nordChalk, permissions, permissionCheck,
+  pickFromArray, randRange, rep, superEscape, timestampStyler, TimeMetric
 }

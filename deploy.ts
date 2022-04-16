@@ -3,15 +3,16 @@ import fs from "fs"
 import "dotenv/config"
 import flags from "flags"
 import { REST } from "@discordjs/rest"
-import { APIApplicationCommand, APIApplicationCommandOption } from "discord-api-types/v10"
+import { localTagLog } from "./Modules"
 import { ApplicationCommandOptionType } from "discord.js"
+import { APIApplicationCommand, APIApplicationCommandOption } from "discord-api-types/v10"
 
 flags.defineString("mode", "global", "The mode to deploy the commands.")
 flags.parse()
 const mode = flags.get("mode")
 
 const rest = new REST({ version: "10" }).setToken(process.env.Token as string)
-console.localTagLog("Deploy", "Refreshing application commands...")
+localTagLog("Deploy", "Refreshing application commands...")
 
 function replaceDescription(cmd: APIApplicationCommand, tag: string) {
   if (cmd.type == 2 || cmd.type == 3) {cmd.name = `[${tag.charAt(0)}] ${cmd.name}`; return cmd}
@@ -32,7 +33,7 @@ function replaceDescription(cmd: APIApplicationCommand, tag: string) {
 async function registerCommands(cmd: APIApplicationCommand[], client: string, guildID: string | null = null) {
   const route: `/${string}` = `/applications/${client}/${guildID != null ? `guilds/${guildID}/` : ""}commands`
   await rest.put(route, { body: cmd })
-    .then(() => console.localTagLog("Deploy", `Registered ${cmd.length} ${mode} commands.`))
+    .then(() => localTagLog("Deploy", `Registered ${cmd.length} ${mode} commands.`))
     .catch(err => console.error(err))
 }
 

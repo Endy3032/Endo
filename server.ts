@@ -2,6 +2,7 @@ import os from "os"
 import morgan from "morgan"
 import express from "express"
 import { createWriteStream } from "fs"
+import { localTagLog } from "./Modules"
 
 const port = 3032
 const server = express()
@@ -12,5 +13,5 @@ server.use(morgan("[:date[web]] :method :user-agent", { stream: networkLog }))
 server.all("/", (_, res) => res.sendStatus(200))
 
 export default function keepAlive() {
-  server.listen(port, () => console.localTagLog("Server", "Ready"))
+  server.listen(port, () => localTagLog("Server", "Ready"))
 }
