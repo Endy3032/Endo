@@ -1,4 +1,4 @@
-import { colors, random } from "../Modules"
+import { colors, pickFromArray } from "../Modules"
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js"
 
 export const cmd = {
@@ -44,13 +44,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const index = Math.floor(Math.random() * 300) % 3
   const question = interaction.options.getString("question") as string
-  const response = question.endsWith("\u200a") || question.startsWith("\u200a") ? random.pickFromArray(responses.yes)
-    : question.endsWith("\u200b") || question.startsWith("\u200b") ? random.pickFromArray(responses.no)
-    : random.pickFromArray(responses[Object.keys(responses)[index]])
+  const response = question.endsWith("\u200a") || question.startsWith("\u200a") ? pickFromArray(responses.yes)
+    : question.endsWith("\u200b") || question.startsWith("\u200b") ? pickFromArray(responses.no)
+    : pickFromArray(responses[Object.keys(responses)[index]])
 
   await interaction.reply({ embeds: [{
     title: "Magic 8-Ball",
-    color: parseInt(random.pickFromArray(colors), 16),
+    color: parseInt(pickFromArray(colors), 16),
     fields: [
       { name: ":question: Question", value: question, inline: false },
       { name: ":8ball: Response", value: response, inline: false }

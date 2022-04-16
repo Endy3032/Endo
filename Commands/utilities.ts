@@ -4,7 +4,7 @@ import convert from "color-convert"
 import { RGB } from "color-convert/conversions"
 import { Temporal } from "@js-temporal/polyfill"
 import { UnsafeEmbedBuilder } from "@discordjs/builders"
-import { colors, emojis, maxRes, random, superEscape, timestampStyler } from "../Modules"
+import { colors, emojis, maxRes, pickFromArray, superEscape, timestampStyler } from "../Modules"
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction, Embed, Emoji, Message } from "discord.js"
 // const { splitBar } = require("string-progressbar")
 
@@ -467,7 +467,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
 
           await interaction.reply({ embeds: [{
-            color: parseInt(random.pickFromArray(colors), 16),
+            color: parseInt(pickFromArray(colors), 16),
             description: guild.description ? `Server Description: ${guild.description}` : "",
             fields: [
               { name: "Owner", value: `<@${owner.id}>`, inline: true },
@@ -492,7 +492,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const user = await (interaction.options.getUser("target") || interaction.user).fetch()
           const ts = Math.floor(user.createdAt.getTime() / 1000)
           const embed = {
-            color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : random.pickFromArray(colors), 16),
+            color: parseInt(user.hexAccentColor ? user.hexAccentColor.slice(1) : pickFromArray(colors), 16),
             fields: [
               { name: "Name", value: user.username, inline: true },
               { name: "Tag", value: user.discriminator, inline: true },
@@ -534,7 +534,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         break
       }
 
-      for (let i = 0; i < amount; i++) embed.description += `${random.pickFromArray(choices as any[])}, `
+      for (let i = 0; i < amount; i++) embed.description += `${pickFromArray(choices as any[])}, `
       embed.description = embed.description.slice(0, -2)
 
       await interaction.reply({ embeds: [embed] })
@@ -565,7 +565,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
             await interaction.reply({ embeds: [{
               title: "Calculation",
-              color: parseInt(random.pickFromArray(colors), 16),
+              color: parseInt(pickFromArray(colors), 16),
               fields: [
                 { name: "Expression", value: `${superEscape(expression)}`, inline: false },
                 { name: "Result", value: `${superEscape(result)}`, inline: false }
@@ -582,7 +582,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
           await interaction.editReply({ content: null, embeds: [{
             title: "Pong!",
-            color: parseInt(random.pickFromArray(colors), 16),
+            color: parseInt(pickFromArray(colors), 16),
             fields: [
               { name: "Websocket Latency", value: `${interaction.client.ws.ping}ms`, inline: false },
               { name: "Roundtrip Latency", value: `${sent.createdTimestamp - interaction.createdTimestamp}ms`, inline: false }
@@ -736,7 +736,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
           //   embed = {
           //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.slice(1)}`,
-          //     color: parseInt(random.pickFromArray(colors), 16),
+          //     color: parseInt(pickFromArray(colors), 16),
           //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
           //     fields: fields,
           //     footer: { text: "Last updated" },

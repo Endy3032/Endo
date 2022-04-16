@@ -3,9 +3,11 @@ import { CommandInteraction, InteractionReplyOptions, MessageComponentInteractio
 export default async (interaction: CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction, object: InteractionReplyOptions) => {
   if (!interaction.isAutocomplete()) {
     try {
-      interaction.replied || interaction.deferred
-        ? await interaction.followUp(object)
-        : await interaction.reply(object)
+      interaction.deferred
+        ? interaction.editReply(object)
+        : interaction.replied
+          ? interaction.followUp(object)
+          : interaction.reply(object)
     } catch (err) {
       console.error(`Can't respond to the interaction\n\`\`\`${(err as Error).stack}\`\`\``)
     }

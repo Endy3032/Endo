@@ -2,7 +2,9 @@
 declare global {
   interface Console {
     botLog: Function
+    localLog: Function
     tagLog: Function
+    localTagLog: Function
   }
 }
 

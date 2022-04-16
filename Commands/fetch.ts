@@ -6,8 +6,8 @@ import { Temporal } from "@js-temporal/polyfill"
 import googtrans from "@vitalets/google-translate-api"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
-import { capitalize, colors, emojis, handleError, random, TimeMetric } from "../Modules"
 import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
+import { capitalize, colors, emojis, handleError, pickFromArray, TimeMetric } from "../Modules"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js"
 
 const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
@@ -311,6 +311,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       break
     }
 
+    case "wikipedia": {
+      switch (interaction.options.getSubcommand()) {
+        case "article": {
+          const articleId = interaction.options.getString("query", true)
+          const page = await wikipedia.page(articleId)
+          const summary = await page.summary()
+          interaction.editReply({ embeds: [{
+            title: summary.title,
+            thumbnail: { url: summary.thumbnail.source }
+          }] })
+          break
+        }
+      }
+      break
+    }
+
     default: {
       switch (interaction.options.getSubcommand()) {
         case "covid": {
@@ -496,7 +512,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
               const weatherEmbed = {
                 title: data.title,
-                color: parseInt(random.pickFromArray(colors), 16),
+                color: parseInt(pickFromArray(colors), 16),
                 description: `Data Provided by ${emojis.WeatherAPI.shorthand} [WeatherAPI](https://www.weatherapi.com/)\`\`\`Weather • ${data.current.condition.text}\`\`\``,
                 fields: [
                   { name: "Temperature   ", value: `${isMetric ? data.current.temp_c : data.current.temp_f}${symbol}`, inline: true },

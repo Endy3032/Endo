@@ -1,7 +1,7 @@
 import os from "os"
 import morgan from "morgan"
 import express from "express"
-import { createWriteStream, existsSync, mkdirSync } from "fs"
+import { createWriteStream } from "fs"
 
 const port = 3032
 const server = express()

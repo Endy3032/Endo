@@ -1,7 +1,7 @@
 import os from "os"
 import { Client } from "discord.js"
 import axios, { AxiosError, AxiosResponse } from "axios"
-import { activities, nordChalk, random } from "../Modules"
+import { activities, nordChalk, pickFromArray } from "../Modules"
 
 export const name = "ready"
 export const once = true
@@ -28,7 +28,7 @@ export async function execute(client: Client) {
       localUpdated = true
       return client?.user?.setPresence({ status: "idle" })
     }
-    const activity = random.pickFromArray(activities as [any])
+    const activity = pickFromArray(activities as [any])
     const act_type = activity.activities[0]["type"]
     const act_name = activity.activities[0]["name"]
     const type_str = ["Playing", "Streaming", "Listening to", "Watching"]
@@ -46,44 +46,13 @@ export async function execute(client: Client) {
   setInterval(() => { pinger() }, 5 * 60 * 1000)
   setInterval(() => { reloadPresence() }, 15 * 60 * 1000)
 
-  // client?.user?.setPresence(random.pickFromArray(activities))
-  // clientcmd = client.application.commands.fetch()
-  // .then(cmds => console.log(cmds))
-
   client?.application?.commands.fetch()
     .then(commands => console.botLog(`${nordChalk.bright.cyan("[Global]")} Fetched ${commands.size} commands`))
     .catch(console.error)
 
   const guild = client.guilds.cache.get("864972641219248140")
-  // commands = guild.commands
+
   guild?.commands.fetch()
     .then(commands => console.botLog(`${nordChalk.bright.cyan("[ Test ]")} Fetched ${commands.size} commands`))
     .catch(console.error)
-
-  // delete_cmd = false
-  // delete_cmd ? guild.commands.set([]) : null
 }
-
-/*
-const Guilds = client.guilds.cache.map(guild => (guild.id))
-const channel = client.channels.cache.get(process.env.Log)
-
-console.log(Guilds[0])
-const guildd = client.guilds.cache.get(String(Guilds[0]))
-// console.log(guildd.members.cache.map(guild => (guild.members.username, guild.members.discriminator)))
-guildd.members.fetch()
-.then((guild) => {console.log(guild)})
-// .then((ls)=>{console.log(ls)})
-// .catch((er) => {console.error(er)})
-
-await Guilds.forEach(guildId => {
-  const guild = client.guilds.cache.get(guildId)
-  console.log('Fetching...')
-  guild.members.fetch()
-  .then(members => {
-    console.log(members)
-    // members = members.map(mem => mem.code)
-    // channel.send(`discord.gg/${invites[0]}\n`)
-  })
-  .catch((err) => {console.error(err)})
-}) */

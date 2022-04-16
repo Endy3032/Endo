@@ -1,6 +1,6 @@
 import axios from "axios"
 import Fuse from "fuse.js"
-import { colors, random } from "../Modules"
+import { colors, pickFromArray, randRange } from "../Modules"
 import { Temporal } from "@js-temporal/polyfill"
 import { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from "discord-api-types/v10"
 import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"
@@ -38,7 +38,7 @@ function getMidY(ctx: CanvasRenderingContext2D, text: string, width: number, hei
 async function sendMeme(interaction: ChatInputCommandInteraction, canvas: Canvas, variant: string, text: string, separator: string) {
   const attachment = new MessageAttachment(await canvas.png, "meme.png")
   await interaction.editReply({ files: [attachment], embeds: [{
-    color: parseInt(random.pickFromArray(colors), 16),
+    color: parseInt(pickFromArray(colors), 16),
     image: { url: "attachment://meme.png" },
     footer: variant.includes("panik_kalm_panik") && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null
   }] as APIEmbed[] })
@@ -202,8 +202,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const mode = interaction.options.getString("mode")
           title += "Random Wordle"
           answer = mode == "random"
-            ? random.pickFromArray(wordle.allowed)
-            : random.pickFromArray(wordle.answers)
+            ? pickFromArray(wordle.allowed)
+            : pickFromArray(wordle.answers)
           break
         }
       }
@@ -243,11 +243,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         case "achievement": {
           const titles = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
           const content = interaction.options.getString("content") as string
-          const icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : random.randRange(39)
-          const title = interaction.options.getString("title") != null ? interaction.options.getString("title") : random.pickFromArray(titles)
+          const icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : randRange(39)
+          const title = interaction.options.getString("title") != null ? interaction.options.getString("title") : pickFromArray(titles)
 
           await interaction.reply({ embeds: [{
-            color: parseInt(random.pickFromArray(colors), 16),
+            color: parseInt(pickFromArray(colors), 16),
             image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
           }] })
           break
@@ -279,8 +279,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
           await interaction.reply({ embeds: [{
             title: "Fact of the second...",
-            color: parseInt(random.pickFromArray(colors), 16),
-            description: random.pickFromArray(facts),
+            color: parseInt(pickFromArray(colors), 16),
+            description: pickFromArray(facts),
           }] as APIEmbed[] })
           break
         }
@@ -363,7 +363,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           const text = interaction.options.getString("text") as string
           const image = interaction.options.getAttachment("custom_image")
           const variants = fs.readdirSync("./Resources/Meme/").filter((file) => file.endsWith(".png"))
-          const variant = interaction.options.getString("variant")?.replaceAll(" ", "_") || random.pickFromArray(variants).slice(0, -4)
+          const variant = interaction.options.getString("variant")?.replaceAll(" ", "_") || pickFromArray(variants).slice(0, -4)
 
           if (image) {
             const response = await axios.get(image.url, { responseType: "arraybuffer" })
