@@ -8,7 +8,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
 import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
 import { capitalize, colors, emojis, handleError, pickFromArray, TimeMetric } from "../Modules"
-import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction, ComponentType, APISelectMenuOption } from "discord.js"
+import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction, ComponentType } from "discord.js"
 
 const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
   let timestamp: Temporal.Instant

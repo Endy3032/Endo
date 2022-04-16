@@ -18,4 +18,4 @@ export const localLog = (content: string, logLevel = "info", doLog = true) => {
   return { content: log, temporal: temporalTime }
 }
 
-export const localTagLog = (tag: string, content: string, logLevel = "info") => console.localLog(`${nordChalk.bright.cyan(`[${tag}]`)} ${content}`, logLevel)
+export const localTagLog = (tag: string, content: string, logLevel = "info") => localLog(`${nordChalk.bright.cyan(`[${tag}]`)} ${content}`, logLevel)
