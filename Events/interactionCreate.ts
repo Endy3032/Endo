@@ -62,28 +62,15 @@ export async function execute(interaction: Interaction) {
 
   const command = interaction.client.commands.get(commandName as never) as unknown as Command
 
-  var type: string | undefined
-  let exec: any
-  if (interaction.isChatInputCommand()) {
-    exec = command.execute
-    type = "Command"
-  } else if (interaction.isButton()) {
-    exec = command.button
-    type = "Button"
-  } else if (interaction.isSelectMenu()) {
-    exec = command.selectMenu
-    type = "Select"
-  } else if (interaction.isContextMenuCommand()) {
-    exec = command.ctxMenu
-    type = "CtxMenu"
-  } else if (interaction.isAutocomplete()) {
-    exec = command.autocomplete
-    type = "Autocomplete"
-  } else if (interaction.isModalSubmit()) {
-    exec = command.modal
-    type = "Modal"
-  }
+  var type: string | undefined, exec: any | undefined;
 
-  await exec(interaction)
-    .catch((err: any) => {return handleError(interaction, err, type)})
+  [exec, type] = interaction.isChatInputCommand()   ? [command.execute,      "Command"]
+    :            interaction.isContextMenuCommand() ? [command.ctxMenu,      "CtxMenu"]
+    :            interaction.isButton()             ? [command.button,       "Button"]
+    :            interaction.isSelectMenu()         ? [command.selectMenu,   "Select"]
+    :            interaction.isModalSubmit()        ? [command.modal,        "Modal"]
+    :            interaction.isAutocomplete()       ? [command.autocomplete, "Autocomplete"]
+    :                                                 [undefined, undefined]
+
+  await exec(interaction).catch((err: Error) => {return handleError(interaction, err, type)})
 }
