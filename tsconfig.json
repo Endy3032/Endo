@@ -25,10 +25,5 @@
     "logs",
     "node_modules"
   ],
-  "files": [
-    "index.ts",
-    "deploy.ts",
-    "server.ts"
-  ],
-  "include": ["Commands/**/*", "Events/*", "Modules/*", "Resources/**/*"]
+  "include": ["Commands/**/*", "Events/*", "Modules/*", "Resources/**/*", "Old/**/*"]
 }
