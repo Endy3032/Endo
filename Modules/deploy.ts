@@ -1,6 +1,9 @@
-import { configSync as dotenv } from "https://deno.land/std@0.135.0/dotenv/mod.ts"
-import * as fs from "https://deno.land/std@0.135.0/node/fs.ts"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands } from "https://deno.land/x/discordeno@13.0.0-rc35/mod.ts"
+import {
+  configSync as dotenv, // dotenv
+  readdirSync, // fs
+  ApplicationCommandOption, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot,
+  CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, // discordeno
+} from "../deps.ts"
 
 dotenv({ export: true })
 const env = Deno.env.toObject()
@@ -30,10 +33,10 @@ function replaceDescription(cmd: ApplicationCommand, tag: string) {
 
 export const deploy = async (bot: Bot, args: string[]) => {
   if (args.includes("guilds")) {
-    const guildFolders = fs.readdirSync("../Commands/Guilds")
+    const guildFolders = readdirSync("../Commands/Guilds")
     guildFolders.forEach((guildID: string) => {
       var commands = [] as ApplicationCommand[]
-      const commandFiles = fs.readdirSync(`../Commands/Guilds/${guildID}`).filter(file => file.endsWith(".ts"))
+      const commandFiles = readdirSync(`../Commands/Guilds/${guildID}`).filter(file => file.endsWith(".ts"))
 
       commandFiles.forEach(async command => {
         const { cmd } = await import(`../Commands/Guilds/${guildID}/${command}`)
@@ -47,7 +50,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
   if (args.includes("global") || args.includes("test")) {
     var testCommands = [] as ApplicationCommand[]
     var globalCommands = [] as ApplicationCommand[]
-    const commandFiles = fs.readdirSync("../Commands").filter(file => file.endsWith(".ts"))
+    const commandFiles = readdirSync("../Commands").filter(file => file.endsWith(".ts"))
 
     commandFiles.forEach(async command => {
       const { cmd } = await import(`../Commands/${command}`)
