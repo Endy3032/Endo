@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "/": "./",
+    "./": "./",
+    "Modules": "./Modules/mod.ts",
+    "axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
+    "dotenv": "https://deno.land/std@0.138.0/dotenv/mod.ts",
+    "discordeno": "https://deno.land/x/discordeno@13.0.0-rc35/mod.ts",
+    "ddenoplugins": "https://deno.land/x/discordeno@13.0.0-rc35/plugins/mod.ts"
+  }
+}

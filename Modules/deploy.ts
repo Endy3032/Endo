@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import {
-  readdirSync, // Node fs
-  createRequire, // Node modules
-  configSync as dotenv, // dotenv
-  ApplicationCommandOption, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot,
-  CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, // discordeno
-} from "../deps.ts"
+import { readdirSync } from "fs"
+import { createRequire } from "nodeModule"
+import { configSync as dotenv } from "dotenv"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, } from "discordeno"
 
 dotenv({ export: true })
 const env = Deno.env.toObject()
