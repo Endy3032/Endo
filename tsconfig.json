@@ -26,6 +26,6 @@
     "node_modules",
     "Old"
   ],
-  "files": ["deps.ts", "mod.ts"],
+  "files": ["mod.ts", "scripts.config.ts"],
   "include": ["Commands/**/*", "Events/*", "Modules/*", "Resources/**/*", "Old/**/*"]
 }

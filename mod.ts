@@ -1,8 +1,5 @@
 import { deploy } from "Modules"
-import { configSync as dotenv } from "dotenv"
 import { createBot, EventHandlers, startBot } from "discordeno"
-
-dotenv({ export: true })
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
 if (token === undefined) { throw new Error("Missing Token") }
@@ -23,3 +20,9 @@ for await (const { name: file } of Deno.readDir("./Events")) {
 
 deploy(bot, Deno.args)
 await startBot(bot)
+
+for await (const conn of Deno.listen({ port: 8080 })) {
+  for await (const req of Deno.serveHttp(conn)) {
+    req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
+  }
+}

@@ -1,15 +1,10 @@
-import { readdirSync } from "fs"
-import { createRequire } from "nodeModule"
-import { configSync as dotenv } from "dotenv"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, } from "discordeno"
 
-dotenv({ export: true })
 const env = Deno.env.toObject()
-const require = createRequire(import.meta.url)
 
 type ApplicationCommand = CreateApplicationCommand | CreateContextApplicationCommand
 
-function replaceDescription(cmd: ApplicationCommand, tag: string) {
+const replaceDescription = (cmd: ApplicationCommand, tag: string) => {
   if (cmd.type == ApplicationCommandTypes.Message || cmd.type == ApplicationCommandTypes.User) {
     cmd.name = `[${tag.charAt(0)}] ${cmd.name}`
     return cmd
@@ -30,32 +25,32 @@ function replaceDescription(cmd: ApplicationCommand, tag: string) {
   return cmd
 }
 
-export const deploy = (bot: Bot, args: string[]) => {
+export const deploy = async (bot: Bot, args: string[]) => {
   if (args.includes("guilds")) {
-    const guildFolders = readdirSync("./Commands/Guilds")
-    guildFolders.forEach((guildID: string) => {
+    const guildFolders = Deno.readDir("./Commands/Guilds")
+    for await (const { name: guildID } of guildFolders) {
       var commands = [] as ApplicationCommand[]
-      const commandFiles = readdirSync(`./Commands/Guilds/${guildID}`).filter(file => file.endsWith(".ts"))
+      const commandFiles = [...Deno.readDirSync(`./Commands/Guilds/${guildID}`)].filter((file: Deno.DirEntry) => file.name.endsWith(".ts")).map((file: Deno.DirEntry) => file.name)
 
-      commandFiles.forEach(command => {
-        const { cmd } = require(`./Commands/Guilds/${guildID}/${command}`)
+      for await (const command of commandFiles) {
+        const { cmd } = await import(`./Commands/Guilds/${guildID}/${command}`)
         commands.push(replaceDescription(cmd, "G"))
-      })
+      }
 
       upsertApplicationCommands(bot, commands, BigInt(guildID))
-    })
+    }
   }
 
   if (args.includes("global") || args.includes("test")) {
     var testCommands = [] as ApplicationCommand[]
     var globalCommands = [] as ApplicationCommand[]
-    const commandFiles = readdirSync("./Commands").filter(file => file.endsWith(".ts"))
+    const commandFiles = [...Deno.readDirSync("./Commands")].filter((file: Deno.DirEntry) => file.name.endsWith(".ts")).map((file: Deno.DirEntry) => file.name)
 
-    commandFiles.forEach(command => {
-      const { cmd } = require(`./Commands/${command}`)
+    for await (const command of commandFiles) {
+      const { cmd } = await import(`./Commands/${command}`)
       if (args.includes("global")) globalCommands.push(cmd)
       if (args.includes("test")) testCommands.push(replaceDescription(cmd, "Dev"))
-    })
+    }
 
     if (args.includes("global"))
       upsertApplicationCommands(bot, globalCommands)
