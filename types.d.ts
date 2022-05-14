@@ -3,13 +3,13 @@ import { Embed } from "discordeno"
 
 declare global {
   interface Console {
-    botLog: (content: string, logLevel?: string, embed?: Embed) => void
-    localLog: (content: string, logLevel?: string, log?: boolean) => { content: string, temporal: Temporal.Instant }
-    tagLog: (tag: string, content: string, logLevel?: string) => void
-    localTagLog: (tag: string, content: string, logLevel?: string) => void
+    botLog: (content: string, logLevel?: LogLevel, embed?: Embed) => void
+    localLog: (content: string, logLevel?: LogLevel, log?: boolean) => { content: string, temporal: Temporal.Instant }
+    tagLog: (tag: string, content: string, logLevel?: LogLevel) => void
+    localTagLog: (tag: string, content: string, logLevel?: LogLevel) => void
   }
 
-  enum nordColors {
+  enum NordColors {
     // Polar Night
     night1 = 0x2E3440,
     night2 = 0x3B4252,
@@ -43,7 +43,7 @@ declare global {
     debug = 0xD08770,
   }
 
-  enum brightNordColors {
+  enum BrightNordColors {
     // Polar Night
     night1 = 0x3E4450,
     night2 = 0x4B5262,
@@ -77,7 +77,7 @@ declare global {
     debug = 0xE09780,
   }
 
-  enum darkNordColors {
+  enum DarkNordColors {
     // Polar Night
     night1 = 0x1E2430,
     night2 = 0x2B3242,
@@ -149,4 +149,10 @@ declare global {
     sec2year = 31536000,
   }
 
+  enum LogLevel {
+    Info = "INFO",
+    Warn = "WARN",
+    Error = "ERROR",
+    Debug = "DEBUG",
+  }
 }

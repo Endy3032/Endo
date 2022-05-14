@@ -31,6 +31,7 @@ for await (const conn of listener) {
   }
 }
 
+// #region Logging stuff
 const send = async (body: CreateMessage, epoch: number) => {
   const channelID = Deno.env.get("Log")
   if (channelID === undefined) throw new Error("Log Channel ID Not Found")
@@ -38,34 +39,36 @@ const send = async (body: CreateMessage, epoch: number) => {
     .catch((err: Error) => sendMessage(bot, BigInt(channelID), { content: `**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\`` }))
 }
 
-console.localLog = (content: string, logLevel = "info", log = true) => {
-  const temporalTime = Temporal.Now.instant()
-  const logTime = temporalTime.toLocaleString("default", {
+console.localLog = (content: string, logLevel = LogLevel.Info, log = true) => {
+  const temporal = Temporal.Now.instant()
+
+  const logTime = temporal.toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric", month: "2-digit", day: "2-digit",
     hour: "2-digit", minute: "2-digit", second: "2-digit",
     hour12: false, fractionalSecondDigits: 2
   }).replace(",", "")
 
-  const logColor = nordColors[logLevel.toLowerCase()]
-  content = content.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ").replaceAll("\n", "\n                             | ")
+  const logColor = NordColors[logLevel.toLowerCase()]
 
-  const logContent = rgb24(`${logTime} ${rgb24(logLevel.padEnd(5, " ").toUpperCase(), logColor)} ${`| ${content}`}`, nordColors.blue)
-  if (log) console.log(log)
-  return { content: logContent, temporal: temporalTime }
+  content.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ").replaceAll("\n", "\n                             | ")
+  content = rgb24(`${logTime} ${rgb24(logLevel.padStart(5, " "), logColor)} | ${content}`, NordColors.blue)
+
+  if (log) console.log(content)
+  return { content, temporal }
 }
 
-console.localTagLog = (tag: string, content: string, logLevel = "info") => console.localLog(`${rgb24(`[${tag}]`, brightNordColors.cyan)} ${content}`, logLevel)
+console.localTagLog = (tag: string, content: string, logLevel = LogLevel.Info) => console.localLog(`${rgb24(`[${tag}]`, BrightNordColors.cyan)} ${content}`, logLevel)
 
-console.botLog = async (content: string, logLevel = "info", embed?: Embed) => {
-  const { content: consoleLog, temporal: date } = console.localLog(content, logLevel, false)
-  const epoch = date.epochMilliseconds
+console.botLog = async (content: string, logLevel = LogLevel.Info, embed?: Embed) => {
+  const { content: consoleLog, temporal } = console.localLog(content, logLevel, false)
+  const epoch = temporal.epochMilliseconds
 
   console.log(consoleLog)
   await Deno.writeTextFile("./Resources/discord.log", stripColor(`${consoleLog}\n`), { append: true })
   content = stripColor(content)
 
-  if (logLevel == "error") return await send({ content: `**Timestamp** • ${epoch}\`\`\`${content}\`\`\`` }, epoch)
+  if (logLevel == LogLevel.Error) return await send({ content: `**Timestamp** • ${epoch}\`\`\`${content}\`\`\`` }, epoch)
   if (content.includes("youtu.be")) return await send({ content: `**Timestamp** • ${epoch}\n**Status** • Streaming lofi - ${content.split(" Streaming lofi ")[1]}` }, epoch)
   if (!embed) {
     embed = {
@@ -77,3 +80,4 @@ console.botLog = async (content: string, logLevel = "info", embed?: Embed) => {
   if (!embed.description?.includes("**Timestamp** • ")) embed.description = `**Timestamp** • ${epoch}\n${embed.description}`
   send({ embeds: [embed] }, epoch)
 }
+// #endregion
