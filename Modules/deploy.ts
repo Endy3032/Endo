@@ -1,7 +1,7 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, } from "discordeno"
+import { getFiles } from "Modules"
+import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, } from "discordeno"
 
 const env = Deno.env.toObject()
-
 type ApplicationCommand = CreateApplicationCommand | CreateContextApplicationCommand
 
 const replaceDescription = (cmd: ApplicationCommand, tag: string) => {
@@ -11,26 +11,23 @@ const replaceDescription = (cmd: ApplicationCommand, tag: string) => {
   }
 
   cmd = cmd as CreateApplicationCommand
-  cmd.description = `[${tag}] ${cmd.description} [${tag}]`
-  cmd.options?.forEach((option: ApplicationCommandOption) => {
-    if (option.type == ApplicationCommandOptionTypes.SubCommandGroup) {
-      option.options?.forEach((suboption: ApplicationCommandOption) => {
-        suboption.description = `[${tag}] ${suboption.description} [${tag}]`
-      })
-    } else if (option.type == ApplicationCommandOptionTypes.SubCommand) {
-      option.description = `[${tag}] ${option.description} [${tag}]`
-    }
+  cmd.description = `[${tag}] ${cmd.description}`
+  cmd.options?.forEach((opt: ApplicationCommandOption) => {
+    opt.description = `[${tag}] ${opt.description} [${tag}]`
+    opt.options?.forEach((subopt: ApplicationCommandOption) => {
+      subopt.description = `[${tag}] ${subopt.description} [${tag}]`
+    })
   })
-
   return cmd
 }
 
 export const deploy = async (bot: Bot, args: string[]) => {
   if (args.includes("guilds")) {
-    const guildFolders = Deno.readDir("./Commands/Guilds")
-    for await (const { name: guildID } of guildFolders) {
+    const guildFolders = getFiles("./Commands/Guilds")
+
+    for await (const guildID of guildFolders) {
       var commands = [] as ApplicationCommand[]
-      const commandFiles = [...Deno.readDirSync(`./Commands/Guilds/${guildID}`)].filter((file: Deno.DirEntry) => file.name.endsWith(".ts")).map((file: Deno.DirEntry) => file.name)
+      const commandFiles = getFiles(`./Commands/Guilds/${guildID}`)
 
       for await (const command of commandFiles) {
         const { cmd } = await import(`./Commands/Guilds/${guildID}/${command}`)
@@ -42,22 +39,24 @@ export const deploy = async (bot: Bot, args: string[]) => {
   }
 
   if (args.includes("global") || args.includes("test")) {
+    var commands = [] as ApplicationCommand[]
     var testCommands = [] as ApplicationCommand[]
-    var globalCommands = [] as ApplicationCommand[]
-    const commandFiles = [...Deno.readDirSync("./Commands")].filter((file: Deno.DirEntry) => file.name.endsWith(".ts")).map((file: Deno.DirEntry) => file.name)
 
+    const commandFiles = getFiles("./Commands")
     for await (const command of commandFiles) {
       const { cmd } = await import(`./Commands/${command}`)
-      if (args.includes("global")) globalCommands.push(cmd)
+      if (args.includes("global")) commands.push(cmd)
       if (args.includes("test")) testCommands.push(replaceDescription(cmd, "Dev"))
     }
 
-    if (args.includes("global"))
-      upsertApplicationCommands(bot, globalCommands)
-        .then(collection => console.log(`Deployed ${collection.size} test commands`))
+    if (args.includes("global")) {
+      const deployed = await upsertApplicationCommands(bot, commands)
+      console.log(`Deployed ${deployed.size} test commands`)
+    }
 
-    if (args.includes("test"))
-      upsertApplicationCommands(bot, globalCommands, BigInt(env.TestGuild))
-        .then(collection => console.log(`Deployed ${collection.size} test commands`))
+    if (args.includes("test")) {
+      const deployed = await upsertApplicationCommands(bot, testCommands, BigInt(env.TestGuild))
+      console.log(`Deployed ${deployed.size} test commands`)
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { deploy } from "Modules"
+import { deploy, getFiles } from "Modules"
 import { createBot, EventHandlers, startBot } from "discordeno"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
@@ -12,16 +12,18 @@ const bot = createBot({
   events: {},
 })
 
-for await (const { name: file } of Deno.readDir("./Events")) {
-  if (!file.endsWith(".ts")) continue
+for await (const file of getFiles("./Events")) {
   const { name, execute } = await import(`./Events/${file}`)
   bot.events[name as keyof EventHandlers] = execute
 }
 
-deploy(bot, Deno.args)
+await deploy(bot, Deno.args)
 await startBot(bot)
 
-for await (const conn of Deno.listen({ port: 8080 })) {
+const listener = Deno.listen({ port: 8080 })
+console.log("Server Ready")
+
+for await (const conn of listener) {
   for await (const req of Deno.serveHttp(conn)) {
     req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
   }

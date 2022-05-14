@@ -5,6 +5,6 @@
     "Modules": "./Modules/mod.ts",
     "axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
     "discordeno": "https://deno.land/x/discordeno@13.0.0-rc35/mod.ts",
-    "ddenoplugins": "https://deno.land/x/discordeno@13.0.0-rc35/plugins/mod.ts"
+    "temporal": "https://esm.sh/@js-temporal/polyfill"
   }
 }
