@@ -1,6 +1,6 @@
 import { Temporal } from "temporal"
 import { rgb24, stripColor } from "colors"
-import { capitalize, deploy, getFiles } from "Modules"
+import { BrightNordColors, capitalize, deploy, getFiles, LogLevel, NordColors } from "Modules"
 import { createBot, CreateMessage, Embed, EventHandlers, sendMessage, startBot } from "discordeno"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
@@ -14,23 +14,6 @@ const bot = createBot({
   events: {},
 })
 
-for await (const file of getFiles("./Events")) {
-  const { name, execute } = await import(`./Events/${file}`)
-  bot.events[name as keyof EventHandlers] = execute
-}
-
-await deploy(bot, Deno.args)
-await startBot(bot)
-
-const listener = Deno.listen({ port: 8080 })
-console.log("Server Ready")
-
-for await (const conn of listener) {
-  for await (const req of Deno.serveHttp(conn)) {
-    req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
-  }
-}
-
 // #region Logging stuff
 const send = async (body: CreateMessage, epoch: number) => {
   const channelID = Deno.env.get("Log")
@@ -39,7 +22,7 @@ const send = async (body: CreateMessage, epoch: number) => {
     .catch((err: Error) => sendMessage(bot, BigInt(channelID), { content: `**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\`` }))
 }
 
-console.localLog = (content: string, logLevel = LogLevel.Info, log = true) => {
+console.localLog = (content: string, logLevel: LogLevel = "INFO", log = true) => {
   const temporal = Temporal.Now.instant()
 
   const logTime = temporal.toLocaleString("default", {
@@ -58,9 +41,9 @@ console.localLog = (content: string, logLevel = LogLevel.Info, log = true) => {
   return { content, temporal }
 }
 
-console.localTagLog = (tag: string, content: string, logLevel = LogLevel.Info) => console.localLog(`${rgb24(`[${tag}]`, BrightNordColors.cyan)} ${content}`, logLevel)
+console.tagLog = (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNordColors.cyan)} ${content}`, logLevel)
 
-console.botLog = async (content: string, logLevel = LogLevel.Info, embed?: Embed) => {
+console.botLog = async (content: string, logLevel: LogLevel = "INFO", embed?: Embed) => {
   const { content: consoleLog, temporal } = console.localLog(content, logLevel, false)
   const epoch = temporal.epochMilliseconds
 
@@ -68,7 +51,7 @@ console.botLog = async (content: string, logLevel = LogLevel.Info, embed?: Embed
   await Deno.writeTextFile("./Resources/discord.log", stripColor(`${consoleLog}\n`), { append: true })
   content = stripColor(content)
 
-  if (logLevel == LogLevel.Error) return await send({ content: `**Timestamp** • ${epoch}\`\`\`${content}\`\`\`` }, epoch)
+  if (logLevel == "INFO") return await send({ content: `**Timestamp** • ${epoch}\`\`\`${content}\`\`\`` }, epoch)
   if (content.includes("youtu.be")) return await send({ content: `**Timestamp** • ${epoch}\n**Status** • Streaming lofi - ${content.split(" Streaming lofi ")[1]}` }, epoch)
   if (!embed) {
     embed = {
@@ -81,3 +64,20 @@ console.botLog = async (content: string, logLevel = LogLevel.Info, embed?: Embed
   send({ embeds: [embed] }, epoch)
 }
 // #endregion
+
+for await (const file of getFiles("./Events")) {
+  const { name, execute } = await import(`./Events/${file}`)
+  bot.events[name as keyof EventHandlers] = execute
+}
+
+await deploy(bot, Deno.args)
+await startBot(bot)
+
+const listener = Deno.listen({ port: 8080 })
+console.tagLog("Ready", "Server")
+
+for await (const conn of listener) {
+  for await (const req of Deno.serveHttp(conn)) {
+    req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
+  }
+}

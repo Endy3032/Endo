@@ -1,4 +1,5 @@
 import { Temporal } from "temporal"
+import { TimeMetric } from "Modules"
 
 const answers = [
   "cigar",
@@ -12957,7 +12958,7 @@ allowed.push(...answers)
 
 function getWord() {
   const a = Temporal.Now.instant().epochSeconds
-  return answers[Math.floor(a/TimeMetric.sec2day) - 18796]
+  return answers[Math.floor(a/TimeMetric.sec2day) - 18794]
 }
 
 const colors = {

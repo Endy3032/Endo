@@ -3,8 +3,7 @@
   "compilerOptions": {
     "types": ["./types.d.ts"],
     "alwaysStrict": false,
-    "noImplicitAny": false,
-    "skipLibCheck": false
+    "noImplicitAny": false
   },
   "exclude": ["Old"],
   "files": ["mod.ts", "scripts.config.ts", "types.d.ts"],

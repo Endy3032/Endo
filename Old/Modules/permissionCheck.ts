@@ -1,9 +1,7 @@
-import emojis from "./emojis"
-import perms from "./permissions"
-import { nordChalk } from "./colors"
-import { ChatInputCommandInteraction, PermissionsBitField } from "discord.js"
+import { emojis, permissions, NordColors } from "./mod.ts"
+import { Interaction } from "discordeno"
 
-export default async (interaction: ChatInputCommandInteraction, ...permissions: bigint[]) => {
+export default async (interaction: Interaction, ...permissions: bigint[]) => {
   if (!interaction.guild) {
     await interaction.reply({ content: `${emojis.warn.shorthand} This command can only be used in servers.`, ephemeral: true })
     return true

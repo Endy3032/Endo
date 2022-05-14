@@ -6,7 +6,8 @@ const cmd = "mod.ts"
 const config: DenonConfig = {
   allow: "all",
   env: env(),
-  importMap: "imports.json",
+  importMap: "./imports.json",
+  tsconfig: "./deno.json",
   noCheck: true,
   scripts: {
     start: {

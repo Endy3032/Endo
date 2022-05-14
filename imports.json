@@ -4,9 +4,19 @@
     "./": "./",
     "Modules": "./Modules/mod.ts",
     "axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
+    "canvas": "https://deno.land/x/canvas/mod.ts",
+    "color-convert": "https://deno.land/x/color/mod.ts",
     "colors": "https://deno.land/std@0.139.0/fmt/colors.ts",
     "discordeno": "https://deno.land/x/discordeno@13.0.0-rc35/mod.ts",
+    "dom": "https://deno.land/x/deno_dom@v0.1.27-alpha/deno-dom-wasm.ts",
+    "exif": "https://deno.land/x/deno_exif@0.0.2/mod.ts",
     "fs": "https://deno.land/std@0.139.0/fs/mod.ts",
-    "temporal": "https://esm.sh/@js-temporal/polyfill"
+    "fuse": "https://esm.sh/fuse.js",
+    "google-translate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
+    "mathjs": "https://esm.sh/mathjs",
+    "progressbar": "https://esm.sh/string-progressbar",
+    "temporal": "https://esm.sh/@js-temporal/polyfill",
+    "urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
+    "wikipedia": "https://deno.land/x/denowiki@v0.2.1"
   }
 }

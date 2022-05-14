@@ -1,4 +1,4 @@
-export default (timestamp: number, mode: string) => {
+export const timestampStyler = (timestamp: number, mode: string) => {
   const ts = Math.floor(timestamp / 1000)
   switch (mode) {
     case "stime": return `<t:${ts}:t>`
