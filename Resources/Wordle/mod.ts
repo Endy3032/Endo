@@ -1,5 +1,4 @@
-import { TimeMetric } from "../../Modules"
-import { Temporal } from "@js-temporal/polyfill"
+import { Temporal } from "temporal"
 
 const answers = [
   "cigar",

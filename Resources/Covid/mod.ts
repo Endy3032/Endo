@@ -1,5 +1,4 @@
-import { ApplicationCommandOptionChoice } from "discord.js"
-import { existsSync, writeFileSync } from "fs"
+import { ApplicationCommandOptionChoice } from "discordeno"
 
 const countries = [
   "Global",
@@ -245,13 +244,13 @@ const countries = [
 var choices: ApplicationCommandOptionChoice[] = []
 const jsonFile = "./Resources/Covid/choices.json"
 
-if (!existsSync(jsonFile)) {
+try {
+  choices = JSON.parse(Deno.readTextFileSync("./choices.json"))
+} catch {
   choices.push(...countries.map(country => {
     return { name: country, value: country }
   }))
-  writeFileSync(jsonFile, JSON.stringify(choices, null, 2))
-} else {
-  choices = require("./choices.json")
+  Deno.writeTextFileSync(jsonFile, JSON.stringify(choices, null, 2))
 }
 
 type BaseCovidCase = {
@@ -285,4 +284,5 @@ interface GlobalCovidCase extends BaseCovidCase {
   created: string
 }
 
-export { choices, countries, CountryCovidCase, GlobalCovidCase }
+export { choices, countries }
+export type { CountryCovidCase, GlobalCovidCase }

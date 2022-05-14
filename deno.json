@@ -1,8 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "types": ["./types.d.ts"],
     "alwaysStrict": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "skipLibCheck": false
   },
   "exclude": ["Old"],
   "files": ["mod.ts", "scripts.config.ts", "types.d.ts"],

@@ -4,7 +4,9 @@
     "./": "./",
     "Modules": "./Modules/mod.ts",
     "axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
+    "colors": "https://deno.land/std@0.139.0/fmt/colors.ts",
     "discordeno": "https://deno.land/x/discordeno@13.0.0-rc35/mod.ts",
+    "fs": "https://deno.land/std@0.139.0/fs/mod.ts",
     "temporal": "https://esm.sh/@js-temporal/polyfill"
   }
 }
