@@ -1,4 +1,4 @@
-export enum NordColors {
+export enum Nord {
   // Polar Night
   night1 = 0x2E3440,
   night2 = 0x3B4252,
@@ -32,7 +32,7 @@ export enum NordColors {
   debug = 0xD08770,
 }
 
-export enum BrightNordColors {
+export enum BrightNord {
   // Polar Night
   night1 = 0x3E4450,
   night2 = 0x4B5262,
@@ -66,7 +66,7 @@ export enum BrightNordColors {
   debug = 0xE09780,
 }
 
-export enum DarkNordColors {
+export enum DarkNord {
   // Polar Night
   night1 = 0x1E2430,
   night2 = 0x2B3242,

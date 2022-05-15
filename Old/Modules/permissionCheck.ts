@@ -1,4 +1,4 @@
-import { emojis, permissions, NordColors } from "./mod.ts"
+import { emojis, permissions, Nord } from "./mod.ts"
 import { Interaction } from "discordeno"
 
 export default async (interaction: Interaction, ...permissions: bigint[]) => {
