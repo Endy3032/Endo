@@ -1,4 +1,5 @@
-import { ApplicationCommandTypes, Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
+import { getSubcmd, getSubcmdGroup, getValue } from "Modules"
+import { ApplicationCommandTypes, ApplicationCommandOptionTypes, Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
 
 const testGuildID = Deno.env.get("TestGuild")
 const testGuildChannel = Deno.env.get("TestChannel")
@@ -20,13 +21,13 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
       ? interaction.message?.interaction?.name
       : "null"
 
-  console.log(commandName)
+  // console.log(getSubcmd(interaction, ))
   // switch (interaction.data?.componentType) {
   //   case MessageComponentTypes.Button: {
   //     commandName = "button"
   //     break
   //   }
-  
+
   //   case MessageComponentTypes.SelectMenu: {
   //     commandName = "select"
   //     break
