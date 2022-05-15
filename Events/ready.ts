@@ -1,6 +1,6 @@
 import axiod from "axiod"
 import { bold, rgb24 } from "colors"
-import { Bot, EventHandlers, getApplicationCommands, StatusUpdate, User } from "discordeno"
+import { Bot, editBotStatus, EventHandlers, getApplicationCommands, StatusUpdate, User } from "discordeno"
 import type { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
 import { activities, BrightNord, Nord, TimeMetric } from "Modules"
 
@@ -42,9 +42,10 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
   const reloadPresence = async () => {
     const activity = activities
     if (Deno.build.os == "darwin" && localUpdated) return
+    if (Date.now() - (bot.gateway.presence?.activities[0].createdAt || 0) < 15 * TimeMetric.milli2min) return
     localUpdated = true
     logStatusChange(activity)
-    return bot.gateway.presence = activity
+    return editBotStatus(bot, activity)
   }
 
   pinger()
