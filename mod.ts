@@ -1,6 +1,6 @@
 import { Temporal } from "temporal"
 import { rgb24, stripColor } from "colors"
-import { BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "Modules"
+import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "Modules"
 import { createBot, CreateMessage, Embed, EventHandlers, sendMessage, startBot } from "discordeno"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
@@ -72,6 +72,8 @@ for await (const file of getFiles("./Events")) {
   const { name, execute } = await import(`./Events/${file}`)
   bot.events[name as keyof EventHandlers] = execute
 }
+
+bot.gateway.presence = activities
 
 await deploy(bot, Deno.args)
 await startBot(bot)

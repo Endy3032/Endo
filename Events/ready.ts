@@ -29,7 +29,11 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
     })
   }
 
-  const logStatusChange = async (activity: StatusUpdate) => {
+  const reloadPresence = async () => {
+    const activity = activities
+    if (Deno.build.os == "darwin" && localUpdated) return
+    localUpdated = true
+    editBotStatus(bot, activity)
     const act_type = activity.activities[0]["type"]
     const act_name = activity.activities[0]["name"]
     const type_str = ["Playing", "Streaming", "Listening to", "Watching"]
@@ -37,15 +41,6 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
       const res: IAxiodResponse = await axiod.get(`https://noembed.com/embed?url=${activity.activities[0].url}`)
       console.botLog(`${rgb24("[Status]", BrightNord.cyan)} ${type_str[act_type]} ${act_name} ${rgb24(`${res.data.title} • ${activity.activities[0].url?.replace("www.youtube.com/watch?v=", "youtu.be/")}`, BrightNord.cyan)}`)
     } else console.botLog(`${rgb24("[Status]", BrightNord.cyan)} ${type_str[act_type]} ${act_name}`, "INFO", { description: `**Status** • ${type_str[act_type]} ${act_name}` })
-  }
-
-  const reloadPresence = async () => {
-    const activity = activities
-    if (Deno.build.os == "darwin" && localUpdated) return
-    if (Date.now() - (bot.gateway.presence?.activities[0].createdAt || 0) < 15 * TimeMetric.milli2min) return
-    localUpdated = true
-    logStatusChange(activity)
-    return editBotStatus(bot, activity)
   }
 
   pinger()
