@@ -1,5 +1,6 @@
 import { rgb24, stripColor } from "colors"
-import { commands, imageURL, BrightNord, getSubcmd, getSubcmdGroup, toTimestamp, Command } from "Modules"
+import { commands, Command } from "/Commands/mod.ts"
+import { imageURL, BrightNord, getSubcmd, getSubcmdGroup, toTimestamp } from "Modules"
 import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, getGuild, getChannel, Embed } from "discordeno"
 
 const testGuildID = Deno.env.get("TestGuild")
@@ -68,7 +69,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
             : [console.log, "Unknown"]
 
   try {
-    if (exec !== undefined) { exec(interaction) }
+    if (exec !== undefined) { exec(bot, interaction) }
     else { console.botLog(`No ${type} function found for ${commandName}`) }
   } catch {
     console.botLog(`Failed to execute ${type} ${commandName}`)
