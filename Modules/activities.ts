@@ -1,3 +1,4 @@
+import { Temporal } from "temporal"
 import { pickFromArray } from "./random.ts"
 import { ActivityTypes, StatusUpdate } from "discordeno"
 
@@ -29,7 +30,7 @@ const getActivity = () => {
   const { name, type, url } = pickFromArray(status) as ActivityType
   return {
     name, type, url,
-    createdAt: Date.now()
+    createdAt: Temporal.Now.instant().epochMilliseconds
   }
 }
 

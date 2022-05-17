@@ -1,5 +1,6 @@
+import { Temporal } from "temporal"
 import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, maxRes, pickFromArray, colors, imageURL } from "Modules"
-import { ApplicationCommandOptionTypes, Bot, Embed, Interaction, InteractionResponseTypes, Member, User } from "discordeno"
+import { ApplicationCommandOptionTypes, Bot, DiscordUser, Embed, getUser, Interaction, InteractionResponseTypes, Member, User } from "discordeno"
 
 export const cmd = {
   name: "utils",
@@ -352,6 +353,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
         case "user": {
           const target = getValue(interaction, "target", ApplicationCommandOptionTypes.User) as { user: User, member: Member } || { user: interaction.user, member: interaction.member }
           const { user } = target
+          const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "get", bot.constants.endpoints.USER(target.user.id))
           const createdAt = toTimestamp(user.id)
           const embed: Embed = {
             color: pickFromArray(colors),
@@ -359,19 +361,24 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
               { name: "Name", value: user.username, inline: true },
               { name: "Tag", value: user.discriminator, inline: true },
               { name: "ID", value: user.id.toString(), inline: true },
-              { name: "Creation Date", value: `<t:${createdAt}:f>\n<t:${createdAt}:R>` }
+              { name: "Creation Date", value: `<t:${Math.floor(Number(createdAt / 1000n))}:f> (<t:${Math.floor(Number(createdAt / 1000n))}:R>)` }
             ],
-            // image: { url: maxRes(imageURL(user.id, user.bannerURL, "banners") as string) },
+            image: { url: maxRes(imageURL(user.id, discordUser.banner, "banners") || "") },
             thumbnail: { url: maxRes(imageURL(user.id, user.avatar, "avatars") || "") },
             author: { name: "User Info" },
+            timestamp: Temporal.Now.instant().epochMilliseconds
           }
-          console.log(user)
+
           await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
             type: InteractionResponseTypes.ChannelMessageWithSource,
             data: {
               embeds: [embed]
             }
-          })
+          }).catch(err => {console.botLog(err.message, "ERROR")})
+        }
+
+        case "server": {
+          
         }
       }
     }
