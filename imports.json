@@ -11,7 +11,6 @@
     "discordeno": "https://deno.land/x/discordeno@13.0.0-rc39/mod.ts",
     "dom": "https://deno.land/x/deno_dom@v0.1.27-alpha/deno-dom-wasm.ts",
     "exif": "https://deno.land/x/deno_exif@0.0.2/mod.ts",
-    "fs": "https://deno.land/std@0.140.0/fs/mod.ts",
     "fuse": "https://esm.sh/fuse.js",
     "google-translate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
     "mathjs": "https://esm.sh/mathjs",
