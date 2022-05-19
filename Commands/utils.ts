@@ -1,6 +1,6 @@
-import { Temporal } from "temporal"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, maxRes, pickFromArray, colors, imageURL } from "Modules"
-import { ApplicationCommandOptionTypes, Bot, DiscordUser, Embed, getUser, Interaction, InteractionResponseTypes, Member, User } from "discordeno"
+import { Color } from "color-convert"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL } from "Modules"
+import { ApplicationCommandOptionTypes, Bot, ChannelTypes, DiscordEmoji, DiscordUser, getChannels, getGuild, Interaction, InteractionResponseTypes } from "discordeno"
 
 export const cmd = {
   name: "utils",
@@ -348,37 +348,169 @@ export const cmd = {
 
 export const execute = async (bot: Bot, interaction: Interaction) => {
   switch (getSubcmdGroup(interaction)) {
+    case "color": {
+      let color: Color
+
+      switch (getSubcmd(interaction)) {
+        case "rgb": {
+          const red = getValue(interaction, "red", ApplicationCommandOptionTypes.Integer)
+          const green = getValue(interaction, "green", ApplicationCommandOptionTypes.Integer)
+          const blue = getValue(interaction, "blue", ApplicationCommandOptionTypes.Integer)
+
+          color = Color.rgb(red, green, blue)
+          break
+        }
+
+        case "decimal": {
+          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer)
+          const hex = value.toString(16).padStart(6, "0")
+          const [red, green, blue] = hex.match(/.{1,2}/g) as RegExpMatchArray
+
+          color = Color.rgb(parseInt(red), parseInt(green), parseInt(blue))
+          break
+        }
+
+        case "hex": {
+          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.String)
+          const matched = value.match(/\d{1,6}/g)?.reduce((prev, curr) => Math.abs(curr.length - 6) < Math.abs(prev.length - 6) ? curr : prev) || "000000"
+          const hex = parseInt(matched, 16)
+
+          color = Color.rgb(hex >> 16, (hex >> 8) & 0xFF, hex & 0xFF)
+          break
+        }
+
+        case "hsl": {
+          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer)
+          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer)
+          const lightness = getValue(interaction, "lightness", ApplicationCommandOptionTypes.Integer)
+
+          color = Color.hsl(hue, saturation, lightness)
+          break
+        }
+
+        case "hsv": {
+          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer)
+          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer)
+          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer)
+
+          color = Color.hsv(hue, saturation, value)
+          break
+        }
+
+        case "cmyk": {
+          const cyan = getValue(interaction, "cyan", ApplicationCommandOptionTypes.Integer)
+          const magenta = getValue(interaction, "magenta", ApplicationCommandOptionTypes.Integer)
+          const yellow = getValue(interaction, "yellow", ApplicationCommandOptionTypes.Integer)
+          const key = getValue(interaction, "key", ApplicationCommandOptionTypes.Integer)
+
+          color = Color.cmyk(cyan, magenta, yellow, key)
+          break
+        }
+
+        default: {
+          const hex = Math.floor(Math.random() * 0xFFFFFF)
+
+          color = Color.rgb(hex >> 16, (hex >> 8) & 0xFF, hex & 0xFF)
+          break
+        }
+      }
+
+      const rgb = color.rgb()
+      const cmyk = color.cmyk()
+      const hex = color.hex()
+      const hsl = color.hsl()
+      const hsv = color.hsv()
+
+      await bot.helpers.sendInteractionResponse(
+        interaction.id, interaction.token, {
+          type: InteractionResponseTypes.ChannelMessageWithSource,
+          data: {
+            embeds: [{
+              title: "Color Conversion",
+              color: color.rgbNumber(),
+              fields: [
+                { name: "RGB", value: `${rgb.red()}, ${rgb.green()}, ${rgb.blue()}`, inline: true },
+                { name: "CMYK", value: `${cmyk.cyan()}, ${cmyk.magenta()}, ${cmyk.yellow()}, ${cmyk.black()}`, inline: true },
+                { name: "Decimal", value: `${color.rgbNumber()}`, inline: true },
+                { name: "HEX", value: hex, inline: true },
+                { name: "HSL", value: `${hsl.hue()}, ${hsl.saturation()}, ${hsl.lightness()}`, inline: true },
+                { name: "HSV", value: `${hsv.hue()}, ${hsv.saturation()}, ${hsv.value()}`, inline: true },
+              ],
+              thumbnail: { url: `https://dummyimage.com/128/${hex.slice(1)}/${hex.slice(1)}.png` },
+            }]
+          }
+        }
+      )
+      break
+    }
+
     case "info": {
       switch (getSubcmd(interaction)) {
         case "user": {
-          const target = getValue(interaction, "target", ApplicationCommandOptionTypes.User) as { user: User, member: Member } || { user: interaction.user, member: interaction.member }
-          const { user } = target
-          const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "get", bot.constants.endpoints.USER(target.user.id))
-          const createdAt = toTimestamp(user.id)
-          const embed: Embed = {
-            color: pickFromArray(colors),
-            fields: [
-              { name: "Name", value: user.username, inline: true },
-              { name: "Tag", value: user.discriminator, inline: true },
-              { name: "ID", value: user.id.toString(), inline: true },
-              { name: "Creation Date", value: `<t:${Math.floor(Number(createdAt / 1000n))}:f> (<t:${Math.floor(Number(createdAt / 1000n))}:R>)` }
-            ],
-            image: { url: maxRes(imageURL(user.id, discordUser.banner, "banners") || "") },
-            thumbnail: { url: maxRes(imageURL(user.id, user.avatar, "avatars") || "") },
-            author: { name: "User Info" },
-            timestamp: Temporal.Now.instant().epochMilliseconds
-          }
+          const { user } = getValue(interaction, "target", ApplicationCommandOptionTypes.User) || interaction
+          const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "get", bot.constants.endpoints.USER(user.id))
+          const createdAt = Math.floor(Number(toTimestamp(user.id) / 1000n))
 
           await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
             type: InteractionResponseTypes.ChannelMessageWithSource,
             data: {
-              embeds: [embed]
+              embeds: [{
+                color: discordUser.accent_color || pickFromArray(colors),
+                fields: [
+                  { name: "Name", value: user.username, inline: true },
+                  { name: "Tag", value: user.discriminator, inline: true },
+                  { name: "ID", value: user.id.toString(), inline: true },
+                  { name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)` }
+                ],
+                image: { url: imageURL(user.id, discordUser.banner, "banners") || "" },
+                thumbnail: { url: imageURL(user.id, user.avatar, "avatars") || "" },
+                author: { name: "User Info" },
+              }]
             }
           }).catch(err => {console.botLog(err.message, "ERROR")})
+          break
         }
 
         case "server": {
-          
+          if (interaction.guildId === undefined) {
+            await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+              type: InteractionResponseTypes.ChannelMessageWithSource,
+              data: { content: "This command can't be used ouside of a server.", flags: 1 << 6 },
+            }).catch(err => {console.botLog(err.message, "ERROR")})
+            break
+          }
+
+          const guild = await getGuild(bot, interaction.guildId, { counts: true })
+          const channels = await getChannels(bot, interaction.guildId)
+          const emojis = await bot.rest.runMethod<DiscordEmoji[]>(bot.rest, "get", bot.constants.endpoints.GUILD_EMOJIS(interaction.guildId))
+
+          const verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
+          const filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
+
+          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+            type: InteractionResponseTypes.ChannelMessageWithSource,
+            data: {
+              embeds: [{
+                color: pickFromArray(colors),
+                description: guild.description ? `Server Description: ${guild.description}` : "",
+                fields: [
+                  { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
+                  { name: "Creation Date", value: `<t:${Math.floor(Number(toTimestamp(guild.id) / 1000n))}:D>`, inline: true },
+                  { name: "Vanity Invite URL", value: guild.vanityUrlCode || "None", inline: true },
+                  { name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
+                  { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
+                  { name: "AFK Channel", value: guild.afkChannelId ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
+                  { name: "General Info", value: `~${guild.approximateMemberCount} Members\n${guild.roles.size} Roles\n${guild.emojis.size} Emojis\n┣ ${emojis.filter(emoji => !emoji.animated).length} static\n╰ ${emojis.filter(emoji => emoji.animated).length} animated`, inline: true },
+                  { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories\n${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text\n${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice\n${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages\n`, inline: true },
+                ],
+                image: { url: imageURL(guild.id, guild.banner, "banners") || "" },
+                thumbnail: { url: imageURL(guild.id, guild.icon, "icons") || "" },
+                author: { name: guild.name },
+                footer: { text: `Server ID • ${guild.id}` },
+              }]
+            }
+          })
+          break
         }
       }
     }

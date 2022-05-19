@@ -241,7 +241,7 @@ const countries = [
   "Zimbabwe",
 ]
 
-var choices: ApplicationCommandOptionChoice[] = []
+let choices: ApplicationCommandOptionChoice[] = []
 const jsonFile = "./Resources/Covid/choices.json"
 
 try {
@@ -254,33 +254,33 @@ try {
 }
 
 type BaseCovidCase = {
-  totalConfirmed: Number
-  totalDeaths: Number
-  totalRecovered: Number
+  totalConfirmed: number
+  totalDeaths: number
+  totalRecovered: number
 }
 
 interface CountryCovidCase extends BaseCovidCase {
   countryCode: string
   country: string
   countryName: string
-  lat: Number
-  lng: Number
-  dailyConfirmed: Number
-  dailyDeaths: Number
-  activeCases: Number
-  totalCritical: Number
-  totalConfirmedPerMillionPopulation: Number
-  totalDeathsPerMillionPopulation: Number
+  lat: number
+  lng: number
+  dailyConfirmed: number
+  dailyDeaths: number
+  activeCases: number
+  totalCritical: number
+  totalConfirmedPerMillionPopulation: number
+  totalDeathsPerMillionPopulation: number
   FR: string,
   PR: string,
   lastUpdated: string
 }
 
 interface GlobalCovidCase extends BaseCovidCase {
-  totalNewCases: Number
-  totalNewDeaths: Number
-  totalActiveCases: Number
-  totalCasesPerMillionPop: Number
+  totalNewCases: number
+  totalNewDeaths: number
+  totalActiveCases: number
+  totalCasesPerMillionPop: number
   created: string
 }
 

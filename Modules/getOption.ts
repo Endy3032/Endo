@@ -1,6 +1,6 @@
-import { ApplicationCommandOptionTypes, Interaction } from "discordeno"
+import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, Member, Role, User } from "discordeno"
 
-export const getSubcmd = (interaction: Interaction) => {
+export function getSubcmd(interaction: Interaction) {
   if (interaction.data?.options === undefined) return null
 
   if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup)
@@ -10,14 +10,14 @@ export const getSubcmd = (interaction: Interaction) => {
     return interaction.data.options[0].name
 }
 
-export const getSubcmdGroup = (interaction: Interaction) => {
+export function getSubcmdGroup(interaction: Interaction) {
   if (interaction.data?.options === undefined) return null
 
   if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup)
     return interaction.data.options[0].name
 }
 
-const getOptions = (interaction: Interaction) => {
+function getOptions(interaction: Interaction) {
   return interaction.data?.options?.[0].type === ApplicationCommandOptionTypes.SubCommandGroup
     ? interaction.data?.options?.[0].options?.[0].options
     : interaction.data?.options?.[0].type === ApplicationCommandOptionTypes.SubCommand
@@ -33,12 +33,20 @@ const resolvedOptionTypeToKey = {
 
 const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
 
-export const getValue = (interaction: Interaction, name: string, type: ApplicationCommandOptionTypes | null = null) => {
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.String): string
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Boolean): boolean
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Integer | ApplicationCommandOptionTypes.Number): number
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Role): Role
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Channel): Channel
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Attachment): Attachment
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Mentionable): User | Channel | Role
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.User): { user: User, member?: Member }
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes) {
   const options = getOptions(interaction)
   if (options === undefined) return null
 
   const option = options.find(option => {
-    var cond = option.name === name
+    let cond = option.name === name
     if (type) cond = cond && option.type === type
     return cond
   })

@@ -26,7 +26,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
     const guildFolders = getFiles("./Commands/Guilds")
 
     for await (const guildID of guildFolders) {
-      var commands = [] as ApplicationCommand[]
+      const commands = [] as ApplicationCommand[]
       const commandFiles = getFiles(`./Commands/Guilds/${guildID}`)
 
       for await (const command of commandFiles) {
@@ -39,8 +39,8 @@ export const deploy = async (bot: Bot, args: string[]) => {
   }
 
   if (args.includes("global") || args.includes("test")) {
-    var commands = [] as ApplicationCommand[]
-    var testCommands = [] as ApplicationCommand[]
+    const commands = [] as ApplicationCommand[]
+    const testCommands = [] as ApplicationCommand[]
 
     const commandFiles = getFiles("./Commands")
     for await (const command of commandFiles) {

@@ -1,6 +1,6 @@
 import axiod from "axiod"
 import { bold, rgb24 } from "colors"
-import { Bot, editBotStatus, EventHandlers, getApplicationCommands, StatusUpdate, User } from "discordeno"
+import { Bot, editBotStatus, EventHandlers, getApplicationCommands, User } from "discordeno"
 import type { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
 import { activities, BrightNord, Nord, TimeMetric } from "Modules"
 
@@ -16,7 +16,7 @@ type Payload = {
 
 export const name: keyof EventHandlers = "ready"
 export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload) => {
-  var localUpdated = false
+  let localUpdated = false
   console.tagLog("Login", `As ${payload.user.username}#${payload.user.discriminator} [${bot.botGatewayData?.sessionStartLimit.remaining} Remaining | ${Deno.build.os == "darwin" ? "VSCode" : "Replit"}]`)
 
   const pinger = () => {
