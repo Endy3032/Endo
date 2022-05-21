@@ -1,5 +1,5 @@
 import { getFiles } from "Modules"
-import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand, upsertApplicationCommands, } from "discordeno"
+import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand } from "discordeno"
 
 const env = Deno.env.toObject()
 type ApplicationCommand = CreateApplicationCommand | CreateContextApplicationCommand
@@ -34,7 +34,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
         commands.push(replaceDescription(cmd, "G"))
       }
 
-      upsertApplicationCommands(bot, commands, BigInt(guildID))
+      await bot.helpers.upsertApplicationCommands(commands, BigInt(guildID))
     }
   }
 
@@ -50,12 +50,12 @@ export const deploy = async (bot: Bot, args: string[]) => {
     }
 
     if (args.includes("global")) {
-      const deployed = await upsertApplicationCommands(bot, commands)
+      const deployed = await bot.helpers.upsertApplicationCommands(commands)
       console.log(`Deployed ${deployed.size} test commands`)
     }
 
     if (args.includes("test")) {
-      const deployed = await upsertApplicationCommands(bot, testCommands, BigInt(env.TestGuild))
+      const deployed = await bot.helpers.upsertApplicationCommands(testCommands, BigInt(env.TestGuild))
       console.log(`Deployed ${deployed.size} test commands`)
     }
   }

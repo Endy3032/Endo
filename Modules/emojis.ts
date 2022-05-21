@@ -1,5 +1,5 @@
-interface Emojis {
-  [key: string]: { name: string, id: string, shorthand?: string}
+type Emojis = {
+  [key: string]: { name: string, id: string, animated?: boolean, shorthand?: string },
 }
 
 const emojis: Emojis = {
@@ -11,7 +11,7 @@ const emojis: Emojis = {
 }
 
 Object.keys(emojis).forEach(emoji => {
-  emojis[emoji].shorthand = `<:${emojis[emoji].name}:${emojis[emoji].id}>`
+  emojis[emoji].shorthand = `<${emojis[emoji].animated ? "a" : ""}:${emojis[emoji].name}:${emojis[emoji].id}>`
 })
 
 export { emojis }

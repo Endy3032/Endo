@@ -1,7 +1,7 @@
 import { Temporal } from "temporal"
 import { rgb24, stripColor } from "colors"
 import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "Modules"
-import { createBot, CreateMessage, Embed, EventHandlers, sendMessage, startBot } from "discordeno"
+import { createBot, CreateMessage, Embed, EventHandlers, startBot } from "discordeno"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
 if (token === undefined) { throw new Error("Missing Token") }
@@ -17,15 +17,16 @@ const bot = createBot({
 // #region Logging stuff
 const send = async (body: CreateMessage, epoch: number) => {
   const channelID = Deno.env.get("Log")
-  if (channelID === undefined) throw new Error("Log Channel ID Not Found")
-  sendMessage(bot, BigInt(channelID), body)
+  if (channelID === undefined) return
+  await bot.helpers.sendMessage(BigInt(channelID), body)
     .catch((err: Error) => {
-      console.log(err)
-      sendMessage(bot, BigInt(channelID), { content: `**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\`` })
+      console.botLog(err, "ERROR")
+      bot.helpers.sendMessage(BigInt(channelID), { content: `**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\`` })
     })
 }
 
-console.localLog = (content: string, logLevel: LogLevel = "INFO", log = true) => {
+console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = true) => {
+  if (content instanceof Error) content = content.stack
   const temporal = Temporal.Now.instant()
 
   const logTime = temporal.toLocaleString("default", {
@@ -36,17 +37,17 @@ console.localLog = (content: string, logLevel: LogLevel = "INFO", log = true) =>
   }).replace(",", "")
 
   const logColor = Nord[logLevel.toLowerCase()]
-
-  content.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ").replaceAll("\n", "\n                             | ")
-  content = rgb24(`${logTime} ${rgb24(logLevel.padStart(5, " "), logColor)} | ${content}`, Nord.blue)
+  content = content.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ").replaceAll("\n", `\n${" ".repeat(30)}| `)
+  content = rgb24(`${logTime} ${rgb24(logLevel.padStart(6, " "), logColor)} | ${content}`, Nord.blue)
 
   if (log) console.log(content)
   return { content, temporal }
 }
 
-console.tagLog = (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
+console.tagLog = async (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
 
-console.botLog = async (content: string, logLevel: LogLevel = "INFO", embed?: Embed) => {
+console.botLog = async (content: string | any, logLevel: LogLevel = "INFO", embed?: Embed) => {
+  if (content instanceof Error) content = content.stack
   const { content: consoleLog, temporal } = console.localLog(content, logLevel, false)
   const epoch = temporal.epochMilliseconds
 
@@ -78,11 +79,13 @@ bot.gateway.presence = activities
 await deploy(bot, Deno.args)
 await startBot(bot)
 
-const listener = Deno.listen({ port: 8080 })
+const listener = Deno.listen({ port: 3032 })
 console.tagLog("Ready", "Server")
 
-for await (const conn of listener) {
+const http = async (conn: Deno.Conn) => {
   for await (const req of Deno.serveHttp(conn)) {
     req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
   }
 }
+
+for await (const conn of listener) http(conn)

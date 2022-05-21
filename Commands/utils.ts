@@ -1,8 +1,9 @@
+import { evaluate } from "mathjs"
 import { Color } from "color-convert"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL } from "Modules"
-import { ApplicationCommandOptionTypes, Bot, ChannelTypes, DiscordEmoji, DiscordUser, getChannels, getGuild, Interaction, InteractionResponseTypes } from "discordeno"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags } from "Modules"
+import { ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes } from "discordeno"
 
-export const cmd = {
+export const cmd: CreateApplicationCommand = {
   name: "utils",
   description: "Random utilities for you to use!",
   options: [
@@ -25,24 +26,24 @@ export const cmd = {
               name: "red",
               description: "The red value of the RGB color [integer 0~255]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 255,
+              minValue: 0,
+              maxValue: 255,
               required: true
             },
             {
               name: "green",
               description: "The green value of the RGB color [integer 0~255]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 255,
+              minValue: 0,
+              maxValue: 255,
               required: true
             },
             {
               name: "blue",
               description: "The blue value of the RGB color [integer 0~255]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 255,
+              minValue: 0,
+              maxValue: 255,
               required: true
             }
           ]
@@ -55,8 +56,8 @@ export const cmd = {
             name: "value",
             description: "The value of the color [integer 0~16777215]",
             type: ApplicationCommandOptionTypes.Integer,
-            "min_value": 0,
-            "max_value": 16777215,
+            minValue: 0,
+            maxValue: 16777215,
             required: true
           }]
         },
@@ -80,24 +81,24 @@ export const cmd = {
               name: "hue",
               description: "The hue value of the HSV color [integer 0~360]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 360,
+              minValue: 0,
+              maxValue: 360,
               required: true
             },
             {
               name: "saturation",
               description: "The saturation value of the HSV color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             },
             {
               name: "value",
               description: "The lightness value of the HSV color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             }
           ]
@@ -111,24 +112,24 @@ export const cmd = {
               name: "hue",
               description: "The hue value of the HSV color [integer 0~360]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 360,
+              minValue: 0,
+              maxValue: 360,
               required: true
             },
             {
               name: "saturation",
               description: "The saturation value of the HSV color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             },
             {
               name: "value",
               description: "The value value of the HSV color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             }
           ]
@@ -142,32 +143,32 @@ export const cmd = {
               name: "cyan",
               description: "The cyan value of the CMYK color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             },
             {
               name: "magenta",
               description: "The magenta value of the CMYK color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             },
             {
               name: "yellow",
               description: "The yellow value of the CMYK color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             },
             {
               name: "key",
               description: "The key value of the CMYK color [integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 100,
+              minValue: 0,
+              maxValue: 100,
               required: true
             }
           ]
@@ -232,8 +233,8 @@ export const cmd = {
             name: "amount",
             description: "The amount of coins to flip [integer 1~10]",
             type: ApplicationCommandOptionTypes.Integer,
-            "min_value": 1,
-            "max_value": 10,
+            minValue: 1,
+            maxValue: 10,
             required: true
           }]
         },
@@ -245,8 +246,8 @@ export const cmd = {
             name: "amount",
             description: "The amount of dice to roll [integer 1~10]",
             type: ApplicationCommandOptionTypes.Integer,
-            "min_value": 1,
-            "max_value": 10,
+            minValue: 1,
+            maxValue: 10,
             required: true
           }]
         },
@@ -259,21 +260,21 @@ export const cmd = {
               name: "amount",
               description: "The amount of numbers to generate [integer 1~10]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 1,
-              "max_value": 10,
+              minValue: 1,
+              maxValue: 10,
               required: true
             },
             {
               name: "min",
               description: "The minimum limit for the numbers [integer]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
+              minValue: 0,
               required: false
             },
             {
               name: "max",
               description: "The maximum limit for the numbers [integer]",
-              "max_value": 20000,
+              maxValue: 20000,
               type: ApplicationCommandOptionTypes.Integer,
             }
           ]
@@ -289,56 +290,56 @@ export const cmd = {
           name: "year",
           description: "The timestamp's year [Integer -271821~275760]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": -271821,
-          "max_value": 275760,
+          minValue: -271821,
+          maxValue: 275760,
           required: true
         },
         {
           name: "month",
           description: "The timestamp's month [Integer 1~12]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": 1,
-          "max_value": 12,
+          minValue: 1,
+          maxValue: 12,
           required: false
         },
         {
           name: "day",
           description: "The timestamp's day [Integer 1~31]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": 1,
-          "max_value": 31,
+          minValue: 1,
+          maxValue: 31,
           required: false
         },
         {
           name: "hour",
           description: "The timestamp's hours [Integer 0~23]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": 0,
-          "max_value": 23,
+          minValue: 0,
+          maxValue: 23,
           required: false
         },
         {
           name: "minute",
           description: "The timestamp's minutes [Integer 0~59]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": 0,
-          "max_value": 59,
+          minValue: 0,
+          maxValue: 59,
           required: false
         },
         {
           name: "second",
           description: "The timestamp's seconds [Integer 0~59]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": 0,
-          "max_value": 59,
+          minValue: 0,
+          maxValue: 59,
           required: false
         },
         {
           name: "millisecond",
           description: "The timestamp's milliseconds [Integer 0~999]",
           type: ApplicationCommandOptionTypes.Integer,
-          "min_value": 0,
-          "max_value": 999,
+          minValue: 0,
+          maxValue: 999,
           required: false
         },
       ]
@@ -353,16 +354,16 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 
       switch (getSubcmd(interaction)) {
         case "rgb": {
-          const red = getValue(interaction, "red", ApplicationCommandOptionTypes.Integer)
-          const green = getValue(interaction, "green", ApplicationCommandOptionTypes.Integer)
-          const blue = getValue(interaction, "blue", ApplicationCommandOptionTypes.Integer)
+          const red = getValue(interaction, "red", ApplicationCommandOptionTypes.Integer) ?? 0
+          const green = getValue(interaction, "green", ApplicationCommandOptionTypes.Integer) ?? 0
+          const blue = getValue(interaction, "blue", ApplicationCommandOptionTypes.Integer) ?? 0
 
           color = Color.rgb(red, green, blue)
           break
         }
 
         case "decimal": {
-          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer)
+          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer) ?? 0
           const hex = value.toString(16).padStart(6, "0")
           const [red, green, blue] = hex.match(/.{1,2}/g) as RegExpMatchArray
 
@@ -371,8 +372,8 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
         }
 
         case "hex": {
-          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.String)
-          const matched = value.match(/\d{1,6}/g)?.reduce((prev, curr) => Math.abs(curr.length - 6) < Math.abs(prev.length - 6) ? curr : prev) || "000000"
+          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.String) ?? "000000"
+          const matched = value.match(/\d{1,6}/g)?.reduce((prev, curr) => Math.abs(curr.length - 6) < Math.abs(prev.length - 6) ? curr : prev) ?? "000000"
           const hex = parseInt(matched, 16)
 
           color = Color.rgb(hex >> 16, (hex >> 8) & 0xFF, hex & 0xFF)
@@ -380,28 +381,28 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
         }
 
         case "hsl": {
-          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer)
-          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer)
-          const lightness = getValue(interaction, "lightness", ApplicationCommandOptionTypes.Integer)
+          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer) ?? 0
+          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer) ?? 0
+          const lightness = getValue(interaction, "lightness", ApplicationCommandOptionTypes.Integer) ?? 0
 
           color = Color.hsl(hue, saturation, lightness)
           break
         }
 
         case "hsv": {
-          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer)
-          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer)
-          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer)
+          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer) ?? 0
+          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer) ?? 0
+          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer) ?? 0
 
           color = Color.hsv(hue, saturation, value)
           break
         }
 
         case "cmyk": {
-          const cyan = getValue(interaction, "cyan", ApplicationCommandOptionTypes.Integer)
-          const magenta = getValue(interaction, "magenta", ApplicationCommandOptionTypes.Integer)
-          const yellow = getValue(interaction, "yellow", ApplicationCommandOptionTypes.Integer)
-          const key = getValue(interaction, "key", ApplicationCommandOptionTypes.Integer)
+          const cyan = getValue(interaction, "cyan", ApplicationCommandOptionTypes.Integer) ?? 0
+          const magenta = getValue(interaction, "magenta", ApplicationCommandOptionTypes.Integer) ?? 0
+          const yellow = getValue(interaction, "yellow", ApplicationCommandOptionTypes.Integer) ?? 0
+          const key = getValue(interaction, "key", ApplicationCommandOptionTypes.Integer) ?? 0
 
           color = Color.cmyk(cyan, magenta, yellow, key)
           break
@@ -447,7 +448,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     case "info": {
       switch (getSubcmd(interaction)) {
         case "user": {
-          const { user } = getValue(interaction, "target", ApplicationCommandOptionTypes.User) || interaction
+          const { user } = getValue(interaction, "target", ApplicationCommandOptionTypes.User) ?? interaction
           const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "get", bot.constants.endpoints.USER(user.id))
           const createdAt = Math.floor(Number(toTimestamp(user.id) / 1000n))
 
@@ -455,19 +456,19 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
             type: InteractionResponseTypes.ChannelMessageWithSource,
             data: {
               embeds: [{
-                color: discordUser.accent_color || pickFromArray(colors),
+                color: discordUser.accent_color ?? pickFromArray(colors),
                 fields: [
                   { name: "Name", value: user.username, inline: true },
                   { name: "Tag", value: user.discriminator, inline: true },
                   { name: "ID", value: user.id.toString(), inline: true },
                   { name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)` }
                 ],
-                image: { url: imageURL(user.id, discordUser.banner, "banners") || "" },
-                thumbnail: { url: imageURL(user.id, user.avatar, "avatars") || "" },
+                image: { url: imageURL(user.id, discordUser.banner, "banners") },
+                thumbnail: { url: imageURL(user.id, user.avatar, "avatars") },
                 author: { name: "User Info" },
               }]
             }
-          }).catch(err => {console.botLog(err.message, "ERROR")})
+          }).catch(err => {console.botLog(err, "ERROR")})
           break
         }
 
@@ -475,13 +476,13 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
           if (interaction.guildId === undefined) {
             await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
               type: InteractionResponseTypes.ChannelMessageWithSource,
-              data: { content: "This command can't be used ouside of a server.", flags: 1 << 6 },
-            }).catch(err => {console.botLog(err.message, "ERROR")})
+              data: { content: "This command can't be used ouside of a server.", flags: MessageFlags.Ephemeral },
+            }).catch(err => {console.botLog(err, "ERROR")})
             break
           }
 
-          const guild = await getGuild(bot, interaction.guildId, { counts: true })
-          const channels = await getChannels(bot, interaction.guildId)
+          const guild = await bot.helpers.getGuild(interaction.guildId, { counts: true })
+          const channels = await bot.helpers.getChannels(interaction.guildId)
           const emojis = await bot.rest.runMethod<DiscordEmoji[]>(bot.rest, "get", bot.constants.endpoints.GUILD_EMOJIS(interaction.guildId))
 
           const verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
@@ -496,19 +497,129 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
                 fields: [
                   { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
                   { name: "Creation Date", value: `<t:${Math.floor(Number(toTimestamp(guild.id) / 1000n))}:D>`, inline: true },
-                  { name: "Vanity Invite URL", value: guild.vanityUrlCode || "None", inline: true },
+                  { name: "Vanity Invite URL", value: guild.vanityUrlCode ?? "None", inline: true },
                   { name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
                   { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
                   { name: "AFK Channel", value: guild.afkChannelId ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
                   { name: "General Info", value: `~${guild.approximateMemberCount} Members\n${guild.roles.size} Roles\n${guild.emojis.size} Emojis\n┣ ${emojis.filter(emoji => !emoji.animated).length} static\n╰ ${emojis.filter(emoji => emoji.animated).length} animated`, inline: true },
                   { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories\n${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text\n${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice\n${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages\n`, inline: true },
                 ],
-                image: { url: imageURL(guild.id, guild.banner, "banners") || "" },
-                thumbnail: { url: imageURL(guild.id, guild.icon, "icons") || "" },
+                image: { url: imageURL(guild.id, guild.banner, "banners") ?? "" },
+                thumbnail: { url: imageURL(guild.id, guild.icon, "icons") ?? "" },
                 author: { name: guild.name },
                 footer: { text: `Server ID • ${guild.id}` },
               }]
             }
+          })
+          break
+        }
+      }
+      break
+    }
+
+    case "random": {
+      const mode = getSubcmd(interaction)
+      const amount = getValue(interaction, "amount", ApplicationCommandOptionTypes.Integer) ?? 0
+      const min = getValue(interaction, "min", ApplicationCommandOptionTypes.Integer) ?? 0
+      const max = getValue(interaction, "max", ApplicationCommandOptionTypes.Integer) ?? 100
+
+      const embed = {
+        title: mode == "coin" ? "Coin flip" : mode == "dice" ? "Dice roll" : "Random numbers",
+        description: ""
+      }
+      let choices: any[] = []
+
+      if (mode == "coin") {
+        choices = ["Head", "Tail"]
+      } else if (mode == "dice") {
+        choices = [1, 2, 3, 4, 5, 6]
+      } else if (mode == "number") {
+        for (let i = 0; i < amount; i++) embed.description += `${Math.floor(Math.random() * (max - min) + min)}, `
+        embed.description = embed.description.slice(0, -2)
+        await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+          type: InteractionResponseTypes.ChannelMessageWithSource,
+          data: { embeds: [embed] }
+        })
+        break
+      }
+
+      for (let i = 0; i < amount; i++) embed.description += `${pickFromArray(choices)}, `
+      embed.description = embed.description.slice(0, -2)
+
+      await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+        type: InteractionResponseTypes.ChannelMessageWithSource,
+        data: { embeds: [embed] }
+      })
+      break
+    }
+
+    default: {
+      switch (getSubcmd(interaction)) {
+        case "calculate": {
+          const expression = getValue(interaction, "expression", ApplicationCommandOptionTypes.String) ?? ""
+          const symbols = ["π", "τ"]
+          const symvals = [Math.PI, Math.PI * 2]
+
+          var scope = {}
+          symbols.forEach((value: string | number | any[], i: string | number) => {
+            if (typeof value == "object") {
+              value.forEach((subvalue: string | number) => {
+                scope[subvalue] = symvals[i]
+              })
+            } else {
+              scope[value] = symvals[i]
+            }
+          })
+
+          try {
+            let result = evaluate(expression, scope)
+            if (typeof result == "number") result = result.toString()
+            if (typeof result == "object") result = result.entries.join("; ")
+
+            await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+              type: InteractionResponseTypes.ChannelMessageWithSource,
+              data: {
+                embeds: [{
+                  title: "Calculation",
+                  color: pickFromArray(colors),
+                  fields: [
+                    { name: "Expression", value: `${escapeMarkdown(expression)}`, inline: false },
+                    { name: "Result", value: `${escapeMarkdown(result)}`, inline: false }
+                  ]
+                }]
+              }
+            })
+          } catch (err) {
+            console.botLog(err, "ERROR")
+            await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+              type: InteractionResponseTypes.ChannelMessageWithSource,
+              data: { content: `Cannot evaluate \`${expression}\`\n${err}.${String(err).includes("Undefined symbol") ? " You may want to declare variables like `a = 9; a * 7` => 63" : ""}`, flags: MessageFlags.Ephemeral }
+            })
+          }
+          break
+        }
+
+        case "ping": {
+          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+            type: InteractionResponseTypes.ChannelMessageWithSource,
+            data: { content: "Pinging..." }
+          })
+
+          const original = await bot.helpers.getOriginalInteractionResponse(interaction.token)
+          const wsPing = bot.gateway.shards.reduce((curr, next) => curr + (next.heartbeat.lastReceivedAt - next.heartbeat.lastSentAt), 0) / bot.gateway.shards.size
+
+          if (wsPing < 0) console.botLog(bot.gateway.shards.map(shard => shard.heartbeat))
+
+          await bot.helpers.editInteractionResponse(interaction.token, {
+            content: "",
+            embeds: [{
+              title: "Pong!",
+              color: pickFromArray(colors),
+              fields: [
+                { name: "Websocket Latency", value: `${wsPing}ms`, inline: false },
+                { name: "Roundtrip Latency", value: `${BigInt(original.timestamp) - toTimestamp(interaction.id)}ms`, inline: false }
+              ]
+            }]
           })
           break
         }

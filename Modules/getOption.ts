@@ -33,14 +33,14 @@ const resolvedOptionTypeToKey = {
 
 const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
 
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.String): string
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Boolean): boolean
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Integer | ApplicationCommandOptionTypes.Number): number
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Role): Role
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Channel): Channel
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Attachment): Attachment
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Mentionable): User | Channel | Role
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.User): { user: User, member?: Member }
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.String): string | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Boolean): boolean | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Integer | ApplicationCommandOptionTypes.Number): number | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Role): Role | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Channel): Channel | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Attachment): Attachment | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Mentionable): User | Channel | Role | null
+export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.User): { user: User, member?: Member } | null
 export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes) {
   const options = getOptions(interaction)
   if (options === undefined) return null
@@ -65,8 +65,8 @@ export function getValue(interaction: Interaction, name: string, type?: Applicat
     }
 
     return {
-      user: resolved.users?.get(value) || null,
-      member: resolved.members?.get(value) || null,
+      user: resolved.users?.get(value) ?? null,
+      member: resolved.members?.get(value) ?? null,
     }
   }
 

@@ -1,7 +1,7 @@
 import { rgb24, stripColor } from "colors"
 import { commands, Command } from "/Commands/mod.ts"
 import { imageURL, BrightNord, getSubcmd, getSubcmdGroup, toTimestamp } from "Modules"
-import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, getGuild, getChannel, Embed } from "discordeno"
+import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed } from "discordeno"
 
 const testGuildID = Deno.env.get("TestGuild")
 const testGuildChannel = Deno.env.get("TestChannel")
@@ -27,9 +27,9 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
   const [subcmd, group] = [getSubcmd(interaction), getSubcmdGroup(interaction)]
 
   if (interaction.type != InteractionTypes.ApplicationCommandAutocomplete) {
-    const guild = interaction.guildId ? await getGuild(bot, interaction.guildId) : null
-    const guildName = guild?.name || null
-    const channelName = interaction.channelId ? (await getChannel(bot, BigInt(interaction.channelId))).name : null
+    const guild = interaction.guildId ? await bot.helpers.getGuild(interaction.guildId) : null
+    const guildName = guild?.name ?? null
+    const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
     const invoker = rgb24(`[${interaction.user.username}#${interaction.user.discriminator} | ${guildName ? `${guildName} #${channelName}` : "DM"}] `, BrightNord.cyan)
 
     const interactionLog =
@@ -45,35 +45,34 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 
     const embed: Embed = {
       description: stripColor(`**Timestamp** • ${discordTimestamp}\n**Interaction** • ${interactionLog}`),
-      author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, iconUrl: imageURL(interaction.user.id, interaction.user.avatar, "avatars") || undefined },
-      footer: { text: guildName ? `${guildName} #${channelName}` : "**DM**", iconUrl: imageURL(guild?.id, guild?.icon, "icons") || undefined },
+      author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, iconUrl: imageURL(interaction.user.id, interaction.user.avatar, "avatars") },
+      footer: { text: guildName ? `${guildName} #${channelName}` : "**DM**", iconUrl: imageURL(guild?.id, guild?.icon, "icons") },
       timestamp: Number(discordTimestamp)
     }
 
     console.botLog(invoker + interactionLog, "INFO", embed)
   }
 
-  const command = commands.get(commandName || "null") as Command
+  const command = commands.get(commandName ?? "null") as Command
 
   const [exec, type] =
   interaction.type == InteractionTypes.ApplicationCommand
-    ? [command?.execute || undefined, "Command"]
+    ? [command?.execute ?? undefined, "Command"]
     : interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.Button
-      ? [command?.button || undefined,  "Button"]
+      ? [command?.button ?? undefined,  "Button"]
       : interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.SelectMenu
-        ? [command?.select || undefined,  "Select Menu"]
+        ? [command?.select ?? undefined,  "Select Menu"]
         : interaction.type == InteractionTypes.ModalSubmit
-          ? [command?.modal || undefined,   "Modal"]
+          ? [command?.modal ?? undefined,   "Modal"]
           : interaction.type == InteractionTypes.ApplicationCommandAutocomplete
-            ? [command?.autocomplete || undefined, "Autocomplete"]
+            ? [command?.autocomplete ?? undefined, "Autocomplete"]
             : [console.log, "Unknown"]
 
-  try {
-    if (exec !== undefined) { exec(bot, interaction) }
-    else { console.botLog(`No ${type} function found for ${commandName}`) }
-  } catch {
-    console.botLog(`Failed to execute ${type} ${commandName}`)
+  if (exec !== undefined) {
+    try {await exec(bot, interaction)}
+    catch (e) {console.botLog(e, "ERROR")}
   }
+  else { console.botLog(`No ${type} function found for ${commandName}`) }
 
   // console.log(getSubcmd(interaction, ))
   // switch (interaction.data?.componentType) {
