@@ -80,6 +80,7 @@ await deploy(bot, Deno.args)
 await startBot(bot)
 
 const listener = Deno.listen({ port: 3032 })
+console.clear()
 console.tagLog("Ready", "Server")
 
 const http = async (conn: Deno.Conn) => {
