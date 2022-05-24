@@ -2,7 +2,7 @@ import axiod from "axiod"
 import { bold, rgb24 } from "colors"
 import { Bot, EventHandlers, getApplicationCommands, User } from "discordeno"
 import type { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
-import { activities, BrightNord, Nord, TimeMetric } from "Modules"
+import { activities, BrightNord, Nord, TimeMetric } from "modules"
 
 type Payload = {
   shardId: number;
@@ -30,7 +30,7 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
   }
 
   const reloadPresence = async () => {
-    const activity = activities
+    const activity = activities()
     if (Deno.build.os == "darwin" && localUpdated) return
     localUpdated = true
     bot.helpers.editBotStatus(activity)

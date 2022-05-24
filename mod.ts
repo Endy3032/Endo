@@ -1,6 +1,6 @@
 import { Temporal } from "temporal"
 import { rgb24, stripColor } from "colors"
-import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "Modules"
+import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "modules"
 import { createBot, CreateMessage, Embed, EventHandlers, startBot } from "discordeno"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
@@ -44,7 +44,7 @@ console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = tr
   return { content, temporal }
 }
 
-console.tagLog = async (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
+console.tagLog = (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
 
 console.botLog = async (content: string | any, logLevel: LogLevel = "INFO", embed?: Embed) => {
   if (content instanceof Error) content = content.stack

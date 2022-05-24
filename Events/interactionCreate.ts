@@ -1,6 +1,6 @@
 import { rgb24, stripColor } from "colors"
 import { commands, Command } from "/Commands/mod.ts"
-import { imageURL, BrightNord, getSubcmd, getSubcmdGroup, toTimestamp } from "Modules"
+import { imageURL, BrightNord, getSubcmd, getSubcmdGroup, toTimestamp, getCmdName } from "modules"
 import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed } from "discordeno"
 
 const testGuildID = Deno.env.get("TestGuild")
@@ -15,16 +15,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
   const isReplitTest = interaction.channelId == BigInt(testGuildChannel)
   if ((isLocal && (!isTestGuild || isReplitTest)) || (!isLocal && isTestGuild && !isReplitTest)) return
 
-  const commandName =
-  [InteractionTypes.ApplicationCommand, InteractionTypes.ApplicationCommandAutocomplete].includes(interaction.type)
-    ? interaction.data?.name.replace(/^(\[.\]) /, "")
-    : [InteractionTypes.MessageComponent, InteractionTypes.ModalSubmit].includes(interaction.type)
-      ? interaction.message?.interaction?.name
-      : "null"
-
-  getSubcmd(interaction)
-
-  const [subcmd, group] = [getSubcmd(interaction), getSubcmdGroup(interaction)]
+  const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
 
   if (interaction.type != InteractionTypes.ApplicationCommandAutocomplete) {
     const guild = interaction.guildId ? await bot.helpers.getGuild(interaction.guildId) : null

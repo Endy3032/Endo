@@ -1,4 +1,12 @@
-import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, Member, Role, User } from "discordeno"
+import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, InteractionTypes, Member, Role, User } from "discordeno"
+
+export function getCmdName(interaction: Interaction) {
+  return [InteractionTypes.ApplicationCommand, InteractionTypes.ApplicationCommandAutocomplete].includes(interaction.type)
+    ? interaction.data?.name.replace(/^(\[.\]) /, "")
+    : [InteractionTypes.MessageComponent, InteractionTypes.ModalSubmit].includes(interaction.type)
+      ? interaction.message?.interaction?.name
+      : "null"
+}
 
 export function getSubcmd(interaction: Interaction) {
   if (interaction.data?.options === undefined) return null

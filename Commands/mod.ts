@@ -1,10 +1,10 @@
-import { getFiles } from "Modules"
-import { ApplicationCommand, Bot, Collection, Interaction } from "discordeno"
+import { getFiles } from "modules"
+import { Bot, Collection, CreateApplicationCommand, Interaction } from "discordeno"
 
 type CommandFunction = (bot: Bot, interaction: Interaction) => Promise<void>
 
 export type Command = {
-  cmd: ApplicationCommand,
+  cmd: CreateApplicationCommand,
   execute?: CommandFunction,
   button?: CommandFunction,
   select?: CommandFunction,

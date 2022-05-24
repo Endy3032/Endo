@@ -1,5 +1,5 @@
 import { Temporal } from "temporal"
-import { TimeMetric } from "Modules"
+import { TimeMetric } from "modules"
 
 const answers = [
   "cigar",

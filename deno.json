@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "types": ["./types.d.ts"],
+    "types": ["./mod.d.ts"],
     "alwaysStrict": false,
     "noImplicitAny": false
   },
   "exclude": ["Old"],
-  "files": ["mod.ts", "scripts.config.ts", "types.d.ts"],
-  "include": ["Commands/**/*", "Events/*", "Modules/*", "Resources/**/*", "Old/**/*"]
+  "files": ["mod.ts", "mod.d.ts", "scripts.config.ts"],
+  "include": ["Commands/**/*", "Events/*", "Modules/*", "Resources/**/*"]
 }

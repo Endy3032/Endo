@@ -2,7 +2,7 @@ export const pickFromArray = (arr: any[], start = 0, range = arr.length as numbe
   if (start < 0) start = 0
   if (start > arr.length - 1) start = arr.length - 1
   if (range > arr.length - 1) range = arr.length - 1
-  return arr[Math.floor(Math.random() * (range - start + 1)) + start]
+  return arr[Math.floor(Math.random() * (range - start + 1) * (arr.length * 100)) % arr.length + start]
 }
 
 export const randRange = (num1: number, num2 = 0) => {

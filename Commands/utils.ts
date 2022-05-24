@@ -1,6 +1,6 @@
 import { evaluate } from "mathjs"
 import { Color } from "color-convert"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags } from "Modules"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags } from "modules"
 import { ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
@@ -527,7 +527,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
         title: mode == "coin" ? "Coin flip" : mode == "dice" ? "Dice roll" : "Random numbers",
         description: ""
       }
-      let choices: any[] = []
+      let choices: (string | number)[] = []
 
       if (mode == "coin") {
         choices = ["Head", "Tail"]
@@ -560,7 +560,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
           const symbols = ["π", "τ"]
           const symvals = [Math.PI, Math.PI * 2]
 
-          var scope = {}
+          const scope = {}
           symbols.forEach((value: string | number | any[], i: string | number) => {
             if (typeof value == "object") {
               value.forEach((subvalue: string | number) => {

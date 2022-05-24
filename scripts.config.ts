@@ -24,6 +24,10 @@ const config: DenonConfig = {
       desc: "Start the bot in dev mode",
       inspect: "127.0.0.1:9229"
     },
+    repl: {
+      cmd: "deno repl",
+      allow: undefined,
+    },
   },
   watcher: { exts: ["ts"] },
 }

@@ -183,7 +183,7 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   switch(interaction.options.getSubcommandGroup()) {
     case "wordle": {
-      var title = `${interaction.user.tag} | `
+      let title = `${interaction.user.tag} | `
       let answer: string | undefined
 
       switch (interaction.options.getSubcommand()) {

@@ -1,4 +1,4 @@
-import { getFiles } from "Modules"
+import { getFiles } from "modules"
 import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand } from "discordeno"
 
 const env = Deno.env.toObject()
