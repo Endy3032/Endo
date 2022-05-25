@@ -1,5 +1,6 @@
-export const timestampStyler = (timestamp: number, mode: string) => {
-  const ts = Math.floor(timestamp / 1000)
+export const timestampStyler = (timestamp: number, mode: string, metric: "s" | "ms" = "s") => {
+  let ts = timestamp
+  if (metric == "ms") ts = Math.floor(timestamp / 1000)
   switch (mode) {
     case "stime": return `<t:${ts}:t>`
     case "ltime": return `<t:${ts}:T>`

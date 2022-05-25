@@ -30,7 +30,8 @@ export const deploy = async (bot: Bot, args: string[]) => {
       const commandFiles = getFiles(`./Commands/Guilds/${guildID}`)
 
       for await (const command of commandFiles) {
-        const { cmd } = await import(`./Commands/Guilds/${guildID}/${command}`)
+        if (command == "mod.ts") continue
+        const { cmd } = await import(`/Commands/Guilds/${guildID}/${command}`)
         commands.push(replaceDescription(cmd, "G"))
       }
 
@@ -44,19 +45,20 @@ export const deploy = async (bot: Bot, args: string[]) => {
 
     const commandFiles = getFiles("./Commands")
     for await (const command of commandFiles) {
-      const { cmd } = await import(`./Commands/${command}`)
+      if (command == "mod.ts") continue
+      const { cmd } = await import(`/Commands/${command}`)
       if (args.includes("global")) commands.push(cmd)
       if (args.includes("test")) testCommands.push(replaceDescription(cmd, "Dev"))
     }
 
     if (args.includes("global")) {
       const deployed = await bot.helpers.upsertApplicationCommands(commands)
-      console.log(`Deployed ${deployed.size} test commands`)
+      console.tagLog("Deploy", `${deployed.size} test commands`)
     }
 
     if (args.includes("test")) {
       const deployed = await bot.helpers.upsertApplicationCommands(testCommands, BigInt(env.TestGuild))
-      console.log(`Deployed ${deployed.size} test commands`)
+      console.tagLog("Deploy", `${deployed.size} test commands`)
     }
   }
 }

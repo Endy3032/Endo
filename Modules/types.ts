@@ -155,3 +155,7 @@ export enum MessageFlags {
   Loading = 1 << 7, // this message is an Interaction Response and the bot is "thinking"
   FailedToMentionSomeRolesInThread = 1 << 8, // this message failed to mention some roles and add their members to the thread
 }
+
+export enum Constants {
+  Timezone = "Asia/Ho_Chi_Minh"
+}

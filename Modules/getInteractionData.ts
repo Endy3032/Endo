@@ -41,26 +41,26 @@ const resolvedOptionTypeToKey = {
 
 const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
 
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.String): string | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Boolean): boolean | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Integer | ApplicationCommandOptionTypes.Number): number | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Role): Role | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Channel): Channel | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Attachment): Attachment | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.Mentionable): User | Channel | Role | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes.User): { user: User, member?: Member } | null
-export function getValue(interaction: Interaction, name: string, type?: ApplicationCommandOptionTypes) {
+export function getValue(interaction: Interaction, name: string, type?: "String"): string | null
+export function getValue(interaction: Interaction, name: string, type?: "Boolean"): boolean | null
+export function getValue(interaction: Interaction, name: string, type?: "Integer" | "Number"): number | null
+export function getValue(interaction: Interaction, name: string, type?: "Role"): Role | null
+export function getValue(interaction: Interaction, name: string, type?: "Channel"): Channel | null
+export function getValue(interaction: Interaction, name: string, type?: "Attachment"): Attachment | null
+export function getValue(interaction: Interaction, name: string, type?: "Mentionable"): User | Channel | Role | null
+export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User, member?: Member } | null
+export function getValue(interaction: Interaction, name: string, type?: keyof typeof ApplicationCommandOptionTypes) {
   const options = getOptions(interaction)
   if (options === undefined) return null
 
   const option = options.find(option => {
     let cond = option.name === name
-    if (type) cond = cond && option.type === type
+    if (type) cond = cond && option.type === ApplicationCommandOptionTypes[type]
     return cond
   })
   if (option === undefined) return null
 
-  if (type && needResolved.includes(type) || needResolved.includes(option.type)) {
+  if (type && needResolved.includes(ApplicationCommandOptionTypes[type]) || needResolved.includes(option.type)) {
     const resolved = interaction.data?.resolved
     if (resolved === undefined) return null
 
@@ -78,5 +78,21 @@ export function getValue(interaction: Interaction, name: string, type?: Applicat
     }
   }
 
+  return option.value
+}
+
+type AutocompleteOptionTypes = Extract<keyof typeof ApplicationCommandOptionTypes, "String" | "Integer" | "Number">
+export function getFocused(interaction: Interaction, type?: "String"): string | null
+export function getFocused(interaction: Interaction, type?: "Integer" | "Number"): number | null
+export function getFocused(interaction: Interaction, type?: AutocompleteOptionTypes) {
+  const options = getOptions(interaction)
+  if (options === undefined) return null
+
+  const option = options.find(option => {
+    let cond = option.focused === true
+    if (type) cond = cond && option.type === ApplicationCommandOptionTypes[type]
+    return cond
+  })
+  if (option === undefined) return null
   return option.value
 }

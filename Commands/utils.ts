@@ -1,7 +1,10 @@
+import Fuse from "fuse"
 import { evaluate } from "mathjs"
+import { Temporal } from "temporal"
 import { Color } from "color-convert"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags } from "modules"
-import { ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes } from "discordeno"
+import { timeZones } from "timezones"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused } from "modules"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
   name: "utils",
@@ -342,6 +345,13 @@ export const cmd: CreateApplicationCommand = {
           maxValue: 999,
           required: false
         },
+        {
+          name: "timezone",
+          description: "The timestamp's timezone [String]",
+          type: ApplicationCommandOptionTypes.String,
+          autocomplete: true,
+          required: false
+        },
       ]
     }
   ]
@@ -354,16 +364,16 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 
       switch (getSubcmd(interaction)) {
         case "rgb": {
-          const red = getValue(interaction, "red", ApplicationCommandOptionTypes.Integer) ?? 0
-          const green = getValue(interaction, "green", ApplicationCommandOptionTypes.Integer) ?? 0
-          const blue = getValue(interaction, "blue", ApplicationCommandOptionTypes.Integer) ?? 0
+          const red = getValue(interaction, "red", "Integer") ?? 0
+          const green = getValue(interaction, "green", "Integer") ?? 0
+          const blue = getValue(interaction, "blue", "Integer") ?? 0
 
           color = Color.rgb(red, green, blue)
           break
         }
 
         case "decimal": {
-          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer) ?? 0
+          const value = getValue(interaction, "value", "Integer") ?? 0
           const hex = value.toString(16).padStart(6, "0")
           const [red, green, blue] = hex.match(/.{1,2}/g) as RegExpMatchArray
 
@@ -372,7 +382,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
         }
 
         case "hex": {
-          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.String) ?? "000000"
+          const value = getValue(interaction, "value", "String") ?? "000000"
           const matched = value.match(/\d{1,6}/g)?.reduce((prev, curr) => Math.abs(curr.length - 6) < Math.abs(prev.length - 6) ? curr : prev) ?? "000000"
           const hex = parseInt(matched, 16)
 
@@ -381,28 +391,28 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
         }
 
         case "hsl": {
-          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer) ?? 0
-          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer) ?? 0
-          const lightness = getValue(interaction, "lightness", ApplicationCommandOptionTypes.Integer) ?? 0
+          const hue = getValue(interaction, "hue", "Integer") ?? 0
+          const saturation = getValue(interaction, "saturation", "Integer") ?? 0
+          const lightness = getValue(interaction, "lightness", "Integer") ?? 0
 
           color = Color.hsl(hue, saturation, lightness)
           break
         }
 
         case "hsv": {
-          const hue = getValue(interaction, "hue", ApplicationCommandOptionTypes.Integer) ?? 0
-          const saturation = getValue(interaction, "saturation", ApplicationCommandOptionTypes.Integer) ?? 0
-          const value = getValue(interaction, "value", ApplicationCommandOptionTypes.Integer) ?? 0
+          const hue = getValue(interaction, "hue", "Integer") ?? 0
+          const saturation = getValue(interaction, "saturation", "Integer") ?? 0
+          const value = getValue(interaction, "value", "Integer") ?? 0
 
           color = Color.hsv(hue, saturation, value)
           break
         }
 
         case "cmyk": {
-          const cyan = getValue(interaction, "cyan", ApplicationCommandOptionTypes.Integer) ?? 0
-          const magenta = getValue(interaction, "magenta", ApplicationCommandOptionTypes.Integer) ?? 0
-          const yellow = getValue(interaction, "yellow", ApplicationCommandOptionTypes.Integer) ?? 0
-          const key = getValue(interaction, "key", ApplicationCommandOptionTypes.Integer) ?? 0
+          const cyan = getValue(interaction, "cyan", "Integer") ?? 0
+          const magenta = getValue(interaction, "magenta", "Integer") ?? 0
+          const yellow = getValue(interaction, "yellow", "Integer") ?? 0
+          const key = getValue(interaction, "key", "Integer") ?? 0
 
           color = Color.cmyk(cyan, magenta, yellow, key)
           break
@@ -448,7 +458,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     case "info": {
       switch (getSubcmd(interaction)) {
         case "user": {
-          const { user } = getValue(interaction, "target", ApplicationCommandOptionTypes.User) ?? interaction
+          const { user } = getValue(interaction, "target", "User") ?? interaction
           const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "get", bot.constants.endpoints.USER(user.id))
           const createdAt = Math.floor(Number(toTimestamp(user.id) / 1000n))
 
@@ -519,9 +529,9 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 
     case "random": {
       const mode = getSubcmd(interaction)
-      const amount = getValue(interaction, "amount", ApplicationCommandOptionTypes.Integer) ?? 0
-      const min = getValue(interaction, "min", ApplicationCommandOptionTypes.Integer) ?? 0
-      const max = getValue(interaction, "max", ApplicationCommandOptionTypes.Integer) ?? 100
+      const amount = getValue(interaction, "amount", "Integer") ?? 0
+      const min = getValue(interaction, "min", "Integer") ?? 0
+      const max = getValue(interaction, "max", "Integer") ?? 100
 
       const embed = {
         title: mode == "coin" ? "Coin flip" : mode == "dice" ? "Dice roll" : "Random numbers",
@@ -556,7 +566,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     default: {
       switch (getSubcmd(interaction)) {
         case "calculate": {
-          const expression = getValue(interaction, "expression", ApplicationCommandOptionTypes.String) ?? ""
+          const expression = getValue(interaction, "expression", "String") ?? ""
           const symbols = ["π", "τ"]
           const symvals = [Math.PI, Math.PI * 2]
 
@@ -608,7 +618,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
           const original = await bot.helpers.getOriginalInteractionResponse(interaction.token)
           const wsPing = bot.gateway.shards.reduce((curr, next) => curr + (next.heartbeat.lastReceivedAt - next.heartbeat.lastSentAt), 0) / bot.gateway.shards.size
 
-          if (wsPing < 0) console.botLog(bot.gateway.shards.map(shard => shard.heartbeat))
+          if (wsPing < 0) console.botLog(`${bot.gateway.shards.map(shard => shard.heartbeat)}\n${wsPing}`)
 
           await bot.helpers.editInteractionResponse(interaction.token, {
             content: "",
@@ -616,14 +626,67 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
               title: "Pong!",
               color: pickFromArray(colors),
               fields: [
-                { name: "Websocket Latency", value: `${wsPing}ms`, inline: false },
+                { name: "Websocket Latency", value: `${wsPing}ms${wsPing < 0 ? " (lmao how)" : ""}`, inline: false },
                 { name: "Roundtrip Latency", value: `${BigInt(original.timestamp) - toTimestamp(interaction.id)}ms`, inline: false }
               ]
             }]
           })
           break
         }
+
+        case "timestamp": {
+          const millisecond = getValue(interaction, "millisecond", "Integer") ?? 0
+          const second = getValue(interaction, "second", "Integer") ?? 0
+          const minute = getValue(interaction, "minute", "Integer") ?? 0
+          const hour = getValue(interaction, "hour", "Integer") ?? 0
+          const day = getValue(interaction, "day", "Integer") ?? 1
+          const month = getValue(interaction, "month", "Integer") ?? 1
+          const timezone = getValue(interaction, "timezone", "String") ?? Constants.Timezone
+          const year = getValue(interaction, "year", "Integer") ?? Temporal.Now.zonedDateTimeISO(timezone).year
+
+          let date: Temporal.ZonedDateTime | Temporal.Instant = Temporal.ZonedDateTime.from({ year, month, day, hour, minute, second, millisecond, timeZone: timezone })
+          if (date.toString() == "Invalid Date") date = Temporal.Instant.fromEpochSeconds(year < 0 ? -8640000000000 : 8640000000000)
+
+          const timestamp = date.epochSeconds
+          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+            type: InteractionResponseTypes.ChannelMessageWithSource,
+            data: {
+              content: `**Date** • ${date}\n**Timestamp** • ${timestamp} (${String(date.epochMilliseconds)})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`,
+              flags: MessageFlags.Ephemeral,
+            }
+          })
+          break
+        }
       }
     }
   }
+}
+
+export const autocomplete = async (bot: Bot, interaction: Interaction) => {
+  const current = getFocused(interaction, "String") || ""
+  const blankInitial = { name: "Keep typing to continue…", value: "__" }
+  // const filledInitial = { name: current, value: "__" }
+  const response: ApplicationCommandOptionChoice[] = []
+
+  if (current.length == 0) return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+    type: InteractionResponseTypes.ApplicationCommandAutocompleteResult,
+    data: {
+      choices: [blankInitial]
+    }
+  })
+
+  switch (getSubcmd(interaction)) {
+    case "timestamp": {
+      const fuse = new Fuse(timeZones, { distance: 5 })
+      response.push(...fuse.search(current).map(result => {return { name: result.item, value: result.item }}))
+      break
+    }
+  }
+
+  await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+    type: InteractionResponseTypes.ApplicationCommandAutocompleteResult,
+    data: {
+      choices: response.slice(0, 25)
+    }
+  })
 }

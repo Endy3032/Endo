@@ -74,13 +74,13 @@ for await (const file of getFiles("./Events")) {
   bot.events[name as keyof EventHandlers] = execute
 }
 
-bot.gateway.presence = activities
+bot.gateway.presence = activities()
 
+console.clear()
 await deploy(bot, Deno.args)
 await startBot(bot)
 
 const listener = Deno.listen({ port: 3032 })
-console.clear()
 console.tagLog("Ready", "Server")
 
 const http = async (conn: Deno.Conn) => {

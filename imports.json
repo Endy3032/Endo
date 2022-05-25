@@ -12,11 +12,12 @@
     "discordeno-stable": "https://deno.land/x/discordeno@13.0.0-rc39/mod.ts",
     "dom": "https://deno.land/x/deno_dom@v0.1.27-alpha/deno-dom-wasm.ts",
     "exif": "https://deno.land/x/deno_exif@0.0.2/mod.ts",
-    "fuse": "https://esm.sh/fuse.js",
+    "fuse": "https://esm.sh/fuse.js@6.6.2",
     "google-translate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
     "mathjs": "https://esm.sh/mathjs",
     "progressbar": "https://esm.sh/string-progressbar",
     "temporal": "https://esm.sh/@js-temporal/polyfill",
+    "timezones": "https://deno.land/x/timezones/mod.ts",
     "urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
     "wikipedia": "https://deno.land/x/denowiki@v0.2.1"
   }
