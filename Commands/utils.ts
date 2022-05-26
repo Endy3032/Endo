@@ -4,7 +4,7 @@ import { prettyBytes } from "bytes"
 import { Temporal } from "temporal"
 import { Color } from "color-convert"
 import { timeZones } from "timezones"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, getCmdName, emojis } from "modules"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, emojis } from "modules"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes, MessageComponents } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
