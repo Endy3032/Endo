@@ -47,7 +47,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
       console.tagLog("Deploy", `${deployed.size} global commands`)
     }
 
-    if (args.includes("testdep")) {
+    if (args.includes("test")) {
       if (TestGuild === undefined) return console.tagLog("Deploy", "Failed to register test commands [Test Guild ID Not Provided]")
       const testCommands = [...botCommands.map(command => replaceDescription(command, "Dev"))]
       const deployed = await bot.helpers.upsertApplicationCommands(testCommands, BigInt(TestGuild))

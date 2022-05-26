@@ -75,16 +75,15 @@ for await (const file of getFiles("./Events")) {
   bot.events[name as keyof EventHandlers] = execute
 }
 
-
 console.clear()
 await deploy(bot, Deno.args)
-await bot.helpers.editBotStatus(activities())
+bot.gateway.manager.createShardOptions.makePresence = (shardId) => { return activities() }
 startBot(bot)
 
 const listener = Deno.listen({ port: 3032 })
 console.tagLog("Ready", "Server")
 
-const http = async (conn: Deno.Conn) => {
+async function http (conn: Deno.Conn) {
   for await (const req of Deno.serveHttp(conn)) {
     req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
   }

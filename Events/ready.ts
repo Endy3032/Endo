@@ -16,7 +16,6 @@ type Payload = {
 
 export const name: keyof EventHandlers = "ready"
 export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload) => {
-  let localUpdated = false
   console.tagLog("Login", `As ${payload.user.username}#${payload.user.discriminator} [v${payload.v} | ${bot.gateway.gatewayBot.sessionStartLimit.remaining} Remaining | ${Deno.build.os == "darwin" ? "Local" : "Cloud"}]`)
 
   const pinger = () => {
@@ -31,8 +30,6 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
 
   const reloadPresence = async () => {
     const activity = activities()
-    if (Deno.build.os == "darwin" && localUpdated) return
-    localUpdated = true
     await bot.helpers.editBotStatus(activity)
     const activityType = activity.activities[0].type
     const activityName = activity.activities[0].name
@@ -45,7 +42,7 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
 
   pinger()
   setInterval(() => { pinger() }, 5 * TimeMetric.milli2min)
-  setInterval(() => { reloadPresence() }, 15 * TimeMetric.milli2min)
+  if (Deno.build.os == "linux") setInterval(() => { reloadPresence() }, 15 * TimeMetric.milli2min)
 
   const globalCommands = await getApplicationCommands(bot).catch(err => console.botLog(err, "ERROR"))
   console.tagLog("Global", `${globalCommands?.size ?? "Failed Fetching"} Commands`)

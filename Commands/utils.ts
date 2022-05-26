@@ -1,9 +1,10 @@
 import Fuse from "fuse"
 import { evaluate } from "mathjs"
+import { prettyBytes } from "bytes"
 import { Temporal } from "temporal"
 import { Color } from "color-convert"
 import { timeZones } from "timezones"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, getCmdName } from "modules"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, getCmdName, emojis } from "modules"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes, MessageComponents } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
@@ -195,6 +196,11 @@ export const cmd: CreateApplicationCommand = {
       type: ApplicationCommandOptionTypes.SubCommandGroup,
       options: [
         {
+          name: "bot",
+          description: "Get info about this bot",
+          type: ApplicationCommandOptionTypes.SubCommand
+        },
+        {
           name: "server",
           description: "Get info about the server",
           type: ApplicationCommandOptionTypes.SubCommand
@@ -282,6 +288,27 @@ export const cmd: CreateApplicationCommand = {
             }
           ]
         },
+      ]
+    },
+    {
+      name: "send",
+      description: "Send something in this channel",
+      type: ApplicationCommandOptionTypes.SubCommand,
+      options: [
+        {
+          name: "message",
+          description: "The message to send [String]",
+          type: ApplicationCommandOptionTypes.String,
+          required: true
+        },
+        {
+          name: "times",
+          description: "The number of times to send the message [Integer 1~3 - Default 1]",
+          type: ApplicationCommandOptionTypes.Integer,
+          minValue: 1,
+          maxValue: 3,
+          required: false
+        }
       ]
     },
     {
@@ -457,6 +484,38 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
     case "info": {
       switch (getSubcmd(interaction)) {
+        case "bot": {
+          const app = await bot.helpers.getApplicationInfo()
+          const memory = Deno.memoryUsage()
+          const creationTimestamp = Math.floor(Number(toTimestamp(bot.id) / 1000n))
+          const { version } = Deno
+          const discordenoVersion = bot.constants.DISCORDENO_VERSION
+
+          const ownerID = (app.team ? app.team.ownerUserId : app.owner?.id) ?? bot.id
+          const owner = await bot.helpers.getUser(ownerID)
+
+          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+            type: InteractionResponseTypes.ChannelMessageWithSource,
+            data: {
+              embeds: [{
+                title: `Bot Info • ${app.name}`,
+                description: app.description,
+                color: pickFromArray(colors),
+                fields: [
+                  { name: "Owner", value: `${owner?.username}#${owner?.discriminator}`, inline: true },
+                  { name: "Invite", value: `[Link](https://discord.com/api/v9/oauth2/authorize?client_id=${bot.id}&scope=bot%20applications.commands)`, inline: true },
+                  { name: "Creation Date", value: `<t:${creationTimestamp}:f>\n<t:${creationTimestamp}:R>`, inline: true },
+                  { name: "Discordeno Version", value: `[${discordenoVersion}](https://deno.land/x/discordeno@${discordenoVersion}/mod.ts)`, inline: true },
+                  { name: "Deno Info", value: `Deno v${version.deno}\nV8 Engine v${version.v8}\nTypeScript v${version.typescript}`, inline: true },
+                  { name: "Memory Usage", value: `**RSS** • ${prettyBytes(memory.rss)}\n**Heap Total** • ${prettyBytes(memory.heapTotal)}\n**Heap Used** • ${prettyBytes(memory.heapUsed)}`, inline: true },
+                ],
+                thumbnail: { url: imageURL(bot.id, app.icon, "icons") },
+              }]
+            }
+          })
+          break
+        }
+
         case "server": {
           if (interaction.guildId === undefined) {
             await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
@@ -667,6 +726,49 @@ export async function execute(bot: Bot, interaction: Interaction) {
               flags: MessageFlags.Ephemeral
             }
           })
+          break
+        }
+
+        case "send": {
+          if (!interaction.guildId) {
+            return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+              type: InteractionResponseTypes.ChannelMessageWithSource,
+              data: {
+                content: `${emojis.warn.shorthand} This command can only be used in servers.`,
+                flags: MessageFlags.Ephemeral
+              }
+            })
+          }
+
+          const { channelId } = interaction
+          if (channelId === undefined) {
+            return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+              type: InteractionResponseTypes.ChannelMessageWithSource,
+              data: {
+                content: `${emojis.warn.shorthand} Can't reach this channel.`,
+                flags: MessageFlags.Ephemeral
+              }
+            })
+          }
+
+          const message = getValue(interaction, "message", "String") ?? ""
+          var times = getValue(interaction, "times", "Integer") ?? 1
+
+          // Failsafe
+          let response = `Dispatching "${message}" ${times} times`
+          if (times > 3) {
+            times = 3
+            response += "\nNote: 3 times maximum"
+          }
+
+          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+            type: InteractionResponseTypes.ChannelMessageWithSource,
+            data: { content: response, flags: MessageFlags.Ephemeral }
+          })
+
+          for (let i = 0; i < times; i++) {
+            setTimeout(() => bot.helpers.sendMessage(channelId, { content: message }), 750 * i)
+          }
           break
         }
 

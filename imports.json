@@ -5,6 +5,7 @@
     "modules": "./Modules/mod.ts",
     "axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
     "axiod/": "https://deno.land/x/axiod@0.26.1/",
+    "bytes": "https://deno.land/std@0.140.0/fmt/bytes.ts",
     "canvas": "https://deno.land/x/canvas/mod.ts",
     "color-convert": "https://deno.land/x/color@v0.2.2/mod.ts",
     "colors": "https://deno.land/std@0.140.0/fmt/colors.ts",

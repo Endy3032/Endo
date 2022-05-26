@@ -1,6 +1,6 @@
 import { rgb24, stripColor } from "colors"
 import { commands } from "/Commands/mod.ts"
-import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, MessageFlags, getValue } from "modules"
+import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, MessageFlags } from "modules"
 import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed, InteractionResponseTypes } from "discordeno"
 
 const testGuildID = Deno.env.get("TestGuild")
