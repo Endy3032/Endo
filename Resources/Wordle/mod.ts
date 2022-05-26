@@ -12958,7 +12958,7 @@ allowed.push(...answers)
 
 function getWord() {
   const a = Temporal.Now.instant().epochSeconds
-  return answers[Math.floor(a/TimeMetric.sec2day) - 18794]
+  return answers[Math.floor(a/TimeMetric.sec2day) - 18792]
 }
 
 const colors = {
