@@ -41,7 +41,7 @@ const resolvedOptionTypeToKey = {
 
 const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
 
-export function getValue(interaction: Interaction, name: string, type?: "String"): string | null
+export function getValue(interaction: Interaction, name: string, type?: "String" | "Modal"): string | null
 export function getValue(interaction: Interaction, name: string, type?: "Boolean"): boolean | null
 export function getValue(interaction: Interaction, name: string, type?: "Integer" | "Number"): number | null
 export function getValue(interaction: Interaction, name: string, type?: "Role"): Role | null
@@ -49,7 +49,12 @@ export function getValue(interaction: Interaction, name: string, type?: "Channel
 export function getValue(interaction: Interaction, name: string, type?: "Attachment"): Attachment | null
 export function getValue(interaction: Interaction, name: string, type?: "Mentionable"): User | Channel | Role | null
 export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User, member?: Member } | null
-export function getValue(interaction: Interaction, name: string, type?: keyof typeof ApplicationCommandOptionTypes) {
+export function getValue(interaction: Interaction, name: string, type?: keyof typeof ApplicationCommandOptionTypes | "Modal") {
+  if (interaction.type == InteractionTypes.ModalSubmit) {
+    const modalData = interaction.data?.components?.map(component => component.components).flat()
+    return modalData?.find(input => input?.customId == name)?.value
+  }
+
   const options = getOptions(interaction)
   if (options === undefined) return null
 

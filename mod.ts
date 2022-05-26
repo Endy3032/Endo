@@ -37,6 +37,7 @@ console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = tr
   }).replace(",", "")
 
   const logColor = Nord[logLevel.toLowerCase()]
+  if (typeof content !== "string") content = JSON.stringify(content, null, 4)
   content = content.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ").replaceAll("\n", `\n${" ".repeat(30)}| `)
   content = rgb24(`${logTime} ${rgb24(logLevel.padStart(6, " "), logColor)} | ${content}`, Nord.blue)
 

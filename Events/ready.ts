@@ -17,7 +17,7 @@ type Payload = {
 export const name: keyof EventHandlers = "ready"
 export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload) => {
   let localUpdated = false
-  console.tagLog("Login", `As ${payload.user.username}#${payload.user.discriminator} [v${payload.v} | ${bot.botGatewayData?.sessionStartLimit.remaining} Remaining | ${Deno.build.os == "darwin" ? "Local" : "Cloud"}]`)
+  console.tagLog("Login", `As ${payload.user.username}#${payload.user.discriminator} [v${payload.v} | ${bot.gateway.gatewayBot.sessionStartLimit.remaining} Remaining | ${Deno.build.os == "darwin" ? "Local" : "Cloud"}]`)
 
   const pinger = () => {
     const servers = ["pinger", "endyjs"]
