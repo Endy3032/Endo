@@ -1,3 +1,5 @@
+import { Bot, CreateApplicationCommand, CreateContextApplicationCommand, Interaction } from "discordeno"
+
 export enum Nord {
   // Polar Night
   night1 = 0x2E3440,
@@ -158,4 +160,15 @@ export enum MessageFlags {
 
 export enum Constants {
   Timezone = "Asia/Ho_Chi_Minh"
+}
+
+type InteractionFunction = (bot: Bot, interaction: Interaction) => Promise<void>
+export type BotApplicationCommand = CreateApplicationCommand | CreateContextApplicationCommand
+export type Command = {
+  cmd: BotApplicationCommand,
+  execute?: InteractionFunction,
+  button?: InteractionFunction,
+  select?: InteractionFunction,
+  autocomplete?: InteractionFunction,
+  modal?: InteractionFunction,
 }

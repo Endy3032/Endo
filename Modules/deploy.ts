@@ -1,10 +1,9 @@
-import { getFiles } from "modules"
-import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand, CreateContextApplicationCommand } from "discordeno"
+import { BotApplicationCommand, getFiles } from "modules"
+import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand } from "discordeno"
 
-const env = Deno.env.toObject()
-type ApplicationCommand = CreateApplicationCommand | CreateContextApplicationCommand
+const { TestGuild } = Deno.env.toObject()
 
-const replaceDescription = (cmd: ApplicationCommand, tag: string) => {
+const replaceDescription = (cmd: BotApplicationCommand, tag: string) => {
   if (cmd.type == ApplicationCommandTypes.Message || cmd.type == ApplicationCommandTypes.User) {
     cmd.name = `[${tag.charAt(0)}] ${cmd.name}`
     return cmd
@@ -26,7 +25,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
     const guildFolders = getFiles("./Commands/Guilds")
 
     for await (const guildID of guildFolders) {
-      const commands = [] as ApplicationCommand[]
+      const commands = [] as BotApplicationCommand[]
       const commandFiles = getFiles(`./Commands/Guilds/${guildID}`)
 
       for await (const command of commandFiles) {
@@ -40,24 +39,18 @@ export const deploy = async (bot: Bot, args: string[]) => {
   }
 
   if (args.includes("global") || args.includes("test")) {
-    const commands = [] as ApplicationCommand[]
-    const testCommands = [] as ApplicationCommand[]
-
-    const commandFiles = getFiles("./Commands")
-    for await (const command of commandFiles) {
-      if (command == "mod.ts") continue
-      const { cmd } = await import(`/Commands/${command}`)
-      if (args.includes("global")) commands.push(cmd)
-      if (args.includes("test")) testCommands.push(replaceDescription(cmd, "Dev"))
-    }
+    const { commands } = await import("/Commands/mod.ts")
+    const botCommands = commands.array().map(command => command.cmd)
 
     if (args.includes("global")) {
-      const deployed = await bot.helpers.upsertApplicationCommands(commands)
-      console.tagLog("Deploy", `${deployed.size} test commands`)
+      const deployed = await bot.helpers.upsertApplicationCommands(botCommands)
+      console.tagLog("Deploy", `${deployed.size} global commands`)
     }
 
-    if (args.includes("test")) {
-      const deployed = await bot.helpers.upsertApplicationCommands(testCommands, BigInt(env.TestGuild))
+    if (args.includes("testdep")) {
+      if (TestGuild === undefined) return console.tagLog("Deploy", "Failed to register test commands [Test Guild ID Not Provided]")
+      const testCommands = [...botCommands.map(command => replaceDescription(command, "Dev"))]
+      const deployed = await bot.helpers.upsertApplicationCommands(testCommands, BigInt(TestGuild))
       console.tagLog("Deploy", `${deployed.size} test commands`)
     }
   }
