@@ -459,7 +459,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
       switch (getSubcmd(interaction)) {
         case "user": {
           const { user } = getValue(interaction, "target", "User") ?? interaction
-          const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "get", bot.constants.endpoints.USER(user.id))
+          const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "GET", bot.constants.routes.USER(user.id))
           const createdAt = Math.floor(Number(toTimestamp(user.id) / 1000n))
 
           await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
@@ -493,7 +493,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 
           const guild = await bot.helpers.getGuild(interaction.guildId, { counts: true })
           const channels = await bot.helpers.getChannels(interaction.guildId)
-          const emojis = await bot.rest.runMethod<DiscordEmoji[]>(bot.rest, "get", bot.constants.endpoints.GUILD_EMOJIS(interaction.guildId))
+          const emojis = await bot.rest.runMethod<DiscordEmoji[]>(bot.rest, "GET", bot.constants.routes.GUILD_EMOJIS(interaction.guildId))
 
           const verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
           const filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
@@ -571,7 +571,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
           const symvals = [Math.PI, Math.PI * 2]
 
           const scope = {}
-          symbols.forEach((value: string | number | any[], i: string | number) => {
+          symbols.forEach((value: string | string[], i: string | number) => {
             if (typeof value == "object") {
               value.forEach((subvalue: string | number) => {
                 scope[subvalue] = symvals[i]
@@ -616,9 +616,10 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
           })
 
           const original = await bot.helpers.getOriginalInteractionResponse(interaction.token)
-          const wsPing = bot.gateway.shards.reduce((curr, next) => curr + (next.heartbeat.lastReceivedAt - next.heartbeat.lastSentAt), 0) / bot.gateway.shards.size
+          const wsPing = bot.gateway.manager.shards.reduce((curr, next) => curr + (next.heart.rtt ?? 0), 0) / bot.gateway.manager.shards.size
+          const noPing = bot.gateway.manager.shards.some(shard => shard.heart.rtt === undefined)
 
-          if (wsPing < 0) console.botLog(`${bot.gateway.shards.map(shard => shard.heartbeat)}\n${wsPing}`)
+          if (wsPing < 0 && !noPing) console.botLog(`${bot.gateway.manager.shards.map(shard => shard.heart)}\n${wsPing}`)
 
           await bot.helpers.editInteractionResponse(interaction.token, {
             content: "",
@@ -626,7 +627,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
               title: "Pong!",
               color: pickFromArray(colors),
               fields: [
-                { name: "Websocket Latency", value: `${wsPing}ms${wsPing < 0 ? " (lmao how)" : ""}`, inline: false },
+                { name: "Websocket Latency", value: noPing ? "Not available" : `${wsPing}ms${wsPing < 0 ? " (lmao how)" : ""}`, inline: false },
                 { name: "Roundtrip Latency", value: `${BigInt(original.timestamp) - toTimestamp(interaction.id)}ms`, inline: false }
               ]
             }]

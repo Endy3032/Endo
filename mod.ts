@@ -1,16 +1,16 @@
 import { Temporal } from "temporal"
 import { rgb24, stripColor } from "colors"
 import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "modules"
-import { createBot, CreateMessage, Embed, EventHandlers, startBot } from "discordeno"
+import { createBot, CreateMessage, Embed, EventHandlers, Intents, startBot } from "discordeno"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
 if (token === undefined) { throw new Error("Missing Token") }
 if (botId === undefined) { throw new Error("Missing Bot ID") }
 
-const bot = createBot({
+const bot = await createBot({
   token,
   botId: BigInt(botId),
-  intents: ["Guilds", "DirectMessages"],
+  intents: Intents.Guilds | Intents.DirectMessages,
   events: {},
 })
 
@@ -74,11 +74,11 @@ for await (const file of getFiles("./Events")) {
   bot.events[name as keyof EventHandlers] = execute
 }
 
-bot.gateway.presence = activities()
 
 console.clear()
 await deploy(bot, Deno.args)
-await startBot(bot)
+await bot.helpers.editBotStatus(activities())
+startBot(bot)
 
 const listener = Deno.listen({ port: 3032 })
 console.tagLog("Ready", "Server")

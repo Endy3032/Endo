@@ -1,8 +1,8 @@
 import axiod from "axiod"
 import { bold, rgb24 } from "colors"
-import { Bot, EventHandlers, getApplicationCommands, User } from "discordeno"
-import type { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
 import { activities, BrightNord, Nord, TimeMetric } from "modules"
+import type { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
+import { Bot, EventHandlers, getApplicationCommands, User } from "discordeno"
 
 type Payload = {
   shardId: number;
@@ -33,7 +33,7 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
     const activity = activities()
     if (Deno.build.os == "darwin" && localUpdated) return
     localUpdated = true
-    bot.helpers.editBotStatus(activity)
+    await bot.helpers.editBotStatus(activity)
     const activityType = activity.activities[0].type
     const activityName = activity.activities[0].name
     const typeString = ["Playing", "Streaming", "Listening to", "Watching"]
@@ -44,7 +44,6 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
   }
 
   pinger()
-  reloadPresence()
   setInterval(() => { pinger() }, 5 * TimeMetric.milli2min)
   setInterval(() => { reloadPresence() }, 15 * TimeMetric.milli2min)
 
