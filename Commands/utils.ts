@@ -28,7 +28,7 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "red",
-              description: "The red value of the RGB color [integer 0~255]",
+              description: "The red value of the RGB color [Integer 0~255]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 255,
@@ -36,7 +36,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "green",
-              description: "The green value of the RGB color [integer 0~255]",
+              description: "The green value of the RGB color [Integer 0~255]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 255,
@@ -44,7 +44,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "blue",
-              description: "The blue value of the RGB color [integer 0~255]",
+              description: "The blue value of the RGB color [Integer 0~255]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 255,
@@ -58,7 +58,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.SubCommand,
           options: [{
             name: "value",
-            description: "The value of the color [integer 0~16777215]",
+            description: "The value of the color [Integer 0~16777215]",
             type: ApplicationCommandOptionTypes.Integer,
             minValue: 0,
             maxValue: 16777215,
@@ -71,7 +71,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.SubCommand,
           options: [{
             name: "value",
-            description: "The hex value of the color [string]",
+            description: "The hex value of the color [String]",
             type: ApplicationCommandOptionTypes.String,
             required: true
           }]
@@ -83,7 +83,7 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "hue",
-              description: "The hue value of the HSV color [integer 0~360]",
+              description: "The hue value of the HSV color [Integer 0~360]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 360,
@@ -91,7 +91,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "saturation",
-              description: "The saturation value of the HSV color [integer 0~100]",
+              description: "The saturation value of the HSV color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -99,7 +99,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "value",
-              description: "The lightness value of the HSV color [integer 0~100]",
+              description: "The lightness value of the HSV color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -114,7 +114,7 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "hue",
-              description: "The hue value of the HSV color [integer 0~360]",
+              description: "The hue value of the HSV color [Integer 0~360]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 360,
@@ -122,7 +122,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "saturation",
-              description: "The saturation value of the HSV color [integer 0~100]",
+              description: "The saturation value of the HSV color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -130,7 +130,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "value",
-              description: "The value value of the HSV color [integer 0~100]",
+              description: "The value value of the HSV color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -145,7 +145,7 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "cyan",
-              description: "The cyan value of the CMYK color [integer 0~100]",
+              description: "The cyan value of the CMYK color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -153,7 +153,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "magenta",
-              description: "The magenta value of the CMYK color [integer 0~100]",
+              description: "The magenta value of the CMYK color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -161,7 +161,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "yellow",
-              description: "The yellow value of the CMYK color [integer 0~100]",
+              description: "The yellow value of the CMYK color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -169,7 +169,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "key",
-              description: "The key value of the CMYK color [integer 0~100]",
+              description: "The key value of the CMYK color [Integer 0~100]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
@@ -185,7 +185,7 @@ export const cmd: CreateApplicationCommand = {
       type: ApplicationCommandOptionTypes.SubCommand,
       options: [{
         name: "expression",
-        description: "The expression to calculate [string]",
+        description: "The expression to calculate [String]",
         type: ApplicationCommandOptionTypes.String,
         required: true
       }]
@@ -212,7 +212,7 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "target",
-              description: "The user to get info [mention / none]",
+              description: "The user to get info [User]",
               type: ApplicationCommandOptionTypes.User
             }
           ]
@@ -240,7 +240,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.SubCommand,
           options: [{
             name: "amount",
-            description: "The amount of coins to flip [integer 1~10]",
+            description: "The amount of coins to flip [Integer 1~10]",
             type: ApplicationCommandOptionTypes.Integer,
             minValue: 1,
             maxValue: 10,
@@ -253,7 +253,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.SubCommand,
           options: [{
             name: "amount",
-            description: "The amount of dice to roll [integer 1~10]",
+            description: "The amount of dice to roll [Integer 1~10]",
             type: ApplicationCommandOptionTypes.Integer,
             minValue: 1,
             maxValue: 10,
@@ -267,7 +267,7 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "amount",
-              description: "The amount of numbers to generate [integer 1~10]",
+              description: "The amount of numbers to generate [Integer 1~10]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 1,
               maxValue: 10,
@@ -275,14 +275,14 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "min",
-              description: "The minimum limit for the numbers [integer]",
+              description: "The minimum limit for the numbers [Integer]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               required: false
             },
             {
               name: "max",
-              description: "The maximum limit for the numbers [integer]",
+              description: "The maximum limit for the numbers [Integer]",
               maxValue: 20000,
               type: ApplicationCommandOptionTypes.Integer,
             }
