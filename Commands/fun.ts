@@ -1,4 +1,4 @@
-import { colors, getSubcmd, getSubcmdGroup, getValue, pickFromArray } from "modules"
+import { colors, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
 import { ApplicationCommandOptionTypes, Bot, Interaction, InteractionResponseTypes } from "discordeno"
 
 export const cmd = {
@@ -187,18 +187,15 @@ export async function execute(bot: Bot, interaction: Interaction) {
             : question.endsWith("\u200b") || question.startsWith("\u200b") ? pickFromArray(responses.no)
             : pickFromArray(responses[Object.keys(responses)[index]])
 
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: {
-              embeds: [{
-                title: "Magic 8-Ball",
-                color: parseInt(pickFromArray(colors), 16),
-                fields: [
-                  { name: ":question: Question", value: question, inline: false },
-                  { name: ":8ball: Response", value: response, inline: false }
-                ]
-              }]
-            }
+          await respond(bot, interaction, {
+            embeds: [{
+              title: "Magic 8-Ball",
+              color: parseInt(pickFromArray(colors), 16),
+              fields: [
+                { name: ":question: Question", value: question, inline: false },
+                { name: ":8ball: Response", value: response, inline: false }
+              ]
+            }]
           })
         }
       }

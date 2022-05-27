@@ -1,6 +1,6 @@
 import { rgb24, stripColor } from "colors"
 import { commands } from "/Commands/mod.ts"
-import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, MessageFlags } from "modules"
+import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, MessageFlags, respond } from "modules"
 import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed, InteractionResponseTypes } from "discordeno"
 
 const testGuildID = Deno.env.get("TestGuild")
@@ -64,13 +64,9 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     catch (e) {console.botLog(e, "ERROR")}
   } else {
     console.botLog(`No ${type} function found for ${commandName}`)
-    await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: {
-        content: "I can't seem to run this command. There might be something wrong on my end.",
-        flags: MessageFlags.Ephemeral
-      }
-    })
+    await respond(bot, interaction, {
+      content: "I can't seem to run this command. There might be something wrong on my end.",
+    }, true)
   }
 
   // console.log(getSubcmd(interaction, ))

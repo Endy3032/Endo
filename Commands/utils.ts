@@ -4,7 +4,7 @@ import { prettyBytes } from "bytes"
 import { Temporal } from "temporal"
 import { Color } from "color-convert"
 import { timeZones } from "timezones"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, emojis } from "modules"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, emojis, BotPermissions, respond } from "modules"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes, MessageComponents } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
@@ -459,26 +459,21 @@ export async function execute(bot: Bot, interaction: Interaction) {
       const hsl = color.hsl()
       const hsv = color.hsv()
 
-      await bot.helpers.sendInteractionResponse(
-        interaction.id, interaction.token, {
-          type: InteractionResponseTypes.ChannelMessageWithSource,
-          data: {
-            embeds: [{
-              title: "Color Conversion",
-              color: color.rgbNumber(),
-              fields: [
-                { name: "RGB", value: `${rgb.red()}, ${rgb.green()}, ${rgb.blue()}`, inline: true },
-                { name: "CMYK", value: `${cmyk.cyan()}, ${cmyk.magenta()}, ${cmyk.yellow()}, ${cmyk.black()}`, inline: true },
-                { name: "Decimal", value: `${color.rgbNumber()}`, inline: true },
-                { name: "HEX", value: hex, inline: true },
-                { name: "HSL", value: `${hsl.hue()}, ${hsl.saturation()}, ${hsl.lightness()}`, inline: true },
-                { name: "HSV", value: `${hsv.hue()}, ${hsv.saturation()}, ${hsv.value()}`, inline: true },
-              ],
-              thumbnail: { url: `https://dummyimage.com/128/${hex.slice(1)}/${hex.slice(1)}.png` },
-            }]
-          }
-        }
-      )
+      await respond(bot, interaction, {
+        embeds: [{
+          title: "Color Conversion",
+          color: color.rgbNumber(),
+          fields: [
+            { name: "RGB", value: `${rgb.red()}, ${rgb.green()}, ${rgb.blue()}`, inline: true },
+            { name: "CMYK", value: `${cmyk.cyan()}, ${cmyk.magenta()}, ${cmyk.yellow()}, ${cmyk.black()}`, inline: true },
+            { name: "Decimal", value: `${color.rgbNumber()}`, inline: true },
+            { name: "HEX", value: hex, inline: true },
+            { name: "HSL", value: `${hsl.hue()}, ${hsl.saturation()}, ${hsl.lightness()}`, inline: true },
+            { name: "HSV", value: `${hsv.hue()}, ${hsv.saturation()}, ${hsv.value()}`, inline: true },
+          ],
+          thumbnail: { url: `https://dummyimage.com/128/${hex.slice(1)}/${hex.slice(1)}.png` },
+        }]
+      })
       break
     }
 
@@ -494,34 +489,29 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const ownerID = (app.team ? app.team.ownerUserId : app.owner?.id) ?? bot.id
           const owner = await bot.helpers.getUser(ownerID)
 
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: {
-              embeds: [{
-                title: `Bot Info • ${app.name}`,
-                description: app.description,
-                color: pickFromArray(colors),
-                fields: [
-                  { name: "Owner", value: `${owner?.username}#${owner?.discriminator}`, inline: true },
-                  { name: "Invite", value: `[Link](https://discord.com/api/v9/oauth2/authorize?client_id=${bot.id}&scope=bot%20applications.commands)`, inline: true },
-                  { name: "Creation Date", value: `<t:${creationTimestamp}:f>\n<t:${creationTimestamp}:R>`, inline: true },
-                  { name: "Discordeno Version", value: `[${discordenoVersion}](https://deno.land/x/discordeno@${discordenoVersion}/mod.ts)`, inline: true },
-                  { name: "Deno Info", value: `Deno v${version.deno}\nV8 Engine v${version.v8}\nTypeScript v${version.typescript}`, inline: true },
-                  { name: "Memory Usage", value: `**RSS** • ${prettyBytes(memory.rss)}\n**Heap Total** • ${prettyBytes(memory.heapTotal)}\n**Heap Used** • ${prettyBytes(memory.heapUsed)}`, inline: true },
-                ],
-                thumbnail: { url: imageURL(bot.id, app.icon, "icons") },
-              }]
-            }
+          await respond(bot, interaction, {
+            embeds: [{
+              title: `Bot Info • ${app.name}`,
+              description: app.description,
+              color: pickFromArray(colors),
+              fields: [
+                { name: "Owner", value: `${owner?.username}#${owner?.discriminator}`, inline: true },
+                { name: "Invite", value: `[Link](https://discord.com/api/v9/oauth2/authorize?client_id=${bot.id}&permissions=${BotPermissions}&scope=bot%20applications.commands)`, inline: true },
+                { name: "Creation Date", value: `<t:${creationTimestamp}:f>\n<t:${creationTimestamp}:R>`, inline: true },
+                { name: "Discordeno Version", value: `[${discordenoVersion}](https://deno.land/x/discordeno@${discordenoVersion}/mod.ts)`, inline: true },
+                { name: "Deno Info", value: `Deno v${version.deno}\nV8 Engine v${version.v8}\nTypeScript v${version.typescript}`, inline: true },
+                { name: "Memory Usage", value: `**RSS** • ${prettyBytes(memory.rss)}\n**Heap Total** • ${prettyBytes(memory.heapTotal)}\n**Heap Used** • ${prettyBytes(memory.heapUsed)}`, inline: true },
+              ],
+              thumbnail: { url: imageURL(bot.id, app.icon, "icons") },
+            }]
           })
           break
         }
 
         case "server": {
           if (interaction.guildId === undefined) {
-            await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-              type: InteractionResponseTypes.ChannelMessageWithSource,
-              data: { content: "This command can't be used ouside of a server.", flags: MessageFlags.Ephemeral },
-            }).catch(err => {console.botLog(err, "ERROR")})
+            await respond(bot, interaction, { content: "This command can't be used ouside of a server.", flags: MessageFlags.Ephemeral })
+              .catch(err => {console.botLog(err, "ERROR")})
             break
           }
 
@@ -532,28 +522,25 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const verificationLevel = ["Unrestricted", "Verified Email", "Registered for >5m", "Member for >10m", "Verified Phone"]
           const filterLevel = ["Not Scanned", "Scan Without Roles", "Scan Everything"]
 
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: {
-              embeds: [{
-                color: pickFromArray(colors),
-                description: guild.description ? `Server Description: ${guild.description}` : "",
-                fields: [
-                  { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
-                  { name: "Creation Date", value: `<t:${Math.floor(Number(toTimestamp(guild.id) / 1000n))}:D>`, inline: true },
-                  { name: "Vanity Invite URL", value: guild.vanityUrlCode ?? "None", inline: true },
-                  { name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
-                  { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
-                  { name: "AFK Channel", value: guild.afkChannelId ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
-                  { name: "General Info", value: `~${guild.approximateMemberCount} Members\n${guild.roles.size} Roles\n${guild.emojis.size} Emojis\n┣ ${emojis.filter(emoji => !emoji.animated).length} static\n╰ ${emojis.filter(emoji => emoji.animated).length} animated`, inline: true },
-                  { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories\n${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text\n${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice\n${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages\n`, inline: true },
-                ],
-                image: { url: imageURL(guild.id, guild.banner, "banners") ?? "" },
-                thumbnail: { url: imageURL(guild.id, guild.icon, "icons") ?? "" },
-                author: { name: guild.name },
-                footer: { text: `Server ID • ${guild.id}` },
-              }]
-            }
+          await respond(bot, interaction, {
+            embeds: [{
+              color: pickFromArray(colors),
+              description: guild.description ? `Server Description: ${guild.description}` : "",
+              fields: [
+                { name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
+                { name: "Creation Date", value: `<t:${Math.floor(Number(toTimestamp(guild.id) / 1000n))}:D>`, inline: true },
+                { name: "Vanity Invite URL", value: guild.vanityUrlCode ?? "None", inline: true },
+                { name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
+                { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
+                { name: "AFK Channel", value: guild.afkChannelId ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
+                { name: "General Info", value: `~${guild.approximateMemberCount} Members\n${guild.roles.size} Roles\n${guild.emojis.size} Emojis\n┣ ${emojis.filter(emoji => !emoji.animated).length} static\n╰ ${emojis.filter(emoji => emoji.animated).length} animated`, inline: true },
+                { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories\n${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text\n${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice\n${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages\n`, inline: true },
+              ],
+              image: { url: imageURL(guild.id, guild.banner, "banners") ?? "" },
+              thumbnail: { url: imageURL(guild.id, guild.icon, "icons") ?? "" },
+              author: { name: guild.name },
+              footer: { text: `Server ID • ${guild.id}` },
+            }]
           })
           break
         }
@@ -563,22 +550,19 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "GET", bot.constants.routes.USER(user.id))
           const createdAt = Math.floor(Number(toTimestamp(user.id) / 1000n))
 
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: {
-              embeds: [{
-                color: discordUser.accent_color ?? pickFromArray(colors),
-                fields: [
-                  { name: "Name", value: user.username, inline: true },
-                  { name: "Tag", value: user.discriminator, inline: true },
-                  { name: "ID", value: user.id.toString(), inline: true },
-                  { name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)` }
-                ],
-                image: { url: imageURL(user.id, discordUser.banner, "banners") },
-                thumbnail: { url: imageURL(user.id, user.avatar, "avatars") },
-                author: { name: "User Info" },
-              }]
-            }
+          await respond(bot, interaction, {
+            embeds: [{
+              color: discordUser.accent_color ?? pickFromArray(colors),
+              fields: [
+                { name: "Name", value: user.username, inline: true },
+                { name: "Tag", value: user.discriminator, inline: true },
+                { name: "ID", value: user.id.toString(), inline: true },
+                { name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)` }
+              ],
+              image: { url: imageURL(user.id, discordUser.banner, "banners") },
+              thumbnail: { url: imageURL(user.id, user.avatar, "avatars") },
+              author: { name: "User Info" },
+            }]
           }).catch(err => {console.botLog(err, "ERROR")})
           break
         }
@@ -605,20 +589,14 @@ export async function execute(bot: Bot, interaction: Interaction) {
       } else if (mode == "number") {
         for (let i = 0; i < amount; i++) embed.description += `${Math.floor(Math.random() * (max - min) + min)}, `
         embed.description = embed.description.slice(0, -2)
-        await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-          type: InteractionResponseTypes.ChannelMessageWithSource,
-          data: { embeds: [embed] }
-        })
+        await respond(bot, interaction, { embeds: [embed] })
         break
       }
 
       for (let i = 0; i < amount; i++) embed.description += `${pickFromArray(choices)}, `
       embed.description = embed.description.slice(0, -2)
 
-      await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
-        data: { embeds: [embed] }
-      })
+      await respond(bot, interaction, { embeds: [embed] })
       break
     }
 
@@ -645,34 +623,25 @@ export async function execute(bot: Bot, interaction: Interaction) {
             if (typeof result == "number") result = result.toString()
             if (typeof result == "object") result = result.entries.join("; ")
 
-            await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-              type: InteractionResponseTypes.ChannelMessageWithSource,
-              data: {
-                embeds: [{
-                  title: "Calculation",
-                  color: pickFromArray(colors),
-                  fields: [
-                    { name: "Expression", value: `${escapeMarkdown(expression)}`, inline: false },
-                    { name: "Result", value: `${escapeMarkdown(result)}`, inline: false }
-                  ]
-                }]
-              }
+            await respond(bot, interaction, {
+              embeds: [{
+                title: "Calculation",
+                color: pickFromArray(colors),
+                fields: [
+                  { name: "Expression", value: `${escapeMarkdown(expression)}`, inline: false },
+                  { name: "Result", value: `${escapeMarkdown(result)}`, inline: false }
+                ]
+              }]
             })
           } catch (err) {
             console.botLog(err, "ERROR")
-            await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-              type: InteractionResponseTypes.ChannelMessageWithSource,
-              data: { content: `Cannot evaluate \`${expression}\`\n${err}.${String(err).includes("Undefined symbol") ? " You may want to declare variables like `a = 9; a * 7` => 63" : ""}`, flags: MessageFlags.Ephemeral }
-            })
+            await respond(bot, interaction, { content: `Cannot evaluate \`${expression}\`\n${err}.${String(err).includes("Undefined symbol") ? " You may want to declare variables like `a = 9; a * 7` => 63" : ""}` }, true)
           }
           break
         }
 
         case "ping": {
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: { content: "Pinging..." }
-          })
+          await respond(bot, interaction, { content: "Pinging..." })
 
           const original = await bot.helpers.getOriginalInteractionResponse(interaction.token)
           const wsPing = bot.gateway.manager.shards.reduce((curr, next) => curr + (next.heart.rtt ?? 0), 0) / bot.gateway.manager.shards.size
@@ -716,39 +685,27 @@ export async function execute(bot: Bot, interaction: Interaction) {
             })
           }
 
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.Modal,
-            data: {
-              // title: "Create a Poll",
-              // customId: "poll",
-              // components: modalData
-              content: "Poll is not available yet",
-              flags: MessageFlags.Ephemeral
-            }
-          })
+          await respond(bot, interaction, {
+            // title: "Create a Poll",
+            // customId: "poll",
+            // components: modalData
+            content: "Poll is not available yet",
+          }, true)
           break
         }
 
         case "send": {
           if (!interaction.guildId) {
-            return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-              type: InteractionResponseTypes.ChannelMessageWithSource,
-              data: {
-                content: `${emojis.warn.shorthand} This command can only be used in servers.`,
-                flags: MessageFlags.Ephemeral
-              }
-            })
+            return await respond(bot, interaction, {
+              content: `${emojis.warn.shorthand} This command can only be used in servers.`,
+            }, true)
           }
 
           const { channelId } = interaction
           if (channelId === undefined) {
-            return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-              type: InteractionResponseTypes.ChannelMessageWithSource,
-              data: {
-                content: `${emojis.warn.shorthand} Can't reach this channel.`,
-                flags: MessageFlags.Ephemeral
-              }
-            })
+            return await respond(bot, interaction, {
+              content: `${emojis.warn.shorthand} Can't reach this channel.`,
+            }, true)
           }
 
           const message = getValue(interaction, "message", "String") ?? ""
@@ -761,10 +718,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
             response += "\nNote: 3 times maximum"
           }
 
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: { content: response, flags: MessageFlags.Ephemeral }
-          })
+          await respond(bot, interaction, { content: response, flags: MessageFlags.Ephemeral })
 
           for (let i = 0; i < times; i++) {
             setTimeout(() => bot.helpers.sendMessage(channelId, { content: message }), 750 * i)
@@ -786,12 +740,9 @@ export async function execute(bot: Bot, interaction: Interaction) {
           if (date.toString() == "Invalid Date") date = Temporal.Instant.fromEpochSeconds(year < 0 ? -8640000000000 : 8640000000000)
 
           const timestamp = date.epochSeconds
-          await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-            type: InteractionResponseTypes.ChannelMessageWithSource,
-            data: {
-              content: `**Date** • ${date}\n**Timestamp** • ${timestamp} (${String(date.epochMilliseconds)})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`,
-              flags: MessageFlags.Ephemeral,
-            }
+          await respond(bot, interaction, {
+            content: `**Date** • ${date}\n**Timestamp** • ${timestamp} (${String(date.epochMilliseconds)})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`,
+            flags: MessageFlags.Ephemeral,
           })
           break
         }
@@ -806,12 +757,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
   // const filledInitial = { name: current, value: "__" }
   const response: ApplicationCommandOptionChoice[] = []
 
-  if (current.length == 0) return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-    type: InteractionResponseTypes.ApplicationCommandAutocompleteResult,
-    data: {
-      choices: [blankInitial]
-    }
-  })
+  if (current.length == 0) return await respond(bot, interaction, { choices: [blankInitial] })
 
   switch (getSubcmd(interaction)) {
     case "timestamp": {
@@ -821,12 +767,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
     }
   }
 
-  await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-    type: InteractionResponseTypes.ApplicationCommandAutocompleteResult,
-    data: {
-      choices: response.slice(0, 25)
-    }
-  })
+  await respond(bot, interaction, { choices: response.slice(0, 25) })
 }
 
 // export async function button(bot: Bot, interaction: Interaction) {

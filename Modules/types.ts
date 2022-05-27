@@ -1,4 +1,4 @@
-import { Bot, CreateApplicationCommand, CreateContextApplicationCommand, Interaction } from "discordeno"
+import { BitwisePermissionFlags as Permissions, Bot, CreateApplicationCommand, CreateContextApplicationCommand, Interaction } from "discordeno"
 
 export enum Nord {
   // Polar Night
@@ -172,3 +172,19 @@ export type Command = {
   autocomplete?: InteractionFunction,
   modal?: InteractionFunction,
 }
+
+export const BotPermissions = Permissions.MANAGE_GUILD
+                            + Permissions.MANAGE_ROLES
+                            + Permissions.MANAGE_CHANNELS
+                            + Permissions.KICK_MEMBERS
+                            + Permissions.BAN_MEMBERS
+                            + Permissions.MANAGE_WEBHOOKS
+                            + Permissions.VIEW_CHANNEL
+                            + Permissions.SEND_MESSAGES
+                            + Permissions.CREATE_PUBLIC_THREADS
+                            + Permissions.MANAGE_MESSAGES
+                            + Permissions.MANAGE_THREADS
+                            + Permissions.EMBED_LINKS
+                            + Permissions.ATTACH_FILES
+                            + Permissions.USE_EXTERNAL_EMOJIS
+                            + Permissions.ADD_REACTIONS

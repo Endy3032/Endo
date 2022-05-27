@@ -1,18 +1,16 @@
 import { rgb24 } from "colors"
 import { emojis } from "./emojis.ts"
+import { Bot, Interaction } from "discordeno"
 import { permissions } from "./permissions.ts"
 import { Nord, MessageFlags } from "./types.ts"
-import { Bot, Interaction, InteractionResponseTypes } from "discordeno"
+import { respond } from "./respondInteraction.ts"
 import { getCmdName, getSubcmdGroup, getSubcmd } from "./getInteractionData.ts"
 
 export const checkPermission = async (bot: Bot, interaction: Interaction, ...perms: bigint[]) => {
   if (!interaction.guildId) {
-    await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: {
-        content: `${emojis.warn.shorthand} This command can only be used in servers.`,
-        flags: MessageFlags.Ephemeral
-      }
+    await respond(bot, interaction, {
+      content: `${emojis.warn.shorthand} This command can only be used in servers.`,
+      flags: MessageFlags.Ephemeral
     })
     return true
   }
@@ -31,12 +29,9 @@ export const checkPermission = async (bot: Bot, interaction: Interaction, ...per
 
   if (block) {
     console.botLog(`${consoleLog.slice(0, -1)} ]`, "WARN")
-    await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-      type: InteractionResponseTypes.ChannelMessageWithSource,
-      data: {
-        content: repContent,
-        flags: MessageFlags.Ephemeral
-      }
+    await respond(bot, interaction, {
+      content: repContent,
+      flags: MessageFlags.Ephemeral
     })
   }
   return block

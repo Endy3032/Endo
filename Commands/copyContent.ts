@@ -1,5 +1,5 @@
-import { escapeMarkdown, MessageFlags } from "modules"
-import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction, InteractionResponseTypes } from "discordeno"
+import { escapeMarkdown, MessageFlags, respond } from "modules"
+import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction } from "discordeno"
 
 export const cmd: CreateContextApplicationCommand = {
   name: "Copy Content",
@@ -15,11 +15,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
   let content = messageContent.length == 0 ? "**Content**\nNone" : `**Content**\n${messageContent}`
   content += `\n\n**Attachment(s): ${attachments.length}**\n${attachments.map(attachment => `<${attachment}>`).join("\n")}`
 
-  await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-    type: InteractionResponseTypes.ChannelMessageWithSource,
-    data: {
-      content: `${content}`,
-      flags: MessageFlags.Ephemeral
-    }
+  await respond(bot, interaction, {
+    content: `${content}`,
+    flags: MessageFlags.Ephemeral
   })
 }
