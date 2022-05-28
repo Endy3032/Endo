@@ -5,7 +5,7 @@ const commands = new Collection<string, Command>()
 
 for await (const file of getFiles("./Commands")) {
   if (file == "mod.ts") continue
-  const command: Command = await import(`./${file.replaceAll(" ", "\ ")}`)
+  const command: Command = await import(`./${file}`)
   commands.set(command.cmd.name, command)
 }
 

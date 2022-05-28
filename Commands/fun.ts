@@ -1,13 +1,15 @@
 import { colors, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
-import { ApplicationCommandOptionTypes, Bot, Interaction, InteractionResponseTypes } from "discordeno"
+import { ApplicationCommandOptionTypes, Bot, CreateApplicationCommand, Interaction } from "discordeno"
 
-export const cmd = {
+export const cmd: CreateApplicationCommand = {
   name: "fun",
   description: "Random fun commands",
+  defaultMemberPermissions: ["USE_SLASH_COMMANDS"],
   options: [
     {
       name: "8ball",
       description: "Get a response from the magic 8-Ball",
+      type: ApplicationCommandOptionTypes.SubCommand,
       options: [{
         name: "question",
         description: "The question to ask [String]",
@@ -120,8 +122,8 @@ export const cmd = {
               description: "The ID of the game to replay [Integer 0~2308]",
               type: ApplicationCommandOptionTypes.Integer,
               required: true,
-              min_value: 0,
-              max_value: 2308
+              minValue: 0,
+              maxValue: 2308
             }
           ]
         },

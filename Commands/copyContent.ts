@@ -1,10 +1,11 @@
-import { escapeMarkdown, MessageFlags, respond } from "modules"
+import { escapeMarkdown, respond } from "modules"
 import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction } from "discordeno"
 
 export const cmd: CreateContextApplicationCommand = {
   name: "Copy Content",
   type: ApplicationCommandTypes.Message,
-  description: ""
+  description: "",
+  defaultMemberPermissions: ["USE_SLASH_COMMANDS"]
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
@@ -15,8 +16,5 @@ export async function execute(bot: Bot, interaction: Interaction) {
   let content = messageContent.length == 0 ? "**Content**\nNone" : `**Content**\n${messageContent}`
   content += `\n\n**Attachment(s): ${attachments.length}**\n${attachments.map(attachment => `<${attachment}>`).join("\n")}`
 
-  await respond(bot, interaction, {
-    content: `${content}`,
-    flags: MessageFlags.Ephemeral
-  })
+  await respond(bot, interaction, { content: `${content}` }, true)
 }

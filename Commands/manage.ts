@@ -1,9 +1,10 @@
-import { emojis, MessageFlags, respond } from "modules"
-import { ApplicationCommandOptionTypes, Bot, ChannelTypes, Interaction } from "discordeno"
+import { checkPermission, emojis, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
+import { ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction } from "discordeno"
 
-export const cmd = {
-  name: "mod",
-  description: "Useful commands for moderators",
+export const cmd: CreateApplicationCommand = {
+  name: "manage",
+  description: "Useful commands for server managing",
+  defaultMemberPermissions: ["USE_SLASH_COMMANDS"],
   options: [
     {
       name: "create",
@@ -31,15 +32,15 @@ export const cmd = {
               name: "below",
               description: "Put below this channel (Default Top) [Text/Category]",
               type: ApplicationCommandOptionTypes.Channel,
-              channel_types: [ChannelTypes.GuildText, ChannelTypes.GuildCategory],
+              channelTypes: [ChannelTypes.GuildText, ChannelTypes.GuildCategory],
               required: false,
             },
             {
               name: "slowmode",
               description: "The channel's slowmode cooldown (Text only) [Integer 0~21600]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 21600,
+              minValue: 0,
+              maxValue: 21600,
               required: false,
             },
             {
@@ -71,7 +72,7 @@ export const cmd = {
               name: "below",
               description: "Put below this category (Default Top) [Category]",
               type: ApplicationCommandOptionTypes.Channel,
-              channel_types: [ChannelTypes.GuildCategory],
+              channelTypes: [ChannelTypes.GuildCategory],
               required: false,
             },
             {
@@ -107,23 +108,23 @@ export const cmd = {
               name: "below",
               description: "Put below this channel (Default Top) [Voice/Category]",
               type: ApplicationCommandOptionTypes.Channel,
-              channel_types: [ChannelTypes.GuildVoice, ChannelTypes.GuildText],
+              channelTypes: [ChannelTypes.GuildVoice, ChannelTypes.GuildText],
               required: false,
             },
             {
               name: "bitrate",
               description: "The channel's bitrate (Voice only) [Integer]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 384,
+              minValue: 0,
+              maxValue: 384,
               required: false,
             },
             {
               name: "user-limit",
               description: "The channel's user limit (Voice only) [Integer]",
               type: ApplicationCommandOptionTypes.Integer,
-              "min_value": 0,
-              "max_value": 99,
+              minValue: 0,
+              maxValue: 99,
               required: false,
             },
             {
@@ -150,7 +151,7 @@ export const cmd = {
               name: "channel",
               description: "The channel to delete [Channel]",
               type: ApplicationCommandOptionTypes.Channel,
-              channel_types: [ChannelTypes.GuildText, ChannelTypes.GuildCategory, ChannelTypes.GuildVoice],
+              channelTypes: [ChannelTypes.GuildText, ChannelTypes.GuildCategory, ChannelTypes.GuildVoice],
               required: true,
             },
             {
@@ -172,8 +173,8 @@ export const cmd = {
           name: "amount",
           description: "Amount of messages to purge [Integer 1~100]",
           type: ApplicationCommandOptionTypes.Integer,
-          min_value: 1,
-          max_value: 100,
+          minValue: 1,
+          maxValue: 100,
           required: true,
         },
         {
@@ -203,8 +204,49 @@ export const cmd = {
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
-  if (!interaction.guildId) respond(bot, interaction, {
+  if (!interaction.guildId) return respond(bot, interaction, {
     content: `${emojis.warn.shorthand} This command can only be used in servers.`,
-    flags: MessageFlags.Ephemeral
-  })
+  }, true)
+
+  switch (getSubcmdGroup(interaction)) {
+    case "create": {
+      if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+      const channelName = getValue(interaction, "name", "String") ?? "channel"
+      const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
+      let parentId: bigint | undefined = undefined, position: number | undefined = undefined
+      const options: CreateGuildChannel = { name: channelName }
+
+      switch (getSubcmd(interaction)) {
+        case "text": {
+          const topic = getValue(interaction, "topic", "String") ?? undefined
+          const slowmode = getValue(interaction, "slowmode", "Integer") ?? 0
+          const below = getValue(interaction, "below", "Channel")
+          const nsfw = getValue(interaction, "nsfw", "Boolean") ?? false
+
+          if (below?.type === ChannelTypes.GuildCategory) {
+            parentId = below.id
+            const channels = await bot.helpers.getChannels(interaction.guildId)
+            position = channels.filter(channel => channel.parentId === parentId).array().reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
+          } else if (below?.type === ChannelTypes.GuildText) {
+            parentId = below.parentId ?? undefined
+            position = (below.position ?? 0) + 1
+          }
+
+          Object.assign(options, {
+            type: ChannelTypes.GuildText,
+            rateLimitPerUser: slowmode,
+            topic, nsfw, position, parentId,
+          })
+        }
+      }
+
+      await bot.helpers.createChannel(interaction.guildId, options, reason)
+        .then(async channel => {
+          await bot.helpers.swapChannels(channel.guildId, [{ id: channel.id.toString(), position: options.position ?? 0, parentId: parentId?.toString() }])
+          await respond(bot, interaction, { content: `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>` })
+        })
+        .catch(async err => console.botLog(err))
+      break
+    }
+  }
 }

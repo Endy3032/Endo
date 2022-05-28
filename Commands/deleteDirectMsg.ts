@@ -1,10 +1,11 @@
 import { emojis, respond } from "modules"
-import { ApplicationCommandTypes, Bot, Interaction } from "discordeno"
+import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction } from "discordeno"
 
-export const cmd = {
+export const cmd: CreateContextApplicationCommand = {
   name: "Delete Direct Message",
   description: "",
-  type: ApplicationCommandTypes.Message
+  type: ApplicationCommandTypes.Message,
+  defaultMemberPermissions: ["USE_SLASH_COMMANDS"]
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {

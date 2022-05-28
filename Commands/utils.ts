@@ -4,12 +4,13 @@ import { prettyBytes } from "bytes"
 import { Temporal } from "temporal"
 import { Color } from "color-convert"
 import { timeZones } from "timezones"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, MessageFlags, Constants, timestampStyler, getFocused, emojis, BotPermissions, respond } from "modules"
+import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, Constants, timestampStyler, getFocused, emojis, BotPermissions, respond } from "modules"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes, MessageComponents } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
   name: "utils",
   description: "Random utilities for you to use!",
+  defaultMemberPermissions: ["USE_SLASH_COMMANDS"],
   options: [
     {
       name: "color",
@@ -510,7 +511,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
         case "server": {
           if (interaction.guildId === undefined) {
-            await respond(bot, interaction, { content: "This command can't be used ouside of a server.", flags: MessageFlags.Ephemeral })
+            await respond(bot, interaction, { content: "This command can't be used ouside of a server." }, true)
               .catch(err => {console.botLog(err, "ERROR")})
             break
           }
@@ -534,7 +535,10 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
                 { name: "AFK Channel", value: guild.afkChannelId ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
                 { name: "General Info", value: `~${guild.approximateMemberCount} Members\n${guild.roles.size} Roles\n${guild.emojis.size} Emojis\n┣ ${emojis.filter(emoji => !emoji.animated).length} static\n╰ ${emojis.filter(emoji => emoji.animated).length} animated`, inline: true },
-                { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories\n${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text\n${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice\n${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages\n`, inline: true },
+                { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories
+${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text
+${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice
+${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages`, inline: true },
               ],
               image: { url: imageURL(guild.id, guild.banner, "banners") ?? "" },
               thumbnail: { url: imageURL(guild.id, guild.icon, "icons") ?? "" },
@@ -718,7 +722,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
             response += "\nNote: 3 times maximum"
           }
 
-          await respond(bot, interaction, { content: response, flags: MessageFlags.Ephemeral })
+          await respond(bot, interaction, { content: response }, true)
 
           for (let i = 0; i < times; i++) {
             setTimeout(() => bot.helpers.sendMessage(channelId, { content: message }), 750 * i)
@@ -742,8 +746,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const timestamp = date.epochSeconds
           await respond(bot, interaction, {
             content: `**Date** • ${date}\n**Timestamp** • ${timestamp} (${String(date.epochMilliseconds)})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`,
-            flags: MessageFlags.Ephemeral,
-          })
+          }, true)
           break
         }
       }

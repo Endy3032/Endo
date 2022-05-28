@@ -7,12 +7,13 @@ const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClien
 if (token === undefined) { throw new Error("Missing Token") }
 if (botId === undefined) { throw new Error("Missing Bot ID") }
 
-const bot = await createBot({
+const bot = createBot({
   token,
   botId: BigInt(botId),
   intents: Intents.Guilds | Intents.DirectMessages,
   events: {},
 })
+bot.gateway.manager.createShardOptions.makePresence = (shardId) => { return activities() }
 
 // #region Logging stuff
 const send = async (body: CreateMessage, epoch: number) => {
@@ -77,8 +78,7 @@ for await (const file of getFiles("./Events")) {
 
 console.clear()
 await deploy(bot, Deno.args)
-bot.gateway.manager.createShardOptions.makePresence = (shardId) => { return activities() }
-startBot(bot)
+await startBot(bot)
 
 const listener = Deno.listen({ port: 3032 })
 console.tagLog("Ready", "Server")

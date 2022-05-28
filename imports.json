@@ -9,7 +9,7 @@
     "canvas": "https://deno.land/x/canvas/mod.ts",
     "color-convert": "https://deno.land/x/color@v0.2.2/mod.ts",
     "colors": "https://deno.land/std@0.140.0/fmt/colors.ts",
-    "discordeno": "https://deno.land/x/discordeno@13.0.0-rc42/mod.ts",
+    "discordeno": "https://deno.land/x/discordeno@13.0.0-rc43/mod.ts",
     "dom": "https://deno.land/x/deno_dom@v0.1.27-alpha/deno-dom-wasm.ts",
     "exif": "https://deno.land/x/deno_exif@0.0.2/mod.ts",
     "fuse": "https://esm.sh/fuse.js@6.6.2",

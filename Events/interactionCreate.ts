@@ -1,7 +1,7 @@
 import { rgb24, stripColor } from "colors"
 import { commands } from "/Commands/mod.ts"
-import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, MessageFlags, respond } from "modules"
-import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed, InteractionResponseTypes } from "discordeno"
+import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed } from "discordeno"
+import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, respond } from "modules"
 
 const testGuildID = Deno.env.get("TestGuild")
 const testGuildChannel = Deno.env.get("TestChannel")
@@ -24,9 +24,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     const invoker = rgb24(`[${interaction.user.username}#${interaction.user.discriminator} | ${guildName ? `${guildName} #${channelName}` : "DM"}] `, BrightNord.cyan)
 
     const interactionLog =
-    interaction.type == InteractionTypes.ApplicationCommand && group ? `Triggered ${rgb24(`[${commandName}/${group}/${subcmd}]`, BrightNord.cyan)}`
-    : interaction.type == InteractionTypes.ApplicationCommand && subcmd ? `Triggered ${rgb24(`[${commandName}/${subcmd}]`, BrightNord.cyan)}`
-    : interaction.type == InteractionTypes.ApplicationCommand ? `Triggered ${rgb24(`[${commandName}]`, BrightNord.cyan)}`
+    interaction.type == InteractionTypes.ApplicationCommand ? `Triggered ${rgb24(`/${[commandName, subcmd, group].join(" ").replaceAll("  ", " ")}`, BrightNord.cyan)}`
     : interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.Button ? `Pushed ${rgb24(`[${commandName}/${interaction.data.customId}]`, BrightNord.cyan)}`
     : interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.SelectMenu ? `Selected ${rgb24(`[${commandName}/[${interaction.data?.values?.join("|")}]]`, BrightNord.cyan)}`
     : interaction.type == InteractionTypes.ModalSubmit ? `Submitted ${rgb24(`[${commandName}/${interaction.data?.customId}]`, BrightNord.cyan)}`
