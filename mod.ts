@@ -1,11 +1,11 @@
-import { Temporal } from "temporal"
 import { rgb24, stripColor } from "colors"
-import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "modules"
 import { createBot, CreateMessage, Embed, EventHandlers, Intents, startBot } from "discordeno"
+import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "modules"
+import { Temporal } from "temporal"
 
 const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
-if (token === undefined) { throw new Error("Missing Token") }
-if (botId === undefined) { throw new Error("Missing Bot ID") }
+if (token === undefined) throw new Error("Missing Token")
+if (botId === undefined) throw new Error("Missing Bot ID")
 
 const bot = createBot({
   token,
@@ -13,7 +13,7 @@ const bot = createBot({
   intents: Intents.Guilds | Intents.DirectMessages,
   events: {},
 })
-bot.gateway.manager.createShardOptions.makePresence = (shardId) => { return activities() }
+bot.gateway.manager.createShardOptions.makePresence = shardId => activities()
 
 // #region Logging stuff
 const send = async (body: CreateMessage, epoch: number) => {
@@ -32,9 +32,14 @@ console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = tr
 
   const logTime = temporal.toLocaleString("default", {
     timeZone: "Asia/Ho_Chi_Minh",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-    hour12: false, fractionalSecondDigits: 2
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    fractionalSecondDigits: 2,
   }).replace(",", "")
 
   const logColor = Nord[logLevel.toLowerCase()]
@@ -65,7 +70,7 @@ console.botLog = async (content: string | Error, logLevel: LogLevel = "INFO", em
   if (!embed) {
     embed = {
       description: `**Timestamp** • ${epoch}\n**${capitalize(logLevel)}**${["WARN", "ERROR"].includes(logLevel) ? `\`\`\`${content}\`\`\`` : ` • ${content}`}`,
-      timestamp: epoch
+      timestamp: epoch,
     }
   }
   if (!embed.timestamp) embed.timestamp = epoch
@@ -86,7 +91,7 @@ await startBot(bot)
 const listener = Deno.listen({ port: 3032 })
 console.tagLog("Ready", "Server")
 
-async function http (conn: Deno.Conn) {
+async function http(conn: Deno.Conn) {
   for await (const req of Deno.serveHttp(conn)) {
     req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
   }

@@ -13,9 +13,13 @@ type EscapeMarkdownOptions = {
 export const escapeMarkdown = (text: string, options: EscapeMarkdownOptions = { escapeAll: true }) => {
   if (options.escapeAll) {
     options = {
-      inlineCode: true, codeBlock: true,
-      bold: true, italic: true, underline: true,
-      spoiler: true, strikethrough: true,
+      inlineCode: true,
+      codeBlock: true,
+      bold: true,
+      italic: true,
+      underline: true,
+      spoiler: true,
+      strikethrough: true,
     }
   }
 

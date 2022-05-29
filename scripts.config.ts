@@ -1,5 +1,5 @@
-import type { DenonConfig } from "https://deno.land/x/denon@2.5.0/mod.ts"
 import { configSync as env } from "https://deno.land/std@0.138.0/dotenv/mod.ts"
+import type { DenonConfig } from "https://deno.land/x/denon@2.5.0/mod.ts"
 
 const cmd = "mod.ts"
 
@@ -13,7 +13,7 @@ const config: DenonConfig = {
     start: {
       cmd,
       desc: "Start the bot",
-      watch: false
+      watch: false,
     },
     dev: {
       cmd,
@@ -22,7 +22,7 @@ const config: DenonConfig = {
     debug: {
       cmd,
       desc: "Start the bot in dev mode",
-      inspect: "127.0.0.1:9229"
+      inspect: "127.0.0.1:9229",
     },
     repl: {
       cmd: "deno repl",

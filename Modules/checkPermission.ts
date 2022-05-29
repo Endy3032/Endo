@@ -1,15 +1,15 @@
 import { rgb24 } from "colors"
-import { Nord } from "./types.ts"
+import { BitwisePermissionFlags, Bot, Interaction } from "discordeno"
 import { emojis } from "./emojis.ts"
+import { getCmdName, getSubcmd, getSubcmdGroup } from "./getInteractionData.ts"
 import { permissions } from "./permissions.ts"
 import { respond } from "./respondInteraction.ts"
-import { BitwisePermissionFlags, Bot, Interaction } from "discordeno"
-import { getCmdName, getSubcmdGroup, getSubcmd } from "./getInteractionData.ts"
+import { Nord } from "./types.ts"
 
 export const checkPermission = (bot: Bot, interaction: Interaction, ...perms: BitwisePermissionFlags[]) => {
   if (!interaction.guildId) {
     respond(bot, interaction, {
-      content: `${emojis.warn.shorthand} This command can only be used in servers.`
+      content: `${emojis.warn.shorthand} This command can only be used in servers.`,
     }, true)
     return true
   }

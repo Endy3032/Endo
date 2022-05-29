@@ -1,6 +1,6 @@
+import { ActivityTypes, StatusUpdate } from "discordeno"
 import { Temporal } from "temporal"
 import { pickFromArray } from "./random.ts"
-import { ActivityTypes, StatusUpdate } from "discordeno"
 
 type YouTubeVideoBaseURL = "https://www.youtube.com/watch?v="
 type Activity = {
@@ -37,15 +37,16 @@ function getActivity() {
   const statusTypeKey = pickFromArray(Object.keys(status))
   const { name, url } = pickFromArray(status[statusTypeKey])
   return {
-    name, url,
+    name,
+    url,
     type: parseInt(ActivityTypes[statusTypeKey]) || ActivityTypes.Streaming,
-    createdAt: Temporal.Now.instant().epochMilliseconds
+    createdAt: Temporal.Now.instant().epochMilliseconds,
   }
 }
 
 export function activities(): StatusUpdate {
   return {
     activities: [getActivity()],
-    status: "idle"
+    status: "idle",
   }
 }

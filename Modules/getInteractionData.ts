@@ -11,18 +11,15 @@ export function getCmdName(interaction: Interaction) {
 export function getSubcmd(interaction: Interaction) {
   if (interaction.data?.options === undefined) return null
 
-  if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup)
-    return interaction.data.options?.[0].options?.[0].name
+  if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) return interaction.data.options?.[0].options?.[0].name
 
-  if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommand)
-    return interaction.data.options[0].name
+  if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommand) return interaction.data.options[0].name
 }
 
 export function getSubcmdGroup(interaction: Interaction) {
   if (interaction.data?.options === undefined) return null
 
-  if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup)
-    return interaction.data.options[0].name
+  if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) return interaction.data.options[0].name
 }
 
 function getOptions(interaction: Interaction) {
@@ -38,9 +35,9 @@ type ResolvedOptions = {
 }
 
 const resolvedOptionTypeToKey: ResolvedOptions = {
-  "Attachment": "attachments",
-  "Channel": "channels",
-  "Role": "roles"
+  Attachment: "attachments",
+  Channel: "channels",
+  Role: "roles",
 }
 
 const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
@@ -52,7 +49,7 @@ export function getValue(interaction: Interaction, name: string, type?: "Role"):
 export function getValue(interaction: Interaction, name: string, type?: "Channel"): Channel | null
 export function getValue(interaction: Interaction, name: string, type?: "Attachment"): Attachment | null
 export function getValue(interaction: Interaction, name: string, type?: "Mentionable"): User | Channel | Role | null
-export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User, member?: Member } | null
+export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User; member?: Member } | null
 export function getValue(interaction: Interaction, name: string, type?: keyof typeof ApplicationCommandOptionTypes | "Modal") {
   if (interaction.type == InteractionTypes.ModalSubmit) {
     const modalData = interaction.data?.components?.map(component => component.components).flat()

@@ -1,11 +1,11 @@
+import { prettyBytes } from "bytes"
+import { Color } from "color-convert"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, MessageComponents } from "discordeno"
 import Fuse from "fuse"
 import { evaluate } from "mathjs"
-import { prettyBytes } from "bytes"
+import { BotPermissions, colors, Constants, emojis, escapeMarkdown, getFocused, getSubcmd, getSubcmdGroup, getValue, imageURL, pickFromArray, respond, timestampStyler, toTimestamp } from "modules"
 import { Temporal } from "temporal"
-import { Color } from "color-convert"
 import { timeZones } from "timezones"
-import { getSubcmdGroup, getSubcmd, getValue, toTimestamp, pickFromArray, colors, imageURL, escapeMarkdown, Constants, timestampStyler, getFocused, emojis, BotPermissions, respond } from "modules"
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmoji, DiscordUser, Interaction, InteractionResponseTypes, MessageComponents } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
   name: "utils",
@@ -20,7 +20,7 @@ export const cmd: CreateApplicationCommand = {
         {
           name: "random",
           description: "Generate a random color",
-          type: ApplicationCommandOptionTypes.SubCommand
+          type: ApplicationCommandOptionTypes.SubCommand,
         },
         {
           name: "rgb",
@@ -33,7 +33,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 255,
-              required: true
+              required: true,
             },
             {
               name: "green",
@@ -41,7 +41,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 255,
-              required: true
+              required: true,
             },
             {
               name: "blue",
@@ -49,9 +49,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 255,
-              required: true
-            }
-          ]
+              required: true,
+            },
+          ],
         },
         {
           name: "decimal",
@@ -63,8 +63,8 @@ export const cmd: CreateApplicationCommand = {
             type: ApplicationCommandOptionTypes.Integer,
             minValue: 0,
             maxValue: 16777215,
-            required: true
-          }]
+            required: true,
+          }],
         },
         {
           name: "hex",
@@ -74,8 +74,8 @@ export const cmd: CreateApplicationCommand = {
             name: "value",
             description: "The hex value of the color [String]",
             type: ApplicationCommandOptionTypes.String,
-            required: true
-          }]
+            required: true,
+          }],
         },
         {
           name: "hsl",
@@ -88,7 +88,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 360,
-              required: true
+              required: true,
             },
             {
               name: "saturation",
@@ -96,7 +96,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
+              required: true,
             },
             {
               name: "value",
@@ -104,9 +104,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
-            }
-          ]
+              required: true,
+            },
+          ],
         },
         {
           name: "hsv",
@@ -119,7 +119,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 360,
-              required: true
+              required: true,
             },
             {
               name: "saturation",
@@ -127,7 +127,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
+              required: true,
             },
             {
               name: "value",
@@ -135,9 +135,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
-            }
-          ]
+              required: true,
+            },
+          ],
         },
         {
           name: "cmyk",
@@ -150,7 +150,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
+              required: true,
             },
             {
               name: "magenta",
@@ -158,7 +158,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
+              required: true,
             },
             {
               name: "yellow",
@@ -166,7 +166,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
+              required: true,
             },
             {
               name: "key",
@@ -174,11 +174,11 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 100,
-              required: true
-            }
-          ]
+              required: true,
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       name: "calculate",
@@ -188,8 +188,8 @@ export const cmd: CreateApplicationCommand = {
         name: "expression",
         description: "The expression to calculate [String]",
         type: ApplicationCommandOptionTypes.String,
-        required: true
-      }]
+        required: true,
+      }],
     },
     {
       name: "info",
@@ -199,7 +199,7 @@ export const cmd: CreateApplicationCommand = {
         {
           name: "bot",
           description: "Get info about this bot",
-          type: ApplicationCommandOptionTypes.SubCommand
+          type: ApplicationCommandOptionTypes.SubCommand,
         },
         {
           name: "channel",
@@ -209,14 +209,14 @@ export const cmd: CreateApplicationCommand = {
             {
               name: "target",
               description: "The channel to get info [Channel]",
-              type: ApplicationCommandOptionTypes.Channel
-            }
-          ]
+              type: ApplicationCommandOptionTypes.Channel,
+            },
+          ],
         },
         {
           name: "server",
           description: "Get info about the server",
-          type: ApplicationCommandOptionTypes.SubCommand
+          type: ApplicationCommandOptionTypes.SubCommand,
         },
         {
           name: "user",
@@ -226,21 +226,21 @@ export const cmd: CreateApplicationCommand = {
             {
               name: "target",
               description: "The user to get info [User]",
-              type: ApplicationCommandOptionTypes.User
-            }
-          ]
-        }
-      ]
+              type: ApplicationCommandOptionTypes.User,
+            },
+          ],
+        },
+      ],
     },
     {
       name: "ping",
       description: "Get the bot's latency info",
-      type: ApplicationCommandOptionTypes.SubCommand
+      type: ApplicationCommandOptionTypes.SubCommand,
     },
     {
       name: "poll",
       description: "Make a poll!",
-      type: ApplicationCommandOptionTypes.SubCommand
+      type: ApplicationCommandOptionTypes.SubCommand,
     },
     {
       name: "random",
@@ -257,8 +257,8 @@ export const cmd: CreateApplicationCommand = {
             type: ApplicationCommandOptionTypes.Integer,
             minValue: 1,
             maxValue: 10,
-            required: true
-          }]
+            required: true,
+          }],
         },
         {
           name: "dice",
@@ -270,8 +270,8 @@ export const cmd: CreateApplicationCommand = {
             type: ApplicationCommandOptionTypes.Integer,
             minValue: 1,
             maxValue: 10,
-            required: true
-          }]
+            required: true,
+          }],
         },
         {
           name: "number",
@@ -284,24 +284,24 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 1,
               maxValue: 10,
-              required: true
+              required: true,
             },
             {
               name: "min",
               description: "The minimum limit for the numbers [Integer]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
-              required: false
+              required: false,
             },
             {
               name: "max",
               description: "The maximum limit for the numbers [Integer]",
               maxValue: 20000,
               type: ApplicationCommandOptionTypes.Integer,
-            }
-          ]
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       name: "send",
@@ -312,7 +312,7 @@ export const cmd: CreateApplicationCommand = {
           name: "message",
           description: "The message to send [String]",
           type: ApplicationCommandOptionTypes.String,
-          required: true
+          required: true,
         },
         {
           name: "times",
@@ -320,9 +320,9 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 1,
           maxValue: 3,
-          required: false
-        }
-      ]
+          required: false,
+        },
+      ],
     },
     {
       name: "timestamp",
@@ -335,7 +335,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: -271821,
           maxValue: 275760,
-          required: true
+          required: true,
         },
         {
           name: "month",
@@ -343,7 +343,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 1,
           maxValue: 12,
-          required: false
+          required: false,
         },
         {
           name: "day",
@@ -351,7 +351,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 1,
           maxValue: 31,
-          required: false
+          required: false,
         },
         {
           name: "hour",
@@ -359,7 +359,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 0,
           maxValue: 23,
-          required: false
+          required: false,
         },
         {
           name: "minute",
@@ -367,7 +367,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 0,
           maxValue: 59,
-          required: false
+          required: false,
         },
         {
           name: "second",
@@ -375,7 +375,7 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 0,
           maxValue: 59,
-          required: false
+          required: false,
         },
         {
           name: "millisecond",
@@ -383,18 +383,18 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.Integer,
           minValue: 0,
           maxValue: 999,
-          required: false
+          required: false,
         },
         {
           name: "timezone",
           description: "The timestamp's timezone [String]",
           type: ApplicationCommandOptionTypes.String,
           autocomplete: true,
-          required: false
+          required: false,
         },
-      ]
-    }
-  ]
+      ],
+    },
+  ],
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
@@ -485,7 +485,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
             { name: "HSV", value: `${hsv.hue()}, ${hsv.saturation()}, ${hsv.value()}`, inline: true },
           ],
           thumbnail: { url: `https://dummyimage.com/128/${hex.slice(1)}/${hex.slice(1)}.png` },
-        }]
+        }],
       })
       break
     }
@@ -516,7 +516,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 { name: "Memory Usage", value: `**RSS** • ${prettyBytes(memory.rss)}\n**Heap Total** • ${prettyBytes(memory.heapTotal)}\n**Heap Used** • ${prettyBytes(memory.heapUsed)}`, inline: true },
               ],
               thumbnail: { url: imageURL(bot.id, app.icon, "icons") },
-            }]
+            }],
           })
           break
         }
@@ -524,13 +524,13 @@ export async function execute(bot: Bot, interaction: Interaction) {
         case "channel": {
           if (interaction.guildId === undefined) {
             await respond(bot, interaction, { content: "This command can't be used ouside of a server." }, true)
-              .catch(err => {console.botLog(err, "ERROR")})
+              .catch(err => console.botLog(err, "ERROR"))
             break
           }
 
           if (interaction.channelId === undefined) {
             await respond(bot, interaction, { content: "Cannot get this channel ID." }, true)
-              .catch(err => {console.botLog(err, "ERROR")})
+              .catch(err => console.botLog(err, "ERROR"))
             break
           }
 
@@ -542,7 +542,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
               color: pickFromArray(colors),
               fields: [
                 { name: "Name", value: `${channel?.name}`, inline: true },
-                { name: "ID", value: `${channel?.id}`, inline: true, },
+                { name: "ID", value: `${channel?.id}`, inline: true },
                 { name: "Type", value: `${channel?.type}`, inline: true },
                 { name: "Position", value: `${channel?.position}`, inline: true },
                 { name: "NSFW", value: `${channel?.nsfw}`, inline: true },
@@ -550,7 +550,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 { name: "Creation Date", value: `<t:${timestamp}:f>\n<t:${timestamp}:R>`, inline: true },
               ],
               author: { name: "Channel Info" },
-            }]
+            }],
           })
           break
         }
@@ -558,7 +558,9 @@ export async function execute(bot: Bot, interaction: Interaction) {
         case "server": {
           if (interaction.guildId === undefined) {
             await respond(bot, interaction, { content: "This command can't be used ouside of a server." }, true)
-              .catch(err => {console.botLog(err, "ERROR")})
+              .catch(err => {
+                console.botLog(err, "ERROR")
+              })
             break
           }
 
@@ -581,16 +583,20 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 { name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
                 { name: "AFK Channel", value: guild.afkChannelId ? `<#${guild.afkChannelId}> (${guild.afkTimeout / 60} Min Timeout)` : "None", inline: true },
                 { name: "General Info", value: `~${guild.approximateMemberCount} Members\n${guild.roles.size} Roles\n${guild.emojis.size} Emojis\n┣ ${emojis.filter(emoji => !emoji.animated).length} static\n╰ ${emojis.filter(emoji => emoji.animated).length} animated`, inline: true },
-                { name: "Channel Stats", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories
+                {
+                  name: "Channel Stats",
+                  value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).size} Categories
 ${channels.filter(channel => channel.type == ChannelTypes.GuildText).size} Text
 ${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).size} Voice
-${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages`, inline: true },
+${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size} Stages`,
+                  inline: true,
+                },
               ],
               image: { url: imageURL(guild.id, guild.banner, "banners") ?? "" },
               thumbnail: { url: imageURL(guild.id, guild.icon, "icons") ?? "" },
               author: { name: guild.name },
               footer: { text: `Server ID • ${guild.id}` },
-            }]
+            }],
           })
           break
         }
@@ -607,13 +613,15 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
                 { name: "Name", value: user.username, inline: true },
                 { name: "Tag", value: user.discriminator, inline: true },
                 { name: "ID", value: user.id.toString(), inline: true },
-                { name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)` }
+                { name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)` },
               ],
               image: { url: imageURL(user.id, discordUser.banner, "banners") },
               thumbnail: { url: imageURL(user.id, user.avatar, "avatars") },
               author: { name: "User Info" },
-            }]
-          }).catch(err => {console.botLog(err, "ERROR")})
+            }],
+          }).catch(err => {
+            console.botLog(err, "ERROR")
+          })
           break
         }
       }
@@ -628,15 +636,13 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
 
       const embed = {
         title: mode == "coin" ? "Coin flip" : mode == "dice" ? "Dice roll" : "Random numbers",
-        description: ""
+        description: "",
       }
       let choices: (string | number)[] = []
 
-      if (mode == "coin") {
-        choices = ["Head", "Tail"]
-      } else if (mode == "dice") {
-        choices = [1, 2, 3, 4, 5, 6]
-      } else if (mode == "number") {
+      if (mode == "coin") choices = ["Head", "Tail"]
+      else if (mode == "dice") choices = [1, 2, 3, 4, 5, 6]
+      else if (mode == "number") {
         for (let i = 0; i < amount; i++) embed.description += `${Math.floor(Math.random() * (max - min) + min)}, `
         embed.description = embed.description.slice(0, -2)
         await respond(bot, interaction, { embeds: [embed] })
@@ -679,9 +685,9 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
                 color: pickFromArray(colors),
                 fields: [
                   { name: "Expression", value: `${escapeMarkdown(expression)}`, inline: false },
-                  { name: "Result", value: `${escapeMarkdown(result)}`, inline: false }
-                ]
-              }]
+                  { name: "Result", value: `${escapeMarkdown(result)}`, inline: false },
+                ],
+              }],
             })
           } catch (err) {
             console.botLog(err, "ERROR")
@@ -706,9 +712,9 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
               color: pickFromArray(colors),
               fields: [
                 { name: "Websocket Latency", value: noPing ? "Not available" : `${wsPing}ms${wsPing < 0 ? " (lmao how)" : ""}`, inline: false },
-                { name: "Roundtrip Latency", value: `${BigInt(original.timestamp) - toTimestamp(interaction.id)}ms`, inline: false }
-              ]
-            }]
+                { name: "Roundtrip Latency", value: `${BigInt(original.timestamp) - toTimestamp(interaction.id)}ms`, inline: false },
+              ],
+            }],
           })
           break
         }
@@ -730,8 +736,8 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
                 minLength: 1,
                 maxLength: i == 0 ? 500 : 100,
                 customId: "Poll Question",
-                required: i < 3
-              }]
+                required: i < 3,
+              }],
             })
           }
 
@@ -811,7 +817,11 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
   switch (getSubcmd(interaction)) {
     case "timestamp": {
       const fuse = new Fuse(timeZones, { distance: 5 })
-      response.push(...fuse.search(current).map(result => {return { name: result.item, value: result.item }}))
+      response.push(
+        ...fuse.search(current).map(result => {
+          return { name: result.item, value: result.item }
+        }),
+      )
       break
     }
   }

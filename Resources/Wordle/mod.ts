@@ -1,5 +1,5 @@
-import { Temporal } from "temporal"
 import { TimeMetric } from "modules"
+import { Temporal } from "temporal"
 
 const answers = [
   "cigar",
@@ -12958,7 +12958,7 @@ allowed.push(...answers)
 
 function getWord() {
   const a = Temporal.Now.instant().epochSeconds
-  return answers[Math.floor(a/TimeMetric.sec2day) - 18792]
+  return answers[Math.floor(a / TimeMetric.sec2day) - 18792]
 }
 
 const colors = {
@@ -12968,7 +12968,7 @@ const colors = {
   present: "#B59F3B",
   absent: "#2A2A2C",
   correct: "#538D4E",
-  text: "#FFFFFF"
+  text: "#FFFFFF",
 }
 
 interface WordleCanvas {
@@ -12991,15 +12991,24 @@ const space = 10
 const side = 90
 const keyFont = 32
 const tileFont = 56
-const tileStartingX = (width - side * 5 - space*4) / 2
+const tileStartingX = (width - side * 5 - space * 4) / 2
 const tileStartingY = space
-const keyWidth = (width - 11 * space)/10
+const keyWidth = (width - 11 * space) / 10
 const keyStartingY = height - (space + side) * 3
 const keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], ["A", "S", "D", "F", "G", "H", "J", "K", "L"], ["Z", "X", "C", "V", "B", "N", "M"]]
 
 const canvas: WordleCanvas = {
-  width, height, space, side, keyFont, tileFont,
-  tileStartingX, tileStartingY, keyWidth, keyStartingY, keys
+  width,
+  height,
+  space,
+  side,
+  keyFont,
+  tileFont,
+  tileStartingX,
+  tileStartingY,
+  keyWidth,
+  keyStartingY,
+  keys,
 }
 
 export default { answers, allowed, getWord, colors, canvas }

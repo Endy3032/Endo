@@ -4,6 +4,9 @@
     "indentWidth": 2,
     "semiColons": "asi",
     "quoteProps": "asNeeded",
+    "useBraces": "whenNotSingleLine",
+    "singleBodyPosition": "sameLine",
+    "arrowFunction.useParentheses": "preferNone",
     "constructorType.spaceAfterNewKeyword": true,
     "constructSignature.spaceAfterNewKeyword": true
   },

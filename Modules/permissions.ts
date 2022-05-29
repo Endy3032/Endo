@@ -1,5 +1,5 @@
-import { capitalize } from "./capitalize.ts"
 import { BitwisePermissionFlags } from "discordeno"
+import { capitalize } from "./capitalize.ts"
 
 export const permissionNames = Object.keys(BitwisePermissionFlags).filter(key => !parseInt(key)).map((permission: string) => {
   // return permission.match(/[A-Z]?[a-z]+|[0-9]+|[A-Z]+(?![a-z])/g)?.join(" ").replace("VAD", "Voice Activity)")
@@ -8,6 +8,8 @@ export const permissionNames = Object.keys(BitwisePermissionFlags).filter(key =>
     .join(" ").replace("Vad", "Voice Activity")
 })
 
-export const permissions = Object.assign(...Object.values(BitwisePermissionFlags).filter(value => typeof value !== "string").map((val, ind) => ({
-  [val.toString()]: permissionNames[ind]
-})) as unknown as [string, string])
+export const permissions = Object.assign(
+  ...Object.values(BitwisePermissionFlags).filter(value => typeof value !== "string").map((val, ind) => ({
+    [val.toString()]: permissionNames[ind],
+  })) as unknown as [string, string],
+)

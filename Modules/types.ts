@@ -150,7 +150,7 @@ export enum MessageFlags {
   Crossposted = 1 << 0, // this message has been published to subscribed channels (via Channel Following)
   IsCrosspost = 1 << 1, // this message originated from a message in another channel (via Channel Following)
   SuppressEmbeds = 1 << 2, // do not include any embeds when serializing this message
-  SourceMessageDeleted = 1 << 3, //	the source message for this crosspost has been deleted (via Channel Following)
+  SourceMessageDeleted = 1 << 3, // 	the source message for this crosspost has been deleted (via Channel Following)
   Urgent = 1 << 4, // this message came from the urgent message system
   HasThread = 1 << 5, // this message has an associated thread, with the same id as the message
   Ephemeral = 1 << 6, // this message is only visible to the user who invoked the Interaction
@@ -159,32 +159,32 @@ export enum MessageFlags {
 }
 
 export enum Constants {
-  Timezone = "Asia/Ho_Chi_Minh"
+  Timezone = "Asia/Ho_Chi_Minh",
 }
 
 type InteractionFunction = (bot: Bot, interaction: Interaction) => Promise<void>
 export type BotApplicationCommand = CreateApplicationCommand | CreateContextApplicationCommand
 export type Command = {
-  cmd: BotApplicationCommand,
-  execute?: InteractionFunction,
-  button?: InteractionFunction,
-  select?: InteractionFunction,
-  autocomplete?: InteractionFunction,
-  modal?: InteractionFunction,
+  cmd: BotApplicationCommand
+  execute?: InteractionFunction
+  button?: InteractionFunction
+  select?: InteractionFunction
+  autocomplete?: InteractionFunction
+  modal?: InteractionFunction
 }
 
 export const BotPermissions = Permissions.MANAGE_GUILD
-                            + Permissions.MANAGE_ROLES
-                            + Permissions.MANAGE_CHANNELS
-                            + Permissions.KICK_MEMBERS
-                            + Permissions.BAN_MEMBERS
-                            + Permissions.MANAGE_WEBHOOKS
-                            + Permissions.VIEW_CHANNEL
-                            + Permissions.SEND_MESSAGES
-                            + Permissions.CREATE_PUBLIC_THREADS
-                            + Permissions.MANAGE_MESSAGES
-                            + Permissions.MANAGE_THREADS
-                            + Permissions.EMBED_LINKS
-                            + Permissions.ATTACH_FILES
-                            + Permissions.USE_EXTERNAL_EMOJIS
-                            + Permissions.ADD_REACTIONS
+  + Permissions.MANAGE_ROLES
+  + Permissions.MANAGE_CHANNELS
+  + Permissions.KICK_MEMBERS
+  + Permissions.BAN_MEMBERS
+  + Permissions.MANAGE_WEBHOOKS
+  + Permissions.VIEW_CHANNEL
+  + Permissions.SEND_MESSAGES
+  + Permissions.CREATE_PUBLIC_THREADS
+  + Permissions.MANAGE_MESSAGES
+  + Permissions.MANAGE_THREADS
+  + Permissions.EMBED_LINKS
+  + Permissions.ATTACH_FILES
+  + Permissions.USE_EXTERNAL_EMOJIS
+  + Permissions.ADD_REACTIONS

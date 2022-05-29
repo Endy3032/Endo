@@ -271,8 +271,8 @@ interface CountryCovidCase extends BaseCovidCase {
   totalCritical: number
   totalConfirmedPerMillionPopulation: number
   totalDeathsPerMillionPopulation: number
-  FR: string,
-  PR: string,
+  FR: string
+  PR: string
   lastUpdated: string
 }
 

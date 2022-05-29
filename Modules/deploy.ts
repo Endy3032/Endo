@@ -1,5 +1,5 @@
-import { BotApplicationCommand, getFiles } from "modules"
 import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand } from "discordeno"
+import { BotApplicationCommand, getFiles } from "modules"
 
 const { TestGuild } = Deno.env.toObject()
 
@@ -22,10 +22,10 @@ const replaceDescription = (cmd: BotApplicationCommand, tag: string) => {
 
 export const deploy = async (bot: Bot, args: string[]) => {
   if (args.includes("guilds")) {
-    const guildFolders = getFiles("./Commands/Guilds")
+    const guildFolders = getFiles("./Commands/Guilds", "folders")
 
     for await (const guildID of guildFolders) {
-      const commands = [] as BotApplicationCommand[]
+      const commands: BotApplicationCommand[] = []
       const commandFiles = getFiles(`./Commands/Guilds/${guildID}`)
 
       for await (const command of commandFiles) {
@@ -34,11 +34,12 @@ export const deploy = async (bot: Bot, args: string[]) => {
         commands.push(replaceDescription(cmd, "G"))
       }
 
-      await bot.helpers.upsertApplicationCommands(commands, BigInt(guildID))
+      const deployed = await bot.helpers.upsertApplicationCommands(commands, BigInt(guildID))
+      console.tagLog("Deploy", `${deployed.size} commands to ${guildID}`)
     }
   }
 
-  if (args.includes("global") || args.includes("test")) {
+  if (args.some(arg => ["global", "test"].includes(arg))) {
     const { commands } = await import("/Commands/mod.ts")
     const botCommands = commands.array().map(command => command.cmd)
 

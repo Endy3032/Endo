@@ -1,6 +1,6 @@
 type Endpoints = "avatars" | "icons" | "banners"
 type ID = BigInt | string | number | undefined | null
-type Options = { format: "png" | "json" | "webp" | "gif", size: number }
+type Options = { format: "png" | "json" | "webp" | "gif"; size: number }
 
 export const imageURL = (objectID: ID, imageID: ID, imageEndpoint: Endpoints, options: Options = { format: "webp", size: 2048 }): string => {
   if (objectID === undefined || imageID === undefined || objectID === null || imageID === null) return ""

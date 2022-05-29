@@ -1,5 +1,5 @@
 type Emojis = {
-  [key: string]: { name: string, id: string, animated?: boolean, shorthand?: string },
+  [key: string]: { name: string; id: string; animated?: boolean; shorthand?: string }
 }
 
 const emojis: Emojis = {
