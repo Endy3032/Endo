@@ -1,5 +1,5 @@
 import { checkPermission, emojis, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
-import { ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction } from "discordeno"
+import { ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, ModifyGuildChannelPositions } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
   name: "manage",
@@ -214,7 +214,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
       const channelName = getValue(interaction, "name", "String") ?? "channel"
       const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
       let parentId: bigint | undefined = undefined, position: number | undefined = undefined
-      const options: CreateGuildChannel = { name: channelName }
+      const options: CreateGuildChannel = { name: channelName }, swapOptions: ModifyGuildChannelPositions[] = []
 
       switch (getSubcmd(interaction)) {
         case "text": {
@@ -226,24 +226,30 @@ export async function execute(bot: Bot, interaction: Interaction) {
           if (below?.type === ChannelTypes.GuildCategory) {
             parentId = below.id
             const channels = await bot.helpers.getChannels(interaction.guildId)
-            position = channels.filter(channel => channel.parentId === parentId).array().reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
+            const categoryChildren = channels.filter(channel => channel.parentId === parentId).array()
+            position = categoryChildren.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
+            const lowestChildID = categoryChildren.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).id.toString()
+            swapOptions.push({ id: lowestChildID, position: position + 1 })
           } else if (below?.type === ChannelTypes.GuildText) {
-            parentId = below.parentId ?? undefined
-            position = (below.position ?? 0) + 1
+            const belowCategory = await bot.helpers.getChannel(below.id)
+            parentId = belowCategory?.parentId ?? undefined
+            position = below.position ?? 0
           }
 
-          Object.assign(options, {
+          Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
             type: ChannelTypes.GuildText,
             rateLimitPerUser: slowmode,
-            topic, nsfw, position, parentId,
+            topic, nsfw, position, parentId
           })
         }
       }
 
       await bot.helpers.createChannel(interaction.guildId, options, reason)
         .then(async channel => {
-          await bot.helpers.swapChannels(channel.guildId, [{ id: channel.id.toString(), position: options.position ?? 0, parentId: parentId?.toString() }])
-          await respond(bot, interaction, { content: `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>` })
+          await respond(bot, interaction, { content: `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>` }, true)
+          swapOptions.push({ id: channel.id.toString(), position: options.position ?? 0 })
+          await bot.helpers.swapChannels(channel.guildId, swapOptions)
+          console.log(options, swapOptions)
         })
         .catch(async err => console.botLog(err))
       break

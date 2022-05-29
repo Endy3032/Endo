@@ -202,6 +202,18 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.SubCommand
         },
         {
+          name: "channel",
+          description: "Get info about a channel",
+          type: ApplicationCommandOptionTypes.SubCommand,
+          options: [
+            {
+              name: "target",
+              description: "The channel to get info [Channel]",
+              type: ApplicationCommandOptionTypes.Channel
+            }
+          ]
+        },
+        {
           name: "server",
           description: "Get info about the server",
           type: ApplicationCommandOptionTypes.SubCommand
@@ -504,6 +516,40 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 { name: "Memory Usage", value: `**RSS** • ${prettyBytes(memory.rss)}\n**Heap Total** • ${prettyBytes(memory.heapTotal)}\n**Heap Used** • ${prettyBytes(memory.heapUsed)}`, inline: true },
               ],
               thumbnail: { url: imageURL(bot.id, app.icon, "icons") },
+            }]
+          })
+          break
+        }
+
+        case "channel": {
+          if (interaction.guildId === undefined) {
+            await respond(bot, interaction, { content: "This command can't be used ouside of a server." }, true)
+              .catch(err => {console.botLog(err, "ERROR")})
+            break
+          }
+
+          if (interaction.channelId === undefined) {
+            await respond(bot, interaction, { content: "Cannot get this channel ID." }, true)
+              .catch(err => {console.botLog(err, "ERROR")})
+            break
+          }
+
+          const channel = await bot.helpers.getChannel(getValue(interaction, "target", "Channel")?.id ?? interaction.channelId)
+          const timestamp = Math.floor(Number(toTimestamp(channel?.id ?? 0n) / 1000n))
+
+          await respond(bot, interaction, {
+            embeds: [{
+              color: pickFromArray(colors),
+              fields: [
+                { name: "Name", value: `${channel?.name}`, inline: true },
+                { name: "ID", value: `${channel?.id}`, inline: true, },
+                { name: "Type", value: `${channel?.type}`, inline: true },
+                { name: "Position", value: `${channel?.position}`, inline: true },
+                { name: "NSFW", value: `${channel?.nsfw}`, inline: true },
+                { name: "Topic", value: `${channel?.topic}`, inline: true },
+                { name: "Creation Date", value: `<t:${timestamp}:f>\n<t:${timestamp}:R>`, inline: true },
+              ],
+              author: { name: "Channel Info" },
             }]
           })
           break

@@ -33,10 +33,14 @@ function getOptions(interaction: Interaction) {
       : interaction.data?.options
 }
 
-const resolvedOptionTypeToKey = {
-  [ApplicationCommandOptionTypes.Attachment]: "attachments",
-  [ApplicationCommandOptionTypes.Channel]: "channels",
-  [ApplicationCommandOptionTypes.Role]: "roles"
+type ResolvedOptions = {
+  [key in Extract<keyof typeof ApplicationCommandOptionTypes, "Attachment" | "Channel" | "Role">]: string
+}
+
+const resolvedOptionTypeToKey: ResolvedOptions = {
+  "Attachment": "attachments",
+  "Channel": "channels",
+  "Role": "roles"
 }
 
 const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
@@ -71,7 +75,6 @@ export function getValue(interaction: Interaction, name: string, type?: keyof ty
 
     const key = resolvedOptionTypeToKey[type || option.type]
     const value = BigInt(option.value as string)
-
     if (![type, option.type].includes(ApplicationCommandOptionTypes.User)) {
       if (resolved[key] === undefined) return null
       return resolved[key].get(value)

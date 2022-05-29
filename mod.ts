@@ -48,8 +48,11 @@ console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = tr
 
 console.tagLog = (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
 
-console.botLog = async (content: string | any, logLevel: LogLevel = "INFO", embed?: Embed) => {
-  if (content instanceof Error) content = content.stack
+console.botLog = async (content: string | Error, logLevel: LogLevel = "INFO", embed?: Embed) => {
+  if (content instanceof Error) {
+    content = content.stack?.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ") ?? "Unable to capture error stack"
+    logLevel = "ERROR"
+  }
   const { content: consoleLog, temporal } = console.localLog(content, logLevel, false)
   const epoch = temporal.epochMilliseconds
 
@@ -61,7 +64,7 @@ console.botLog = async (content: string | any, logLevel: LogLevel = "INFO", embe
   if (content.includes("youtu.be")) return await send({ content: `**Timestamp** • ${epoch}\n**Status** • Streaming lofi - ${content.split(" Streaming lofi ")[1]}` }, epoch)
   if (!embed) {
     embed = {
-      description: `**Timestamp** • ${epoch}\n**${capitalize(logLevel)}**${logLevel.includes("WARN") ? `\`\`\`${content}\`\`\`` : ` • ${content}`}`,
+      description: `**Timestamp** • ${epoch}\n**${capitalize(logLevel)}**${["WARN", "ERROR"].includes(logLevel) ? `\`\`\`${content}\`\`\`` : ` • ${content}`}`,
       timestamp: epoch
     }
   }
