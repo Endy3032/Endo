@@ -241,6 +241,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
             rateLimitPerUser: slowmode,
             topic, nsfw, position, parentId
           })
+          break
         }
       }
 

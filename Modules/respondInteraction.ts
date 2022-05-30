@@ -2,7 +2,7 @@ import { Bot, Interaction, InteractionApplicationCommandCallbackData, Interactio
 import { MessageFlags } from "./types.ts"
 
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData, ephemeral = false) {
-  const responseType = interaction.type == InteractionTypes.ModalSubmit
+  const responseType = response.title
     ? InteractionResponseTypes.Modal
     : interaction.type == InteractionTypes.ApplicationCommandAutocomplete
       ? InteractionResponseTypes.ApplicationCommandAutocompleteResult
