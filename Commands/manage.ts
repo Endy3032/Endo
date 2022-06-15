@@ -1,4 +1,4 @@
-import { checkPermission, emojis, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
+import { checkPermission, defer, emojis, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
 import { ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, ModifyGuildChannelPositions } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
@@ -7,8 +7,20 @@ export const cmd: CreateApplicationCommand = {
   defaultMemberPermissions: ["USE_SLASH_COMMANDS"],
   options: [
     {
+      name: "check",
+      description: "Check some server informations",
+      type: ApplicationCommandOptionTypes.SubCommandGroup,
+      options: [
+        {
+          name: "position",
+          description: "Check the channels' position",
+          type: ApplicationCommandOptionTypes.SubCommand,
+        }
+      ]
+    },
+    {
       name: "create",
-      description: "Create something in the server",
+      description: "Create something for the server",
       type: ApplicationCommandOptionTypes.SubCommandGroup,
       options: [
         {
@@ -18,26 +30,26 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "name",
-              description: "The channel's name [String 1~100 char]",
+              description: "The channel's name [Length 1~100]",
               type: ApplicationCommandOptionTypes.String,
               required: true,
             },
             {
               name: "topic",
-              description: "The channel's topic [String 0~1024 char]",
+              description: "The channel's topic [Length 0~1024]",
               type: ApplicationCommandOptionTypes.String,
               required: false,
             },
             {
               name: "below",
-              description: "Put below this channel (Default Top) [Text/Category]",
+              description: "Where to put the channel below (Default Top) [Text/Category]",
               type: ApplicationCommandOptionTypes.Channel,
               channelTypes: [ChannelTypes.GuildText, ChannelTypes.GuildCategory],
               required: false,
             },
             {
               name: "slowmode",
-              description: "The channel's slowmode cooldown (Text only) [Integer 0~21600]",
+              description: "Slowmode cooldown in seconds [Integer 0~21600]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 21600,
@@ -45,13 +57,13 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "restricted",
-              description: "The channel's NSFW restriction (Default False) [Boolean]",
+              description: "If the channel is NSFW (Default False) [Boolean]",
               type: ApplicationCommandOptionTypes.Boolean,
               required: false,
             },
             {
               name: "reason",
-              description: "The channel's creation reason [String 0~512 char]",
+              description: "Reason for creation [Length 0~512]",
               type: ApplicationCommandOptionTypes.String,
               required: false,
             }
@@ -64,20 +76,20 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "name",
-              description: "The category's name [String 1~100 char]",
+              description: "The category's name [Length 1~100]",
               type: ApplicationCommandOptionTypes.String,
               required: true,
             },
             {
               name: "below",
-              description: "Put below this category (Default Top) [Category]",
+              description: "Where to put the category below (Default Top) [Category]",
               type: ApplicationCommandOptionTypes.Channel,
               channelTypes: [ChannelTypes.GuildCategory],
               required: false,
             },
             {
               name: "reason",
-              description: "The category's creation reason [String 0~512 char]",
+              description: "Reason for creation [Length 0~512]",
               type: ApplicationCommandOptionTypes.String,
               required: false,
             }
@@ -90,13 +102,13 @@ export const cmd: CreateApplicationCommand = {
           options: [
             {
               name: "name",
-              description: "The channel's name [String 1~100 char]",
+              description: "The channel's name [Length 1~100]",
               type: ApplicationCommandOptionTypes.String,
               required: true,
             },
             {
               name: "type",
-              description: "The channel's type (Default Text)",
+              description: "The channel's type (Default Voice)",
               type: ApplicationCommandOptionTypes.Integer,
               choices: [
                 { name: "Voice", value: ChannelTypes.GuildVoice },
@@ -106,22 +118,22 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "below",
-              description: "Put below this channel (Default Top) [Voice/Category]",
+              description: "Where to put the channel below (Default Top) [Voice/Category]",
               type: ApplicationCommandOptionTypes.Channel,
-              channelTypes: [ChannelTypes.GuildVoice, ChannelTypes.GuildText],
+              channelTypes: [ChannelTypes.GuildVoice, ChannelTypes.GuildStageVoice, ChannelTypes.GuildCategory],
               required: false,
             },
             {
               name: "bitrate",
-              description: "The channel's bitrate (Voice only) [Integer]",
+              description: "Audio bitrate in Kbps [Integer 0~384]",
               type: ApplicationCommandOptionTypes.Integer,
-              minValue: 0,
+              minValue: 8,
               maxValue: 384,
               required: false,
             },
             {
               name: "user-limit",
-              description: "The channel's user limit (Voice only) [Integer]",
+              description: "Maximum amount of user able to join [Integer 0~99]",
               type: ApplicationCommandOptionTypes.Integer,
               minValue: 0,
               maxValue: 99,
@@ -129,7 +141,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "reason",
-              description: "The channel's creation reason [String 0~512 char]",
+              description: "Reason for creation [Length 0~512]",
               type: ApplicationCommandOptionTypes.String,
               required: false,
             }
@@ -156,7 +168,7 @@ export const cmd: CreateApplicationCommand = {
             },
             {
               name: "reason",
-              description: "Reason for deleting the channel [String 0~512 char]",
+              description: "Reason for deleting the channel [Length 0~512]",
               type: ApplicationCommandOptionTypes.String,
               required: false,
             }
@@ -204,36 +216,54 @@ export const cmd: CreateApplicationCommand = {
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
-  if (!interaction.guildId) return respond(bot, interaction, {
-    content: `${emojis.warn.shorthand} This command can only be used in servers.`,
-  }, true)
+  if (!interaction.guildId) return respond(bot, interaction, `${emojis.warn.shorthand} This command can only be used in servers.`, true)
 
-  switch (getSubcmdGroup(interaction)) {
+  switch(getSubcmdGroup(interaction)) {
+    case "check": {
+      switch(getSubcmd(interaction)) {
+        case "position": {
+          const channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort((a, b) => (a.position ?? 0) > (b.position ?? 1) ? 1 : -1)
+
+          await respond(bot, interaction, {
+            embeds: [{
+              title: "Channels Position",
+              fields: [
+                { name: "Categories", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
+                { name: "Text Channels", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildText).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
+                { name: "Voice Channels", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
+              ]
+            }]
+          })
+          break
+        }
+      }
+      break
+    }
+
     case "create": {
+      await defer(bot, interaction, { content: "Creating channel..." }, true)
       if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
       const channelName = getValue(interaction, "name", "String") ?? "channel"
       const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
-      let parentId: bigint | undefined = undefined, position: number | undefined = undefined
-      const options: CreateGuildChannel = { name: channelName }, swapOptions: ModifyGuildChannelPositions[] = []
+      let parentId: bigint | undefined = undefined, position = 0
+      const options: CreateGuildChannel = { name: channelName }
+      const channels = await bot.helpers.getChannels(interaction.guildId)
 
-      switch (getSubcmd(interaction)) {
+      switch(getSubcmd(interaction)) {
         case "text": {
-          const topic = getValue(interaction, "topic", "String") ?? undefined
-          const slowmode = getValue(interaction, "slowmode", "Integer") ?? 0
           const below = getValue(interaction, "below", "Channel")
           const nsfw = getValue(interaction, "nsfw", "Boolean") ?? false
+          const slowmode = getValue(interaction, "slowmode", "Integer") ?? 0
+          const topic = getValue(interaction, "topic", "String") ?? undefined
 
           if (below?.type === ChannelTypes.GuildCategory) {
             parentId = below.id
-            const channels = await bot.helpers.getChannels(interaction.guildId)
-            const categoryChildren = channels.filter(channel => channel.parentId === parentId).array()
-            position = categoryChildren.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
-            const lowestChildID = categoryChildren.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).id.toString()
-            swapOptions.push({ id: lowestChildID, position: position + 1 })
+            position = channels.filter(channel => channel.parentId === parentId).array()
+              .reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
           } else if (below?.type === ChannelTypes.GuildText) {
-            const belowCategory = await bot.helpers.getChannel(below.id)
-            parentId = belowCategory?.parentId ?? undefined
-            position = below.position ?? 0
+            const channel = await bot.helpers.getChannel(below.id)
+            parentId = channel?.parentId ?? undefined
+            position = channel?.position ? channel.position + 1 : 0
           }
 
           Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
@@ -243,14 +273,40 @@ export async function execute(bot: Bot, interaction: Interaction) {
           })
           break
         }
+
+        case "voice": {
+          const below = getValue(interaction, "below", "Channel")
+          const bitrate = getValue(interaction, "bitrate", "Integer") ?? 32000
+          const userLimit = getValue(interaction, "user-limit", "Integer") ?? 0
+          const type = getValue(interaction, "type", "Integer") ?? ChannelTypes.GuildVoice
+          const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
+
+          if (below?.type === ChannelTypes.GuildCategory) {
+            parentId = below.id
+            position = channels.filter(channel => channel.parentId === parentId).array()
+              .reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
+          } else if (below?.type === ChannelTypes.GuildVoice) {
+            const channel = await bot.helpers.getChannel(below.id)
+            parentId = channel?.parentId ?? undefined
+            position = channel?.position ? channel.position + 1 : 0
+          }
+
+          Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
+            type, bitrate, userLimit, position, parentId
+          })
+          break
+        }
       }
 
       await bot.helpers.createChannel(interaction.guildId, options, reason)
         .then(async channel => {
-          await respond(bot, interaction, { content: `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>` }, true)
+          await bot.helpers.editInteractionResponse(interaction.token, { content: `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>` })
+
+          const swapOptions: ModifyGuildChannelPositions[] = channels.filter(channel => channel.type == options.type)
+            .map(channel => { return { id: channel.id.toString(), position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position } })
+
           swapOptions.push({ id: channel.id.toString(), position: options.position ?? 0 })
           await bot.helpers.swapChannels(channel.guildId, swapOptions)
-          console.log(options, swapOptions)
         })
         .catch(async err => console.botLog(err))
       break

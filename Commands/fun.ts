@@ -150,9 +150,9 @@ export const cmd: CreateApplicationCommand = {
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
-  switch (getSubcmdGroup(interaction)) {
+  switch(getSubcmdGroup(interaction)) {
     default: {
-      switch (getSubcmd(interaction)) {
+      switch(getSubcmd(interaction)) {
         case "8ball": {
           const responses = {
             yes: [

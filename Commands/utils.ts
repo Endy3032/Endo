@@ -398,11 +398,11 @@ export const cmd: CreateApplicationCommand = {
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
-  switch (getSubcmdGroup(interaction)) {
+  switch(getSubcmdGroup(interaction)) {
     case "color": {
       let color: Color
 
-      switch (getSubcmd(interaction)) {
+      switch(getSubcmd(interaction)) {
         case "rgb": {
           const red = getValue(interaction, "red", "Integer") ?? 0
           const green = getValue(interaction, "green", "Integer") ?? 0
@@ -491,7 +491,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
     }
 
     case "info": {
-      switch (getSubcmd(interaction)) {
+      switch(getSubcmd(interaction)) {
         case "bot": {
           const app = await bot.helpers.getApplicationInfo()
           const memory = Deno.memoryUsage()
@@ -523,31 +523,42 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
         case "channel": {
           if (interaction.guildId === undefined) {
-            await respond(bot, interaction, { content: "This command can't be used ouside of a server." }, true)
-              .catch(err => console.botLog(err, "ERROR"))
+            await respond(bot, interaction, "This command can't be used ouside of a server.", true).catch(err => console.botLog(err, "ERROR"))
             break
           }
 
           if (interaction.channelId === undefined) {
-            await respond(bot, interaction, { content: "Cannot get this channel ID." }, true)
-              .catch(err => console.botLog(err, "ERROR"))
+            await respond(bot, interaction, "Cannot get this channel ID.", true).catch(err => console.botLog(err, "ERROR"))
             break
           }
 
           const channel = await bot.helpers.getChannel(getValue(interaction, "target", "Channel")?.id ?? interaction.channelId)
           const timestamp = Math.floor(Number(toTimestamp(channel?.id ?? 0n) / 1000n))
+          const fields = [
+            { name: "Name", value: `${channel?.name}`, inline: true },
+            { name: "ID", value: `${channel?.id}`, inline: true },
+            { name: "Type", value: `${channel?.type}`, inline: true },
+            { name: "Position", value: `${channel?.position}`, inline: true },
+          ]
+
+          if (!([ChannelTypes.GuildVoice, ChannelTypes.GuildStageVoice] as any[]).includes(channel?.type)) {
+            fields.push(
+              { name: "NSFW", value: `${channel?.nsfw}`, inline: true },
+              { name: "Topic", value: `${channel?.topic}`, inline: true },
+            )
+          } else {
+            fields.push(
+              { name: "Bitrate", value: `${(channel?.bitrate ?? 0) / 1000}Kbps`, inline: true },
+              { name: "User Limit", value: `${channel?.userLimit}`, inline: true },
+            )
+          }
 
           await respond(bot, interaction, {
             embeds: [{
               color: pickFromArray(colors),
               fields: [
-                { name: "Name", value: `${channel?.name}`, inline: true },
-                { name: "ID", value: `${channel?.id}`, inline: true },
-                { name: "Type", value: `${channel?.type}`, inline: true },
-                { name: "Position", value: `${channel?.position}`, inline: true },
-                { name: "NSFW", value: `${channel?.nsfw}`, inline: true },
-                { name: "Topic", value: `${channel?.topic}`, inline: true },
-                { name: "Creation Date", value: `<t:${timestamp}:f>\n<t:${timestamp}:R>`, inline: true },
+                ...fields,
+                { name: "Creation Date", value: `<t:${timestamp}:f> (<t:${timestamp}:R>)`, inline: true },
               ],
               author: { name: "Channel Info" },
             }],
@@ -557,14 +568,16 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
         case "server": {
           if (interaction.guildId === undefined) {
-            await respond(bot, interaction, { content: "This command can't be used ouside of a server." }, true)
-              .catch(err => {
-                console.botLog(err, "ERROR")
-              })
+            await respond(bot, interaction, "This command can't be used ouside of a server.", true)
+              .catch(err => console.botLog(err, "ERROR"))
             break
           }
 
           const guild = await bot.helpers.getGuild(interaction.guildId, { counts: true })
+          if (guild === undefined) {
+            await respond(bot, interaction, "Cannot fetch this guild.", true)
+            break
+          }
           const channels = await bot.helpers.getChannels(interaction.guildId)
           const emojis = await bot.rest.runMethod<DiscordEmoji[]>(bot.rest, "GET", bot.constants.routes.GUILD_EMOJIS(interaction.guildId))
 
@@ -657,7 +670,7 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
     }
 
     default: {
-      switch (getSubcmd(interaction)) {
+      switch(getSubcmd(interaction)) {
         case "calculate": {
           const expression = getValue(interaction, "expression", "String") ?? ""
           const symbols = ["π", "τ"]
@@ -691,13 +704,13 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
             })
           } catch (err) {
             console.botLog(err, "ERROR")
-            await respond(bot, interaction, { content: `Cannot evaluate \`${expression}\`\n${err}.${String(err).includes("Undefined symbol") ? " You may want to declare variables like `a = 9; a * 7` => 63" : ""}` }, true)
+            await respond(bot, interaction, `Cannot evaluate \`${expression}\`\n${err}.${String(err).includes("Undefined symbol") ? " You may want to declare variables like `a = 9; a * 7` => 63" : ""}`, true)
           }
           break
         }
 
         case "ping": {
-          await respond(bot, interaction, { content: "Pinging..." })
+          await respond(bot, interaction, "Pinging...")
 
           const original = await bot.helpers.getOriginalInteractionResponse(interaction.token)
           const wsPing = bot.gateway.manager.shards.reduce((curr, next) => curr + (next.heart.rtt ?? 0), 0) / bot.gateway.manager.shards.size
@@ -741,27 +754,23 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
             })
           }
 
-          await respond(bot, interaction, {
-            // title: "Create a Poll",
-            // customId: "poll",
-            // components: modalData
-            content: "Poll is not available yet",
-          }, true)
+          // await respond(bot, interaction, {
+          //   title: "Create a Poll",
+          //   customId: "poll",
+          //   components: modalData
+          // }, true)
+          await respond(bot, interaction, "Poll is not available yet")
           break
         }
 
         case "send": {
           if (!interaction.guildId) {
-            return await respond(bot, interaction, {
-              content: `${emojis.warn.shorthand} This command can only be used in servers.`,
-            }, true)
+            return await respond(bot, interaction, `${emojis.warn.shorthand} This command can only be used in servers.`, true)
           }
 
           const { channelId } = interaction
           if (channelId === undefined) {
-            return await respond(bot, interaction, {
-              content: `${emojis.warn.shorthand} Can't reach this channel.`,
-            }, true)
+            return await respond(bot, interaction, `${emojis.warn.shorthand} Can't reach this channel.`, true)
           }
 
           const message = getValue(interaction, "message", "String") ?? ""
@@ -774,7 +783,7 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
             response += "\nNote: 3 times maximum"
           }
 
-          await respond(bot, interaction, { content: response }, true)
+          await respond(bot, interaction, response, true)
 
           for (let i = 0; i < times; i++) {
             setTimeout(() => bot.helpers.sendMessage(channelId, { content: message }), 750 * i)
@@ -796,9 +805,7 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
           if (date.toString() == "Invalid Date") date = Temporal.Instant.fromEpochSeconds(year < 0 ? -8640000000000 : 8640000000000)
 
           const timestamp = date.epochSeconds
-          await respond(bot, interaction, {
-            content: `**Date** • ${date}\n**Timestamp** • ${timestamp} (${String(date.epochMilliseconds)})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`,
-          }, true)
+          await respond(bot, interaction, `**Date** • ${date}\n**Timestamp** • ${timestamp} (${String(date.epochMilliseconds)})\n\n**Discord Styled Timestamps**\n${timestampStyler(timestamp, "tsutils")}`, true)
           break
         }
       }
@@ -814,7 +821,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 
   if (current.length == 0) return await respond(bot, interaction, { choices: [blankInitial] })
 
-  switch (getSubcmd(interaction)) {
+  switch(getSubcmd(interaction)) {
     case "timestamp": {
       const fuse = new Fuse(timeZones, { distance: 5 })
       response.push(
@@ -834,9 +841,9 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 //     const embed = interaction.message?.embeds[0]
 //     // let user = embed.description?.split(" ").at(-1) as string
 //     // user = user.slice(2, user.length - 1)
-//     // switch (true) {
+//     // switch(true) {
 //     //   case interaction.customId.startsWith("poll"): {
-//     //     switch (interaction.customId.slice(5)) {
+//     //     switch(interaction.customId.slice(5)) {
 //     //       case "close": {
 //     //         console.log("close")
 //     //         if (interaction.user.id == user) {await interaction.message.edit({ components: [] })}

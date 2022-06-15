@@ -8,9 +8,7 @@ import { Nord } from "./types.ts"
 
 export const checkPermission = (bot: Bot, interaction: Interaction, ...perms: BitwisePermissionFlags[]) => {
   if (!interaction.guildId) {
-    respond(bot, interaction, {
-      content: `${emojis.warn.shorthand} This command can only be used in servers.`,
-    }, true)
+    respond(bot, interaction, `${emojis.warn.shorthand} This command can only be used in servers.`, true)
     return true
   }
   const memberPermission = interaction.member?.permissions ?? 0n
@@ -29,7 +27,7 @@ export const checkPermission = (bot: Bot, interaction: Interaction, ...perms: Bi
 
   if (block) {
     console.botLog(`${consoleLog.slice(0, -1)} ]`, "WARN")
-    respond(bot, interaction, { content: repContent }, true)
+    respond(bot, interaction, repContent, true)
   }
   return block
 }

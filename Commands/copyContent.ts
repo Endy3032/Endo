@@ -16,5 +16,5 @@ export async function execute(bot: Bot, interaction: Interaction) {
   let content = messageContent.length == 0 ? "**Content**\nNone" : `**Content**\n${messageContent}`
   content += `\n\n**Attachment(s): ${attachments.length}**\n${attachments.map(attachment => `<${attachment}>`).join("\n")}`
 
-  await respond(bot, interaction, { content: `${content}` }, true)
+  await respond(bot, interaction, `${content}`, true)
 }
