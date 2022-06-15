@@ -16,7 +16,7 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 
   if (ephemeral) data.flags = MessageFlags.Ephemeral
 
-  return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data })
+  return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data }).catch(err => console.botLog(err, "ERROR"))
 }
 
 export async function update(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData) {
@@ -25,7 +25,7 @@ export async function update(bot: Bot, interaction: Interaction, response: Inter
   return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
     type: InteractionResponseTypes.UpdateMessage,
     data: response,
-  })
+  }).catch(err => console.botLog(err, "ERROR"))
 }
 
 export async function defer(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData, ephemeral = false) {
@@ -40,7 +40,7 @@ export async function defer(bot: Bot, interaction: Interaction, response: Intera
   return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
     type: responseType,
     data: response,
-  })
+  }).catch(err => console.botLog(err, "ERROR"))
 }
 
 export async function error(bot: Bot, interaction: Interaction, err: Error, type?: string) {

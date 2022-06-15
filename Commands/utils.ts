@@ -494,8 +494,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
       switch(getSubcmd(interaction)) {
         case "bot": {
           const app = await bot.helpers.getApplicationInfo()
-          const memory = Deno.memoryUsage()
           const creationTimestamp = Math.floor(Number(toTimestamp(bot.id) / 1000n))
+          const memory = Deno.memoryUsage()
           const { version } = Deno
           const discordenoVersion = bot.constants.DISCORDENO_VERSION
 
@@ -523,12 +523,12 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
         case "channel": {
           if (interaction.guildId === undefined) {
-            await respond(bot, interaction, "This command can't be used ouside of a server.", true).catch(err => console.botLog(err, "ERROR"))
+            await respond(bot, interaction, "This command can't be used ouside of a server.", true)
             break
           }
 
           if (interaction.channelId === undefined) {
-            await respond(bot, interaction, "Cannot get this channel ID.", true).catch(err => console.botLog(err, "ERROR"))
+            await respond(bot, interaction, "Cannot get this channel ID.", true)
             break
           }
 
@@ -569,7 +569,6 @@ export async function execute(bot: Bot, interaction: Interaction) {
         case "server": {
           if (interaction.guildId === undefined) {
             await respond(bot, interaction, "This command can't be used ouside of a server.", true)
-              .catch(err => console.botLog(err, "ERROR"))
             break
           }
 
