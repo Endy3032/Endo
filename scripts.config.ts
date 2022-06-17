@@ -1,4 +1,4 @@
-import { configSync as env } from "https://deno.land/std@0.138.0/dotenv/mod.ts"
+import { configSync as env } from "https://deno.land/std@0.144.0/dotenv/mod.ts"
 import type { DenonConfig } from "https://deno.land/x/denon@2.5.0/mod.ts"
 
 const cmd = "mod.ts"
@@ -8,7 +8,6 @@ const config: DenonConfig = {
   env: env(),
   importMap: "./imports.json",
   tsconfig: "./deno.json",
-  noCheck: true,
   scripts: {
     start: {
       cmd,
