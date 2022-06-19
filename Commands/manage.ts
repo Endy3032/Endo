@@ -1,5 +1,10 @@
-import { checkPermission, defer, emojis, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
-import { ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, ModifyGuildChannelPositions } from "discordeno"
+import { checkPermission, defer, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond, edit } from "modules"
+import { ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, MessageComponentTypes, ModifyGuildChannelPositions } from "discordeno"
+
+const purge = (bot: Bot, channelId: bigint, messages: bigint[], reason?: string) => {
+  if (messages.length > 1) return bot.helpers.deleteMessages(channelId, messages, reason)
+  else return bot.helpers.deleteMessage(channelId, messages[0], reason)
+}
 
 export const cmd: CreateApplicationCommand = {
   name: "manage",
@@ -210,6 +215,12 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.User,
           required: false,
         },
+        {
+          name: "reason",
+          description: "Reason for creation [Length 0~512]",
+          type: ApplicationCommandOptionTypes.String,
+          required: false,
+        },
       ]
     }
   ]
@@ -241,7 +252,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
     }
 
     case "create": {
-      await defer(bot, interaction, { content: "Creating channel..." }, true)
+      await defer(bot, interaction, true)
       if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
       const channelName = getValue(interaction, "name", "String") ?? "channel"
       const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
@@ -250,6 +261,15 @@ export async function execute(bot: Bot, interaction: Interaction) {
       const channels = await bot.helpers.getChannels(interaction.guildId)
 
       switch(getSubcmd(interaction)) {
+        case "category": {
+          const below = getValue(interaction, "below", "Channel")
+          const belowPos = channels.find(channel => channel.id == below?.id)?.position
+          position = belowPos ? belowPos + 1 : 0
+
+          Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, { type: ChannelTypes.GuildCategory, position })
+          break
+        }
+
         case "text": {
           const below = getValue(interaction, "below", "Channel")
           const nsfw = getValue(interaction, "nsfw", "Boolean") ?? false
@@ -279,7 +299,6 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const bitrate = getValue(interaction, "bitrate", "Integer") ?? 32000
           const userLimit = getValue(interaction, "user-limit", "Integer") ?? 0
           const type = getValue(interaction, "type", "Integer") ?? ChannelTypes.GuildVoice
-          const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
 
           if (below?.type === ChannelTypes.GuildCategory) {
             parentId = below.id
@@ -310,6 +329,114 @@ export async function execute(bot: Bot, interaction: Interaction) {
         })
         .catch(async err => console.botLog(err))
       break
+    }
+
+    case "delete": {
+      if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+      switch(getSubcmd(interaction)) {
+        case "channel": {
+          const channel = getValue(interaction, "channel", "Channel")
+          const reason = getValue(interaction, "reason", "String") ?? `Deleted by ${interaction.user.username}#${interaction.user.discriminator}`
+
+          await respond(bot, interaction, {
+            content: `Confirm to delete <#${channel?.id}> with the following reason: ${reason}`,
+            components: [{
+              type: MessageComponentTypes.ActionRow,
+              components: [{
+                type: MessageComponentTypes.Button,
+                label: "Delete",
+                customId: `delete-channel-${channel?.id}`,
+                style: ButtonStyles.Danger,
+                emoji: { id: emojis.trash.id }
+              }]
+            }]
+          }, true)
+          break
+        }
+      }
+      break
+    }
+
+    default: {
+      switch(getSubcmd(interaction)) {
+        case "purge": {
+          if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
+          const amount = getValue(interaction, "amount", "Integer") ?? 0
+          const option = getValue(interaction, "option", "String")
+          const user = getValue(interaction, "user", "User")
+          const reason = getValue(interaction, "reason", "String") ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
+
+          let content = `Confirm to delete \`${amount}\` messages `
+          content += option && user
+            ? `from <@${user.user.id}> and ${option} only `
+            : option || user
+              ? `from ${user ? `<@${user.user.id}>` : option} only `
+              : ""
+          content += `with the following reason: ${reason}`
+
+          await respond(bot, interaction, {
+            content,
+            components: [{
+              type: MessageComponentTypes.ActionRow,
+              components: [{
+                type: MessageComponentTypes.Button,
+                label: "Delete",
+                customId: `delete-messages-${amount}-${option}-${user?.user.id}`,
+                style: ButtonStyles.Danger,
+                emoji: { id: emojis.trash.id }
+              }]
+            }]
+          }, true)
+          break
+        }
+      }
+    }
+  }
+}
+
+export async function button(bot: Bot, interaction: Interaction) {
+  const customID = (interaction.data?.customId ?? "").split("-")
+  const [action, type] = customID
+  switch(action) {
+    case "delete": {
+      await defer(bot, interaction)
+      switch(type) {
+        case "channel": {
+          if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+          const [,,channelID] = customID
+          const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
+          await bot.helpers.deleteChannel(BigInt(channelID), reason)
+            .then(() => edit(bot, interaction, { content: `${emojis.success.shorthand} Deleted the channel`, components: [] }))
+            .catch(err => error(bot, interaction, err, "Channel Deletion", true))
+          break
+        }
+
+        case "messages": {
+          if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
+          if (interaction.channelId === undefined) return edit(bot, interaction, "Cannot get current channel")
+          const [,,amount, option, user] = customID
+          const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
+
+          let clear = (await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) }))
+          if (option != "null" || user != "undefined") clear = clear.filter(msg => {
+            let cond = false
+            if (option == "bots") cond = cond || msg.isBot
+            if (option == "users") cond = cond || !msg.isBot
+            if (user != "undefined") cond = cond || (msg.authorId == BigInt(user))
+            return cond
+          })
+
+          if (clear.length < 1) return await edit(bot, interaction, `${emojis.warn.shorthand} Found no messages to purge`)
+          else {
+            await purge(bot, interaction.channelId, clear.map(msg => msg.id), reason)
+              .then(() => {
+                edit(bot, interaction, `${emojis.success.shorthand} Found and purged ${clear.length}/${amount} messages`)
+                console.botLog(`Found and purged ${clear.length}/${amount} messages`)
+              })
+              .catch(err => error(bot, interaction, err, "Message Purge", true))
+          }
+        }
+      }
     }
   }
 }

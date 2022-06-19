@@ -1,6 +1,6 @@
 import { emojis } from "./emojis.ts"
 import { MessageFlags } from "./types.ts"
-import { Bot, Interaction, InteractionApplicationCommandCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
+import { Bot, EditWebhookMessage, Interaction, InteractionApplicationCommandCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
 
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData | string, ephemeral = false) {
   let type = InteractionResponseTypes.ChannelMessageWithSource
@@ -19,32 +19,28 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
   return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data }).catch(err => console.botLog(err, "ERROR"))
 }
 
-export async function update(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData) {
-  if (![InteractionTypes.MessageComponent, InteractionTypes.ModalSubmit].includes(interaction.type)) throw new Error("Interaction is not a message component interaction.")
-
-  return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
-    type: InteractionResponseTypes.UpdateMessage,
-    data: response,
-  }).catch(err => console.botLog(err, "ERROR"))
+export async function edit(bot: Bot, interaction: Interaction, response: EditWebhookMessage | InteractionApplicationCommandCallbackData | string) {
+  if (interaction.type == InteractionTypes.ApplicationCommandAutocomplete) return
+  bot.helpers.editInteractionResponse(interaction.token, typeof response === "string" ? { content: response } : response)
+    .catch(err => console.botLog(err, "ERROR"))
 }
 
-export async function defer(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData, ephemeral = false) {
+export async function defer(bot: Bot, interaction: Interaction, ephemeral = false) {
   if (interaction.type == InteractionTypes.ApplicationCommandAutocomplete) throw new Error("Cannot defer an autocomplete interaction.")
 
   const responseType = interaction.type == InteractionTypes.ApplicationCommand
     ? InteractionResponseTypes.DeferredChannelMessageWithSource
     : InteractionResponseTypes.DeferredUpdateMessage
 
-  if (ephemeral) response.flags = MessageFlags.Ephemeral
-
   return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
     type: responseType,
-    data: response,
+    data: { flags: ephemeral ? MessageFlags.Ephemeral : undefined }
   }).catch(err => console.botLog(err, "ERROR"))
 }
 
-export async function error(bot: Bot, interaction: Interaction, err: Error, type?: string) {
+export async function error(bot: Bot, interaction: Interaction, err: Error, type?: string, isEdit = false) {
   const content = `${emojis.error.shorthand} This interaction failed [${type || "Unknown"}]\`\`\`\n${err.name}: ${err.message}\n\`\`\``
-  await respond(bot, interaction, content, true)
-  console.botLog(content, "ERROR")
+  if (isEdit) await edit(bot, interaction, content)
+  else await respond(bot, interaction, content, true)
+  console.botLog(err, "ERROR")
 }

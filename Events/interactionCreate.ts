@@ -1,7 +1,7 @@
 import { rgb24, stripColor } from "colors"
 import { commands } from "/Commands/mod.ts"
 import { Bot, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes, Embed } from "discordeno"
-import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, respond } from "modules"
+import { BrightNord, Command, getSubcmd, getSubcmdGroup, imageURL, toTimestamp, getCmdName, respond, emojis } from "modules"
 
 const testGuildID = Deno.env.get("TestGuild")
 const testGuildChannel = Deno.env.get("TestChannel")
@@ -61,20 +61,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     try {await exec(bot, interaction)}
     catch (e) {console.botLog(e, "ERROR")}
   } else {
-    console.botLog(`No ${type} function found for ${commandName}`)
-    await respond(bot, interaction, "I can't seem to run this command. There might be something wrong on my end.", true)
+    console.botLog(`No ${type} function found for [${commandName}]`, "ERROR")
+    await respond(bot, interaction, `${emojis.error.shorthand} Something failed back here...`, true)
   }
-
-  // console.log(getSubcmd(interaction, ))
-  // switch(interaction.data?.componentType) {
-  //   case MessageComponentTypes.Button: {
-  //     commandName = "button"
-  //     break
-  //   }
-
-  //   case MessageComponentTypes.SelectMenu: {
-  //     commandName = "select"
-  //     break
-  //   }
-  // }
 }
