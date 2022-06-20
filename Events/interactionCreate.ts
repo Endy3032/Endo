@@ -24,7 +24,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
     const invoker = rgb24(`[${interaction.user.username}#${interaction.user.discriminator} | ${guildName ? `${guildName} #${channelName}` : "DM"}] `, BrightNord.cyan)
 
     const interactionLog =
-    interaction.type == InteractionTypes.ApplicationCommand ? `Triggered ${rgb24(`/${[commandName, subcmd, group].join(" ").replaceAll("  ", " ")}`, BrightNord.cyan)}`
+    interaction.type == InteractionTypes.ApplicationCommand ? `Triggered ${rgb24(`/${[commandName, group, subcmd].join(" ").replaceAll("  ", " ")}`, BrightNord.cyan)}`
     : interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.Button ? `Pushed ${rgb24(`[${commandName}/${interaction.data.customId}]`, BrightNord.cyan)}`
     : interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.SelectMenu ? `Selected ${rgb24(`[${commandName}/[${interaction.data?.values?.join("|")}]]`, BrightNord.cyan)}`
     : interaction.type == InteractionTypes.ModalSubmit ? `Submitted ${rgb24(`[${commandName}/${interaction.data?.customId}]`, BrightNord.cyan)}`
