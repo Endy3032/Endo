@@ -7,6 +7,7 @@ type EscapeMarkdownOptions = {
   underline?: boolean
   spoiler?: boolean
   strikethrough?: boolean
+  timestamps?: boolean
 }
 
 // Taken from https://github.com/discordjs/discord.js/blob/main/packages/discord.js/src/util/Util.js
@@ -20,6 +21,7 @@ export const escapeMarkdown = (text: string, options: EscapeMarkdownOptions = { 
       underline: true,
       spoiler: true,
       strikethrough: true,
+      timestamps: true
     }
   }
 
@@ -59,6 +61,8 @@ export const escapeMarkdown = (text: string, options: EscapeMarkdownOptions = { 
   if (options.spoiler) text = text.replaceAll("||", "\\|\\|")
 
   if (options.strikethrough) text = text.replaceAll("~~", "\\~\\~")
+
+  if (options.timestamps) text = text.replaceAll("<t:", "\\<t:")
 
   return text
 }
