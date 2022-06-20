@@ -10,5 +10,31 @@
   [![Hosted with Replit](https://img.shields.io/static/v1?label=Hosted%20with&message=Replit&color=5865F2&labelColor=2e3440&style=for-the-badge&logo=replit)](https://replit.com/@Endy3032/EndyJS)
 
   [![Invite Me](https://img.shields.io/badge/Invite%20Me-2e3440?style=for-the-badge&logo=discord)](https://discord.com/api/v9/oauth2/authorize?client_id=699911346367627374&scope=bot%20applications.commands)
-  
+
 </div>
+
+# Privacy Policy
+
+When using EndyJS, I collect data about you to bring you a better experience.
+
+## What personal information do I collect from people using EndyJS?
+
+- Public server information: Server ID, Server Name, Server Icon, Channel Name
+- Public user information: Username, User ID, Profile picture
+- Any errors that occured while using the bot
+
+All information listed above will only be logged to a private Discord channel when you invoke a command from the bot.
+
+## How do we use your information?
+
+Your information will only be used for logging, analytics and debugging purposes.
+
+## Agreement
+
+By using EndyJS, you agree to the terms of this Privacy Policy. If you do not agree to these terms you must not use my service.
+
+## Contact
+
+If you have any questions or suggestions about my Privacy Policy, please contact me on Discord at Endy#3032.
+
+<sup>Last Modified 20th June 2022.</sup>
