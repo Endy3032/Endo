@@ -17,13 +17,13 @@
 
 When using EndyJS, I collect data about you to bring you a better experience.
 
-## What personal information do I collect from people using EndyJS?
+## What personal informations do I collect from people using EndyJS?
 
-- Public server information: Server ID, Server Name, Server Icon, Channel Name
-- Public user information: Username, User ID, Profile picture
+- Public server informations: Server ID, Server Name, Server Icon, Channel Name
+- Public user informations: Username, User ID, Profile picture
 - Any errors that occured while using the bot
 
-All information listed above will only be logged to a private Discord channel when you invoke a command from the bot.
+These informations will only be logged to a private Discord channel when you invoke my bot's commands.
 
 ## How do we use your information?
 
