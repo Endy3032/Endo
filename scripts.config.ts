@@ -28,7 +28,7 @@ const config: DenonConfig = {
       allow: undefined,
     },
   },
-  watcher: { exts: ["ts"] },
+  watcher: { exts: ["ts"], skip: ["Commands/*$eval.ts"] },
 }
 
 export default config

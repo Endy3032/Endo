@@ -1,5 +1,6 @@
-import { checkPermission, defer, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond, edit } from "modules"
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, MessageComponentTypes, ModifyGuildChannelPositions, VoiceRegions } from "discordeno"
+import * as otpauth from "otpauth"
+import { checkPermission, defer, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond, edit, capitalize } from "modules"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, MessageComponentTypes, ModifyGuildChannelPositions, TextStyles, VoiceRegions } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
   name: "manage",
@@ -281,6 +282,17 @@ export const cmd: CreateApplicationCommand = {
       ]
     },
     {
+      name: "eval",
+      description: "Evaluate a code [Bot Owner Only]",
+      type: ApplicationCommandOptionTypes.SubCommand,
+      options: [{
+        name: "otp",
+        description: "One Time Password for validation",
+        type: ApplicationCommandOptionTypes.String,
+        required: true,
+      }]
+    },
+    {
       name: "purge",
       description: "Purge messages",
       type: ApplicationCommandOptionTypes.SubCommand,
@@ -325,10 +337,14 @@ export const cmd: CreateApplicationCommand = {
   ]
 }
 
-const purge = (bot: Bot, channelId: bigint, messages: bigint[], reason?: string) => {
-  if (messages.length > 1) return bot.helpers.deleteMessages(channelId, messages, reason)
-  else return bot.helpers.deleteMessage(channelId, messages[0], reason)
-}
+const otp = new otpauth.TOTP({
+  issuer: "Endy3032",
+  label: "EndyBotOTP",
+  algorithm: "SHA1",
+  digits: 8,
+  period: 30,
+  secret: Deno.env.get("OTP"),
+})
 
 export async function execute(bot: Bot, interaction: Interaction) {
   if (!interaction.guildId) return respond(bot, interaction, `${emojis.warn.shorthand} This command can only be used in servers.`, true)
@@ -478,6 +494,32 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
     default: {
       switch(getSubcmd(interaction)) {
+        case "eval": {
+          const app = await bot.helpers.getApplicationInfo()
+          const ownerID = (app.team ? app.team.ownerUserId : app.owner?.id) ?? bot.id
+          if (interaction.user.id !== ownerID) return respond(bot, interaction, "You aren't allowed to use this command", true)
+
+          const token = getValue(interaction, "otp", "String")
+          if (token === null) return respond(bot, interaction, "Cannot retrieve OTP, try again", true)
+          if (otp.validate({ token, window: 1 }) === null) return respond(bot, interaction, "Invalid OTP, try again", true)
+
+          respond(bot, interaction, {
+            title: "Eval",
+            customId: "manage_eval",
+            components: [{
+              type: MessageComponentTypes.ActionRow,
+              components: [{
+                type: MessageComponentTypes.InputText,
+                style: TextStyles.Paragraph,
+                customId: "code",
+                label: "Code",
+                required: true,
+              }]
+            }]
+          })
+          break
+        }
+
         case "purge": {
           if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
           const amount = getValue(interaction, "amount", "Integer") ?? 0
@@ -511,6 +553,11 @@ export async function execute(bot: Bot, interaction: Interaction) {
       }
     }
   }
+}
+
+const purge = (bot: Bot, channelId: bigint, messages: bigint[], reason?: string) => {
+  if (messages.length > 1) return bot.helpers.deleteMessages(channelId, messages, reason)
+  else return bot.helpers.deleteMessage(channelId, messages[0], reason)
 }
 
 export async function button(bot: Bot, interaction: Interaction) {
@@ -584,4 +631,28 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
   const abnormal = [...optimal, ...deprecated, ...custom]
 
   await respond(bot, interaction, { choices: [...optimal, ...custom, ...choices.filter(choice => !abnormal.includes(choice)), ...deprecated] })
+}
+
+// async function tseval(code: string) {
+//   // const moduleURL = import.meta.url.replace("file://", "") + "$eval.ts"
+//   // await Deno.writeFile(moduleURL, new TextEncoder().encode(code))
+//   // return await import(moduleURL)
+//   return import(`data:application/javascript,${encodeURIComponent(code)}`)
+// }
+
+export async function modal(bot: Bot, interaction: Interaction) {
+  await defer(bot, interaction)
+  const code = getValue(interaction, "code", "Modal")
+  var response = `**Code**\n\`\`\`ts\n${code}\`\`\`\n`
+  const ddeno = await import("discordeno")
+
+  try {
+    const output = await eval(code?.includes("await") ? `(async function () {${code}})()` : code ?? "")
+    if (output !== undefined) response += `**Output**\n\`\`\`ts\n${Deno.inspect(output, { compact: false })}\ntypeof ${capitalize(typeof output)}\`\`\``
+    else response += "// Executed successfully"
+  } catch (err) {
+    response += `**Error**\n\`\`\`ts\n${err.stack.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ")}\`\`\``
+  }
+
+  edit(bot, interaction, response)
 }

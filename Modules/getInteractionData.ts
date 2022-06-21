@@ -3,9 +3,11 @@ import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, Intera
 export function getCmdName(interaction: Interaction) {
   return [InteractionTypes.ApplicationCommand, InteractionTypes.ApplicationCommandAutocomplete].includes(interaction.type)
     ? interaction.data?.name.replace(/^(\[.\]) /, "")
-    : [InteractionTypes.MessageComponent, InteractionTypes.ModalSubmit].includes(interaction.type)
+    : interaction.type == InteractionTypes.MessageComponent
       ? interaction.message?.interaction?.name
-      : "null"
+      : interaction.type == InteractionTypes.ModalSubmit
+        ? interaction.data?.customId?.split("_")[0]
+        : "null"
 }
 
 export function getSubcmd(interaction: Interaction) {

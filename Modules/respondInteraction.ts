@@ -28,7 +28,7 @@ export async function edit(bot: Bot, interaction: Interaction, response: EditWeb
 export async function defer(bot: Bot, interaction: Interaction, ephemeral = false) {
   if (interaction.type == InteractionTypes.ApplicationCommandAutocomplete) throw new Error("Cannot defer an autocomplete interaction.")
 
-  const responseType = interaction.type == InteractionTypes.ApplicationCommand
+  const responseType = [InteractionTypes.ApplicationCommand, InteractionTypes.ModalSubmit].includes(interaction.type)
     ? InteractionResponseTypes.DeferredChannelMessageWithSource
     : InteractionResponseTypes.DeferredUpdateMessage
 

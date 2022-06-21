@@ -11,3 +11,4 @@ node_modules*
 forecast.json
 package-lock.json
 Resources/Covid/*.json
+*$eval.ts
