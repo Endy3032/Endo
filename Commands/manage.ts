@@ -503,7 +503,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
           if (token === null) return respond(bot, interaction, "Cannot retrieve OTP, try again", true)
           if (otp.validate({ token, window: 1 }) === null) return respond(bot, interaction, "Invalid OTP, try again", true)
 
-          respond(bot, interaction, {
+          await respond(bot, interaction, {
             title: "Eval",
             customId: "manage_eval",
             components: [{
@@ -633,23 +633,17 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
   await respond(bot, interaction, { choices: [...optimal, ...custom, ...choices.filter(choice => !abnormal.includes(choice)), ...deprecated] })
 }
 
-// async function tseval(code: string) {
-//   // const moduleURL = import.meta.url.replace("file://", "") + "$eval.ts"
-//   // await Deno.writeFile(moduleURL, new TextEncoder().encode(code))
-//   // return await import(moduleURL)
-//   return import(`data:application/javascript,${encodeURIComponent(code)}`)
-// }
-
 export async function modal(bot: Bot, interaction: Interaction) {
   await defer(bot, interaction)
   const code = getValue(interaction, "code", "Modal")
   var response = `**Code**\n\`\`\`ts\n${code}\`\`\`\n`
-  const ddeno = await import("discordeno")
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const discordeno = await import("discordeno")
 
   try {
-    const output = await eval(code?.includes("await") ? `(async function () {${code}})()` : code ?? "")
-    if (output !== undefined) response += `**Output**\n\`\`\`ts\n${Deno.inspect(output, { compact: false })}\ntypeof ${capitalize(typeof output)}\`\`\``
-    else response += "// Executed successfully"
+    let output = Deno.inspect(await eval(code?.replaceAll("await ", "") ?? ""), { compact: false })
+    for (const brack of ["()", "[]", "{}"]) output = output.replaceAll(new RegExp(`(\\${brack.charAt(0)}\\n\\s+\\${brack.charAt(1)},)`, "gm"), `${brack},`)
+    if (output !== undefined) response += `**Output**\n\`\`\`ts\n${output} [typeof ${capitalize(typeof output)}]\`\`\``
   } catch (err) {
     response += `**Error**\n\`\`\`ts\n${err.stack.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ")}\`\`\``
   }
