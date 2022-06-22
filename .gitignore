@@ -10,5 +10,5 @@ node_modules*
 .DS_Store
 forecast.json
 package-lock.json
-Resources/Covid/*.json
+Resources/**/*.json
 *$eval.ts

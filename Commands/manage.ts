@@ -439,7 +439,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
       await bot.helpers.createChannel(interaction.guildId, options, reason)
         .then(async channel => {
-          await bot.helpers.editInteractionResponse(interaction.token, { content: `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>` })
+          await respond(bot, interaction, `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
 
           const swapOptions: ModifyGuildChannelPositions[] = channels.filter(channel => channel.type == options.type)
             .map(channel => { return { id: channel.id.toString(), position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position } })
@@ -572,14 +572,14 @@ export async function button(bot: Bot, interaction: Interaction) {
           const [,,channelID] = customID
           const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
           await bot.helpers.deleteChannel(BigInt(channelID), reason)
-            .then(() => edit(bot, interaction, { content: `${emojis.success.shorthand} Deleted the channel`, components: [] }))
+            .then(() => respond(bot, interaction, { content: `${emojis.success.shorthand} Deleted the channel`, components: [] }))
             .catch(err => error(bot, interaction, err, "Channel Deletion", true))
           break
         }
 
         case "messages": {
           if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
-          if (interaction.channelId === undefined) return edit(bot, interaction, "Cannot get current channel")
+          if (interaction.channelId === undefined) return respond(bot, interaction, "Cannot get current channel")
           const [,,amount, option, user] = customID
           const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 
@@ -592,11 +592,11 @@ export async function button(bot: Bot, interaction: Interaction) {
             return cond
           })
 
-          if (clear.length < 1) return await edit(bot, interaction, `${emojis.warn.shorthand} Found no messages to purge`)
+          if (clear.length < 1) return await respond(bot, interaction, `${emojis.warn.shorthand} Found no messages to purge`)
           else {
             await purge(bot, interaction.channelId, clear.map(msg => msg.id), reason)
               .then(() => {
-                edit(bot, interaction, `${emojis.success.shorthand} Found and purged ${clear.length}/${amount} messages`)
+                respond(bot, interaction, `${emojis.success.shorthand} Found and purged ${clear.length}/${amount} messages`)
                 console.botLog(`Found and purged ${clear.length}/${amount} messages`)
               })
               .catch(err => error(bot, interaction, err, "Message Purge", true))
@@ -648,5 +648,5 @@ export async function modal(bot: Bot, interaction: Interaction) {
     response += `**Error**\n\`\`\`ts\n${err.stack.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ")}\`\`\``
   }
 
-  edit(bot, interaction, response)
+  respond(bot, interaction, response)
 }

@@ -145,60 +145,6 @@ export const cmd = {
       ]
     },
     {
-      name: "facts",
-      description: "Get a fact from a magical place called the internet",
-      type: ApplicationCommandOptionType.SubcommandGroup,
-      options: [
-        {
-          name: "date",
-          description: "Get a fact about a date",
-          type: ApplicationCommandOptionType.Subcommand,
-          options: [
-            {
-              name: "day",
-              description: "The date's day",
-              type: ApplicationCommandOptionType.Integer,
-              min_value: 1,
-              max_value: 31,
-              required: true,
-            },
-            {
-              name: "month",
-              description: "The date's month",
-              type: ApplicationCommandOptionType.Integer,
-              min_value: 1,
-              max_value: 12,
-              required: true,
-            }
-          ]
-        },
-        {
-          name: "number",
-          description: "Get a fact about a number",
-          type: ApplicationCommandOptionType.Subcommand,
-          options: [
-            {
-              name: "mode",
-              description: "The fact's mode",
-              type: ApplicationCommandOptionType.String,
-              choices: [
-                { name: "Trivia", value: "trivia" },
-                { name: "Math", value: "math" },
-                { name: "Year", value: "year" },
-              ],
-              required: true,
-            },
-            {
-              name: "number",
-              description: "The fact's number",
-              type: ApplicationCommandOptionType.Integer,
-              required: true,
-            }
-          ]
-        },
-      ]
-    },
-    {
       name: "lyrics",
       description: "Fetch lyrics from Genius",
       type: ApplicationCommandOptionType.Subcommand,
@@ -289,29 +235,6 @@ export const cmd = {
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply()
   switch (interaction.options.getSubcommandGroup()) {
-    case "facts": {
-      switch (interaction.options.getSubcommand()) {
-        case "date": {
-          const day = interaction.options.getInteger("day", true)
-          const month = interaction.options.getInteger("month", true)
-          const date = Temporal.ZonedDateTime.from({ year: 2020, month, day, timeZone: "UTC" })
-
-          const { data } = await axios.get(`http://numbersapi.com/${date.month}/${date.day}/date`)
-          interaction.editReply(data)
-          break
-        }
-
-        case "number": {
-          const mode = interaction.options.getString("mode", true)
-          const number = interaction.options.getInteger("number", true)
-
-          const { data } = await axios.get(`http://numbersapi.com/${number}/${mode}`)
-          interaction.editReply(data)
-        }
-      }
-      break
-    }
-
     case "wikipedia": {
       switch (interaction.options.getSubcommand()) {
         case "article": {

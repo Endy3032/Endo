@@ -58,6 +58,7 @@ console.botLog = async (content: string | Error, logLevel: LogLevel = "INFO", em
     content = content.stack?.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ") ?? "Unable to capture error stack"
     logLevel = "ERROR"
   }
+  if (typeof content !== "string") content = Deno.inspect(content)
   const { content: consoleLog, temporal } = console.localLog(content, logLevel, false)
   const epoch = temporal.epochMilliseconds
 

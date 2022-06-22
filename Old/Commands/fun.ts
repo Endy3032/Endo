@@ -181,238 +181,58 @@ export const cmd = {
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  switch(interaction.options.getSubcommandGroup()) {
-    case "wordle": {
-      let title = `${interaction.user.tag} | `
-      let answer: string | undefined
+  let title = `${interaction.user.tag} | `
+  let answer: string | undefined
 
-      switch (interaction.options.getSubcommand()) {
-        case "daily": {
-          [answer, title] = [wordle.getWord(), `${title}Daily Wordle`]
-          break
-        }
-
-        case "replay": {
-          const id = interaction.options.getInteger("id") as number;
-          [answer, title] = [wordle.answers[id], `${title}Wordle #${id}`]
-          break
-        }
-
-        case "random": {
-          const mode = interaction.options.getString("mode")
-          title += "Random Wordle"
-          answer = mode == "random"
-            ? pickFromArray(wordle.allowed)
-            : pickFromArray(wordle.answers)
-          break
-        }
-      }
-
-      const embed = {
-        title,
-        image: { url: "attachment://wordle.png" },
-        footer: { text: "6 guesses remaining" },
-        timestamp: Temporal.Now.instant().toString(),
-      }
-
-      const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
-        type: ComponentType.ActionRow,
-        components: [
-          {
-            type: ComponentType.Button,
-            style: ButtonStyle.Primary,
-            label: "Guess",
-            custom_id: `wordle_${(answer as string).toUpperCase()}__`
-          },
-          {
-            type: ComponentType.Button,
-            style: ButtonStyle.Danger,
-            label: "Give Up",
-            custom_id: `wordle_${(answer as string).toUpperCase()}_giveup`
-          }
-        ]
-      }]
-
-      const attachment = new MessageAttachment("./Resources/Wordle/WordleBase.png", "wordle.png")
-      await interaction.reply({ embeds: [embed], components, files: [attachment] })
+  switch (interaction.options.getSubcommand()) {
+    case "daily": {
+      [answer, title] = [wordle.getWord(), `${title}Daily Wordle`]
       break
     }
 
-    default: {
-      switch (interaction.options.getSubcommand()) {
-        case "achievement": {
-          const titles = ["Achievement Get!", "Advancement Made!", "Goal Reached!", "Challenge Complete!"]
-          const content = interaction.options.getString("content") as string
-          const icon = interaction.options.getString("icon") != "0" ? interaction.options.getString("icon") : randRange(39)
-          const title = interaction.options.getString("title") != null ? interaction.options.getString("title") : pickFromArray(titles)
+    case "replay": {
+      const id = interaction.options.getInteger("id") as number;
+      [answer, title] = [wordle.answers[id], `${title}Wordle #${id}`]
+      break
+    }
 
-          await interaction.reply({ embeds: [{
-            color: parseInt(pickFromArray(colors), 16),
-            image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
-          }] })
-          break
-        }
-
-        case "facts": {
-          const facts = [
-            "The chicken came first or the egg? The answer is... `the chicken`",
-            "The alphabet is completely random",
-            "I ran out of facts. That's a fact",
-            "Found this fact? You're lucky!",
-            "There are 168 prime numbers between 1 and 1000",
-            "`τ` is just `π` times two!",
-            "`τ` is `tau` and `π` is `pi`!",
-            "The F word is the most flexible word in English!",
-            "`Homosapiens` are how biologists call humans!",
-            "`Endy` is a cool bot! And that's a fact!",
-            "`Long` is short and `short` is long!",
-            "√-1 love you!",
-            "There are 13 Slavic countries in the world -- Brought to you by your gopnik friend!",
-            "There are plagues in 1620, 1720, 1820, 1920 and...",
-            "The phrase: `The quick brown fox jumps over the lazy dog` contains every letter in the alphabet!",
-            "There are no Nobel prizes for math because Nobel lost his love to a mathematician",
-            "Endy is intellegent",
-            "69 is just a normal number ok?",
-            "There are 24 synthetic elements from 95~118",
-            "Most of these facts are written by Adnagaporp#1965"
-          ]
-
-          await interaction.reply({ embeds: [{
-            title: "Fact of the second...",
-            color: parseInt(pickFromArray(colors), 16),
-            description: pickFromArray(facts),
-          }] as APIEmbed[] })
-          break
-        }
-
-        case "format": {
-          const style = interaction.options.getString("style")
-          const text = interaction.options.getString("text") as string
-          const replacements = {
-            og: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-            sc: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-            ss: " !\"#$%&'⁽⁾*⁺,⁻./⁰¹²³⁴⁵⁶⁷⁸⁹:;<⁼>?@ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁνᵂˣʸᶻÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`ᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖᑫʳˢᵗᵘᵛʷˣʸᶻáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-            ud: " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{",
-            fw: "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝",
-            lt: " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-            jp: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
-          }
-
-          let replace: string | undefined
-          let result = ""
-
-          switch(style) {
-            case "varied": {
-              let turn = false
-              for (let i = 0; i < text.length; i++) {
-                if (text[i] != " ") {
-                  result += (turn ? i % 2 == 0 : i % 2 != 0) ? text[i].toUpperCase() : text[i].toLowerCase()
-                  continue
-                }
-                result += " "
-                turn = !turn
-              }
-              return await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
-            }
-
-            case "smallcaps": {
-              replace = replacements.sc
-              break
-            }
-
-            case "superscript": {
-              replace = replacements.ss
-              break
-            }
-
-            case "upsidedown": {
-              replace = replacements.ud
-              break
-            }
-
-            case "fullwidth": {
-              replace = replacements.fw
-              break
-            }
-
-            case "leet": {
-              replace = replacements.lt
-              break
-            }
-
-            case "japanese": {
-              replace = replacements.jp
-              break
-            }
-          }
-
-          for (let i = 0; i < text.length; i++) {
-            result += (replace as string).charAt(replacements.og.indexOf(text[i]))
-          }
-
-          await interaction.reply({ content: `**Original:** ${text}\n**Converted:** ${result}`, ephemeral: true })
-          break
-        }
-
-        case "meme": {
-          await interaction.deferReply()
-
-          const separator = "§§"
-          let img: string | Buffer
-
-          const text = interaction.options.getString("text") as string
-          const image = interaction.options.getAttachment("custom_image")
-          const variants = fs.readdirSync("./Resources/Meme/").filter((file) => file.endsWith(".png"))
-          const variant = interaction.options.getString("variant")?.replaceAll(" ", "_") || pickFromArray(variants).slice(0, -4)
-
-          if (image) {
-            const response = await axios.get(image.url, { responseType: "arraybuffer" })
-            img = Buffer.from(response.data, "utf-8")
-          } else {
-            img = `./Resources/Meme/${variant}.png`
-          }
-          const offset = 0.4
-          const dimensions = imageSize(img) as { width: number, height: number }
-          const height = (dimensions.height > 250 ? dimensions.height : 250) as number
-          const width = height / dimensions.height * dimensions.width
-
-          let canvas = new Canvas(width, height * (1 + offset))
-
-          if (variant == "panik_kalm_panik") {
-            canvas = new Canvas(width, height)
-            const ctx = getCtx(canvas)
-
-            const bg = await loadImage(img)
-            ctx.drawImage(bg, 0, 0, width, height)
-
-            const texts = text.split(separator)
-            texts.forEach((text, ind) => {
-              const fontSize = getFontSize(text, width, height)
-              ctx.font = `normal ${fontSize}px/${fontSize * (1 + offset / 2)}px LeagueSpartan`
-              ctx.fillText(text, width / 4, getMidY(ctx, text, width / 2, height / 3) + height / 3 * ind, width * 0.45)
-            })
-
-            await sendMeme(interaction, canvas, variant, text, separator)
-          } else {
-            const ctx = getCtx(canvas)
-
-            const bg = await loadImage(img)
-            ctx.drawImage(bg, 0, height * offset, width, height)
-
-            ctx.fillStyle = "#fff"
-            ctx.fillRect(0, 0, width, height * offset)
-
-            ctx.fillStyle = "#000"
-            const fontSize = getFontSize(text, width, height)
-            ctx.font = `normal ${fontSize}px/${fontSize * (1 + offset / 2)}px LeagueSpartan`
-            ctx.fillText(text, width / 2, getMidY(ctx, text, width, height * offset), width)
-            await sendMeme(interaction, canvas, variant as string, text, separator)
-          }
-          break
-        }
-      }
+    case "random": {
+      const mode = interaction.options.getString("mode")
+      title += "Random Wordle"
+      answer = mode == "random"
+        ? pickFromArray(wordle.allowed)
+        : pickFromArray(wordle.answers)
+      break
     }
   }
+
+  const embed = {
+    title,
+    image: { url: "attachment://wordle.png" },
+    footer: { text: "6 guesses remaining" },
+    timestamp: Temporal.Now.instant().toString(),
+  }
+
+  const components: APIActionRowComponent<APIMessageActionRowComponent>[] = [{
+    type: ComponentType.ActionRow,
+    components: [
+      {
+        type: ComponentType.Button,
+        style: ButtonStyle.Primary,
+        label: "Guess",
+        custom_id: `wordle_${(answer as string).toUpperCase()}__`
+      },
+      {
+        type: ComponentType.Button,
+        style: ButtonStyle.Danger,
+        label: "Give Up",
+        custom_id: `wordle_${(answer as string).toUpperCase()}_giveup`
+      }
+    ]
+  }]
+
+  const attachment = new MessageAttachment("./Resources/Wordle/WordleBase.png", "wordle.png")
+  await interaction.reply({ embeds: [embed], components, files: [attachment] })
 }
 
 export async function button(interaction: ButtonInteraction) {
@@ -441,82 +261,6 @@ export async function button(interaction: ButtonInteraction) {
       }]
     })
   }
-}
-
-export async function autocomplete(interaction: AutocompleteInteraction) {
-  const fs = await import("fs")
-  let choices: { name: string, value: string }[] = []
-  switch (interaction.options.getSubcommand()) {
-    case "meme":
-    case "meme-skia": {
-      const memeFiles = fs.readdirSync("./Resources/Meme/").filter((file: string) => file.endsWith(".png"))
-      memeFiles.forEach((file: string) => {
-        choices.push({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })
-      })
-      break
-    }
-
-    case "achievement": {
-      choices = [
-        { name: "arrow",            value: "34" },
-        { name: "bed",              value: "9"  },
-        { name: "cake",             value: "10" },
-        { name: "cobweb",           value: "16" },
-        { name: "crafting_table",   value: "13" },
-        { name: "creeper",          value: "4"  },
-        { name: "diamond",          value: "2"  },
-        { name: "diamond_sword",    value: "3"  },
-        { name: "arrow",            value: "34" },
-        { name: "book",             value: "19" },
-        { name: "bow",              value: "33" },
-        { name: "bucket",           value: "36" },
-        { name: "chest",            value: "17" },
-        { name: "coal_block",       value: "31" },
-        { name: "cookie",           value: "7"  },
-        { name: "diamond_armor",    value: "26" },
-        { name: "fire",             value: "15" },
-        { name: "flint_and_steel",  value: "27" },
-        { name: "furnace",          value: "18" },
-        { name: "gold_ingot",       value: "23" },
-        { name: "grass_block",      value: "1"  },
-        { name: "heart",            value: "8"  },
-        { name: "iron_armor",       value: "35" },
-        { name: "iron_door",        value: "25" },
-        { name: "iron_ingot",       value: "22" },
-        { name: "iron_sword",       value: "32" },
-        { name: "lava",             value: "38" },
-        { name: "milk",             value: "39" },
-        { name: "oak_door",         value: "24" },
-        { name: "pig",              value: "5"  },
-        { name: "planks",           value: "21" },
-        { name: "potion",           value: "28" },
-        { name: "rail",             value: "12" },
-        { name: "redstone",         value: "14" },
-        { name: "sign",             value: "11" },
-        { name: "spawn_egg",        value: "30" },
-        { name: "splash",           value: "29" },
-        { name: "stone",            value: "20" },
-        { name: "tnt",              value: "6"  },
-        { name: "water",            value: "37" },
-      ]
-      break
-    }
-  }
-
-  var res: { name: string, value: string }[] = []
-  const pattern = interaction.options.getFocused() as string
-  const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
-
-  if (pattern.length > 0) {fuse.search(pattern).forEach((choice: { item: { name: string; value: string } }) => res.push(choice.item))}
-  else {
-    for (let i = 0; i < choices.length; i++) {
-      if (i > 24) break
-      res.push(choices[i])
-    }
-  }
-
-  await interaction.respond(res)
-    .catch((err) => {console.error(err)})
 }
 
 export async function modal(interaction: ModalMessageModalSubmitInteraction) {
