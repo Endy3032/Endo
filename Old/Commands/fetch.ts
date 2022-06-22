@@ -1,56 +1,12 @@
 import Fuse from "fuse.js"
 import wikipedia from "wikipedia"
-import urban from "urban-dictionary"
 import { getLyrics } from "genius-lyrics-api"
 import { Temporal } from "@js-temporal/polyfill"
 import googtrans from "@vitalets/google-translate-api"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
-import { choices, CountryCovidCase, GlobalCovidCase } from "../Resources/Covid"
 import { capitalize, colors, emojis, handleError, pickFromArray, TimeMetric } from "../Modules"
 import { ApplicationCommandType, ApplicationCommandOptionType, ApplicationCommandOptionChoice, AutocompleteInteraction, ChatInputCommandInteraction, ComponentType, SelectMenuInteraction } from "discord.js"
-
-const repCovid = async (interaction: ChatInputCommandInteraction, covCase: CountryCovidCase | GlobalCovidCase, msg = "") => {
-  let timestamp: Temporal.Instant
-  var title = `Covid Stats - Global ${msg.length > 0 ? `${msg}` : ""}`
-  var fields = [
-    { name: "Confirmed", value: `${covCase.totalConfirmed.toLocaleString("en")}`, inline: true },
-    { name: "Deaths", value: `${covCase.totalDeaths.toLocaleString("en")}`, inline: true },
-    { name: "Recovered", value: `${covCase.totalRecovered.toLocaleString("en")}`, inline: true },
-  ]
-  if (Object.keys(covCase).includes("country")) {
-    covCase = covCase as CountryCovidCase
-    title = title.replace("Global", `${covCase.country} [${covCase.countryCode}]`)
-    fields.push(
-      { name: "Daily Confirmed", value: `${covCase.dailyConfirmed.toLocaleString("en")}`, inline: true },
-      { name: "Daily Deaths", value: `${covCase.dailyDeaths.toLocaleString("en")}`, inline: true },
-      { name: "Active Cases", value: `${covCase.activeCases.toLocaleString("en")}`, inline: true },
-      { name: "Confirmed/1M", value: `${covCase.totalConfirmedPerMillionPopulation.toLocaleString("en")}`, inline: true },
-      { name: "Deaths/1M", value: `${covCase.totalDeathsPerMillionPopulation.toLocaleString("en")}`, inline: true },
-      { name: "Critical", value: `${covCase.totalCritical.toLocaleString("en")}`, inline: true },
-      { name: "Fatality Rate", value: `${covCase.FR}%`, inline: true },
-      { name: "Recovery Rate", value: `${covCase.PR}%`, inline: true }
-    )
-    timestamp = Temporal.Instant.from(covCase.lastUpdated)
-  } else {
-    covCase = covCase as GlobalCovidCase
-    fields.push(
-      { name: "New Cases", value: `${covCase.totalNewCases.toLocaleString("en")}`, inline: true },
-      { name: "New Deaths", value: `${covCase.totalNewDeaths.toLocaleString("en")}`, inline: true },
-      { name: "New Active Cases", value: `${covCase.totalActiveCases.toLocaleString("en")}`, inline: true },
-      { name: "Total Cases/1M", value: `${covCase.totalCasesPerMillionPop.toLocaleString("en")}`, inline: true },
-    )
-    timestamp = Temporal.Instant.from(covCase.created)
-  }
-
-  interaction.editReply({ embeds: [{
-    title: title,
-    color: parseInt(pickFromArray(colors), 16),
-    fields: fields,
-    footer: { text: "Last Updated" },
-    timestamp: timestamp.toString(),
-  }] })
-}
 
 export const cmd = {
   name: "fetch",
@@ -108,18 +64,6 @@ export const cmd = {
     //   ]
     // },
     // #endregion
-    {
-      name: "covid",
-      description: "Get data from the COVID-19 API",
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [{
-        name: "location",
-        description: "The data's location",
-        type: ApplicationCommandOptionType.String,
-        autocomplete: true,
-        required: true,
-      }]
-    },
     {
       name: "definition",
       description: "Fetch a definition from dictionaries",
@@ -271,108 +215,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     default: {
       switch (interaction.options.getSubcommand()) {
-        case "covid": {
-          var location = interaction.options.getString("location") as string
-          if (!existsSync("./Resources/Covid/cache.json") || readFileSync("./Resources/Covid/cache.json").toString().length == 0) writeFileSync("./Resources/Covid/cache.json", JSON.stringify({}))
-
-          const ts = Temporal.Now.instant()
-          var cache = JSON.parse(readFileSync("./Resources/Covid/cache.json").toString())
-          if (!Object.keys(cache).length || cache.timestamp < ts.epochMilliseconds) {
-            var data = {}
-            const { data: cases } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/country")
-            const { data: global } = await axios.get("https://api.coronatracker.com/v3/stats/worldometer/global")
-
-            data["Global"] = global as GlobalCovidCase
-            cases.forEach((country: CountryCovidCase) => {
-              data[country.country] = country
-            })
-
-            cache = { timestamp: ts.epochMilliseconds + 60 * 30, ...data }
-            writeFile("./Resources/Covid/cache.json", JSON.stringify(cache, null, 2), (err) => {
-              if (err) return console.error(err)
-            })
-          }
-          repCovid(interaction, cache[location], location == "Global" ? ":globe_with_meridians:" : `:flag_${cache[location].countryCode.toLowerCase()}:`)
-          break
-        }
-
-        case "definition": {
-          const dictionary = interaction.options.getString("dictionary") as string
-          const word = interaction.options.getString("word") as string
-          if (word == "__") return await interaction.editReply("You must specify a word to search for")
-
-          switch (dictionary) {
-            case "dictapi": {
-              await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-                .then((response: AxiosResponse) => {
-                  let desc = ""
-                  const { data } = response
-                  data.forEach((entry: { meanings: any[] }) => {
-                    entry.meanings.forEach((meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
-                      desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
-                      desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
-                      desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
-                      desc += "\n**Meanings:**\n"
-
-                      meaning.definitions.forEach((def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any }, ind: number) => {
-                        desc += `\`[${ind + 1}]\` ${def.definition}\n`
-                        desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
-                        desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
-                        desc += def.example ? `**• Example:** ${def.example}\n` : ""
-                        desc += "\n"
-                      })
-                    })
-                  })
-
-                  const phonetics = [...new Set(data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text))].join(" - ")
-
-                  interaction.editReply({ embeds: [{
-                    title: `${data[0].word} - ${phonetics || "—"}`,
-                    color: parseInt(pickFromArray(colors), 16),
-                    description: desc,
-                    footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
-                  }] })
-                })
-                .catch(() => {
-                  console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
-                  interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
-                })
-              break
-            }
-
-            case "urban": {
-              await urban.define(word)
-                .then((results: any[]) => {
-                  const [result] = results
-                  let descriptionBefore = `**Definition(s)**\n${result.definition}`
-                  const descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
-
-                  if (descriptionBefore.length + descriptionAfter.length > 4096) {
-                    descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
-                  }
-
-                  const description = descriptionBefore + descriptionAfter
-
-                  interaction.editReply({ embeds: [{
-                    title: word,
-                    url: result.permalink,
-                    color: parseInt(pickFromArray(colors), 16),
-                    description,
-                    author: { name: `Urban Dictionary - ${result.author}` },
-                    footer: { text: `Definition ID • ${result.defid} | Written on` },
-                    timestamp: Temporal.Instant.from(result.written_on).toString()
-                  }] })
-                })
-                .catch(() => {
-                  console.botLog(`The word \`${word}\` was not found in the dictionary`, "WARN")
-                  interaction.editReply(`${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`)
-                })
-              break
-            }
-          }
-          break
-        }
-
         case "lyrics": {
           const id = interaction.options.getString("song")
           const request: AxiosRequestConfig = {
@@ -557,33 +399,6 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 
     default: {
       switch (interaction.options.getSubcommand()) {
-        case "covid": {
-          const fuse = new Fuse(choices, { distance: 25, keys: ["name", "value"] })
-          response.push(...fuse.search(current as string).map(option => option.item))
-          response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-          if (!interaction.responded) interaction.respond(response.slice(0, 25))
-          break
-        }
-
-        case "definition": {
-          const dict = interaction.options.getString("dictionary")
-          if (dict == "dictapi") return interaction.respond([initial])
-
-          await urban.autocomplete(current)
-            .then((autocompleteRes: string[]) => {
-              const results: ApplicationCommandOptionChoice[] = autocompleteRes.map((result: any) => {
-                return { name: `${result}`, value: `${result}` }
-              })
-
-              const fuse = new Fuse(results, { distance: 25, keys: ["name", "value"] })
-              const response: ApplicationCommandOptionChoice[] = [...fuse.search(current).map(option => option.item)]
-              if (!response.includes(initial)) response.unshift(initial)
-              if (!interaction.responded) interaction.respond(response.slice(0, 25))
-            })
-            .catch(() => interaction.respond([initial]))
-          break
-        }
-
         case "lyrics": {
           if (current.length == 0) return interaction.respond([initial])
 

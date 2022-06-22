@@ -1,9 +1,10 @@
 import Fuse from "fuse"
 import axiod from "axiod"
+import * as urban from "urban"
 import { Temporal } from "temporal"
 import { choices, CountryCovidCase, CovidCache, CovidCountries, GlobalCovidCase } from "../Resources/Covid/mod.ts"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
-import { capitalize, colors, defer, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
+import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
 
 export const cmd = {
   name: "fetch",
@@ -82,7 +83,7 @@ export const cmd = {
           name: "dictionary",
           description: "The dictionary to use",
           type: ApplicationCommandOptionTypes.String,
-          facts: [
+          choices: [
             { name: "Dictionary API", value: "dictapi" },
             { name: "Urban Dictionary", value: "urban" },
           ],
@@ -231,7 +232,7 @@ export const cmd = {
           name: "options",
           description: "Options to change the output",
           type: ApplicationCommandOptionTypes.String,
-          facts: [
+          choices: [
             { name: "Use Imperial (˚F)", value: "imp" },
             { name: "Includes Air Quality", value: "aq" },
             { name: "Both", value: "both" },
@@ -265,6 +266,7 @@ export const cmd = {
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
+  await defer(bot, interaction)
   switch(getSubcmdGroup(interaction)) {
     case "facts": {
       await defer(bot, interaction)
@@ -371,7 +373,6 @@ export async function execute(bot: Bot, interaction: Interaction) {
     default: {
       switch(getSubcmd(interaction)) {
         case "covid": {
-          await defer(bot, interaction)
           const now = Temporal.Now.instant()
           const cacheFile = "./Resources/Covid/cache.json"
           const location = getValue(interaction, "location", "String") as CovidCountries | "Global"
@@ -437,6 +438,77 @@ export async function execute(bot: Bot, interaction: Interaction) {
           }] })
           break
         }
+
+        case "definition": {
+          const dictionary = getValue(interaction, "dictionary", "String")
+          const word = getValue(interaction, "word", "String") ?? ""
+          if (word == "…") return respond(bot, interaction, "You must specify a word to define.")
+
+          switch(dictionary) {
+            case "dictapi": {
+              await axiod.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+                .then(response => {
+                  const { data } = response
+                  let desc = ""
+                  data.forEach((entry: { meanings: any[] }) => {
+                    entry.meanings.forEach((meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
+                      desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
+                      desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
+                      desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
+                      desc += "\n**Meanings:**\n"
+
+                      meaning.definitions.forEach((def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any }, ind: number) => {
+                        desc += `\`[${ind + 1}]\` ${def.definition}\n`
+                        desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
+                        desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
+                        desc += def.example ? `**• Example:** ${def.example}\n` : ""
+                        desc += "\n"
+                      })
+                    })
+                  })
+
+                  const phonetics = [...new Set(data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text))].join(" - ")
+
+                  edit(bot, interaction, { embeds: [{
+                    title: `${data[0].word} - ${phonetics ?? "//"}`,
+                    color: pickFromArray(colors),
+                    description: desc,
+                    footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
+                  }] })
+                })
+                .catch(() => edit(bot, interaction, `${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`))
+              break
+            }
+
+            case "urban": {
+              await urban.define(word)
+                .then(results => {
+                  const [result] = results.list
+                  let descriptionBefore = `**Definition(s)**\n${result.definition}`
+                  const descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
+
+                  if (descriptionBefore.length + descriptionAfter.length > 4096) {
+                    descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
+                  }
+
+                  const description = descriptionBefore + descriptionAfter
+
+                  edit(bot, interaction, { embeds: [{
+                    title: word,
+                    url: result.permalink,
+                    color: pickFromArray(colors),
+                    description,
+                    author: { name: `Urban Dictionary - ${result.author}` },
+                    footer: { text: `Definition ID • ${result.defid} | Written on` },
+                    timestamp: Temporal.Instant.from(result.written_on).epochMilliseconds
+                  }] })
+                })
+                .catch(() => edit(bot, interaction, `${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`))
+              break
+            }
+          }
+          break
+        }
       }
     }
   }
@@ -445,7 +517,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 export async function autocomplete(bot: Bot, interaction: Interaction) {
   const current = getFocused(interaction) ?? ""
   const response: ApplicationCommandOptionChoice[] = []
-  // const initial = { name: "Keep typing to continue…", value: "…" }
+  const initial = { name: "Keep typing to continue…", value: "…" }
+  const filled = { name: current ?? "Keep typing to continue…", value: current ?? "…" }
 
   switch(getSubcmd(interaction)) {
     case "covid": {
@@ -453,6 +526,19 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
       response.push(...fuse.search(current as string).map(option => option.item))
       response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
       respond(bot, interaction, { choices: response.slice(0, 25) })
+      break
+    }
+
+    case "definition": {
+      const dict = getValue(interaction, "dictionary", "String")
+      if (dict == "dictapi") return respond(bot, interaction, { choices: [filled] })
+
+      await urban.autocomplete(current)
+        .then(results => {
+          const fuse = new Fuse(results, { distance: 5 })
+          response.push(...fuse.search(current).map(option => ({ name: option.item, value: option.item })))
+          respond(bot, interaction, { choices: response.slice(0, 25) })
+        })
       break
     }
   }
