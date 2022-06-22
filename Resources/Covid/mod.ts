@@ -1,7 +1,6 @@
 import { ApplicationCommandOptionChoice } from "discordeno"
 
 const countries = [
-  "Global",
   "Afghanistan",
   "Albania",
   "Algeria",
@@ -63,6 +62,7 @@ const countries = [
   "Djibouti",
   "Dominica",
   "Dominican Republic",
+  "DPRK",
   "Ecuador",
   "Egypt",
   "El Salvador",
@@ -221,6 +221,7 @@ const countries = [
   "Tunisia",
   "Turkey",
   "Turks and Caicos",
+  "Tuvalu",
   "U.S. Virgin Islands",
   "UAE",
   "UK",
@@ -239,7 +240,7 @@ const countries = [
   "Yemen",
   "Zambia",
   "Zimbabwe",
-]
+] as const
 
 let choices: ApplicationCommandOptionChoice[] = []
 const jsonFile = "./Resources/Covid/choices.json"
@@ -247,6 +248,7 @@ const jsonFile = "./Resources/Covid/choices.json"
 try {
   choices = JSON.parse(Deno.readTextFileSync("./choices.json"))
 } catch {
+  choices.push({ name: "Global", value: "Global" })
   choices.push(...countries.map(country => {
     return { name: country, value: country }
   }))
@@ -261,7 +263,7 @@ type BaseCovidCase = {
 
 interface CountryCovidCase extends BaseCovidCase {
   countryCode: string
-  country: string
+  country: CovidCountries
   countryName: string
   lat: number
   lng: number
@@ -284,5 +286,13 @@ interface GlobalCovidCase extends BaseCovidCase {
   created: string
 }
 
+type CovidCountries = typeof countries[number]
+type CovidCache = {
+  [country in CovidCountries]: CountryCovidCase;
+} & {
+  timestamp: number;
+  Global: GlobalCovidCase;
+}
+
 export { choices, countries }
-export type { CountryCovidCase, GlobalCovidCase }
+export type { CovidCache, CovidCountries, CountryCovidCase, GlobalCovidCase }

@@ -814,8 +814,7 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
 
 export async function autocomplete(bot: Bot, interaction: Interaction) {
   const current = getFocused(interaction, "String") || ""
-  const blankInitial = { name: "Keep typing to continue…", value: "__" }
-  // const filledInitial = { name: current, value: "__" }
+  const blankInitial = { name: "Keep typing to continue…", value: "…" }
   const response: ApplicationCommandOptionChoice[] = []
 
   if (current.length == 0) return await respond(bot, interaction, { choices: [blankInitial] })

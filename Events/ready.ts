@@ -1,7 +1,7 @@
 import axiod from "axiod"
 import { bold, rgb24 } from "colors"
 import { activities, BrightNord, Nord, TimeMetric } from "modules"
-import type { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
+import { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
 import { Bot, EventHandlers, getApplicationCommands, User } from "discordeno"
 
 type Payload = {

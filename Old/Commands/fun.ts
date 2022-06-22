@@ -49,65 +49,6 @@ export const cmd = {
   description: "Random fun commands",
   options: [
     {
-      name: "achievement",
-      description: "Make your own Minecraft achievement",
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: "icon",
-          description: "The icon of the achievement",
-          type: ApplicationCommandOptionType.String,
-          autocomplete: true,
-          required: true
-        },
-        {
-          name: "content",
-          description: "The content of the achievement",
-          type: ApplicationCommandOptionType.String,
-          required: true
-        },
-        {
-          name: "title",
-          description: "The title of the achievement",
-          type: ApplicationCommandOptionType.String,
-          required: false
-        }
-      ]
-    },
-    {
-      name: "facts",
-      description: "Get a random fact",
-      type: ApplicationCommandOptionType.Subcommand
-    },
-    {
-      name: "format",
-      description: "Reformat your text to any style from the list",
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: "style",
-          description: "The style of the text",
-          type: ApplicationCommandOptionType.String,
-          choices: [
-            { name: "vArIeD cAsE", value: "varied" },
-            { name: "sᴍᴀʟʟ ᴄᴀᴘs", value: "smallcaps" },
-            { name: "ᵗᶦⁿʸ ˢᵘᵖᵉʳˢᶜʳᶦᵖᵗ (tiny superscript)", value: "superscript" },
-            { name: "uʍopǝpᴉsdn (upsidedown)", value: "upsidedown" },
-            { name: "ｆｕｌｌｗｉｄｔｈ (fullwidth)", value: "fullwidth" },
-            { name: "1337 (leet)", value: "leet" },
-            { name: "丁卂尸卂ん乇丂乇 (japanese)", value: "japanese" }
-          ],
-          required: true,
-        },
-        {
-          name: "text",
-          description: "The text to be formatted [string]",
-          type: ApplicationCommandOptionType.String,
-          required: true
-        }
-      ]
-    },
-    {
       name: "meme",
       description: "Make your own meme",
       type: ApplicationCommandOptionType.Subcommand,

@@ -1,7 +1,9 @@
+import Fuse from "fuse"
 import axiod from "axiod"
-import { ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
-import { capitalize, colors, defer, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
 import { Temporal } from "temporal"
+import { choices, CountryCovidCase, CovidCache, CovidCountries, GlobalCovidCase } from "../Resources/Covid/mod.ts"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
+import { capitalize, colors, defer, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
 
 export const cmd = {
   name: "fetch",
@@ -331,7 +333,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
         case "trivia": {
           const { data } = await axiod.get("https://facts-by-api-ninjas.p.rapidapi.com/v1/facts", {
             headers: {
-              "X-RapidAPI-Key": Deno.env.get("RapidAPI"),
+              "X-RapidAPI-Key": Deno.env.get("RapidAPI") ?? "",
               "X-RapidAPI-Host": "facts-by-api-ninjas.p.rapidapi.com"
             }
           });
@@ -363,6 +365,94 @@ export async function execute(bot: Bot, interaction: Interaction) {
         color: pickFromArray(colors),
         description: typeof fact === "string" ? fact : pickFromArray(fact),
       }] })
+      break
+    }
+
+    default: {
+      switch(getSubcmd(interaction)) {
+        case "covid": {
+          await defer(bot, interaction)
+          const now = Temporal.Now.instant()
+          const cacheFile = "./Resources/Covid/cache.json"
+          const location = getValue(interaction, "location", "String") as CovidCountries | "Global"
+
+          let cache: Partial<CovidCache> & { timestamp: number } = { timestamp: now.epochMilliseconds - 1 }
+          try {
+            cache = JSON.parse(Deno.readTextFileSync(cacheFile))
+          } catch {
+            Deno.writeTextFileSync(cacheFile, JSON.stringify(cache))
+          }
+
+          if (cache.timestamp <= now.epochMilliseconds) {
+            var data: Partial<CovidCache> = {}
+            const { data: cases } = await axiod.get<CountryCovidCase[]>("https://api.coronatracker.com/v3/stats/worldometer/country")
+            const { data: Global } = await axiod.get<GlobalCovidCase>("https://api.coronatracker.com/v3/stats/worldometer/global")
+
+            Object.assign<Partial<CovidCache>, Partial<CovidCache>>(data, { Global, ...cases.reduce((a, b) => ({ ...a, [b.country]: b }), {}) })
+
+            cache = { timestamp: now.epochMilliseconds + 60 * 30, ...data }
+            Deno.writeTextFileSync(cacheFile, JSON.stringify(cache, null, 2))
+          }
+
+          let lastUpdated: Temporal.Instant
+          let covCase = cache[location]
+          const emoji = location == "Global" ? ":globe_with_meridians:" : `:flag_${(covCase as CountryCovidCase).countryCode.toLowerCase()}:`
+          const title = `Covid - ${location == "Global" ? location : (covCase as CountryCovidCase).country} ${emoji}`
+          const fields = [
+            { name: "Confirmed", value: `${covCase?.totalConfirmed.toLocaleString("en")}`, inline: true },
+            { name: "Deaths", value: `${covCase?.totalDeaths.toLocaleString("en")}`, inline: true },
+            { name: "Recovered", value: `${covCase?.totalRecovered.toLocaleString("en")}`, inline: true },
+          ]
+
+          if (location == "Global") {
+            covCase = covCase as GlobalCovidCase
+            fields.push(
+              { name: "New Cases", value: `${covCase.totalNewCases.toLocaleString("en")}`, inline: true },
+              { name: "New Deaths", value: `${covCase.totalNewDeaths.toLocaleString("en")}`, inline: true },
+              { name: "New Active Cases", value: `${covCase.totalActiveCases.toLocaleString("en")}`, inline: true },
+              { name: "Total Cases/1M", value: `${covCase.totalCasesPerMillionPop.toLocaleString("en")}`, inline: true },
+            )
+            lastUpdated = Temporal.Instant.from(covCase.created)
+          } else {
+            covCase = covCase as CountryCovidCase
+            fields.push(
+              { name: "Daily Confirmed", value: `${covCase.dailyConfirmed.toLocaleString("en")}`, inline: true },
+              { name: "Daily Deaths", value: `${covCase.dailyDeaths.toLocaleString("en")}`, inline: true },
+              { name: "Active Cases", value: `${covCase.activeCases.toLocaleString("en")}`, inline: true },
+              { name: "Confirmed/1M", value: `${covCase.totalConfirmedPerMillionPopulation.toLocaleString("en")}`, inline: true },
+              { name: "Deaths/1M", value: `${covCase.totalDeathsPerMillionPopulation.toLocaleString("en")}`, inline: true },
+              { name: "Critical", value: `${covCase.totalCritical.toLocaleString("en")}`, inline: true },
+              { name: "Fatality Rate", value: `${covCase.FR}%`, inline: true },
+              { name: "Recovery Rate", value: `${covCase.PR}%`, inline: true }
+            )
+            lastUpdated = Temporal.Instant.from(covCase.lastUpdated)
+          }
+
+          await respond(bot, interaction, { embeds: [{
+            title,
+            fields,
+            color: pickFromArray(colors),
+            footer: { text: "Last Updated" },
+            timestamp: lastUpdated.epochMilliseconds,
+          }] })
+          break
+        }
+      }
+    }
+  }
+}
+
+export async function autocomplete(bot: Bot, interaction: Interaction) {
+  const current = getFocused(interaction) ?? ""
+  const response: ApplicationCommandOptionChoice[] = []
+  // const initial = { name: "Keep typing to continue…", value: "…" }
+
+  switch(getSubcmd(interaction)) {
+    case "covid": {
+      const fuse = new Fuse(choices, { distance: 5, keys: ["name", "value"] })
+      response.push(...fuse.search(current as string).map(option => option.item))
+      response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
+      respond(bot, interaction, { choices: response.slice(0, 25) })
       break
     }
   }

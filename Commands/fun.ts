@@ -325,5 +325,5 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
   if (current.length > 0) response.push(...fuse.search(current).map(choice => choice.item))
   else response.push(...choices)
 
-  await respond(bot, interaction, { choices: response.slice(25) }).catch(err => error(bot, interaction, err, "Autocomplete"))
+  await respond(bot, interaction, { choices: response.slice(0, 25) }).catch(err => error(bot, interaction, err, "Autocomplete"))
 }
