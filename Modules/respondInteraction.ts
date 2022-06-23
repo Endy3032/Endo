@@ -1,6 +1,6 @@
+import { Bot, EditWebhookMessage, Interaction, InteractionApplicationCommandCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
 import { emojis } from "./emojis.ts"
 import { MessageFlags } from "./types.ts"
-import { Bot, EditWebhookMessage, Interaction, InteractionApplicationCommandCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
 
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData | string, ephemeral = false) {
   let type = InteractionResponseTypes.ChannelMessageWithSource
@@ -34,7 +34,7 @@ export async function defer(bot: Bot, interaction: Interaction, ephemeral = fals
 
   return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
     type: responseType,
-    data: { flags: ephemeral ? MessageFlags.Ephemeral : undefined }
+    data: { flags: ephemeral ? MessageFlags.Ephemeral : undefined },
   }).catch(err => console.botLog(err, "ERROR"))
 }
 

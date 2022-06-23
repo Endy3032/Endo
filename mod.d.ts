@@ -3,8 +3,8 @@ import { LogLevel } from "modules"
 import { Temporal } from "temporal"
 
 interface Log {
-  content: string,
-  temporal: Temporal.Instant,
+  content: string
+  temporal: Temporal.Instant
 }
 
 declare global {

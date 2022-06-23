@@ -1,11 +1,11 @@
-import { escapeMarkdown, respond } from "modules"
 import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction } from "discordeno"
+import { escapeMarkdown, respond } from "modules"
 
 export const cmd: CreateContextApplicationCommand = {
   name: "Copy Content",
   type: ApplicationCommandTypes.Message,
   description: "",
-  defaultMemberPermissions: ["USE_SLASH_COMMANDS"]
+  defaultMemberPermissions: ["USE_SLASH_COMMANDS"],
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {

@@ -1,6 +1,6 @@
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, CreateApplicationCommand, Interaction } from "discordeno"
 import Fuse from "fuse"
 import { colors, error, getFiles, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, randRange, respond } from "modules"
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, CreateApplicationCommand, Interaction } from "discordeno"
 
 export const cmd: CreateApplicationCommand = {
   name: "fun",
@@ -15,8 +15,8 @@ export const cmd: CreateApplicationCommand = {
         name: "question",
         description: "The question to ask [String]",
         type: ApplicationCommandOptionTypes.String,
-        required: true
-      }]
+        required: true,
+      }],
     },
     {
       name: "achievement",
@@ -28,21 +28,21 @@ export const cmd: CreateApplicationCommand = {
           description: "The icon of the achievement",
           type: ApplicationCommandOptionTypes.String,
           autocomplete: true,
-          required: true
+          required: true,
         },
         {
           name: "content",
           description: "The content of the achievement",
           type: ApplicationCommandOptionTypes.String,
-          required: true
+          required: true,
         },
         {
           name: "title",
           description: "The title of the achievement",
           type: ApplicationCommandOptionTypes.String,
-          required: false
-        }
-      ]
+          required: false,
+        },
+      ],
     },
     {
       name: "format",
@@ -60,7 +60,7 @@ export const cmd: CreateApplicationCommand = {
             { name: "uʍopǝpᴉsdn (upsidedown)", value: "upsidedown" },
             { name: "ｆｕｌｌｗｉｄｔｈ (fullwidth)", value: "fullwidth" },
             { name: "1337 (leet)", value: "leet" },
-            { name: "丁卂尸卂ん乇丂乇 (japanese)", value: "japanese" }
+            { name: "丁卂尸卂ん乇丂乇 (japanese)", value: "japanese" },
           ],
           required: true,
         },
@@ -68,9 +68,9 @@ export const cmd: CreateApplicationCommand = {
           name: "text",
           description: "The text to be formatted [String]",
           type: ApplicationCommandOptionTypes.String,
-          required: true
-        }
-      ]
+          required: true,
+        },
+      ],
     },
     {
       name: "meme",
@@ -81,22 +81,22 @@ export const cmd: CreateApplicationCommand = {
           name: "text",
           description: "The meme's caption",
           type: ApplicationCommandOptionTypes.String,
-          required: true
+          required: true,
         },
         {
           name: "variant",
           description: "The meme's variant (leave blank for random)",
           type: ApplicationCommandOptionTypes.String,
           autocomplete: true,
-          required: false
+          required: false,
         },
         {
           name: "custom_image",
           description: "Custom image (overrides variant)",
           type: ApplicationCommandOptionTypes.Attachment,
-          required: false
-        }
-      ]
+          required: false,
+        },
+      ],
     },
     {
       name: "wordle",
@@ -119,9 +119,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.Integer,
               required: true,
               minValue: 0,
-              maxValue: 2308
-            }
-          ]
+              maxValue: 2308,
+            },
+          ],
         },
         {
           name: "random",
@@ -136,19 +136,19 @@ export const cmd: CreateApplicationCommand = {
               choices: [
                 { name: "Random Words", value: "random" },
                 { name: "Random Daily Wordle", value: "daily" },
-              ]
-            }
-          ]
+              ],
+            },
+          ],
         },
-      ]
+      ],
     },
-  ]
+  ],
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
-  switch(getSubcmdGroup(interaction)) {
+  switch (getSubcmdGroup(interaction)) {
     default: {
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "8ball": {
           const responses = {
             yes: [
@@ -176,14 +176,16 @@ export async function execute(bot: Bot, interaction: Interaction) {
               "My sources say no.",
               "Outlook not so good.",
               "Very doubtful",
-            ]
+            ],
           }
 
           const index = Math.floor(Math.random() * 300) % 3
           const question = getValue(interaction, "question", "String") ?? ""
-          const response = question.endsWith("\u200a") || question.startsWith("\u200a") ? pickFromArray(responses.yes)
-            : question.endsWith("\u200b") || question.startsWith("\u200b") ? pickFromArray(responses.no)
-            : pickFromArray(responses[Object.keys(responses)[index]])
+          const response = question.endsWith("\u200a") || question.startsWith("\u200a")
+            ? pickFromArray(responses.yes)
+            : question.endsWith("\u200b") || question.startsWith("\u200b")
+              ? pickFromArray(responses.no)
+              : pickFromArray(responses[Object.keys(responses)[index]])
 
           await respond(bot, interaction, {
             embeds: [{
@@ -191,9 +193,9 @@ export async function execute(bot: Bot, interaction: Interaction) {
               color: parseInt(pickFromArray(colors), 16),
               fields: [
                 { name: ":question: Question", value: question, inline: false },
-                { name: ":8ball: Response", value: response, inline: false }
-              ]
-            }]
+                { name: ":8ball: Response", value: response, inline: false },
+              ],
+            }],
           })
           break
         }
@@ -207,8 +209,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
           await respond(bot, interaction, {
             embeds: [{
               color: parseInt(pickFromArray(colors), 16),
-              image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` }
-            }]
+              image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` },
+            }],
           })
           break
         }
@@ -224,13 +226,13 @@ export async function execute(bot: Bot, interaction: Interaction) {
             upsidedown: " ¡\"#$%℘,)(*+'-˙/0ƖᄅƐㄣϛ9ㄥ86:;>=<¿@∀qƆpƎℲפHIſʞ˥WNOԀQɹS┴∩ΛMXλZÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ]\\[^‾,ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎzáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ}|{",
             fullwidth: "　！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ｛｜｝",
             leet: " !\"#$%&'()*+,-./0123456789:;<=>?@48CD3FG#IJK1MN0PQЯ57UVWXY2ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`48cd3fg#ijk1mn0pqЯ57uvwxy2áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
-            japanese: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}"
+            japanese: "　!\"#$%&'()*+,-./0123456789:;<=>?@卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙ÁÀẢÃẠÉÈẺẼẸÍÌỈĨỊÓÒỎÕỌÚÙỦŨỤẮẰẲẴẶẤẦẨẪẬẾỀỂỄỆỐỒỔỖỘỚỜỞỠỢỨỪỬỮỰÝỲỶỸỴ[\\]^_`卂乃匚刀乇下厶卄工丁长乚从ん口尸㔿尺丂丅凵リ山乂丫乙áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựýỳỷỹỵ{|}",
           }
 
           let replace = ""
           let result = ""
 
-          switch(style) {
+          switch (style) {
             case "varied": {
               let turn = false
               for (let i = 0; i < text.length; i++) {
@@ -275,46 +277,46 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 
     case "achievement": {
       choices.push(
-        { name: "arrow",            value: "34" },
-        { name: "bed",              value: "9"  },
-        { name: "cake",             value: "10" },
-        { name: "cobweb",           value: "16" },
-        { name: "crafting_table",   value: "13" },
-        { name: "creeper",          value: "4"  },
-        { name: "diamond",          value: "2"  },
-        { name: "diamond_sword",    value: "3"  },
-        { name: "arrow",            value: "34" },
-        { name: "book",             value: "19" },
-        { name: "bow",              value: "33" },
-        { name: "bucket",           value: "36" },
-        { name: "chest",            value: "17" },
-        { name: "coal_block",       value: "31" },
-        { name: "cookie",           value: "7"  },
-        { name: "diamond_armor",    value: "26" },
-        { name: "fire",             value: "15" },
-        { name: "flint_and_steel",  value: "27" },
-        { name: "furnace",          value: "18" },
-        { name: "gold_ingot",       value: "23" },
-        { name: "grass_block",      value: "1"  },
-        { name: "heart",            value: "8"  },
-        { name: "iron_armor",       value: "35" },
-        { name: "iron_door",        value: "25" },
-        { name: "iron_ingot",       value: "22" },
-        { name: "iron_sword",       value: "32" },
-        { name: "lava",             value: "38" },
-        { name: "milk",             value: "39" },
-        { name: "oak_door",         value: "24" },
-        { name: "pig",              value: "5"  },
-        { name: "planks",           value: "21" },
-        { name: "potion",           value: "28" },
-        { name: "rail",             value: "12" },
-        { name: "redstone",         value: "14" },
-        { name: "sign",             value: "11" },
-        { name: "spawn_egg",        value: "30" },
-        { name: "splash",           value: "29" },
-        { name: "stone",            value: "20" },
-        { name: "tnt",              value: "6"  },
-        { name: "water",            value: "37" },
+        { name: "arrow", value: "34" },
+        { name: "bed", value: "9" },
+        { name: "cake", value: "10" },
+        { name: "cobweb", value: "16" },
+        { name: "crafting_table", value: "13" },
+        { name: "creeper", value: "4" },
+        { name: "diamond", value: "2" },
+        { name: "diamond_sword", value: "3" },
+        { name: "arrow", value: "34" },
+        { name: "book", value: "19" },
+        { name: "bow", value: "33" },
+        { name: "bucket", value: "36" },
+        { name: "chest", value: "17" },
+        { name: "coal_block", value: "31" },
+        { name: "cookie", value: "7" },
+        { name: "diamond_armor", value: "26" },
+        { name: "fire", value: "15" },
+        { name: "flint_and_steel", value: "27" },
+        { name: "furnace", value: "18" },
+        { name: "gold_ingot", value: "23" },
+        { name: "grass_block", value: "1" },
+        { name: "heart", value: "8" },
+        { name: "iron_armor", value: "35" },
+        { name: "iron_door", value: "25" },
+        { name: "iron_ingot", value: "22" },
+        { name: "iron_sword", value: "32" },
+        { name: "lava", value: "38" },
+        { name: "milk", value: "39" },
+        { name: "oak_door", value: "24" },
+        { name: "pig", value: "5" },
+        { name: "planks", value: "21" },
+        { name: "potion", value: "28" },
+        { name: "rail", value: "12" },
+        { name: "redstone", value: "14" },
+        { name: "sign", value: "11" },
+        { name: "spawn_egg", value: "30" },
+        { name: "splash", value: "29" },
+        { name: "stone", value: "20" },
+        { name: "tnt", value: "6" },
+        { name: "water", value: "37" },
       )
       break
     }

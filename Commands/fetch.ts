@@ -1,10 +1,10 @@
-import Fuse from "fuse"
 import axiod from "axiod"
-import * as urban from "urban"
-import { Temporal } from "temporal"
-import { choices, CountryCovidCase, CovidCache, CovidCountries, GlobalCovidCase } from "../Resources/Covid/mod.ts"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
+import Fuse from "fuse"
 import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
+import { Temporal } from "temporal"
+import * as urban from "urban"
+import { choices, CountryCovidCase, CovidCache, CovidCountries, GlobalCovidCase } from "../Resources/Covid/mod.ts"
 
 export const cmd = {
   name: "fetch",
@@ -72,7 +72,7 @@ export const cmd = {
         type: ApplicationCommandOptionTypes.String,
         autocomplete: true,
         required: true,
-      }]
+      }],
     },
     {
       name: "definition",
@@ -95,8 +95,8 @@ export const cmd = {
           type: ApplicationCommandOptionTypes.String,
           autocomplete: true,
           required: true,
-        }
-      ]
+        },
+      ],
     },
     {
       name: "facts",
@@ -128,8 +128,8 @@ export const cmd = {
               min_value: 1,
               max_value: 12,
               required: true,
-            }
-          ]
+            },
+          ],
         },
         {
           name: "legacy",
@@ -162,8 +162,8 @@ export const cmd = {
               description: "The fact's number",
               type: ApplicationCommandOptionTypes.Integer,
               required: true,
-            }
-          ]
+            },
+          ],
         },
         {
           name: "random",
@@ -175,7 +175,7 @@ export const cmd = {
           description: "Get a random useless fact",
           type: ApplicationCommandOptionTypes.SubCommand,
         },
-      ]
+      ],
     },
     {
       name: "lyrics",
@@ -187,7 +187,7 @@ export const cmd = {
         type: ApplicationCommandOptionTypes.String,
         autocomplete: true,
         required: true,
-      }]
+      }],
     },
     {
       name: "translation",
@@ -214,7 +214,7 @@ export const cmd = {
           autocomplete: true,
           required: false,
         },
-      ]
+      ],
     },
     {
       name: "weather",
@@ -238,8 +238,8 @@ export const cmd = {
             { name: "Both", value: "both" },
           ],
           required: false,
-        }
-      ]
+        },
+      ],
     },
     {
       name: "wikipedia",
@@ -257,17 +257,17 @@ export const cmd = {
               type: ApplicationCommandOptionTypes.String,
               autocomplete: true,
               required: true,
-            }
-          ]
-        }
-      ]
+            },
+          ],
+        },
+      ],
     },
-  ]
+  ],
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
   await defer(bot, interaction)
-  switch(getSubcmdGroup(interaction)) {
+  switch (getSubcmdGroup(interaction)) {
     case "facts": {
       await defer(bot, interaction)
       let fact: string | string[] = "Wow, such empty",
@@ -275,7 +275,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
         url: string | undefined = undefined,
         iconUrl: string | undefined = undefined
 
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "cat": {
           try {
             fact = JSON.parse(Deno.readTextFileSync("./Resources/cat-facts.json"))
@@ -293,8 +293,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const day = getValue(interaction, "day", "Integer") ?? 1
           const month = getValue(interaction, "month", "Integer") ?? 1
           const date = Temporal.ZonedDateTime.from({ year: 2020, month, day, timeZone: "UTC" })
-          const { data } = await axiod.get(`http://numbersapi.com/${date.month}/${date.day}/date`);
-          [fact, source, url, iconUrl] = [data, "Numbers API", "http://numbersapi.com/", "http://numbersapi.com/img/favicon.ico"]
+          const { data } = await axiod.get(`http://numbersapi.com/${date.month}/${date.day}/date`)
+          ;[fact, source, url, iconUrl] = [data, "Numbers API", "http://numbersapi.com/", "http://numbersapi.com/img/favicon.ico"]
           break
         }
 
@@ -319,7 +319,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
             "Endy is intellegent",
             "69 is just a normal number ok?",
             "There are 24 synthetic elements from 95~118",
-            "Most of these facts are written by Adnagaporp#1965"
+            "Most of these facts are written by Adnagaporp#1965",
           ]
           break
         }
@@ -327,8 +327,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
         case "number": {
           const mode = getValue(interaction, "mode", "String") ?? "trivia"
           const number = getValue(interaction, "number", "Integer") ?? 1
-          const { data } = await axiod.get(`http://numbersapi.com/${number}/${mode}`);
-          [fact, source, url, iconUrl] = [data, "Numbers API", "http://numbersapi.com/", "http://numbersapi.com/img/favicon.ico"]
+          const { data } = await axiod.get(`http://numbersapi.com/${number}/${mode}`)
+          ;[fact, source, url, iconUrl] = [data, "Numbers API", "http://numbersapi.com/", "http://numbersapi.com/img/favicon.ico"]
           break
         }
 
@@ -336,24 +336,24 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const { data } = await axiod.get("https://facts-by-api-ninjas.p.rapidapi.com/v1/facts", {
             headers: {
               "X-RapidAPI-Key": Deno.env.get("RapidAPI") ?? "",
-              "X-RapidAPI-Host": "facts-by-api-ninjas.p.rapidapi.com"
-            }
-          });
-          [fact, source, url, iconUrl] = [data[0].fact, "API Ninjas", "https://api-ninjas.com/facts", "https://rapidapi-prod-apis.s3.amazonaws.com/0a046a2e-24a5-4309-aa42-f3521e784b30.png"]
+              "X-RapidAPI-Host": "facts-by-api-ninjas.p.rapidapi.com",
+            },
+          })
+          ;[fact, source, url, iconUrl] = [data[0].fact, "API Ninjas", "https://api-ninjas.com/facts", "https://rapidapi-prod-apis.s3.amazonaws.com/0a046a2e-24a5-4309-aa42-f3521e784b30.png"]
           break
         }
 
         case "useless": {
-          switch(pickFromArray(["pl", "sk"])) {
+          switch (pickFromArray(["pl", "sk"])) {
             case "pl": {
-              const { data } = await axiod.get("https://useless-facts.sameerkumar.website/api");
-              [fact, source, url] = [data.data, "sameerkumar18", "https://github.com/sameerkumar18/useless-facts-api"]
+              const { data } = await axiod.get("https://useless-facts.sameerkumar.website/api")
+              ;[fact, source, url] = [data.data, "sameerkumar18", "https://github.com/sameerkumar18/useless-facts-api"]
               break
             }
 
             case "sk": {
-              const { data } = await axiod.get("https://useless-facts.sameerkumar.website/api");
-              [fact, source, url] = [data.text, `${data.source} via jsph.pl`, "https://useless-facts.sameerkumar.website"]
+              const { data } = await axiod.get("https://useless-facts.sameerkumar.website/api")
+              ;[fact, source, url] = [data.text, `${data.source} via jsph.pl`, "https://useless-facts.sameerkumar.website"]
               break
             }
           }
@@ -361,17 +361,19 @@ export async function execute(bot: Bot, interaction: Interaction) {
         }
       }
 
-      await respond(bot, interaction, { embeds: [{
-        title: `${capitalize(getSubcmd(interaction) ?? "")} Fact`,
-        author: source ? { name: `Source: ${source}`, url, iconUrl: iconUrl ?? "https://github.com/fluidicon.png" } : undefined,
-        color: pickFromArray(colors),
-        description: typeof fact === "string" ? fact : pickFromArray(fact),
-      }] })
+      await respond(bot, interaction, {
+        embeds: [{
+          title: `${capitalize(getSubcmd(interaction) ?? "")} Fact`,
+          author: source ? { name: `Source: ${source}`, url, iconUrl: iconUrl ?? "https://github.com/fluidicon.png" } : undefined,
+          color: pickFromArray(colors),
+          description: typeof fact === "string" ? fact : pickFromArray(fact),
+        }],
+      })
       break
     }
 
     default: {
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "covid": {
           const now = Temporal.Now.instant()
           const cacheFile = "./Resources/Covid/cache.json"
@@ -424,18 +426,20 @@ export async function execute(bot: Bot, interaction: Interaction) {
               { name: "Deaths/1M", value: `${covCase.totalDeathsPerMillionPopulation.toLocaleString("en")}`, inline: true },
               { name: "Critical", value: `${covCase.totalCritical.toLocaleString("en")}`, inline: true },
               { name: "Fatality Rate", value: `${covCase.FR}%`, inline: true },
-              { name: "Recovery Rate", value: `${covCase.PR}%`, inline: true }
+              { name: "Recovery Rate", value: `${covCase.PR}%`, inline: true },
             )
             lastUpdated = Temporal.Instant.from(covCase.lastUpdated)
           }
 
-          await respond(bot, interaction, { embeds: [{
-            title,
-            fields,
-            color: pickFromArray(colors),
-            footer: { text: "Last Updated" },
-            timestamp: lastUpdated.epochMilliseconds,
-          }] })
+          await respond(bot, interaction, {
+            embeds: [{
+              title,
+              fields,
+              color: pickFromArray(colors),
+              footer: { text: "Last Updated" },
+              timestamp: lastUpdated.epochMilliseconds,
+            }],
+          })
           break
         }
 
@@ -444,7 +448,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
           const word = getValue(interaction, "word", "String") ?? ""
           if (word == "…") return respond(bot, interaction, "You must specify a word to define.")
 
-          switch(dictionary) {
+          switch (dictionary) {
             case "dictapi": {
               await axiod.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
                 .then(response => {
@@ -469,12 +473,14 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
                   const phonetics = [...new Set(data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text))].join(" - ")
 
-                  edit(bot, interaction, { embeds: [{
-                    title: `${data[0].word} - ${phonetics ?? "//"}`,
-                    color: pickFromArray(colors),
-                    description: desc,
-                    footer: { text: "Source: DictionaryAPI.dev & Wiktionary" }
-                  }] })
+                  edit(bot, interaction, {
+                    embeds: [{
+                      title: `${data[0].word} - ${phonetics ?? "//"}`,
+                      color: pickFromArray(colors),
+                      description: desc,
+                      footer: { text: "Source: DictionaryAPI.dev & Wiktionary" },
+                    }],
+                  })
                 })
                 .catch(() => edit(bot, interaction, `${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`))
               break
@@ -493,15 +499,17 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
                   const description = descriptionBefore + descriptionAfter
 
-                  edit(bot, interaction, { embeds: [{
-                    title: word,
-                    url: result.permalink,
-                    color: pickFromArray(colors),
-                    description,
-                    author: { name: `Urban Dictionary - ${result.author}` },
-                    footer: { text: `Definition ID • ${result.defid} | Written on` },
-                    timestamp: Temporal.Instant.from(result.written_on).epochMilliseconds
-                  }] })
+                  edit(bot, interaction, {
+                    embeds: [{
+                      title: word,
+                      url: result.permalink,
+                      color: pickFromArray(colors),
+                      description,
+                      author: { name: `Urban Dictionary - ${result.author}` },
+                      footer: { text: `Definition ID • ${result.defid} | Written on` },
+                      timestamp: Temporal.Instant.from(result.written_on).epochMilliseconds,
+                    }],
+                  })
                 })
                 .catch(() => edit(bot, interaction, `${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`))
               break
@@ -520,7 +528,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
   const initial = { name: "Keep typing to continue…", value: "…" }
   const filled = { name: current ?? "Keep typing to continue…", value: current ?? "…" }
 
-  switch(getSubcmd(interaction)) {
+  switch (getSubcmd(interaction)) {
     case "covid": {
       const fuse = new Fuse(choices, { distance: 5, keys: ["name", "value"] })
       response.push(...fuse.search(current as string).map(option => option.item))

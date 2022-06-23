@@ -398,11 +398,11 @@ export const cmd: CreateApplicationCommand = {
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
-  switch(getSubcmdGroup(interaction)) {
+  switch (getSubcmdGroup(interaction)) {
     case "color": {
       let color: Color
 
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "rgb": {
           const red = getValue(interaction, "red", "Integer") ?? 0
           const green = getValue(interaction, "green", "Integer") ?? 0
@@ -491,7 +491,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
     }
 
     case "info": {
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "bot": {
           const app = await bot.helpers.getApplicationInfo()
           const creationTimestamp = Math.floor(Number(toTimestamp(bot.id) / 1000n))
@@ -669,7 +669,7 @@ ${channels.filter(channel => channel.type == ChannelTypes.GuildStageVoice).size}
     }
 
     default: {
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "calculate": {
           const expression = getValue(interaction, "expression", "String") ?? ""
           const symbols = ["π", "τ"]
@@ -819,7 +819,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 
   if (current.length == 0) return await respond(bot, interaction, { choices: [blankInitial] })
 
-  switch(getSubcmd(interaction)) {
+  switch (getSubcmd(interaction)) {
     case "timestamp": {
       const fuse = new Fuse(timeZones, { distance: 5 })
       response.push(

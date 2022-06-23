@@ -15,18 +15,13 @@
     "project": "./deno.json"
   },
   "plugins": ["@typescript-eslint"],
-  // "resolutions": {
-  //   "@typescript-eslint/eslint-plugin": "2.23.0",
-  //   "@typescript-eslint/parser": "2.23.0",
-  //   "@typescript-eslint/typescript-estree": "2.23.0"
-  // },
   "rules": {
     "@typescript-eslint/ban-types": ["off", "never"],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-var-requires": "off",
     "enforceForRenamedProperties": "off",
-    "indent": ["warn", 2, { "SwitchCase": 1, "flatTernaryExpressions": true }],
+    "indent": ["warn", 2, { "SwitchCase": 1, "flatTernaryExpressions": true, "offsetTernaryExpressions": false }],
     "linebreak-style": ["warn", "unix"],
     "no-undef": ["off", "never"],
     "no-unneeded-ternary": "error",

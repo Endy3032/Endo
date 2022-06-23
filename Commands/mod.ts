@@ -1,5 +1,5 @@
 import { Collection } from "discordeno"
-import { getFiles, Command } from "modules"
+import { Command, getFiles } from "modules"
 
 const commands = new Collection<string, Command>()
 

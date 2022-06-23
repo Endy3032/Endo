@@ -1,17 +1,17 @@
 import axiod from "axiod"
-import { bold, rgb24 } from "colors"
-import { activities, BrightNord, Nord, TimeMetric } from "modules"
 import { IAxiodError, IAxiodResponse } from "axiod/interfaces.ts"
+import { bold, rgb24 } from "colors"
 import { Bot, EventHandlers, getApplicationCommands, User } from "discordeno"
+import { activities, BrightNord, Nord, TimeMetric } from "modules"
 
 type Payload = {
-  shardId: number;
-  v: number;
-  user: User;
-  guilds: bigint[];
-  sessionId: string;
-  shard?: number[];
-  applicationId: bigint;
+  shardId: number
+  v: number
+  user: User
+  guilds: bigint[]
+  sessionId: string
+  shard?: number[]
+  applicationId: bigint
 }
 
 export const name: keyof EventHandlers = "ready"
@@ -41,8 +41,14 @@ export const execute: EventHandlers["ready"] = async (bot: Bot, payload: Payload
   }
 
   pinger()
-  setInterval(() => { pinger() }, 5 * TimeMetric.milli2min)
-  if (Deno.build.os == "linux") setInterval(() => { reloadPresence() }, 15 * TimeMetric.milli2min)
+  setInterval(() => {
+    pinger()
+  }, 5 * TimeMetric.milli2min)
+  if (Deno.build.os == "linux") {
+    setInterval(() => {
+      reloadPresence()
+    }, 15 * TimeMetric.milli2min)
+  }
 
   const globalCommands = await getApplicationCommands(bot).catch(err => console.botLog(err, "ERROR"))
   console.tagLog("Global", `${globalCommands?.size ?? "Failed Fetching"} Commands`)

@@ -287,12 +287,14 @@ interface GlobalCovidCase extends BaseCovidCase {
 }
 
 type CovidCountries = typeof countries[number]
-type CovidCache = {
-  [country in CovidCountries]: CountryCovidCase;
-} & {
-  timestamp: number;
-  Global: GlobalCovidCase;
-}
+type CovidCache =
+  & {
+    [country in CovidCountries]: CountryCovidCase
+  }
+  & {
+    timestamp: number
+    Global: GlobalCovidCase
+  }
 
 export { choices, countries }
-export type { CovidCache, CovidCountries, CountryCovidCase, GlobalCovidCase }
+export type { CountryCovidCase, CovidCache, CovidCountries, GlobalCovidCase }

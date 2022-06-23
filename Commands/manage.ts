@@ -1,6 +1,6 @@
-import * as otpauth from "otpauth"
-import { checkPermission, defer, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond, edit, capitalize } from "modules"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, MessageComponentTypes, ModifyGuildChannelPositions, TextStyles, VoiceRegions } from "discordeno"
+import { capitalize, checkPermission, defer, edit, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
+import * as otpauth from "otpauth"
 
 export const cmd: CreateApplicationCommand = {
   name: "manage",
@@ -17,7 +17,7 @@ export const cmd: CreateApplicationCommand = {
           description: "Check the channels' position",
           type: ApplicationCommandOptionTypes.SubCommand,
         },
-      ]
+      ],
     },
     {
       name: "create",
@@ -68,7 +68,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.String,
               required: false,
             },
-          ]
+          ],
         },
         {
           name: "category",
@@ -94,7 +94,7 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.String,
               required: false,
             },
-          ]
+          ],
         },
         {
           name: "voice",
@@ -146,9 +146,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.String,
               required: false,
             },
-          ]
+          ],
         },
-      ]
+      ],
     },
     {
       name: "delete",
@@ -173,9 +173,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.String,
               required: false,
             },
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
     {
       name: "edit",
@@ -277,9 +277,9 @@ export const cmd: CreateApplicationCommand = {
               type: ApplicationCommandOptionTypes.String,
               required: false,
             },
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
     {
       name: "eval",
@@ -290,7 +290,7 @@ export const cmd: CreateApplicationCommand = {
         description: "One Time Password for validation",
         type: ApplicationCommandOptionTypes.String,
         required: true,
-      }]
+      }],
     },
     {
       name: "purge",
@@ -332,9 +332,9 @@ export const cmd: CreateApplicationCommand = {
           type: ApplicationCommandOptionTypes.String,
           required: false,
         },
-      ]
-    }
-  ]
+      ],
+    },
+  ],
 }
 
 const otp = new otpauth.TOTP({
@@ -349,9 +349,9 @@ const otp = new otpauth.TOTP({
 export async function execute(bot: Bot, interaction: Interaction) {
   if (!interaction.guildId) return respond(bot, interaction, `${emojis.warn.shorthand} This command can only be used in servers.`, true)
 
-  switch(getSubcmdGroup(interaction)) {
+  switch (getSubcmdGroup(interaction)) {
     case "check": {
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "position": {
           const channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort((a, b) => (a.position ?? 0) > (b.position ?? 1) ? 1 : -1)
 
@@ -362,8 +362,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 { name: "Categories", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
                 { name: "Text Channels", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildText).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
                 { name: "Voice Channels", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
-              ]
-            }]
+              ],
+            }],
           })
           break
         }
@@ -380,7 +380,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
       const options: CreateGuildChannel = { name: channelName }
       const channels = await bot.helpers.getChannels(interaction.guildId)
 
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "category": {
           const below = getValue(interaction, "below", "Channel")
           const belowPos = channels.find(channel => channel.id == below?.id)?.position
@@ -409,7 +409,10 @@ export async function execute(bot: Bot, interaction: Interaction) {
           Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
             type: ChannelTypes.GuildText,
             rateLimitPerUser: slowmode,
-            topic, nsfw, position, parentId
+            topic,
+            nsfw,
+            position,
+            parentId,
           })
           break
         }
@@ -431,7 +434,11 @@ export async function execute(bot: Bot, interaction: Interaction) {
           }
 
           Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
-            type, bitrate, userLimit, position, parentId
+            type,
+            bitrate,
+            userLimit,
+            position,
+            parentId,
           })
           break
         }
@@ -442,7 +449,9 @@ export async function execute(bot: Bot, interaction: Interaction) {
           await respond(bot, interaction, `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
 
           const swapOptions: ModifyGuildChannelPositions[] = channels.filter(channel => channel.type == options.type)
-            .map(channel => { return { id: channel.id.toString(), position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position } })
+            .map(channel => {
+              return { id: channel.id.toString(), position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position }
+            })
 
           swapOptions.push({ id: channel.id.toString(), position: options.position ?? 0 })
           await bot.helpers.swapChannels(channel.guildId, swapOptions)
@@ -453,7 +462,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
     case "delete": {
       if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "channel": {
           const channel = getValue(interaction, "channel", "Channel")
           const reason = getValue(interaction, "reason", "String") ?? `Deleted by ${interaction.user.username}#${interaction.user.discriminator}`
@@ -467,9 +476,9 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 label: "Delete",
                 customId: `delete-channel-${channel?.id}`,
                 style: ButtonStyles.Danger,
-                emoji: { id: emojis.trash.id }
-              }]
-            }]
+                emoji: { id: emojis.trash.id },
+              }],
+            }],
           }, true)
           break
         }
@@ -479,7 +488,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
     case "edit": {
       if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "channel": {
           const channel = getValue(interaction, "channel", "Channel")
           if (channel === null) return respond(bot, interaction, "Cannot get the channel", true)
@@ -493,7 +502,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
     }
 
     default: {
-      switch(getSubcmd(interaction)) {
+      switch (getSubcmd(interaction)) {
         case "eval": {
           const app = await bot.helpers.getApplicationInfo()
           const ownerID = (app.team ? app.team.ownerUserId : app.owner?.id) ?? bot.id
@@ -514,8 +523,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 customId: "code",
                 label: "Code",
                 required: true,
-              }]
-            }]
+              }],
+            }],
           })
           break
         }
@@ -544,9 +553,9 @@ export async function execute(bot: Bot, interaction: Interaction) {
                 label: "Delete",
                 customId: `delete-messages-${amount}-${option}-${user?.user.id}`,
                 style: ButtonStyles.Danger,
-                emoji: { id: emojis.trash.id }
-              }]
-            }]
+                emoji: { id: emojis.trash.id },
+              }],
+            }],
           }, true)
           break
         }
@@ -563,13 +572,13 @@ const purge = (bot: Bot, channelId: bigint, messages: bigint[], reason?: string)
 export async function button(bot: Bot, interaction: Interaction) {
   const customID = (interaction.data?.customId ?? "").split("-")
   const [action, type] = customID
-  switch(action) {
+  switch (action) {
     case "delete": {
       await defer(bot, interaction)
-      switch(type) {
+      switch (type) {
         case "channel": {
           if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
-          const [,,channelID] = customID
+          const [, , channelID] = customID
           const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
           await bot.helpers.deleteChannel(BigInt(channelID), reason)
             .then(() => respond(bot, interaction, { content: `${emojis.success.shorthand} Deleted the channel`, components: [] }))
@@ -580,17 +589,19 @@ export async function button(bot: Bot, interaction: Interaction) {
         case "messages": {
           if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
           if (interaction.channelId === undefined) return respond(bot, interaction, "Cannot get current channel")
-          const [,,amount, option, user] = customID
+          const [, , amount, option, user] = customID
           const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 
           let clear = (await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) }))
-          if (option != "null" || user != "undefined") clear = clear.filter(msg => {
-            let cond = false
-            if (option == "bots") cond = cond || msg.isBot
-            if (option == "users") cond = cond || !msg.isBot
-            if (user != "undefined") cond = cond || (msg.authorId == BigInt(user))
-            return cond
-          })
+          if (option != "null" || user != "undefined") {
+            clear = clear.filter(msg => {
+              let cond = false
+              if (option == "bots") cond = cond || msg.isBot
+              if (option == "users") cond = cond || !msg.isBot
+              if (user != "undefined") cond = cond || (msg.authorId == BigInt(user))
+              return cond
+            })
+          }
 
           if (clear.length < 1) return await respond(bot, interaction, `${emojis.warn.shorthand} Found no messages to purge`)
           else {
@@ -612,12 +623,13 @@ const transformRegion = (choices: ApplicationCommandOptionChoice[], property: ke
 }
 
 export async function autocomplete(bot: Bot, interaction: Interaction) {
-  if (interaction.guildId === undefined) return await respond(bot, interaction, {
-    choices: [{ name: "This command can only be used in a server", value: "null" }]
-  })
+  if (interaction.guildId === undefined) {
+    return await respond(bot, interaction, {
+      choices: [{ name: "This command can only be used in a server", value: "null" }],
+    })
+  }
 
-  const choices: ApplicationCommandOptionChoice[] =
-  (await bot.helpers.getVoiceRegions(interaction.guildId)).array().map(region => {
+  const choices: ApplicationCommandOptionChoice[] = (await bot.helpers.getVoiceRegions(interaction.guildId)).array().map(region => {
     let { name } = region
     if (region.optimal) name += " [Optimal]"
     if (region.deprecated) name += " [Deprecated]"

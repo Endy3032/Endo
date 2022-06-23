@@ -21,7 +21,7 @@ export const escapeMarkdown = (text: string, options: EscapeMarkdownOptions = { 
       underline: true,
       spoiler: true,
       strikethrough: true,
-      timestamps: true
+      timestamps: true,
     }
   }
 
