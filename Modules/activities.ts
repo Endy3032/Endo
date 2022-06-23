@@ -39,7 +39,7 @@ function getActivity() {
   return {
     name,
     url,
-    type: parseInt(ActivityTypes[statusTypeKey]) || ActivityTypes.Streaming,
+    type: parseInt(ActivityTypes[statusTypeKey]),
     createdAt: Temporal.Now.instant().epochMilliseconds,
   }
 }

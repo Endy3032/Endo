@@ -27,6 +27,10 @@ const config: DenonConfig = {
       cmd: "deno repl",
       allow: undefined,
     },
+    fmt: {
+      cmd: "dprint fmt && eslint --fix .",
+      watch: false,
+    },
   },
   watcher: { exts: ["ts"], skip: ["Commands/*$eval.ts"] },
 }
