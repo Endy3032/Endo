@@ -1,25 +1,25 @@
 {
-  "imports": {
-    "/": "./",
-    "./": "./",
-    "modules": "./Modules/mod.ts",
-    "axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
-    "axiod/": "https://deno.land/x/axiod@0.26.1/",
-    "bytes": "https://deno.land/std@0.144.0/fmt/bytes.ts",
-    "canvas": "https://deno.land/x/canvas@v1.4.1/mod.ts",
-    "color-convert": "https://deno.land/x/color@v0.2.2/mod.ts",
-    "colors": "https://deno.land/std@0.144.0/fmt/colors.ts",
-    "discordeno": "https://deno.land/x/discordeno@13.0.0-rc45/mod.ts",
-    "dom": "https://deno.land/x/deno_dom@v0.1.31-alpha/deno-dom-wasm.ts",
-    "exif": "https://deno.land/x/deno_exif@0.0.2/mod.ts",
-    "fuse": "https://esm.sh/fuse.js@6.6.2",
-    "google-translate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
-    "mathjs": "https://esm.sh/mathjs@10.6.1",
-    "otpauth": "https://esm.sh/otpauth@7.1.3",
-    "progressbar": "https://esm.sh/string-progressbar",
-    "temporal": "https://esm.sh/@js-temporal/polyfill@0.4.1",
-    "timezones": "https://deno.land/x/timezones@v1.3.0/mod.ts",
-    "urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
-    "wikipedia": "https://deno.land/x/denowiki@v0.2.1"
-  }
+	"imports": {
+		"/": "./",
+		"./": "./",
+		"modules": "./Modules/mod.ts",
+		"axiod": "https://deno.land/x/axiod@0.26.1/mod.ts",
+		"axiod/": "https://deno.land/x/axiod@0.26.1/",
+		"bytes": "https://deno.land/std@0.144.0/fmt/bytes.ts",
+		"canvas": "https://deno.land/x/canvas@v1.4.1/mod.ts",
+		"color-convert": "https://deno.land/x/color@v0.2.2/mod.ts",
+		"colors": "https://deno.land/std@0.144.0/fmt/colors.ts",
+		"discordeno": "https://deno.land/x/discordeno@13.0.0-rc45/mod.ts",
+		"dom": "https://deno.land/x/deno_dom@v0.1.31-alpha/deno-dom-wasm.ts",
+		"exif": "https://deno.land/x/deno_exif@0.0.2/mod.ts",
+		"fuse": "https://esm.sh/fuse.js@6.6.2",
+		"google-translate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
+		"mathjs": "https://esm.sh/mathjs@10.6.1",
+		"otpauth": "https://esm.sh/otpauth@7.1.3",
+		"progressbar": "https://esm.sh/string-progressbar",
+		"temporal": "https://esm.sh/@js-temporal/polyfill@0.4.1",
+		"timezones": "https://deno.land/x/timezones@v1.3.0/mod.ts",
+		"urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
+		"wikipedia": "https://deno.land/x/denowiki@v0.2.1"
+	}
 }

@@ -1,14 +1,4 @@
-# Folders
-dist
-logs
-node_modules*
-
-# Files
 .env
-*.log
 .vscode
 .DS_Store
-forecast.json
-package-lock.json
 Resources/**/*.json
-*$eval.ts

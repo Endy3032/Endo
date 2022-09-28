@@ -1,0 +1,8 @@
+{
+	"deno.enable": true,
+	"deno.importMap": "imports.json",
+	"deno.config": "deno.json",
+	"editor.defaultFormatter": "dprint.dprint",
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true
+}
