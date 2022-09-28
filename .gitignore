@@ -1,4 +1,4 @@
 .env
-.vscode
+*.log
 .DS_Store
 Resources/**/*.json
