@@ -1,4 +1,4 @@
-import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateApplicationCommand } from "discordeno"
+import { ApplicationCommandOption, ApplicationCommandTypes, Bot, CreateSlashApplicationCommand } from "discordeno"
 import { BotApplicationCommand, getFiles } from "modules"
 
 const { TestGuild } = Deno.env.toObject()
@@ -9,7 +9,7 @@ const replaceDescription = (cmd: BotApplicationCommand, tag: string) => {
 		return cmd
 	}
 
-	cmd = cmd as CreateApplicationCommand
+	cmd = cmd as CreateSlashApplicationCommand
 	cmd.description = `[${tag}] ${cmd.description}`
 	cmd.options?.forEach((opt: ApplicationCommandOption) => {
 		opt.description = `[${tag}] ${opt.description} [${tag}]`
@@ -34,7 +34,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
 				commands.push(replaceDescription(cmd, "G"))
 			}
 
-			const deployed = await bot.helpers.upsertApplicationCommands(commands, BigInt(guildID))
+			const deployed = await bot.helpers.upsertGuildApplicationCommands(BigInt(guildID), commands)
 			console.tagLog("Deploy", `${deployed.size} commands to ${guildID}`)
 		}
 	}
@@ -44,14 +44,14 @@ export const deploy = async (bot: Bot, args: string[]) => {
 		const botCommands = commands.array().map(command => command.cmd)
 
 		if (args.includes("global")) {
-			const deployed = await bot.helpers.upsertApplicationCommands(botCommands)
+			const deployed = await bot.helpers.upsertGlobalApplicationCommands(botCommands)
 			console.tagLog("Deploy", `${deployed.size} global commands`)
 		}
 
 		if (args.includes("test")) {
 			if (TestGuild === undefined) return console.tagLog("Deploy", "Failed to register test commands [Test Guild ID Not Provided]")
 			const testCommands = [...botCommands.map(command => replaceDescription(command, "Dev"))]
-			const deployed = await bot.helpers.upsertApplicationCommands(testCommands, BigInt(TestGuild))
+			const deployed = await bot.helpers.upsertGuildApplicationCommands(BigInt(TestGuild), testCommands)
 			console.tagLog("Deploy", `${deployed.size} test commands`)
 		}
 	}

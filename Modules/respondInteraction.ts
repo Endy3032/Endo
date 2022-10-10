@@ -1,8 +1,8 @@
-import { Bot, EditWebhookMessage, Interaction, InteractionApplicationCommandCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
+import { Bot, Interaction, InteractionCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
 import { emojis } from "./emojis.ts"
 import { MessageFlags } from "./types.ts"
 
-export async function respond(bot: Bot, interaction: Interaction, response: InteractionApplicationCommandCallbackData | string, ephemeral = false) {
+export async function respond(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string, ephemeral = false) {
 	let type = InteractionResponseTypes.ChannelMessageWithSource
 	const data = typeof response === "string" ? { content: response } : response
 
@@ -16,13 +16,14 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 
 	if (ephemeral) data.flags = MessageFlags.Ephemeral
 
-	return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data }).catch(err => console.botLog(err, "ERROR"))
+	return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data }).catch(err => console.botLog(err, "ERROR"))
 }
 
-export async function edit(bot: Bot, interaction: Interaction, response: EditWebhookMessage | InteractionApplicationCommandCallbackData | string) {
-	if (interaction.type == InteractionTypes.ApplicationCommandAutocomplete) return
-	bot.helpers.editInteractionResponse(interaction.token, typeof response === "string" ? { content: response } : response)
-		.catch(err => console.botLog(err, "ERROR"))
+export async function edit(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string) {
+	if (interaction.type == InteractionTypes.ApplicationCommandAutocomplete) {
+		return await bot.helpers.editOriginalInteractionResponse(interaction.token, typeof response === "string" ? { content: response } : response)
+			.catch(err => console.botLog(err, "ERROR"))
+	}
 }
 
 export async function defer(bot: Bot, interaction: Interaction, ephemeral = false) {
@@ -32,7 +33,7 @@ export async function defer(bot: Bot, interaction: Interaction, ephemeral = fals
 		? InteractionResponseTypes.DeferredChannelMessageWithSource
 		: InteractionResponseTypes.DeferredUpdateMessage
 
-	return bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+	return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
 		type: responseType,
 		data: { flags: ephemeral ? MessageFlags.Ephemeral : undefined },
 	}).catch(err => console.botLog(err, "ERROR"))
