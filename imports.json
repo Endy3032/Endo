@@ -5,11 +5,11 @@
 		"modules": "./Modules/mod.ts",
 		"axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
 		"axiod/": "https://deno.land/x/axiod@0.26.2/",
-		"bytes": "https://deno.land/std@0.157.0/fmt/bytes.ts",
+		"bytes": "https://deno.land/std@0.159.0/fmt/bytes.ts",
 		"canvas": "https://deno.land/x/canvas@v1.4.1/mod.ts",
 		"color-convert": "https://deno.land/x/color@v0.2.2/mod.ts",
-		"colors": "https://deno.land/std@0.157.0/fmt/colors.ts",
-		"discordeno": "https://deno.land/x/discordeno@16.0.0/mod.ts",
+		"colors": "https://deno.land/std@0.159.0/fmt/colors.ts",
+		"discordeno": "https://deno.land/x/discordeno@17.0.0/mod.ts",
 		"dom": "https://deno.land/x/deno_dom@v0.1.35-alpha/deno-dom-wasm.ts",
 		"exif": "https://deno.land/x/deno_exif@0.0.3/mod.ts",
 		"fuse": "https://esm.sh/fuse.js@6.6.2",
@@ -22,6 +22,6 @@
 		"urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
 		"wikipedia": "https://deno.land/x/denowiki@v0.2.1/mod.ts",
 		"denon": "https://deno.land/x/denon@2.5.0/mod.ts",
-		"dotenv": "https://deno.land/std@0.157.0/dotenv/mod.ts"
+		"dotenv": "https://deno.land/std@0.159.0/dotenv/mod.ts"
 	}
 }
