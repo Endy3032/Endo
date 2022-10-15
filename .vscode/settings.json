@@ -4,5 +4,8 @@
 	"deno.config": "deno.json",
 	"editor.defaultFormatter": "dprint.dprint",
 	"editor.formatOnSave": true,
-	"editor.formatOnPaste": true
+	"editor.formatOnPaste": true,
+	"[json]": {
+		"editor.defaultFormatter": "dprint.dprint"
+	}
 }

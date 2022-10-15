@@ -1,5 +1,5 @@
-import { configSync as env } from "dotenv"
-import { DenonConfig } from "denon"
+import { configSync as env } from "https://deno.land/std@0.159.0/dotenv/mod.ts"
+import { DenonConfig } from "https://deno.land/x/denon@2.5.0/mod.ts"
 
 const cmd = "mod.ts"
 

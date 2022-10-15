@@ -20,8 +20,6 @@
 		"temporal": "https://esm.sh/@js-temporal/polyfill@0.4.2",
 		"timezones": "https://deno.land/x/timezones@v1.3.0/mod.ts",
 		"urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
-		"wikipedia": "https://deno.land/x/denowiki@v0.2.1/mod.ts",
-		"denon": "https://deno.land/x/denon@2.5.0/mod.ts",
-		"dotenv": "https://deno.land/std@0.159.0/dotenv/mod.ts"
+		"wikipedia": "https://deno.land/x/denowiki@v0.2.1/mod.ts"
 	}
 }
