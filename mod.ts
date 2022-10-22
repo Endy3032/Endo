@@ -111,7 +111,7 @@ console.botLog = async (content: any, options: LogOptions = { logLevel: "INFO" }
 		.replaceAll("    ", "  ")
 		.replaceAll(Deno.cwd(), "Endo")
 
-	if (tag) content = `[${rgb24(tag, BrightNord.cyan)}]` + content
+	if (tag) content = `[${rgb24(tag, BrightNord.cyan)}] ${content}`
 
 	// Formatting
 	const plainLog = stripColor(content)
