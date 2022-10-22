@@ -1,4 +1,4 @@
-import { BitwisePermissionFlags as Permissions, Bot, CreateApplicationCommand, CreateContextApplicationCommand, Interaction } from "discordeno"
+import { BitwisePermissionFlags as Permissions, Bot, CreateApplicationCommand, CreateContextApplicationCommand, Embed, Interaction } from "discordeno"
 
 export enum Nord {
 	// Polar Night
@@ -145,6 +145,12 @@ export type LogLevel =
 	| "WARN"
 	| "ERROR"
 	| "DEBUG"
+
+export interface LogOptions {
+	logLevel?: LogLevel
+	tag?: string
+	embed?: Embed
+}
 
 export enum MessageFlags {
 	Crossposted = 1 << 0, // this message has been published to subscribed channels (via Channel Following)

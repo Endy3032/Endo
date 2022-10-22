@@ -35,7 +35,7 @@ export const deploy = async (bot: Bot, args: string[]) => {
 			}
 
 			const deployed = await bot.helpers.upsertGuildApplicationCommands(BigInt(guildID), commands)
-			console.tagLog("Deploy", `${deployed.size} commands to ${guildID}`)
+			console.botLog(`${deployed.size} commands to ${guildID}`, { tag: "Deploy" })
 		}
 	}
 
@@ -45,14 +45,14 @@ export const deploy = async (bot: Bot, args: string[]) => {
 
 		if (args.includes("global")) {
 			const deployed = await bot.helpers.upsertGlobalApplicationCommands(botCommands)
-			console.tagLog("Deploy", `${deployed.size} global commands`)
+			console.botLog(`${deployed.size} global commands`, { tag: "Deploy" })
 		}
 
 		if (args.includes("test")) {
-			if (TestGuild === undefined) return console.tagLog("Deploy", "Failed to register test commands [Test Guild ID Not Provided]")
+			if (TestGuild === undefined) return console.botLog("Failed to register test commands [Test Guild ID Not Provided]", { tag: "Deploy" })
 			const testCommands = [...botCommands.map(command => replaceDescription(command, "Dev"))]
 			const deployed = await bot.helpers.upsertGuildApplicationCommands(BigInt(TestGuild), testCommands)
-			console.tagLog("Deploy", `${deployed.size} test commands`)
+			console.botLog(`${deployed.size} test commands`, { tag: "Deploy" })
 		}
 	}
 }

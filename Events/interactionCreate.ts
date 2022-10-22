@@ -36,7 +36,7 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 		const discordTimestamp = toTimestamp(interaction.id)
 
 		const embed: Embed = {
-			description: stripColor(`**Timestamp** • ${discordTimestamp}\n**Interaction** • ${interactionLog}`),
+			description: stripColor(`<t:${discordTimestamp}:T> <t:${discordTimestamp}:d> [${discordTimestamp}]\n**Interaction** • ${interactionLog}`),
 			author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, iconUrl: imageURL(interaction.user.id, interaction.user.avatar, "avatars") },
 			footer: { text: guildName ? `${guildName} #${channelName}` : "**DM**", iconUrl: imageURL(guild?.id, guild?.icon, "icons") },
 			timestamp: Number(discordTimestamp),

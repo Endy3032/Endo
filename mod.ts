@@ -1,33 +1,90 @@
 import { rgb24, stripColor } from "colors"
-import { createBot, CreateMessage, Embed, EventHandlers, Intents, startBot } from "discordeno"
-import { activities, BrightNord, capitalize, deploy, getFiles, LogLevel, Nord } from "modules"
+import { createBot, EventHandlers, Intents, startBot } from "discordeno"
+import { activities, BrightNord, capitalize, deploy, getFiles, LogOptions, Nord } from "modules"
 import { Temporal } from "temporal"
 
-const [token, botId] = [Deno.env.get("DiscordToken"), Deno.env.get("DiscordClient")]
+const [token, logChannel] = [Deno.env.get("DiscordToken"), Deno.env.get("Log")]
 if (token === undefined) throw new Error("Missing Token")
-if (botId === undefined) throw new Error("Missing Bot ID")
 
 const bot = createBot({
 	token,
-	botId: BigInt(botId),
 	intents: Intents.Guilds | Intents.DirectMessages,
 	events: {},
 })
-bot.gateway.manager.createShardOptions.makePresence = shardId => activities()
+bot.gateway.manager.createShardOptions.makePresence = () => activities()
 
 // #region Logging stuff
-const send = async (body: CreateMessage, epoch: number) => {
-	const channelID = Deno.env.get("Log")
-	if (channelID === undefined) return
-	await bot.helpers.sendMessage(BigInt(channelID), body)
-		.catch((err: Error) => {
-			console.botLog(err, "ERROR")
-			bot.helpers.sendMessage(BigInt(channelID), { content: `**Timestamp** • ${epoch}\`\`\`${err.stack}\`\`\`` })
-		})
-}
+// const send = async (body: CreateMessage, timestamp: string) => {
+// 	if (logChannel === undefined) return
+// 	await bot.helpers.sendMessage(BigInt(logChannel), body)
+// 		.catch((err: Error) => {
+// 			console.botLog(err, "ERROR")
+// 			bot.helpers.sendMessage(BigInt(logChannel), { content: `${timestamp}\`\`\`${err.stack}\`\`\`` })
+// 		})
+// }
 
-console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = true) => {
-	if (content instanceof Error) content = content.stack
+// // deno-lint-ignore no-explicit-any
+// console.localLog = (content: any, logLevel: LogLevel = "INFO") => {
+// 	const temporal = Temporal.Now.instant()
+
+// 	const logTime = temporal.toLocaleString("default", {
+// 		timeZone: "Asia/Ho_Chi_Minh",
+// 		year: "numeric",
+// 		month: "2-digit",
+// 		day: "2-digit",
+// 		hour: "2-digit",
+// 		minute: "2-digit",
+// 		second: "2-digit",
+// 		hour12: false,
+// 		fractionalSecondDigits: 2,
+// 	}).replace(",", "")
+
+// 	if (content instanceof Error) {
+// 		content = content.stack ?? "Unable to capture Error stack"
+// 		logLevel = "ERROR"
+// 	} else if (typeof content !== "string") content = Deno.inspect(content, { colors: true, compact: false, depth: 6, iterableLimit: 200 })
+
+// 	content = content
+// 		.replaceAll("    ", "  ")
+// 		.replaceAll(Deno.cwd(), "Endo")
+
+// 	const logColor = Nord[logLevel.toLowerCase()]
+// 	const consoleLog = rgb24(`${logTime} ${rgb24(logLevel.padStart(6, " "), logColor)} | ${content.replaceAll("\n", "\n" + " ".repeat(32))}`, Nord.blue)
+
+// 	console.log(consoleLog)
+// 	Deno.writeTextFileSync("./Resources/discord.log", stripColor(consoleLog) + "\n", { append: true })
+
+// 	return { plainLog: stripColor(content), epoch: temporal.epochMilliseconds }
+// }
+
+// console.tagLog = (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
+
+// // deno-lint-ignore no-explicit-any
+// console.botLog = async (content: any, logLevel: LogLevel = "INFO", embed?: Embed) => {
+// 	const { plainLog, epoch } = console.localLog(content, logLevel)
+// 	if (content instanceof Error) logLevel = "ERROR"
+// 	const timestamp = `<t:${Math.floor(epoch / 1000)}:T> [${epoch}]`
+
+// 	if (logLevel == "ERROR") return await send({ content: `${timestamp} \`\`\`${plainLog}\`\`\`` }, epoch)
+// 	else if (plainLog.includes("youtu.be")) return await send({ content: `${timestamp} │ ${plainLog.split(" Streaming lofi ")[1]}` }, epoch)
+// 	else if (!embed) {
+// 		embed = {
+// 			description: `**${capitalize(logLevel)}** - ${timestamp}\n${/WARN|ERROR/.test(logLevel) ? `\`\`\`${plainLog}\`\`\`` : ` • ${plainLog}`}`,
+// 			timestamp: epoch,
+// 		}
+// 	}
+
+// 	if (!embed.timestamp) embed.timestamp = epoch
+// 	if (!/<t:\d+:[tTdDfFR]>/.test(embed.description ?? "")) embed.description = `${timestamp}\n${embed.description}`
+// 	send({ embeds: [embed] }, epoch)
+// }
+
+// deno-lint-ignore no-explicit-any
+console.botLog = async (content: any, options: LogOptions = { logLevel: "INFO" }) => {
+	let { tag, embed } = options
+	let logLevel = options.logLevel || "INFO"
+
+	// Time
 	const temporal = Temporal.Now.instant()
 
 	const logTime = temporal.toLocaleString("default", {
@@ -42,41 +99,44 @@ console.localLog = (content: string | any, logLevel: LogLevel = "INFO", log = tr
 		fractionalSecondDigits: 2,
 	}).replace(",", "")
 
-	const logColor = Nord[logLevel.toLowerCase()]
-	if (typeof content !== "string") content = JSON.stringify(content, null, 4)
-	content = content.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ").replaceAll("\n", `\n${" ".repeat(30)}| `)
-	content = rgb24(`${logTime} ${rgb24(logLevel.padStart(6, " "), logColor)} | ${content}`, Nord.blue)
+	const timestamp = `<t:${temporal.epochSeconds}:T> \`${temporal.epochMicroseconds / 1000n}\``
 
-	if (log) console.log(content)
-	return { content, temporal }
-}
-
-console.tagLog = (tag: string, content: string, logLevel: LogLevel = "INFO") => console.localLog(`${rgb24(`[${tag}]`, BrightNord.cyan)} ${content}`, logLevel)
-
-console.botLog = async (content: string | Error, logLevel: LogLevel = "INFO", embed?: Embed) => {
+	// Content sanitization
 	if (content instanceof Error) {
-		content = content.stack?.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ") ?? "Unable to capture error stack"
+		content = content.stack ?? "Unable to capture Error stack"
 		logLevel = "ERROR"
-	}
-	if (typeof content !== "string") content = Deno.inspect(content)
-	const { content: consoleLog, temporal } = console.localLog(content, logLevel, false)
-	const epoch = temporal.epochMilliseconds
+	} else if (typeof content !== "string") content = Deno.inspect(content, { colors: true, compact: false, depth: 6, iterableLimit: 200 })
 
-	console.log(consoleLog)
-	await Deno.writeTextFile("./Resources/discord.log", stripColor(`${consoleLog}\n`), { append: true })
-	content = stripColor(content)
+	content = content
+		.replaceAll("    ", "  ")
+		.replaceAll(Deno.cwd(), "Endo")
 
-	if (logLevel == "ERROR") return await send({ content: `**Timestamp** • ${epoch}\`\`\`${content}\`\`\`` }, epoch)
-	if (content.includes("youtu.be")) return await send({ content: `**Timestamp** • ${epoch}\n**Status** • Streaming lofi - ${content.split(" Streaming lofi ")[1]}` }, epoch)
-	if (!embed) {
-		embed = {
-			description: `**Timestamp** • ${epoch}\n**${capitalize(logLevel)}**${["WARN", "ERROR"].includes(logLevel) ? `\`\`\`${content}\`\`\`` : ` • ${content}`}`,
-			timestamp: epoch,
+	if (tag) content = `[${rgb24(tag, BrightNord.cyan)}]` + content
+
+	// Formatting
+	const plainLog = stripColor(content)
+	const logColor = Nord[logLevel.toLowerCase()]
+	const formattedLog = rgb24(logTime + rgb24(logLevel.padStart(6, " "), logColor) + ` | ${content.replaceAll("\n", "\n" + " ".repeat(32))}`, Nord.blue)
+
+	console.log(formattedLog)
+	Deno.writeTextFileSync("./Resources/discord.log", stripColor(formattedLog) + "\n", { append: true })
+
+	// Discord logging
+	if (logChannel === undefined) return
+	try {
+		// if (logLevel == "ERROR") content = `${timestamp} \`\`\`${plainLog}\`\`\``
+		// else {
+		embed = embed ?? {}
+		if (!embed.timestamp) embed.timestamp = temporal.epochSeconds
+		if (!/<t:\d+:[tTdDfFR]>/.test(embed.description ?? "")) {
+			embed.description = `**${capitalize(logLevel)}** [${timestamp}]\n${/WARN|ERROR/.test(logLevel) ? `\`\`\`${plainLog}\`\`\`` : `${plainLog}`}`
 		}
+		// }
+		const embeds = embed ? [embed] : undefined
+		await bot.helpers.sendMessage(logChannel, { content, embeds })
+	} catch (err) {
+		console.botLog(err, { logLevel: "ERROR" })
 	}
-	if (!embed.timestamp) embed.timestamp = epoch
-	if (!embed.description?.includes("**Timestamp** • ")) embed.description = `**Timestamp** • ${epoch}\n${embed.description}`
-	send({ embeds: [embed] }, epoch)
 }
 // #endregion
 
@@ -90,12 +150,10 @@ await deploy(bot, Deno.args)
 await startBot(bot)
 
 const listener = Deno.listen({ port: 3032 })
-console.tagLog("Ready", "Server")
+console.botLog("Server", { tag: "Ready" })
 
 async function http(conn: Deno.Conn) {
-	for await (const req of Deno.serveHttp(conn)) {
-		req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
-	}
+	for await (const req of Deno.serveHttp(conn)) req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
 }
 
 for await (const conn of listener) http(conn)

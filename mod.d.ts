@@ -1,16 +1,12 @@
+// deno-lint-ignore-file no-explicit-any
 import { Embed } from "discordeno"
-import { LogLevel } from "modules"
-import { Temporal } from "temporal"
-
-interface Log {
-	content: string
-	temporal: Temporal.Instant
-}
+import { LogLevel, LogOptions } from "modules"
 
 declare global {
 	interface Console {
-		tagLog: (tag: string, content: string, logLevel?: LogLevel) => void
-		localLog: (content: string, logLevel?: LogLevel, log?: boolean) => Log
-		botLog: (content: string | any, logLevel?: LogLevel, embed?: Embed) => void
+		// localLog: (content: any, logLevel?: LogLevel) => Log
+		// tagLog: (tag: string, content: string, logLevel?: LogLevel) => void
+		// botLog: (content: any, logLevel?: LogLevel, embed?: Embed) => void
+		botLog: (content: any, options?: LogOptions) => Promise<void>
 	}
 }
