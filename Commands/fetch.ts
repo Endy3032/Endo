@@ -1,4 +1,4 @@
-import axiod from "axiod"
+import axiod from "axiod/mod.ts"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
 import Fuse from "fuse"
 import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
