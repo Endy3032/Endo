@@ -1,10 +1,10 @@
-import axiod from "axiod/mod.ts"
+import axiod from "axiod"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
 import Fuse from "fuse"
-import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray, respond } from "modules"
+import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray,
+	respond } from "modules"
 import { Temporal } from "temporal"
 import * as urban from "urban"
-import { choices, CountryCovidCase, CovidCache, CovidCountries, GlobalCovidCase } from "../Resources/Covid/mod.ts"
 
 export const cmd = {
 	name: "fetch",
@@ -62,18 +62,6 @@ export const cmd = {
 		//   ]
 		// },
 		// #endregion
-		{
-			name: "covid",
-			description: "Get data from the COVID-19 API",
-			type: ApplicationCommandOptionTypes.SubCommand,
-			options: [{
-				name: "location",
-				description: "The data's location",
-				type: ApplicationCommandOptionTypes.String,
-				autocomplete: true,
-				required: true,
-			}],
-		},
 		{
 			name: "definition",
 			description: "Fetch a definition from dictionaries",
@@ -339,7 +327,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 							"X-RapidAPI-Host": "facts-by-api-ninjas.p.rapidapi.com",
 						},
 					})
-					;[fact, source, url, iconUrl] = [data[0].fact, "API Ninjas", "https://api-ninjas.com/facts", "https://rapidapi-prod-apis.s3.amazonaws.com/0a046a2e-24a5-4309-aa42-f3521e784b30.png"]
+					;[fact, source, url, iconUrl] = [data[0].fact, "API Ninjas", "https://api-ninjas.com/facts",
+						"https://rapidapi-prod-apis.s3.amazonaws.com/0a046a2e-24a5-4309-aa42-f3521e784b30.png"]
 					break
 				}
 
@@ -374,75 +363,6 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
 		default: {
 			switch (getSubcmd(interaction)) {
-				case "covid": {
-					const now = Temporal.Now.instant()
-					const cacheFile = "./Resources/Covid/cache.json"
-					const location = getValue(interaction, "location", "String") as CovidCountries | "Global"
-
-					let cache: Partial<CovidCache> & { timestamp: number } = { timestamp: now.epochMilliseconds - 1 }
-					try {
-						cache = JSON.parse(Deno.readTextFileSync(cacheFile))
-					} catch {
-						Deno.writeTextFileSync(cacheFile, JSON.stringify(cache))
-					}
-
-					if (cache.timestamp <= now.epochMilliseconds) {
-						var data: Partial<CovidCache> = {}
-						const { data: cases } = await axiod.get<CountryCovidCase[]>("https://api.coronatracker.com/v3/stats/worldometer/country")
-						const { data: Global } = await axiod.get<GlobalCovidCase>("https://api.coronatracker.com/v3/stats/worldometer/global")
-
-						Object.assign<Partial<CovidCache>, Partial<CovidCache>>(data, { Global, ...cases.reduce((a, b) => ({ ...a, [b.country]: b }), {}) })
-
-						cache = { timestamp: now.epochMilliseconds + 60 * 30, ...data }
-						Deno.writeTextFileSync(cacheFile, JSON.stringify(cache, null, 2))
-					}
-
-					let lastUpdated: Temporal.Instant
-					let covCase = cache[location]
-					const emoji = location == "Global" ? ":globe_with_meridians:" : `:flag_${(covCase as CountryCovidCase).countryCode.toLowerCase()}:`
-					const title = `Covid - ${location == "Global" ? location : (covCase as CountryCovidCase).country} ${emoji}`
-					const fields = [
-						{ name: "Confirmed", value: `${covCase?.totalConfirmed.toLocaleString("en")}`, inline: true },
-						{ name: "Deaths", value: `${covCase?.totalDeaths.toLocaleString("en")}`, inline: true },
-						{ name: "Recovered", value: `${covCase?.totalRecovered.toLocaleString("en")}`, inline: true },
-					]
-
-					if (location == "Global") {
-						covCase = covCase as GlobalCovidCase
-						fields.push(
-							{ name: "New Cases", value: `${covCase.totalNewCases.toLocaleString("en")}`, inline: true },
-							{ name: "New Deaths", value: `${covCase.totalNewDeaths.toLocaleString("en")}`, inline: true },
-							{ name: "New Active Cases", value: `${covCase.totalActiveCases.toLocaleString("en")}`, inline: true },
-							{ name: "Total Cases/1M", value: `${covCase.totalCasesPerMillionPop.toLocaleString("en")}`, inline: true },
-						)
-						lastUpdated = Temporal.Instant.from(covCase.created)
-					} else {
-						covCase = covCase as CountryCovidCase
-						fields.push(
-							{ name: "Daily Confirmed", value: `${covCase.dailyConfirmed.toLocaleString("en")}`, inline: true },
-							{ name: "Daily Deaths", value: `${covCase.dailyDeaths.toLocaleString("en")}`, inline: true },
-							{ name: "Active Cases", value: `${covCase.activeCases.toLocaleString("en")}`, inline: true },
-							{ name: "Confirmed/1M", value: `${covCase.totalConfirmedPerMillionPopulation.toLocaleString("en")}`, inline: true },
-							{ name: "Deaths/1M", value: `${covCase.totalDeathsPerMillionPopulation.toLocaleString("en")}`, inline: true },
-							{ name: "Critical", value: `${covCase.totalCritical.toLocaleString("en")}`, inline: true },
-							{ name: "Fatality Rate", value: `${covCase.FR}%`, inline: true },
-							{ name: "Recovery Rate", value: `${covCase.PR}%`, inline: true },
-						)
-						lastUpdated = Temporal.Instant.from(covCase.lastUpdated)
-					}
-
-					await respond(bot, interaction, {
-						embeds: [{
-							title,
-							fields,
-							color: pickFromArray(colors),
-							footer: { text: "Last Updated" },
-							timestamp: lastUpdated.epochMilliseconds,
-						}],
-					})
-					break
-				}
-
 				case "definition": {
 					const dictionary = getValue(interaction, "dictionary", "String")
 					const word = getValue(interaction, "word", "String") ?? ""
@@ -455,23 +375,35 @@ export async function execute(bot: Bot, interaction: Interaction) {
 									const { data } = response
 									let desc = ""
 									data.forEach((entry: { meanings: any[] }) => {
-										entry.meanings.forEach((meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
-											desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
-											desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
-											desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
-											desc += "\n**Meanings:**\n"
+										entry.meanings.forEach(
+											(meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
+												desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
+												desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
+												desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
+												desc += "\n**Meanings:**\n"
 
-											meaning.definitions.forEach((def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any }, ind: number) => {
-												desc += `\`[${ind + 1}]\` ${def.definition}\n`
-												desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
-												desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
-												desc += def.example ? `**• Example:** ${def.example}\n` : ""
-												desc += "\n"
-											})
-										})
+												meaning.definitions.forEach(
+													(def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any },
+														ind: number) =>
+													{
+														desc += `\`[${ind + 1}]\` ${def.definition}\n`
+														desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
+														desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
+														desc += def.example ? `**• Example:** ${def.example}\n` : ""
+														desc += "\n"
+													},
+												)
+											},
+										)
 									})
 
-									const phonetics = [...new Set(data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text))].join(" - ")
+									const phonetics = [
+										...new Set(
+											data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) =>
+												phonetic.text
+											),
+										),
+									].join(" - ")
 
 									edit(bot, interaction, {
 										embeds: [{
@@ -482,7 +414,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 										}],
 									})
 								})
-								.catch(() => edit(bot, interaction, `${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`))
+								.catch(() => edit(bot, interaction, `${shorthand("warn")} The word \`${word}\` was not found in the dictionary`))
 							break
 						}
 
@@ -491,7 +423,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 								.then(results => {
 									const [result] = results.list
 									let descriptionBefore = `**Definition(s)**\n${result.definition}`
-									const descriptionAfter = `\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
+									const descriptionAfter =
+										`\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
 
 									if (descriptionBefore.length + descriptionAfter.length > 4096) {
 										descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
@@ -511,7 +444,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 										}],
 									})
 								})
-								.catch(() => edit(bot, interaction, `${emojis.warn.shorthand} The word \`${word}\` was not found in the dictionary`))
+								.catch(() => edit(bot, interaction, `${shorthand("warn")} The word \`${word}\` was not found in the dictionary`))
 							break
 						}
 					}
@@ -529,14 +462,6 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 	const filled = { name: current ?? "Keep typing to continue…", value: current ?? "…" }
 
 	switch (getSubcmd(interaction)) {
-		case "covid": {
-			const fuse = new Fuse(choices, { distance: 5, keys: ["name", "value"] })
-			response.push(...fuse.search(current as string).map(option => option.item))
-			response.push(...choices.filter((option: ApplicationCommandOptionChoice) => !response.includes(option)))
-			respond(bot, interaction, { choices: response.slice(0, 25) })
-			break
-		}
-
 		case "definition": {
 			const dict = getValue(interaction, "dictionary", "String")
 			if (dict == "dictapi") return respond(bot, interaction, { choices: [filled] })
