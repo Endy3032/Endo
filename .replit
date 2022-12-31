@@ -1,3 +1,2 @@
-onBoot = "source ~/.bashrc"
 language = "bash"
 run = "npm start"

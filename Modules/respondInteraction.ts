@@ -1,5 +1,5 @@
 import { Bot, Interaction, InteractionCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
-import { emojis } from "./emojis.ts"
+import { shorthand } from "./emojis.ts"
 import { MessageFlags } from "./types.ts"
 
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string, ephemeral = false) {
@@ -40,7 +40,7 @@ export async function defer(bot: Bot, interaction: Interaction, ephemeral = fals
 }
 
 export async function error(bot: Bot, interaction: Interaction, err: Error, type?: string, isEdit = false) {
-	const content = `${emojis.error.shorthand} This interaction failed [${type || "Unknown"}]\`\`\`\n${err.name}: ${err.message}\n\`\`\``
+	const content = `${shorthand("error")} This interaction failed [${type || "Unknown"}]\`\`\`\n${err.name}: ${err.message}\n\`\`\``
 	if (isEdit) await edit(bot, interaction, content)
 	else await respond(bot, interaction, content, true)
 	console.botLog(err, "ERROR")

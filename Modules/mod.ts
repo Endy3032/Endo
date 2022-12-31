@@ -1,7 +1,5 @@
 export * from "./activities.ts"
 export * from "./capitalize.ts"
-export * from "./checkPermission.ts"
-export * from "./colors.ts"
 export * from "./deploy.ts"
 export * from "./emojis.ts"
 export * from "./escapeMarkdown.ts"

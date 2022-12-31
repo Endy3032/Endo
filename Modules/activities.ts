@@ -1,45 +1,35 @@
 import { ActivityTypes, StatusUpdate } from "discordeno"
 import { Temporal } from "temporal"
-import { pickFromArray } from "./random.ts"
+import { pickArray } from "./random.ts"
 
-type YouTubeVideoBaseURL = "https://www.youtube.com/watch?v="
-type Activity = {
-	[key in Exclude<keyof typeof ActivityTypes, "Custom" | "Competing">]: { name: string; url?: `${YouTubeVideoBaseURL}${string}` }[]
-}
+type Activity = { [key in Exclude<keyof typeof ActivityTypes, "Custom" | "Competing" | "Streaming">]: string[] }
+type StreamingActivity = { Streaming: { [key: string]: string[] } }
 
-const status: Activity = {
-	Game: [
-		{ name: "Deno" },
-		{ name: "Replit" },
-		{ name: "VSCode" },
-		{ name: "Discordeno" },
-	],
-	Listening: [
-		{ name: "/help" },
-		{ name: "🌧agoraphobic🌧" },
-		{ name: "llusion - jealous" },
-	],
-	Watching: [
-		{ name: "Stranger Things" },
-		{ name: "Thinger Strangs" },
-	],
-	Streaming: [
-		{ name: "lofi", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-		{ name: "lofi", url: "https://www.youtube.com/watch?v=9FIkzOrryf8" },
-		{ name: "lofi", url: "https://www.youtube.com/watch?v=5qap5aO4i9A" },
-		{ name: "lofi", url: "https://www.youtube.com/watch?v=DWcJFNfaw9c" },
-		{ name: "lofi", url: "https://www.youtube.com/watch?v=TsTtqGAxvWk" },
-		{ name: "lofi", url: "https://www.youtube.com/watch?v=CIfGUiICf8U" },
-	],
+const status: Activity & StreamingActivity = {
+	Game: ["Deno", "Replit", "VSCode", "Discordeno"],
+	Listening: ["/help", "🌧agoraphobic🌧", "llusion - jealous"],
+	Watching: ["Stranger Things", "Thinger Strangs", "Stringer Thangs", "Thanger Strings"],
+	Streaming: {
+		lofi: [
+			"dQw4w9WgXcQ",
+			"9FIkzOrryf8",
+			"5qap5aO4i9A",
+			"DWcJFNfaw9c",
+			"TsTtqGAxvWk",
+			"CIfGUiICf8U",
+		],
+	},
 }
 
 function getActivity() {
-	const statusTypeKey = pickFromArray(Object.keys(status))
-	const { name, url } = pickFromArray(status[statusTypeKey])
+	const type = pickArray(Object.keys(status))
+	const name = pickArray(type === "Streaming" ? Object.keys(status.Streaming) : status[type])
+	const url = type === "Streaming" ? `https://youtube.com/watch?v=${pickArray(status.Streaming[name])}` : undefined
+
 	return {
 		name,
 		url,
-		type: parseInt(ActivityTypes[statusTypeKey]),
+		type: parseInt(ActivityTypes[type]),
 		createdAt: Temporal.Now.instant().epochMilliseconds,
 	}
 }

@@ -12952,13 +12952,12 @@ const allowed = [
 	"zygon",
 	"zymes",
 	"zymic",
+	...answers,
 ]
-
-allowed.push(...answers)
 
 function getWord() {
 	const a = Temporal.Now.instant().epochSeconds
-	return answers[Math.floor(a / TimeMetric.sec2day) - 18792]
+	return answers[Math.floor(a / TimeMetric.sec_day) - 18792]
 }
 
 const colors = {
@@ -12985,17 +12984,16 @@ interface WordleCanvas {
 	keys: string[][]
 }
 
-const width = 750
-const height = 1000
-const space = 10
-const side = 90
-const keyFont = 32
-const tileFont = 56
+const [width, height, space, side, keyFont, tileFont] = [750, 1000, 10, 90, 32, 56]
 const tileStartingX = (width - side * 5 - space * 4) / 2
 const tileStartingY = space
 const keyWidth = (width - 11 * space) / 10
 const keyStartingY = height - (space + side) * 3
-const keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], ["A", "S", "D", "F", "G", "H", "J", "K", "L"], ["Z", "X", "C", "V", "B", "N", "M"]]
+const keys = [
+	["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+	["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+	["Z", "X", "C", "V", "B", "N", "M"],
+]
 
 const canvas: WordleCanvas = {
 	width,

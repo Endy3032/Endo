@@ -1,11 +1,17 @@
 {
-	"$schema": "https://json.schemastore.org/tsconfig",
+	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"compilerOptions": {
 		"types": ["./mod.d.ts"],
-		"alwaysStrict": false,
 		"noImplicitAny": false
 	},
-	"exclude": ["Old"],
-	"files": ["mod.ts", "mod.d.ts", "scripts.config.ts"],
-	"include": ["Commands/**/*", "Events/*", "Modules/*", "Resources/**/*"]
+	"lint": {
+		"files": {
+			"include": ["**/*"],
+			"exclude": ["Old/*"]
+		},
+		"rules": {
+			"include": ["eqeqeq", "no-await-in-loop"],
+			"exclude": ["no-explicit-any"]
+		}
+	}
 }

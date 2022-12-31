@@ -3,7 +3,7 @@ import { DenonConfig } from "https://deno.land/x/denon@2.5.0/mod.ts"
 
 const cmd = "mod.ts"
 
-const config: DenonConfig = {
+export default <DenonConfig> {
 	allow: "all",
 	env: env(),
 	importMap: "./imports.json",
@@ -17,22 +17,16 @@ const config: DenonConfig = {
 		dev: {
 			cmd,
 			desc: "Start the bot in dev mode",
-		},
-		debug: {
-			cmd,
-			desc: "Start the bot in dev mode",
 			inspect: "127.0.0.1:9229",
-		},
-		repl: {
-			cmd: "deno repl",
-			allow: undefined,
 		},
 		fmt: {
 			cmd: "dprint fmt && eslint --fix .",
 			watch: false,
 		},
+		repl: {
+			cmd: "deno repl",
+			watch: false,
+		},
 	},
 	watcher: { exts: ["ts"], skip: ["Commands/*$eval.ts"] },
 }
-
-export default config

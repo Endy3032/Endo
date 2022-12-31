@@ -1,9 +1,16 @@
-type Endpoints = "avatars" | "icons" | "banners"
-type ID = BigInt | string | number | undefined | null
-type Options = { format: "png" | "json" | "webp" | "gif"; size: number }
+const size = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096] as const
+type Size = typeof size[number]
 
-export const imageURL = (objectID: ID, imageID: ID, imageEndpoint: Endpoints, options: Options = { format: "webp", size: 2048 }): string => {
-	if (objectID === undefined || imageID === undefined || objectID === null || imageID === null) return ""
-	const hash = imageID.toString(16)
-	return `https://cdn.discordapp.com/${imageEndpoint}/${objectID}/${hash.startsWith("a") ? `a_${hash.slice(1)}` : hash.slice(1)}.${options.format}?size=${options.size}?quality=lossless`
+type ID = string | number | BigInt | null | undefined
+type Options = { format: "png" | "json" | "webp" | "gif"; size: Size }
+type Endpoints = "avatars" | "banners" | "icons" | "splashes" | "discovery-splashes" | "role-icons"
+
+export const imageURL = (targetID: ID, hash: ID, endpoint: Endpoints, options: Options): string => {
+	if (targetID === undefined || hash === undefined || targetID === null || hash === null) return ""
+
+	options = Object.assign({ format: "png", size: 1024 }, options)
+	const { format, size } = options
+	hash = hash.toString(16)
+
+	return `https://cdn.discordapp.com/${endpoint}/${targetID}/${hash}.${format}?size=${size}?quality=lossless`
 }

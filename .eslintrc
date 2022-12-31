@@ -7,24 +7,22 @@
 	"parser": "@typescript-eslint/parser",
 	"plugins": ["@typescript-eslint"],
 	"extends": [
-		"prettier",
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:@typescript-eslint/eslint-recommended"
+		"plugin:@typescript-eslint/eslint-recommended",
 	],
 	"rules": {
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-var-requires": "off",
+		"eqeqeq": "error",
 		"indent": ["warn", "tab", {
 			"SwitchCase": 1,
-			"VariableDeclarator": "first",
-			"flatTernaryExpressions": true,
-			"offsetTernaryExpressions": true
+			"ignoredNodes": ["ConditionalExpression > *"]
 		}],
 		"linebreak-style": ["warn", "unix"],
 		"no-unneeded-ternary": "error",
-		"no-var": "off",
+		"no-var": "warn",
 		"no-whitespace-before-property": "error",
 		"object-curly-spacing": ["warn", "always"],
 		"prefer-destructuring": "warn",
