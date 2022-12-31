@@ -2,10 +2,8 @@ import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interact
 import { escapeMarkdown, respond } from "modules"
 
 export const cmd: CreateContextApplicationCommand = {
-	name: "Copy Content",
+	name: "Raw Content",
 	type: ApplicationCommandTypes.Message,
-	description: "",
-	defaultMemberPermissions: ["USE_SLASH_COMMANDS"],
 }
 
 export async function execute(bot: Bot, interaction: Interaction) {
@@ -13,7 +11,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
 	const attachments = message?.attachments.map(attachment => attachment.proxyUrl) ?? []
 	const messageContent = escapeMarkdown(message?.content ?? "")
-	let content = messageContent.length == 0 ? "**Content**\nNone" : `**Content**\n${messageContent}`
+	let content = messageContent.length === 0 ? "**Content**\nNone" : `**Content**\n${messageContent}`
 	content += `\n\n**Attachment(s): ${attachments.length}**\n${attachments.map(attachment => `<${attachment}>`).join("\n")}`
 
 	await respond(bot, interaction, `${content}`, true)
