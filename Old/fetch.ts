@@ -1,12 +1,13 @@
 import { Temporal } from "@js-temporal/polyfill"
 import googtrans from "@vitalets/google-translate-api"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionType, ApplicationCommandType, AutocompleteInteraction, ChatInputCommandInteraction, ComponentType, SelectMenuInteraction } from "discord.js"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionType, ApplicationCommandType, AutocompleteInteraction,
+	ChatInputCommandInteraction, ComponentType, SelectMenuInteraction } from "discord.js"
 import { existsSync, readFileSync, writeFile, writeFileSync } from "fs"
 import Fuse from "fuse.js"
 import { getLyrics } from "genius-lyrics-api"
 import wikipedia from "wikipedia"
-import { capitalize, colors, emojis, handleError, pickFromArray, TimeMetric } from "../Modules"
+import { capitalize, colors, emojis, handleError, pickArray, TimeMetric } from "../Modules"
 
 export const cmd = {
 	name: "fetch",
@@ -195,14 +196,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 									placeholder: "Related Articles (doesnt work yet)",
 									custom_id: "wikipedia-related",
 									options: [...related.map(page => {
-										return { label: page.title.replaceAll("_", " ").slice(0, 100), value: page.pageid.toString().slice(0, 100), description: page.description.slice(0, 100) }
+										return { label: page.title.replaceAll("_", " ").slice(0, 100), value: page.pageid.toString().slice(0, 100),
+											description: page.description.slice(0, 100) }
 									})].slice(0, 25),
 								}],
 							}], embeds: [{
 								title: summary.title.replaceAll("_", " "),
 								url: page.fullurl,
 								description: `**\`\`\`${summary.description}\`\`\`**\n${summary.extract}`,
-								color: parseInt(pickFromArray(colors), 16),
+								color: parseInt(pickArray(colors), 16),
 								thumbnail: { url: summary.thumbnail.source },
 							}] })
 						})
@@ -238,7 +240,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 							interaction.editReply({ embeds: [{
 								title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 99) + "…" : title,
-								color: parseInt(pickFromArray(colors), 16),
+								color: parseInt(pickArray(colors), 16),
 								description: lyrics || "No lyrics",
 								thumbnail: { url: data.song_art_image_url },
 								footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
@@ -250,12 +252,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 				}
 
 				case "translation": {
-					const [src, dst, txt] = [interaction.options.getString("from") || "auto", interaction.options.getString("to"), interaction.options.getString("text")] as string[]
+					const [src, dst, txt] = [interaction.options.getString("from") || "auto", interaction.options.getString("to"),
+						interaction.options.getString("text")] as string[]
 					googtrans(txt, { from: src, to: dst })
 						.then(result => {
 							interaction.editReply({ embeds: [{
 								title: "Translation",
-								color: parseInt(pickFromArray(colors), 16),
+								color: parseInt(pickArray(colors), 16),
 								fields: [
 									{ name: `From ${googtrans.languages[result.from.language.iso]}`, value: `${txt}` },
 									{ name: `To ${googtrans.languages[dst]}`, value: `${result.text}` },
@@ -277,7 +280,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 						: ["metric", "km", "˚C", "m/s"]
 					const isMetric = unit == "metric"
 
-					await axios.get(encodeURI("https://api.weatherapi.com/v1/forecast.json"), { params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" } })
+					await axios.get(encodeURI("https://api.weatherapi.com/v1/forecast.json"), {
+						params: { key: process.env.WeatherAPI, q: location, days: 1, aqi: "yes" },
+					})
 						.then((response: AxiosResponse) => {
 							const { data } = response
 							const { location: locData } = data
@@ -286,12 +291,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 							data.localTime = Temporal.Instant.fromEpochSeconds(locData.localtime_epoch)
 							data.deviceTime = Temporal.Instant.fromEpochSeconds(now.epochSeconds - now.toZonedDateTimeISO("UTC").second)
 							data.tz = Temporal.TimeZone.from(locData.tz_id).getOffsetNanosecondsFor(data.localTime) / TimeMetric.nano2hour
-							data.title = `${locData.name}${locData.region == "" ? "" : ` - ${locData.region}`} - ${locData.country} (UTC${data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""})`
+							data.title = `${locData.name}${locData.region == "" ? "" : ` - ${locData.region}`} - ${locData.country} (UTC${
+								data.tz != 0 ? ` ${data.tz > 0 ? "+" : ""}${data.tz}` : ""
+							})`
 
 							const base = Temporal.Instant.fromEpochSeconds(data.forecast.forecastday[0].date_epoch)
 							const discordTs: number[] = []
-							const aqiRatings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy", "Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
-							const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset, data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
+							const aqiRatings = [[null, "Good", "Moderate", "Unhealthy for Sensitive Group", "Unhealthy", "Very Unhealthy",
+								"Hazardous"], [null, "Low", "Moderate", "High", "Very High"]]
+							const times = [data.forecast.forecastday[0].astro.sunrise, data.forecast.forecastday[0].astro.sunset,
+								data.forecast.forecastday[0].astro.moonrise, data.forecast.forecastday[0].astro.moonset]
 
 							discordTs.push(...times.map((time: string, ind: number) => {
 								var hr = parseInt(time.slice(0, 2)) - data.tz
@@ -299,21 +308,32 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 								const mn = parseInt(time.slice(3, 5))
 								if (time.startsWith("0")) times[ind] = time.slice(1)
 
-								return Temporal.Instant.fromEpochSeconds(base.epochSeconds + hr * TimeMetric.sec2hour + mn * TimeMetric.sec2min).epochSeconds
+								return Temporal.Instant.fromEpochSeconds(base.epochSeconds + hr * TimeMetric.sec2hour + mn * TimeMetric.sec2min)
+									.epochSeconds
 							}))
 
 							const weatherEmbed = {
 								title: data.title,
-								color: parseInt(pickFromArray(colors), 16),
-								description: `Data Provided by ${emojis.WeatherAPI.shorthand} [WeatherAPI](https://www.weatherapi.com/)\`\`\`Weather • ${data.current.condition.text}\`\`\``,
+								color: parseInt(pickArray(colors), 16),
+								description: `Data Provided by ${
+									shorthand("WeatherAPI")
+								} [WeatherAPI](https://www.weatherapi.com/)\`\`\`Weather • ${data.current.condition.text}\`\`\``,
 								fields: [
 									{ name: "Temperature   ", value: `${isMetric ? data.current.temp_c : data.current.temp_f}${symbol}`, inline: true },
-									{ name: "Feels Like   ", value: `${isMetric ? data.current.feelslike_c : data.current.feelslike_f}${symbol}`, inline: true },
-									{ name: "Min/Max Temp", value: `${isMetric ? data.forecast.forecastday[0].day.mintemp_c : data.forecast.forecastday[0].day.mintemp_f}/${isMetric ? data.forecast.forecastday[0].day.maxtemp_c : data.forecase.forecaseday[0].day.maxtemp_f}${symbol}`, inline: true },
-									{ name: "Pressure", value: isMetric ? `${data.current.pressure_mb}hPa` : `${data.current.pressure_in}in`, inline: true },
+									{ name: "Feels Like   ", value: `${isMetric ? data.current.feelslike_c : data.current.feelslike_f}${symbol}`,
+										inline: true },
+									{ name: "Min/Max Temp",
+										value: `${isMetric ? data.forecast.forecastday[0].day.mintemp_c : data.forecast.forecastday[0].day.mintemp_f}/${
+											isMetric ? data.forecast.forecastday[0].day.maxtemp_c : data.forecase.forecaseday[0].day.maxtemp_f
+										}${symbol}`, inline: true },
+									{ name: "Pressure", value: isMetric ? `${data.current.pressure_mb}hPa` : `${data.current.pressure_in}in`,
+										inline: true },
 									{ name: "Humidity", value: `${data.current.humidity}%`, inline: true },
 									{ name: "Clouds", value: `${data.current.cloud}%`, inline: true },
-									{ name: "Wind", value: `${isMetric ? data.current.wind_kph : data.current.wind_mph}${speed} ${data.current.wind_degree}˚ ${data.current.wind_dir}`, inline: true },
+									{ name: "Wind",
+										value: `${
+											isMetric ? data.current.wind_kph : data.current.wind_mph
+										}${speed} ${data.current.wind_degree}˚ ${data.current.wind_dir}`, inline: true },
 									{ name: "Gust", value: `${isMetric ? data.current.gust_kph : data.current.gust_mph}${speed}`, inline: true },
 									{ name: "Visibility", value: `${isMetric ? data.current.vis_km : data.current.vis_miles}${dist}`, inline: true },
 									{ name: "Sunrise", value: `${times[0]}\n(<t:${discordTs[0]}:t> Here)`, inline: true },
@@ -321,7 +341,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 									{ name: "UV Index", value: `${data.current.uv}`, inline: true },
 									{ name: "Moonrise", value: `${times[2]}\n(<t:${discordTs[2]}:t> Here)`, inline: true },
 									{ name: "Moonset", value: `${times[3]}\n(<t:${discordTs[3]}:t> Here)`, inline: true },
-									{ name: "Moon Phase", value: `${data.forecast.forecastday[0].astro.moon_phase}\n${data.forecast.forecastday[0].astro.moon_illumination}% Illuminated`, inline: true },
+									{ name: "Moon Phase",
+										value: `${data.forecast.forecastday[0].astro.moon_phase}\n${
+											data.forecast.forecastday[0].astro.moon_illumination
+										}% Illuminated`, inline: true },
 								],
 								thumbnail: { url: `https:${data.current.condition.icon}` },
 								timestamp: Temporal.Now.instant().toString(),
@@ -329,7 +352,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 							if (["aq", "both"].includes(options as string)) {
 								weatherEmbed.fields.push(
-									{ name: "\u200b", value: `\`\`\`Air Quality\nUS - EPA Rating • ${aqiRatings[0][data.current.air_quality["us-epa-index"]]}\nUK Defra Rating • ${aqiRatings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk\`\`\``, inline: false },
+									{ name: "\u200b",
+										value: `\`\`\`Air Quality\nUS - EPA Rating • ${
+											aqiRatings[0][data.current.air_quality["us-epa-index"]]
+										}\nUK Defra Rating • ${aqiRatings[1][Math.ceil(data.current.air_quality["gb-defra-index"] / 3)]} Risk\`\`\``,
+										inline: false },
 									{ name: "CO", value: `${data.current.air_quality.co.toFixed(1)} μg/m³`, inline: true },
 									{ name: "O₃", value: `${data.current.air_quality.o3.toFixed(1)} μg/m³`, inline: true },
 									{ name: "NO₂", value: `${data.current.air_quality.no2.toFixed(1)} μg/m³`, inline: true },
@@ -342,7 +369,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 							interaction.editReply({ embeds: [weatherEmbed] })
 						})
 						.catch((err: AxiosError) => {
-							if (err.response?.data.error.code == 1006) return interaction.editReply({ content: `The location \`${err.config.params.q}\` was not found. Maybe check your spelling?` })
+							if (err.response?.data.error.code == 1006) {
+								return interaction.editReply({
+									content: `The location \`${err.config.params.q}\` was not found. Maybe check your spelling?`,
+								})
+							}
 							handleError(interaction, err, "Weather")
 						})
 					break
@@ -369,14 +400,15 @@ export async function selectMenu(interaction: SelectMenuInteraction) {
 						placeholder: "Related Articles (doesnt work yet)",
 						custom_id: "wikipedia-related",
 						options: [...related.map(page => {
-							return { label: page.title.replaceAll("_", " ").slice(0, 100), value: page.pageid.toString().slice(0, 100), description: page.description.slice(0, 100) }
+							return { label: page.title.replaceAll("_", " ").slice(0, 100), value: page.pageid.toString().slice(0, 100),
+								description: page.description.slice(0, 100) }
 						})].slice(0, 25),
 					}],
 				}], embeds: [{
 					title: summary.title.replaceAll("_", " "),
 					url: page.fullurl,
 					description: `**\`\`\`${summary.description}\`\`\`**\n${summary.extract}`,
-					color: parseInt(pickFromArray(colors), 16),
+					color: parseInt(pickArray(colors), 16),
 					thumbnail: { url: summary.thumbnail.source },
 				}] })
 			})
@@ -416,7 +448,9 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 							options.push(...response.data.response.hits.map((hit: { result: { title: any; artist_names: any; id: any } }) => {
 								let optName: string
 								return {
-									name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100 ? optName.slice(0, 99) + "…" : optName,
+									name: (optName = `${hit.result.title} - ${hit.result.artist_names}`).length > 100
+										? optName.slice(0, 99) + "…"
+										: optName,
 									value: `${hit.result.id}`,
 								}
 							}))
@@ -447,12 +481,16 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 				case "weather": {
 					if (current.length == 0) return interaction.respond([blankInitial])
 
-					await axios.get(encodeURI("https://api.weatherapi.com/v1/search.json"), { params: { key: process.env.WeatherAPI, q: current } })
+					await axios.get(encodeURI("https://api.weatherapi.com/v1/search.json"), {
+						params: { key: process.env.WeatherAPI, q: current },
+					})
 						.then((res: AxiosResponse) => {
 							if (res.data.length == 0) return interaction.respond([blankInitial])
-							const data: ApplicationCommandOptionChoice[] = res.data.map((option: { id: number; name: string; region: string; country: string; lat: number; lon: number; url: string }) => {
-								return { name: `${option.name}, ${option.country}`, value: `${option.name},${option.country}`.slice(0, 100) }
-							})
+							const data: ApplicationCommandOptionChoice[] = res.data.map(
+								(option: { id: number; name: string; region: string; country: string; lat: number; lon: number; url: string }) => {
+									return { name: `${option.name}, ${option.country}`, value: `${option.name},${option.country}`.slice(0, 100) }
+								},
+							)
 
 							const fuse = new Fuse(data, { distance: data.length, keys: ["name", "value"] })
 							response = [...fuse.search(current).map(option => option.item)]

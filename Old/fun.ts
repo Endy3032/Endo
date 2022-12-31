@@ -1,9 +1,11 @@
 import { Temporal } from "@js-temporal/polyfill"
 import axios from "axios"
 import { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from "discord-api-types/v10"
-import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, Embed, EmbedBuilder, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction, TextInputStyle } from "discord.js"
+import { ActionRow, ApplicationCommandOptionType, AutocompleteInteraction, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction,
+	ComponentType, Embed, EmbedBuilder, MessageActionRowComponent, MessageAttachment, ModalMessageModalSubmitInteraction,
+	TextInputStyle } from "discord.js"
 import Fuse from "fuse.js"
-import { colors, pickFromArray, randRange } from "../Modules"
+import { colors, pickArray, randRange } from "../Modules"
 
 // #region Canvas Related Stuff
 import fs from "fs"
@@ -38,9 +40,11 @@ function getMidY(ctx: CanvasRenderingContext2D, text: string, width: number, hei
 async function sendMeme(interaction: ChatInputCommandInteraction, canvas: Canvas, variant: string, text: string, separator: string) {
 	const attachment = new MessageAttachment(await canvas.png, "meme.png")
 	await interaction.editReply({ files: [attachment], embeds: [{
-		color: parseInt(pickFromArray(colors), 16),
+		color: parseInt(pickArray(colors), 16),
 		image: { url: "attachment://meme.png" },
-		footer: variant.includes("panik_kalm_panik") && text.split(separator).length < 3 ? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` } : null,
+		footer: variant.includes("panik_kalm_panik") && text.split(separator).length < 3
+			? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` }
+			: null,
 	}] as APIEmbed[] })
 }
 
@@ -141,8 +145,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 			const mode = interaction.options.getString("mode")
 			title += "Random Wordle"
 			answer = mode == "random"
-				? pickFromArray(wordle.allowed)
-				: pickFromArray(wordle.answers)
+				? pickArray(wordle.allowed)
+				: pickArray(wordle.answers)
 			break
 		}
 	}
@@ -180,9 +184,15 @@ export async function button(interaction: ButtonInteraction) {
 	if (interaction.customId.startsWith("wordle")) {
 		const embed = new EmbedBuilder((interaction.message.embeds[0] as Embed).data).toJSON()
 
-		if (!embed.title?.includes(interaction.user.tag)) return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })
+		if (!embed.title?.includes(interaction.user.tag)) {
+			return interaction.reply({ content: "You can't sabotage another player's Wordle session", ephemeral: true })
+		}
 		if (interaction.customId.endsWith("giveup")) {
-			return await interaction.update({ content: `**${interaction.user.tag} Gave Up!**\n**Answer:** ${interaction.customId.slice(7, 12)}`, components: [], embeds: [] })
+			return await interaction.update({
+				content: `**${interaction.user.tag} Gave Up!**\n**Answer:** ${interaction.customId.slice(7, 12)}`,
+				components: [],
+				embeds: [],
+			})
 		}
 
 		await interaction.showModal({
@@ -205,9 +215,12 @@ export async function button(interaction: ButtonInteraction) {
 }
 
 export async function modal(interaction: ModalMessageModalSubmitInteraction) {
-	const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(), (interaction.message?.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId?.slice(7, 12) as string]
+	const [guess, answer] = [interaction.fields.getTextInputValue("guess").toUpperCase(),
+		(interaction.message?.components as ActionRow<MessageActionRowComponent>[])[0].components[0].customId?.slice(7, 12) as string]
 	if (guess.length != 5) return interaction.reply({ content: "Invalid word length!", ephemeral: true })
-	if (!wordle.allowed.includes(guess.toLowerCase())) return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
+	if (!wordle.allowed.includes(guess.toLowerCase())) {
+		return interaction.reply({ content: `${guess} is not a valid word!`, ephemeral: true })
+	}
 
 	const [embed, ansArray] = [new EmbedBuilder((interaction.message?.embeds[0] as Embed).data).toJSON(), answer.split("")]
 	const { width, height, space, side, keyFont, tileFont, tileStartingX, tileStartingY, keyWidth, keyStartingY, keys } = wordle.canvas
