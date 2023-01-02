@@ -178,7 +178,7 @@ export const colors = [
 	0x000000,
 ]
 
-export const timezone = "Asia/Ho_Chi_Minh"
+export const timezone = "+00:00"
 
 export enum MessageFlags {
 	Crossposted = 1 << 0, // this message has been published to subscribed channels (via Channel Following)
@@ -217,15 +217,18 @@ export type Command = {
 	modal?: InteractionHandler
 }
 
-export const BotPermissions = Permissions.MANAGE_GUILD
+export const BotPerms = Permissions.MANAGE_GUILD
 	+ Permissions.MANAGE_ROLES
 	+ Permissions.MANAGE_CHANNELS
 	+ Permissions.KICK_MEMBERS
 	+ Permissions.BAN_MEMBERS
 	+ Permissions.MANAGE_WEBHOOKS
 	+ Permissions.VIEW_CHANNEL
+	+ Permissions.MODERATE_MEMBERS
 	+ Permissions.SEND_MESSAGES
 	+ Permissions.CREATE_PUBLIC_THREADS
+	+ Permissions.CREATE_PRIVATE_THREADS
+	+ Permissions.SEND_MESSAGES_IN_THREADS
 	+ Permissions.MANAGE_MESSAGES
 	+ Permissions.MANAGE_THREADS
 	+ Permissions.EMBED_LINKS

@@ -1,10 +1,10 @@
 import { rgb24 } from "colors"
 import { BitwisePermissionFlags, Bot, Interaction } from "discordeno"
 import { capitalize } from "./capitalize.ts"
+import { Nord } from "./constants.ts"
 import { shorthand } from "./emojis.ts"
 import { getCmdName, getSubcmd, getSubcmdGroup } from "./getInteractionData.ts"
 import { respond } from "./respondInteraction.ts"
-import { Nord } from "./types.ts"
 
 const permissions = Object.fromEntries(new Map(
 	Object.entries(BitwisePermissionFlags).filter(([key]) => !parseInt(key)).map(([k, v]) => [

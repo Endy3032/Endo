@@ -13,7 +13,9 @@ export function getCmdName(interaction: Interaction) {
 export function getSubcmd(interaction: Interaction) {
 	if (interaction.data?.options === undefined) return null
 
-	if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) return interaction.data.options?.[0].options?.[0].name
+	if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) {
+		return interaction.data.options?.[0].options?.[0].name
+	}
 
 	if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommand) return interaction.data.options[0].name
 }
@@ -42,17 +44,17 @@ const resolvedOptionTypeToKey: ResolvedOptions = {
 	Role: "roles",
 }
 
-const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel, ApplicationCommandOptionTypes.Role,
-	ApplicationCommandOptionTypes.User]
+const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel,
+	ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
 
-export function getValue(interaction: Interaction, name: string, type?: "String" | "Modal"): string | null
-export function getValue(interaction: Interaction, name: string, type?: "Boolean"): boolean | null
-export function getValue(interaction: Interaction, name: string, type?: "Integer" | "Number"): number | null
-export function getValue(interaction: Interaction, name: string, type?: "Role"): Role | null
-export function getValue(interaction: Interaction, name: string, type?: "Channel"): Channel | null
-export function getValue(interaction: Interaction, name: string, type?: "Attachment"): Attachment | null
-export function getValue(interaction: Interaction, name: string, type?: "Mentionable"): User | Channel | Role | null
-export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User; member?: Member } | null
+export function getValue(interaction: Interaction, name: string, type?: "String" | "Modal"): string | undefined
+export function getValue(interaction: Interaction, name: string, type?: "Boolean"): boolean | undefined
+export function getValue(interaction: Interaction, name: string, type?: "Integer" | "Number"): number | undefined
+export function getValue(interaction: Interaction, name: string, type?: "Role"): Role | undefined
+export function getValue(interaction: Interaction, name: string, type?: "Channel"): Channel | undefined
+export function getValue(interaction: Interaction, name: string, type?: "Attachment"): Attachment | undefined
+export function getValue(interaction: Interaction, name: string, type?: "Mentionable"): User | Channel | Role | undefined
+export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User; member?: Member } | undefined
 export function getValue(interaction: Interaction, name: string, type?: keyof typeof ApplicationCommandOptionTypes | "Modal") {
 	if (interaction.type === InteractionTypes.ModalSubmit) {
 		const modalData = interaction.data?.components?.map(component => component.components).flat()
@@ -60,29 +62,29 @@ export function getValue(interaction: Interaction, name: string, type?: keyof ty
 	}
 
 	const options = getOptions(interaction)
-	if (options === undefined) return null
+	if (options === undefined) return undefined
 
 	const option = options.find(option => {
 		let cond = option.name === name
 		if (type) cond = cond && option.type === ApplicationCommandOptionTypes[type]
 		return cond
 	})
-	if (option === undefined) return null
+	if (option === undefined) return undefined
 
 	if (type && needResolved.includes(ApplicationCommandOptionTypes[type]) || needResolved.includes(option.type)) {
 		const resolved = interaction.data?.resolved
-		if (resolved === undefined) return null
+		if (resolved === undefined) return undefined
 
 		const key = resolvedOptionTypeToKey[type || option.type]
 		const value = BigInt(option.value as string)
 		if (![type, option.type].includes(ApplicationCommandOptionTypes.User)) {
-			if (resolved[key] === undefined) return null
+			if (resolved[key] === undefined) return undefined
 			return resolved[key].get(value)
 		}
 
 		return {
-			user: resolved.users?.get(value) ?? null,
-			member: resolved.members?.get(value) ?? null,
+			user: resolved.users?.get(value) ?? undefined,
+			member: resolved.members?.get(value) ?? undefined,
 		}
 	}
 

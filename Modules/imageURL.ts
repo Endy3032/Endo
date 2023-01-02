@@ -5,7 +5,7 @@ type ID = string | number | BigInt | null | undefined
 type Options = { format: "png" | "json" | "webp" | "gif"; size: Size }
 type Endpoints = "avatars" | "banners" | "icons" | "splashes" | "discovery-splashes" | "role-icons"
 
-export const imageURL = (targetID: ID, hash: ID, endpoint: Endpoints, options: Options): string => {
+export const imageURL = (targetID: ID, hash: ID, endpoint: Endpoints, options?: Options): string => {
 	if (targetID === undefined || hash === undefined || targetID === null || hash === null) return ""
 
 	options = Object.assign({ format: "png", size: 1024 }, options)
