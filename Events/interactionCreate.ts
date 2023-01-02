@@ -1,7 +1,7 @@
-import { commands } from "/Commands/mod.ts"
 import { rgb24, stripColor } from "colors"
 import { Bot, Embed, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
-import { BrightNord, Command, emojis, getCmdName, getSubcmd, getSubcmdGroup, imageURL, respond, toTimestamp } from "modules"
+import { BrightNord, Command, emojis, getCmdName, getSubcmd, getSubcmdGroup, imageURL, respond, shorthand, toTimestamp } from "modules"
+import { commands } from "~/Commands/mod.ts"
 
 const testGuildID = Deno.env.get("TestGuild")
 const testGuildChannel = Deno.env.get("TestChannel")
@@ -21,7 +21,10 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 		const guild = interaction.guildId ? await bot.helpers.getGuild(interaction.guildId) : null
 		const guildName = guild?.name ?? null
 		const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
-		const invoker = rgb24(`[${interaction.user.username}#${interaction.user.discriminator} | ${guildName ? `${guildName} #${channelName}` : "DM"}] `, BrightNord.cyan)
+		const invoker = rgb24(
+			`[${interaction.user.username}#${interaction.user.discriminator} | ${guildName ? `${guildName} #${channelName}` : "DM"}] `,
+			BrightNord.cyan,
+		)
 
 		const interactionLog = interaction.type == InteractionTypes.ApplicationCommand
 			? `Triggered ${rgb24(`/${[commandName, group, subcmd].join(" ").replaceAll("  ", " ")}`, BrightNord.cyan)}`
@@ -36,8 +39,11 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 		const discordTimestamp = toTimestamp(interaction.id)
 
 		const embed: Embed = {
-			description: stripColor(`<t:${discordTimestamp}:T> <t:${discordTimestamp}:d> [${discordTimestamp}]\n**Interaction** • ${interactionLog}`),
-			author: { name: `${interaction.user.username}#${interaction.user.discriminator}`, iconUrl: imageURL(interaction.user.id, interaction.user.avatar, "avatars") },
+			description: stripColor(
+				`<t:${discordTimestamp}:T> <t:${discordTimestamp}:d> [${discordTimestamp}]\n**Interaction** • ${interactionLog}`,
+			),
+			author: { name: `${interaction.user.username}#${interaction.user.discriminator}`,
+				iconUrl: imageURL(interaction.user.id, interaction.user.avatar, "avatars") },
 			footer: { text: guildName ? `${guildName} #${channelName}` : "**DM**", iconUrl: imageURL(guild?.id, guild?.icon, "icons") },
 			timestamp: Number(discordTimestamp),
 		}
@@ -47,15 +53,15 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 
 	const command = commands.get(commandName ?? "null") as Command
 
-	const [exec, type] = interaction.type == InteractionTypes.ApplicationCommand
+	const [exec, type] = interaction.type === InteractionTypes.ApplicationCommand
 		? [command?.execute ?? undefined, "Command"]
-		: interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.Button
+		: interaction.type === InteractionTypes.MessageComponent && interaction.data?.componentType === MessageComponentTypes.Button
 		? [command?.button ?? undefined, "Button"]
-		: interaction.type == InteractionTypes.MessageComponent && interaction.data?.componentType == MessageComponentTypes.SelectMenu
+		: interaction.type === InteractionTypes.MessageComponent && interaction.data?.componentType === MessageComponentTypes.SelectMenu
 		? [command?.select ?? undefined, "Select Menu"]
-		: interaction.type == InteractionTypes.ModalSubmit
+		: interaction.type === InteractionTypes.ModalSubmit
 		? [command?.modal ?? undefined, "Modal"]
-		: interaction.type == InteractionTypes.ApplicationCommandAutocomplete
+		: interaction.type === InteractionTypes.ApplicationCommandAutocomplete
 		? [command?.autocomplete ?? undefined, "Autocomplete"]
 		: [console.log, "Unknown"]
 
@@ -63,10 +69,10 @@ export const execute = async (bot: Bot, interaction: Interaction) => {
 		try {
 			await exec(bot, interaction)
 		} catch (e) {
-			console.botLog(e, "ERROR")
+			console.botLog(e, { logLevel: "ERROR" })
 		}
 	} else {
-		console.botLog(`No ${type} function found for [${commandName}]`, "ERROR")
-		await respond(bot, interaction, `${emojis.error.shorthand} Something failed back here...`, true)
+		console.botLog(`No ${type} function found for [${commandName}]`, { logLevel: "ERROR" })
+		await respond(bot, interaction, `${shorthand("error")} Something failed back here...`, true)
 	}
 }
