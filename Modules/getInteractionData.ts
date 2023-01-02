@@ -1,3 +1,4 @@
+// TODO Fix file for api changes
 import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, InteractionTypes, Member, Role, User } from "discordeno"
 
 export function getCmdName(interaction: Interaction) {

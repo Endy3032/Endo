@@ -725,7 +725,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 					break
 				}
 
-				// TODO: Implement Polls
+				// TODO Implement Polls
 				case "poll": {
 					const placeholders = [
 						["Do you like pineapples on pizza?", "Yes", "No", "Why even?", "What the heck is a pineapple pizza"],
@@ -761,7 +761,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 					break
 				}
 
-				// TODO: Implement Message builder
+				// TODO Implement Message builder
 				case "send": {
 					if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 					if (!interaction.channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
