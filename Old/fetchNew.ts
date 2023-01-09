@@ -1,8 +1,7 @@
 import axiod from "axiod"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, ApplicationCommandTypes, Bot, Interaction } from "discordeno"
 import Fuse from "fuse"
-import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickFromArray,
-	respond } from "modules"
+import { capitalize, colors, defer, edit, emojis, getFocused, getSubcmd, getSubcmdGroup, getValue, pickArray, respond } from "modules"
 import { Temporal } from "temporal"
 import * as urban from "urban"
 
@@ -253,7 +252,7 @@ export const cmd = {
 	],
 }
 
-export async function execute(bot: Bot, interaction: Interaction) {
+export async function main(bot: Bot, interaction: Interaction) {
 	await defer(bot, interaction)
 	switch (getSubcmdGroup(interaction)) {
 		case "facts": {
@@ -333,7 +332,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 				}
 
 				case "useless": {
-					switch (pickFromArray(["pl", "sk"])) {
+					switch (pickArray(["pl", "sk"])) {
 						case "pl": {
 							const { data } = await axiod.get("https://useless-facts.sameerkumar.website/api")
 							;[fact, source, url] = [data.data, "sameerkumar18", "https://github.com/sameerkumar18/useless-facts-api"]
@@ -354,8 +353,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 				embeds: [{
 					title: `${capitalize(getSubcmd(interaction) ?? "")} Fact`,
 					author: source ? { name: `Source: ${source}`, url, iconUrl: iconUrl ?? "https://github.com/fluidicon.png" } : undefined,
-					color: pickFromArray(colors),
-					description: typeof fact === "string" ? fact : pickFromArray(fact),
+					color: pickArray(colors),
+					description: typeof fact === "string" ? fact : pickArray(fact),
 				}],
 			})
 			break
@@ -408,7 +407,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 									edit(bot, interaction, {
 										embeds: [{
 											title: `${data[0].word} - ${phonetics ?? "//"}`,
-											color: pickFromArray(colors),
+											color: pickArray(colors),
 											description: desc,
 											footer: { text: "Source: DictionaryAPI.dev & Wiktionary" },
 										}],
@@ -436,7 +435,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 										embeds: [{
 											title: word,
 											url: result.permalink,
-											color: pickFromArray(colors),
+											color: pickArray(colors),
 											description,
 											author: { name: `Urban Dictionary - ${result.author}` },
 											footer: { text: `Definition ID • ${result.defid} | Written on` },

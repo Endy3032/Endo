@@ -1,5 +1,9 @@
+# Files
+._*
 .env
 *.log
 .DS_Store
 Resources/**/*.json
+
+# Folders
 Local

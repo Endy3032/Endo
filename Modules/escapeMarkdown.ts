@@ -1,6 +1,6 @@
 // Source https://github.com/discordjs/discord.js/blob/main/packages/discord.js/src/util/Util.js#L75
-export const escapeMarkdown = (text: string) =>
-	text
+export function escapeMarkdown(text: string) {
+	return text
 		// Codeblocks
 		.replaceAll("`", "\\`")
 		// Bold, Italic & Underline
@@ -20,3 +20,4 @@ export const escapeMarkdown = (text: string) =>
 		.replaceAll(/\[.+\]\(.+\)/gm, "\\$&")
 		// Timestamp
 		.replaceAll("<t:", "\\<t:")
+}

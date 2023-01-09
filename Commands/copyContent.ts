@@ -6,7 +6,7 @@ export const cmd: CreateContextApplicationCommand = {
 	type: ApplicationCommandTypes.Message,
 }
 
-export async function execute(bot: Bot, interaction: Interaction) {
+export async function main(bot: Bot, interaction: Interaction) {
 	const message = interaction.data?.resolved?.messages?.array()[0]
 
 	const attachments = message?.attachments.map(attachment => attachment.proxyUrl) ?? []

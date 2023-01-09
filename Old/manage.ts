@@ -1,6 +1,8 @@
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles, ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, MessageComponentTypes, ModifyGuildChannelPositions, TextStyles, VoiceRegions } from "discordeno"
-import { capitalize, checkPermission, defer, edit, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond } from "modules"
-import * as otpauth from "otpauth"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles,
+	ChannelTypes, CreateApplicationCommand, CreateGuildChannel, Interaction, MessageComponentTypes, ModifyGuildChannelPositions,
+	TextStyles, VoiceRegions } from "discordeno"
+import { capitalize, checkPermission, defer, emojis, error, getSubcmd, getSubcmdGroup, getValue, respond, shorthand } from "modules"
+import { TOTP } from "otpauth"
 
 export const cmd: CreateApplicationCommand = {
 	name: "manage",
@@ -337,31 +339,48 @@ export const cmd: CreateApplicationCommand = {
 	],
 }
 
-const otp = new otpauth.TOTP({
-	issuer: "Endy3032",
-	label: "EndyBotOTP",
+const otp = new TOTP({
 	algorithm: "SHA1",
 	digits: 8,
 	period: 30,
 	secret: Deno.env.get("OTP"),
 })
 
-export async function execute(bot: Bot, interaction: Interaction) {
-	if (!interaction.guildId) return respond(bot, interaction, `${emojis.warn.shorthand} This command can only be used in servers.`, true)
+export async function main(bot: Bot, interaction: Interaction) {
+	if (!interaction.guildId) return respond(bot, interaction, `${shorthand("warn")} This command can only be used in servers.`, true)
 
 	switch (getSubcmdGroup(interaction)) {
 		case "check": {
 			switch (getSubcmd(interaction)) {
 				case "position": {
-					const channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort((a, b) => (a.position ?? 0) > (b.position ?? 1) ? 1 : -1)
+					const channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort((a, b) =>
+						(a.position ?? 0) > (b.position ?? 1) ? 1 : -1
+					)
 
 					await respond(bot, interaction, {
 						embeds: [{
 							title: "Channels Position",
 							fields: [
-								{ name: "Categories", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildCategory).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
-								{ name: "Text Channels", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildText).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
-								{ name: "Voice Channels", value: `${channels.filter(channel => channel.type == ChannelTypes.GuildVoice).map(channel => `<#${channel.id}> ${channel.position}`).join("\n")}`, inline: false },
+								{ name: "Categories",
+									value: `${
+										channels.filter(channel => channel.type == ChannelTypes.GuildCategory).map(channel =>
+											`<#${channel.id}> ${channel.position}`
+										).join(
+											"\n",
+										)
+									}`, inline: false },
+								{ name: "Text Channels",
+									value: `${
+										channels.filter(channel => channel.type == ChannelTypes.GuildText).map(channel =>
+											`<#${channel.id}> ${channel.position}`
+										).join("\n")
+									}`, inline: false },
+								{ name: "Voice Channels",
+									value: `${
+										channels.filter(channel => channel.type == ChannelTypes.GuildVoice).map(channel =>
+											`<#${channel.id}> ${channel.position}`
+										).join("\n")
+									}`, inline: false },
 							],
 						}],
 					})
@@ -375,7 +394,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 			await defer(bot, interaction, true)
 			if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
 			const channelName = getValue(interaction, "name", "String") ?? "channel"
-			const reason = getValue(interaction, "reason", "String") ?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
+			const reason = getValue(interaction, "reason", "String")
+				?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
 			let parentId: bigint | undefined = undefined, position = 0
 			const options: CreateGuildChannel = { name: channelName }
 			const channels = await bot.helpers.getChannels(interaction.guildId)
@@ -446,11 +466,12 @@ export async function execute(bot: Bot, interaction: Interaction) {
 
 			await bot.helpers.createChannel(interaction.guildId, options, reason)
 				.then(async channel => {
-					await respond(bot, interaction, `${emojis.success.shorthand} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
+					await respond(bot, interaction, `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
 
 					const swapOptions: ModifyGuildChannelPositions[] = channels.filter(channel => channel.type == options.type)
 						.map(channel => {
-							return { id: channel.id.toString(), position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position }
+							return { id: channel.id.toString(),
+								position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position }
 						})
 
 					swapOptions.push({ id: channel.id.toString(), position: options.position ?? 0 })
@@ -465,7 +486,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 			switch (getSubcmd(interaction)) {
 				case "channel": {
 					const channel = getValue(interaction, "channel", "Channel")
-					const reason = getValue(interaction, "reason", "String") ?? `Deleted by ${interaction.user.username}#${interaction.user.discriminator}`
+					const reason = getValue(interaction, "reason", "String")
+						?? `Deleted by ${interaction.user.username}#${interaction.user.discriminator}`
 
 					await respond(bot, interaction, {
 						content: `Confirm to delete <#${channel?.id}> with the following reason: ${reason}`,
@@ -476,7 +498,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 								label: "Delete",
 								customId: `delete-channel-${channel?.id}`,
 								style: ButtonStyles.Danger,
-								emoji: { id: emojis.trash.id },
+								emoji: { id: emojis.trash },
 							}],
 						}],
 					}, true)
@@ -534,7 +556,8 @@ export async function execute(bot: Bot, interaction: Interaction) {
 					const amount = getValue(interaction, "amount", "Integer") ?? 0
 					const option = getValue(interaction, "option", "String")
 					const user = getValue(interaction, "user", "User")
-					const reason = getValue(interaction, "reason", "String") ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
+					const reason = getValue(interaction, "reason", "String")
+						?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 
 					let content = `Confirm to delete \`${amount}\` messages `
 					content += option && user
@@ -553,7 +576,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 								label: "Delete",
 								customId: `delete-messages-${amount}-${option}-${user?.user.id}`,
 								style: ButtonStyles.Danger,
-								emoji: { id: emojis.trash.id },
+								emoji: { id: emojis.trash },
 							}],
 						}],
 					}, true)
@@ -579,9 +602,10 @@ export async function button(bot: Bot, interaction: Interaction) {
 				case "channel": {
 					if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
 					const [, , channelID] = customID
-					const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
+					const reason = interaction.message?.content.split(": ")[1]
+						?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 					await bot.helpers.deleteChannel(BigInt(channelID), reason)
-						.then(() => respond(bot, interaction, { content: `${emojis.success.shorthand} Deleted the channel`, components: [] }))
+						.then(() => respond(bot, interaction, { content: `${shorthand("success")} Deleted the channel`, components: [] }))
 						.catch(err => error(bot, interaction, err, "Channel Deletion", true))
 					break
 				}
@@ -590,7 +614,8 @@ export async function button(bot: Bot, interaction: Interaction) {
 					if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
 					if (interaction.channelId === undefined) return respond(bot, interaction, "Cannot get current channel")
 					const [, , amount, option, user] = customID
-					const reason = interaction.message?.content.split(": ")[1] ?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
+					const reason = interaction.message?.content.split(": ")[1]
+						?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 
 					let clear = (await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) }))
 					if (option != "null" || user != "undefined") {
@@ -603,11 +628,11 @@ export async function button(bot: Bot, interaction: Interaction) {
 						})
 					}
 
-					if (clear.length < 1) return await respond(bot, interaction, `${emojis.warn.shorthand} Found no messages to purge`)
+					if (clear.length < 1) return await respond(bot, interaction, `${shorthand("warn")} Found no messages to purge`)
 					else {
 						await purge(bot, interaction.channelId, clear.map(msg => msg.id), reason)
 							.then(() => {
-								respond(bot, interaction, `${emojis.success.shorthand} Found and purged ${clear.length}/${amount} messages`)
+								respond(bot, interaction, `${shorthand("success")} Found and purged ${clear.length}/${amount} messages`)
 								console.botLog(`Found and purged ${clear.length}/${amount} messages`)
 							})
 							.catch(err => error(bot, interaction, err, "Message Purge", true))
@@ -642,7 +667,9 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 	const custom = transformRegion(choices, "custom")
 	const abnormal = [...optimal, ...deprecated, ...custom]
 
-	await respond(bot, interaction, { choices: [...optimal, ...custom, ...choices.filter(choice => !abnormal.includes(choice)), ...deprecated] })
+	await respond(bot, interaction, {
+		choices: [...optimal, ...custom, ...choices.filter(choice => !abnormal.includes(choice)), ...deprecated],
+	})
 }
 
 export async function modal(bot: Bot, interaction: Interaction) {
@@ -654,10 +681,12 @@ export async function modal(bot: Bot, interaction: Interaction) {
 
 	try {
 		let output = Deno.inspect(await eval(code?.replaceAll("await ", "") ?? ""), { compact: false })
-		for (const brack of ["()", "[]", "{}"]) output = output.replaceAll(new RegExp(`(\\${brack.charAt(0)}\\n\\s+\\${brack.charAt(1)},)`, "gm"), `${brack},`)
+		for (const brack of ["()", "[]", "{}"]) {
+			output = output.replaceAll(new RegExp(`(\\${brack.charAt(0)}\\n\\s+\\${brack.charAt(1)},)`, "gm"), `${brack},`)
+		}
 		if (output !== undefined) response += `**Output**\n\`\`\`ts\n${output} [typeof ${capitalize(typeof output)}]\`\`\``
 	} catch (err) {
-		response += `**Error**\n\`\`\`ts\n${err.stack.replaceAll(Deno.cwd(), "EndyJS").replaceAll("    ", "  ")}\`\`\``
+		response += `**Error**\n\`\`\`ts\n${err.stack.replaceAll(Deno.cwd(), "Endo").replaceAll("    ", "  ")}\`\`\``
 	}
 
 	respond(bot, interaction, response)

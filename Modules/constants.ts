@@ -206,16 +206,19 @@ export interface LogOptions {
 	message?: CreateMessage
 }
 
-type InteractionHandler = (bot: Bot, interaction: Interaction) => Promise<void>
+export type BotLog = (content: any, options?: LogOptions) => Promise<void>
 
-export type Command = {
-	cmd: CreateApplicationCommand
-	execute?: InteractionHandler
+export type InteractionHandler = (bot: Bot, interaction: Interaction) => Promise<void>
+
+export type CommandHandler = {
+	main?: InteractionHandler
 	button?: InteractionHandler
 	select?: InteractionHandler
 	autocomplete?: InteractionHandler
 	modal?: InteractionHandler
 }
+
+export type Command = CommandHandler & { cmd: CreateApplicationCommand }
 
 export const BotPerms = Permissions.MANAGE_GUILD
 	+ Permissions.MANAGE_ROLES

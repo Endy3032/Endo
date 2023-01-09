@@ -1,7 +1,7 @@
-import { LogOptions } from "modules"
+import { BotLog } from "modules"
 
 declare global {
 	interface Console {
-		botLog: (content: any, options?: LogOptions) => Promise<void>
+		botLog: BotLog
 	}
 }

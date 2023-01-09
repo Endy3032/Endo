@@ -5,7 +5,7 @@ import { EventHandlers, getGlobalApplicationCommands, getGuildApplicationCommand
 import { activities, BrightNord, Nord, TimeMetric } from "modules"
 
 export const name: keyof EventHandlers = "ready"
-export const execute: EventHandlers["ready"] = async (bot, payload) => {
+export const main: EventHandlers["ready"] = async (bot, payload) => {
 	console.botLog(
 		`As ${payload.user.username}#${payload.user.discriminator} [v${payload.v} | ${bot.gateway.gatewayBot.sessionStartLimit.remaining} Remaining | ${
 			Deno.build.vendor === "unknown" ? "Replit" : "Local"

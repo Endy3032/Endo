@@ -17,9 +17,8 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 
 	if (ephemeral) data.flags = MessageFlags.Ephemeral
 
-	return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data }).catch(err =>
-		console.botLog(err, { logLevel: "ERROR" })
-	)
+	return await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data })
+		.catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
 export async function edit(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string) {

@@ -83,8 +83,8 @@ const activity = activities()
 bot.gateway.manager.createShardOptions.makePresence = () => activity
 
 for await (const file of getFiles("./Events")) {
-	const { name, execute } = await import(`./Events/${file}`)
-	bot.events[name as keyof EventHandlers] = execute
+	const { name, main } = await import(`./Events/${file}`)
+	bot.events[name as keyof EventHandlers] = main
 }
 
 console.clear()

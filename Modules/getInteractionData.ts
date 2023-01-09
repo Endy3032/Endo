@@ -2,13 +2,13 @@
 import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, InteractionTypes, Member, Role, User } from "discordeno"
 
 export function getCmdName(interaction: Interaction) {
-	return [InteractionTypes.ApplicationCommand, InteractionTypes.ApplicationCommandAutocomplete].includes(interaction.type)
-		? interaction.data?.name.replace(/^(\[.\]) /, "")
-		: interaction.type === InteractionTypes.MessageComponent
-		? interaction.message?.interaction?.name
-		: interaction.type === InteractionTypes.ModalSubmit
-		? interaction.data?.customId?.split("_")[0]
-		: "null"
+	if (
+		interaction.type === InteractionTypes.ApplicationCommand
+		|| interaction.type === InteractionTypes.ApplicationCommandAutocomplete
+	) return interaction.data?.name.replace(/^(\[.\]) /, "") ?? ""
+	else if (interaction.type === InteractionTypes.MessageComponent) return interaction.message?.interaction?.name ?? ""
+	else if (interaction.type === InteractionTypes.ModalSubmit) return interaction.data?.customId?.split("_")[0] ?? ""
+	else return "null"
 }
 
 export function getSubcmd(interaction: Interaction) {

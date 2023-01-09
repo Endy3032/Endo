@@ -381,7 +381,7 @@ export const cmd: CreateApplicationCommand = {
 	],
 }
 
-export async function execute(bot: Bot, interaction: Interaction) {
+export async function main(bot: Bot, interaction: Interaction) {
 	switch (getSubcmdGroup(interaction)) {
 		case "color": {
 			let color: Color
@@ -487,7 +487,7 @@ export async function execute(bot: Bot, interaction: Interaction) {
 					const memory = Deno.memoryUsage()
 
 					await respond(bot, interaction, { embeds: [{
-						title: `${app.name} Info`,
+						author: { name: `About @${app.name}` },
 						color: pickArray(colors),
 						description: app.description,
 						fields: [
@@ -510,11 +510,13 @@ export async function execute(bot: Bot, interaction: Interaction) {
 								inline: true,
 							},
 						],
-						thumbnail: { url: imageURL(bot.id, app.icon, "icons") },
+						thumbnail: { url: imageURL(bot.id, app.icon, "avatars") },
 					}] })
+					console.log(imageURL(bot.id, app.icon, "avatars"))
 					break
 				}
 
+				// TODO human readable type instead of type number
 				case "channel": {
 					if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 					if (!interaction.channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)

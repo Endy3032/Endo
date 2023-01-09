@@ -6,7 +6,7 @@ export const cmd: CreateContextApplicationCommand = {
 	type: ApplicationCommandTypes.Message,
 }
 
-export async function execute(bot: Bot, interaction: Interaction) {
+export async function main(bot: Bot, interaction: Interaction) {
 	if (interaction.guildId) return await respond(bot, interaction, `${shorthand("warn")} This command can only be used in my DM.`, true)
 
 	const message = interaction.data?.resolved?.messages?.array()[0]

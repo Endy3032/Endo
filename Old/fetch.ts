@@ -177,7 +177,7 @@ export const cmd = {
 	],
 }
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export async function main(interaction: ChatInputCommandInteraction) {
 	await interaction.deferReply()
 	switch (interaction.options.getSubcommandGroup()) {
 		case "wikipedia": {

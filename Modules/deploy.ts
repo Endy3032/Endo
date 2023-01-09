@@ -3,7 +3,7 @@ import { getFiles } from "modules"
 
 const testGuild = Deno.env.get("TestGuild")
 
-const replaceDescription = (cmd: CreateApplicationCommand, tag: string) => {
+function replaceDescription(cmd: CreateApplicationCommand, tag: string) {
 	if (cmd.type && cmd.type !== ApplicationCommandTypes.ChatInput) {
 		cmd.name = `[${tag.charAt(0)}] ${cmd.name}`
 		return cmd
@@ -17,9 +17,9 @@ const replaceDescription = (cmd: CreateApplicationCommand, tag: string) => {
 	return cmd
 }
 
-export const deploy = async (bot: Bot, args: string[]) => {
+export async function deploy(bot: Bot, args: string[]) {
 	if (args.includes("guilds")) {
-		const guildFolders = getFiles("./Commands/Guilds", "folders")
+		const guildFolders = getFiles("./Commands/Guilds", { fileTypes: "folders" })
 
 		for await (const guildID of guildFolders) {
 			const { commands } = await import(`~/Commands/Guilds/${guildID}/mod.ts`)

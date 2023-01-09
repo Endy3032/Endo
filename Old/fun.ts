@@ -125,7 +125,7 @@ export const cmd = {
 	],
 }
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export async function main(interaction: ChatInputCommandInteraction) {
 	let title = `${interaction.user.tag} | `
 	let answer: string | undefined
 

@@ -9,4 +9,4 @@ export const emojis: { [key in emojiName]: bigint } = {
 	WeatherAPI: 932557801153241088n,
 }
 
-export const shorthand = (name: emojiName): `<:${emojiName}:${string}>` => `<:${name}:${emojis[name]}>`
+export const shorthand = (name: emojiName) => `<:${name}:${emojis[name]}>`
