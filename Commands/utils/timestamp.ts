@@ -102,5 +102,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 		**Milliseconds** • ${finalDate.epochMilliseconds}
 		**Discord Epoch** • ${finalDate.epochSeconds}
 		**Timestamp Styles Table** • Format timestamp with \`<t:Discord Epoch:Style>\``,
+		file: { name: "timestampStyles", blob: Blob },
 	}, true)
 }

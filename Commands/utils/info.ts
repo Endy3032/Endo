@@ -70,16 +70,19 @@ export async function main(bot: Bot, interaction: Interaction) {
 						value: `[Link](${inviteLink})`,
 						inline: true,
 					},
-					{ name: "Creation Date", value: `<t:${timestamp}:f>\n<t:${timestamp}:R>`, inline: true },
+					{ name: "Created", value: `<t:${timestamp}:R>`, inline: true },
 					{
-						name: "Version Info",
-						value:
-							`Deno ${dnVer.deno}\nV8 ${dnVer.v8}\nTypeScript ${dnVer.typescript}\nDiscordeno [${ddVer}](https://deno.land/x/discordeno@${ddVer}/mod.ts)`,
+						name: "Runtime Info",
+						value: stripIndents`**Deno** • [${dnVer.deno}](https://deno.land/x/deno@v${dnVer.deno})
+							V8 • [${dnVer.v8}](https://github.com/v8/v8/releases/tag/${dnVer.v8})
+							TypeScript • [${dnVer.typescript}](https://github.com/microsoft/TypeScript/releases/tag/${dnVer.typescript})
+							Discordeno • [${ddVer}](https://deno.land/x/discordeno@${ddVer}/mod.ts)`,
 						inline: true,
 					},
 					{
 						name: "Memory Usage",
-						value: `**RSS** • ${format(memory.rss)}\n**Heap** • ${format(memory.heapUsed)}/${format(memory.heapTotal)}`,
+						value: stripIndents`**RSS** • ${format(memory.rss)}
+							**Heap** • ${format(memory.heapUsed)}/${format(memory.heapTotal)}`,
 						inline: true,
 					},
 				],
@@ -152,18 +155,18 @@ export async function main(bot: Bot, interaction: Interaction) {
 						{
 							name: "General Info",
 							value: stripIndents`~${guild.approximateMemberCount} Members
-																			${guild.roles.size} Roles
-																			${guild.emojis.size} Emojis
-																			┣ ${emojis.filter(e => !e.toggles.animated).size} static
-																			╰ ${emojis.filter(e => e.toggles.animated).size} animated`,
+								${guild.roles.size} Roles
+								${guild.emojis.size} Emojis
+								┣ ${emojis.filter(e => !e.toggles.animated).size} static
+								╰ ${emojis.filter(e => e.toggles.animated).size} animated`,
 							inline: true,
 						},
 						{
 							name: "Channels Count",
 							value: stripIndents`${channels.filter(c => c.type === ChannelTypes.GuildCategory).size} Categories
-																			${channels.filter(c => c.type === ChannelTypes.GuildText).size} Text
-																			${channels.filter(c => c.type === ChannelTypes.GuildVoice).size} Voice
-																			${channels.filter(c => c.type === ChannelTypes.GuildStageVoice).size} Stages`,
+								${channels.filter(c => c.type === ChannelTypes.GuildText).size} Text
+								${channels.filter(c => c.type === ChannelTypes.GuildVoice).size} Voice
+								${channels.filter(c => c.type === ChannelTypes.GuildStageVoice).size} Stages`,
 							inline: true,
 						},
 					],

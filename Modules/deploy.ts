@@ -19,6 +19,7 @@ function replaceDescription(cmd: CreateApplicationCommand, tag: string) {
 
 export async function deploy(bot: Bot, args: string[]) {
 	if (args.includes("guilds")) {
+		// TODO Finalize this later
 		const guildFolders = getFiles("./Commands/Guilds", { fileTypes: "folders" })
 
 		for await (const guildID of guildFolders) {
@@ -30,17 +31,17 @@ export async function deploy(bot: Bot, args: string[]) {
 	}
 
 	if (args.some(arg => ["global", "test"].includes(arg))) {
-		const { commands } = await import("~/Commands/mod.ts")
-		const botCommands: CreateApplicationCommand[] = commands.map(command => command.cmd)
+		const { commands } = await import("../Commands/mod.ts")
 
 		if (args.includes("global")) {
-			bot.helpers.upsertGlobalApplicationCommands(botCommands)
+			bot.helpers.upsertGlobalApplicationCommands(commands)
 				.then(deployed => console.botLog(`${deployed.size} commands`, { tag: "GlobalDeploy", noSend: true }))
 		}
 
 		if (args.includes("test")) {
-			if (testGuild === undefined) return console.botLog("Dev Guild ID Not Provided", { tag: "DevDeploy", noSend: true })
-			const testCommands = botCommands.map(command => replaceDescription(command, "DEV"))
+			if (!testGuild) return console.botLog("Dev Guild ID Not Provided", { tag: "DevDeploy", noSend: true })
+			const testCommands = commands.map(command => replaceDescription(command, "DEV"))
+
 			bot.helpers.upsertGuildApplicationCommands(BigInt(testGuild), testCommands)
 				.then(deployed => console.botLog(`${deployed.size} commands`, { tag: "DevDeploy", noSend: true }))
 		}

@@ -1,14 +1,15 @@
+import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
 import { evaluate } from "mathjs"
 import { colors, escapeMarkdown, getValue, pickArray, respond } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "calculate",
-	description: "Calculate an expression and return the result",
+	description: "Get the result of a mathematical expression",
 	type: ApplicationCommandOptionTypes.SubCommand,
 	options: [{
 		name: "expression",
-		description: "The expression to calculate [String]",
+		description: "The expression [String]",
 		type: ApplicationCommandOptionTypes.String,
 		required: true,
 	}],
@@ -16,19 +17,20 @@ export const cmd: ApplicationCommandOption = {
 
 export async function main(bot: Bot, interaction: Interaction) {
 	const expression = getValue(interaction, "expression", "String") ?? ""
-	const symbols = ["π", "τ"]
-	const symvals = [Math.PI, Math.PI * 2]
 
-	const scope = new Map(symbols.map((v, i) => [v, symvals[i]]))
+	const scope = {
+		π: Math.PI,
+		τ: Math.PI * 2,
+		e: Math.E,
+	}
 
 	try {
 		let result = evaluate(expression, scope)
 		if (typeof result === "number") result = result.toString()
-		if (typeof result === "object") result = result.entries.join("; ")
+		else if (typeof result === "object") result = result.entries.join("; ")
 
 		await respond(bot, interaction, {
 			embeds: [{
-				title: "Calculation",
 				color: pickArray(colors),
 				fields: [
 					{ name: "Expression", value: `${escapeMarkdown(expression)}`, inline: false },
@@ -36,15 +38,9 @@ export async function main(bot: Bot, interaction: Interaction) {
 				],
 			}],
 		})
-	} catch (err) {
-		console.botLog(err, { logLevel: "ERROR" })
-		await respond(
-			bot,
-			interaction,
-			`Cannot evaluate \`${expression}\`\n\`\`\`${err}\`\`\`${
-				String(err).includes("Undefined symbol") ? "You may want to declare variables like `a = 9; a * 7` => 63" : ""
-			}`,
-			true,
-		)
+	} catch (e) {
+		console.botLog(e, { logLevel: "ERROR" })
+		await respond(bot, interaction, stripIndents`Cannot evaluate \`${expression}\` - \`${e.message}\`
+			${e.message.includes("Undefined symbol") ? "Declare variables by writing `a = 1; a + 1` => 2" : ""}`, true)
 	}
 }

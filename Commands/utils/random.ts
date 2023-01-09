@@ -70,6 +70,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 		title: mode === "coin" ? "Coin flip" : mode === "dice" ? "Dice roll" : "Random numbers",
 		description: "",
 	}
+
 	let choices: (string | number)[] = []
 	const results: (string | number)[] = []
 

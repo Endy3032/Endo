@@ -12,7 +12,7 @@ export async function createCommand(name: string, description: string, importMet
 
 	const dir = dirname(fromFileUrl(importMeta.url))
 	for await (const file of getFiles(dir)) {
-		const { cmd: option } = await import(join(dir, file))
+		const { cmd: option } = await import(`file://${join(dir, file)}`)
 		cmd.options?.push(option)
 	}
 
