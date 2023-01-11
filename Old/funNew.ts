@@ -190,7 +190,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 					await respond(bot, interaction, {
 						embeds: [{
 							title: "Magic 8-Ball",
-							color: parseInt(pickArray(colors), 16),
+							color: pickArray(colors),
 							fields: [
 								{ name: ":question: Question", value: question, inline: false },
 								{ name: ":8ball: Response", value: response, inline: false },
@@ -208,7 +208,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 					await respond(bot, interaction, {
 						embeds: [{
-							color: parseInt(pickArray(colors), 16),
+							color: pickArray(colors),
 							image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` },
 						}],
 					})

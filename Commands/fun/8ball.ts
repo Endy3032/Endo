@@ -1,5 +1,5 @@
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
-import { colors, getValue, pickArray, respond } from "modules"
+import { colors, defer, edit, getValue, pickArray, respond } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "8ball",
@@ -51,10 +51,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 		? pickArray(responses.no)
 		: pickArray(responses[Object.keys(responses)[index]])
 
-	await respond(bot, interaction, {
+	respond(bot, interaction, {
 		embeds: [{
 			title: "Magic 8-Ball",
-			color: parseInt(pickArray(colors), 16),
+			color: pickArray(colors),
 			fields: [
 				{ name: ":question: Question", value: question, inline: false },
 				{ name: ":8ball: Response", value: response, inline: false },

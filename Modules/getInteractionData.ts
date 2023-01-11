@@ -12,17 +12,17 @@ export function getCmdName(interaction: Interaction) {
 }
 
 export function getSubcmd(interaction: Interaction) {
-	if (interaction.data?.options === undefined) return null
+	if (!interaction.data?.options) return undefined
 
 	if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) {
 		return interaction.data.options?.[0].options?.[0].name
+	} else if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommand) {
+		return interaction.data.options[0].name
 	}
-
-	if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommand) return interaction.data.options[0].name
 }
 
 export function getSubcmdGroup(interaction: Interaction) {
-	if (interaction.data?.options === undefined) return null
+	if (interaction.data?.options === undefined) return undefined
 
 	if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) return interaction.data.options[0].name
 }

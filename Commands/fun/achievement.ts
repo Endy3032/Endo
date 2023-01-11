@@ -37,7 +37,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await respond(bot, interaction, {
 		embeds: [{
-			color: parseInt(pickArray(colors), 16),
+			color: pickArray(colors),
 			image: { url: `https://minecraftskinstealer.com/achievement/${icon}/${encodeURI(title)}/${encodeURI(content)}` },
 		}],
 	})

@@ -26,12 +26,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 				{
 					name: "WebSocket Latency",
 					value: noPing ? "Unavailable" : `${wsPing}ms${wsPing < 0 ? " (how did this happen)" : ""}`,
-					inline: false,
 				},
 				{
 					name: "Roundtrip Latency",
 					value: `${BigInt(original.timestamp) - toTimestamp(interaction.id, "ms")}ms`,
-					inline: false,
 				},
 			],
 		}],

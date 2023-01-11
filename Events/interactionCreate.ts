@@ -21,17 +21,15 @@ export async function main(bot: Bot, interaction: Interaction) {
 		const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
 		const invoker = `${interaction.user.username}#${interaction.user.discriminator}`
 
-		let log = rgb24(`[${
-			interaction.type === InteractionTypes.ApplicationCommand
-				? "Command"
-				: interaction.type === InteractionTypes.MessageComponent
-				? (interaction.data?.componentType == MessageComponentTypes.Button ? "Button" : "Select")
-				: interaction.type === InteractionTypes.ModalSubmit
-				? "Submit"
-				: "Unknown"
-		}] `, BrightNord.yellow)
+		const tag = interaction.type === InteractionTypes.ApplicationCommand
+			? "Command"
+			: interaction.type === InteractionTypes.MessageComponent
+			? (interaction.data?.componentType == MessageComponentTypes.Button ? "Button" : "Select")
+			: interaction.type === InteractionTypes.ModalSubmit
+			? "Submit"
+			: "Unknown"
 
-		log += rgb24(
+		let log = rgb24(
 			interaction.type == InteractionTypes.ApplicationCommand
 				? `/${[commandName, group, subcmd].join(" ").replace(/\s+/, " ")}`
 				: interaction.type == InteractionTypes.MessageComponent
@@ -57,8 +55,8 @@ export async function main(bot: Bot, interaction: Interaction) {
 			timestamp: Number(timestamp),
 		}
 
-		log += rgb24(`[${invoker} | ${guildName ? `${guildName} #${channelName}` : "DM"}]`, BrightNord.blue)
-		console.botLog(log, { logLevel: "INFO", embed })
+		log += rgb24(` [${invoker} | ${guildName ? `${guildName} #${channelName}` : "DM"}]`, BrightNord.blue)
+		console.botLog(log, { logLevel: "INFO", embed, tag })
 	}
 
 	handleInteraction(bot, interaction)

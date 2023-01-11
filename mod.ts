@@ -33,29 +33,25 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		fractionalSecondDigits: 2,
 	}).replace(",", "")
 
-	const timestamp = `<t:${temporal.epochSeconds}:T> \`${temporal.epochMilliseconds}\``
+	const timestamp = `<t:${temporal.epochSeconds}:T> [\`${temporal.epochMilliseconds}\`]`
 
 	// Sanitization
 	if (content instanceof Error) {
 		content = content.stack ?? "Unable to capture Error stack"
 		logLevel = "ERROR"
 	} else if (typeof content !== "string") {
-		content = Deno.inspect(content, { colors: true, compact: false, depth: 6, iterableLimit: 200 })
+		content = Deno.inspect(content, { colors: true, compact: false, depth: 8, iterableLimit: 300, strAbbreviateSize: 1000 })
 	}
 
-	content = content
-		.replaceAll("    ", "  ")
-		.replaceAll(Deno.cwd(), "Endo")
+	content = content.replaceAll(Deno.cwd(), "Endo")
 
 	// Formatting
-	if (tag) content = `[${rgb24(tag, BrightNord.cyan)}] ${content}`
+	if (tag) content = `${rgb24(`[${tag}]`, BrightNord.orange)} ${content}`
 
 	const plainLog = stripColor(content)
 	const logColor = Nord[logLevel.toLowerCase()]
-	const formattedLog = rgb24(
-		logTime + rgb24(logLevel.padStart(6, " "), logColor) + ` | ${content.replaceAll("\n", "\n" + " ".repeat(32))}`,
-		Nord.blue,
-	)
+	const formattedLog = rgb24(logTime, Nord.blue) + rgb24(logLevel.padStart(6, " "), logColor) + rgb24(" | ", Nord.blue)
+		+ content.replaceAll("\n", "\n" + " ".repeat(29) + rgb24("| ", Nord.blue))
 
 	console.log(formattedLog)
 	Deno.writeTextFileSync("./Resources/discord.log", stripColor(formattedLog) + "\n", { append: true })
@@ -66,7 +62,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		embed = embed ?? {}
 		if (!embed.timestamp) embed.timestamp = temporal.epochMilliseconds
 		if (!/^<t:\d+:[tTdDfFR]>/.test(embed.description ?? "")) {
-			embed.description = `**${capitalize(logLevel)}**│${timestamp}]\n${logLevel !== "ERROR" ? `\`\`\`${plainLog}\`\`\`\n` : ""}${
+			embed.description = `**${capitalize(logLevel)}**│${timestamp}\n${logLevel !== "ERROR" ? `\`\`\`${plainLog}\`\`\`\n` : ""}${
 				embed.description ? `\`\`\`${embed.description}\`\`\`` : ""
 			}`
 		}

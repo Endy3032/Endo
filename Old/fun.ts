@@ -40,7 +40,7 @@ function getMidY(ctx: CanvasRenderingContext2D, text: string, width: number, hei
 async function sendMeme(interaction: ChatInputCommandInteraction, canvas: Canvas, variant: string, text: string, separator: string) {
 	const attachment = new MessageAttachment(await canvas.png, "meme.png")
 	await interaction.editReply({ files: [attachment], embeds: [{
-		color: parseInt(pickArray(colors), 16),
+		color: pickArray(colors),
 		image: { url: "attachment://meme.png" },
 		footer: variant.includes("panik_kalm_panik") && text.split(separator).length < 3
 			? { text: `Tip: Separate 3 texts with ${separator} to fill the whole template` }

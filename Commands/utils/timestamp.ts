@@ -1,6 +1,8 @@
 import { stripIndents } from "commonTags"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
-import { getValue, respond, timezone } from "modules"
+import { ApplicationCommandOption, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
+import Fuse from "fuse"
+import { getFocused, getSubcmd, getValue, respond, timezone } from "modules"
+import { join } from "path"
 import { Temporal } from "temporal"
 import { timezone as timezones } from "time"
 
@@ -98,10 +100,42 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await respond(bot, interaction, {
 		content: stripIndents`${invalid ? "Invalid date. Fallback to current time:" : ""}
-		**Date** • <t:${finalDate.epochSeconds}:F> [GMT ${timeZone.length == 6 ? timeZone : timezones.find(e => e.id == timeZone)?.offset}]
+		<t:${finalDate.epochSeconds}:F> [GMT ${timeZone.length == 6 ? timeZone : timezones.find(e => e.id == timeZone)?.offset}]
 		**Milliseconds** • ${finalDate.epochMilliseconds}
-		**Discord Epoch** • ${finalDate.epochSeconds}
-		**Timestamp Styles Table** • Format timestamp with \`<t:Discord Epoch:Style>\``,
-		file: { name: "timestampStyles", blob: Blob },
+		**Seconds** • ${finalDate.epochSeconds}
+		**Timestamp Styles Table** • Format timestamp with \`<t:Seconds:Style>\``,
+		file: {
+			name: "timestampStyles.png",
+			blob: new Blob([await Deno.readFile(join(Deno.cwd(), "Resources", "timestampStyles.png"))]),
+		},
 	}, true)
+}
+
+const finalTimezones = [
+	...[...new Set(timezones.map(e => e.offset))].sort((a: string, b: string) => {
+		if (a.startsWith("-") && b.startsWith("-")) return parseInt(a.slice(0, 3)) > parseInt(b.slice(0, 3)) ? 1 : -1
+		else if (a.startsWith("-") && !b.startsWith("-")) return -1
+		else if (!a.startsWith("-") && b.startsWith("-")) return 1
+		return a.localeCompare(b)
+	}),
+	...timezones.map(e => e.id).filter(e => e.length > 0),
+]
+
+export async function autocomplete(bot: Bot, interaction: Interaction) {
+	const current = getFocused(interaction, "String") || ""
+	const response: ApplicationCommandOptionChoice[] = []
+
+	if (current.length === 0) {
+		return await respond(bot, interaction, { choices: finalTimezones.slice(0, 25).map(e => ({ name: e, value: e })) })
+	}
+
+	switch (getSubcmd(interaction)) {
+		case "timestamp": {
+			const fuse = new Fuse(finalTimezones, { distance: 5 })
+			response.push(...fuse.search(current).map(res => ({ name: res.item, value: res.item })))
+			break
+		}
+	}
+
+	await respond(bot, interaction, { choices: response.slice(0, 25) })
 }

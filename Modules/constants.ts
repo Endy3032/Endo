@@ -211,14 +211,22 @@ export type BotLog = (content: any, options?: LogOptions) => Promise<void>
 export type InteractionHandler = (bot: Bot, interaction: Interaction) => Promise<void>
 
 export type CommandHandler = {
-	main?: InteractionHandler
+	main: InteractionHandler
 	button?: InteractionHandler
 	select?: InteractionHandler
-	autocomplete?: InteractionHandler
 	modal?: InteractionHandler
+	autocomplete?: InteractionHandler
 }
 
 export type Command = CommandHandler & { cmd: CreateApplicationCommand }
+
+export const DenoInspectConfig = {
+	colors: true,
+	compact: false,
+	depth: 8,
+	iterableLimit: 300,
+	strAbbreviateSize: 1000,
+}
 
 export const BotPerms = Permissions.MANAGE_GUILD
 	+ Permissions.MANAGE_ROLES

@@ -583,7 +583,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 																			${guild.roles.size} Roles
 																			${guild.emojis.size} Emojis
 																			┣ ${emojis.filter(e => !e.toggles.animated).size} static
-																			╰ ${emojis.filter(e => e.toggles.animated).size} animated`,
+																			┗ ${emojis.filter(e => e.toggles.animated).size} animated`,
 									inline: true,
 								},
 								{
@@ -918,7 +918,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 
 //   //   embed = {
 //   //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.slice(1)}`,
-//   //     color: parseInt(pickArray(colors), 16),
+//   //     color: pickArray(colors),
 //   //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
 //   //     fields: fields,
 //   //     footer: { text: "Last updated" },

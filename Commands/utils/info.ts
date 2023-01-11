@@ -91,7 +91,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 			break
 		}
 
-		// TODO human readable type instead of type number
 		case "channel": {
 			if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 			if (!interaction.channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
@@ -102,8 +101,8 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 			const fields: DiscordEmbedField[] = ![ChannelTypes.GuildVoice, ChannelTypes.GuildStageVoice].includes(channel?.type)
 				? [
-					{ name: "NSFW", value: `${channel?.nsfw}`, inline: true },
-					{ name: "Topic", value: `${channel?.topic}`, inline: true },
+					{ name: "NSFW", value: `${channel?.nsfw ? "Yes" : "No"}`, inline: true },
+					{ name: "Topic", value: `${channel?.topic ?? "None"}`, inline: true },
 				]
 				: [
 					{ name: "Bitrate", value: `${(channel?.bitrate ?? 0) / 1000}Kbps`, inline: true },
@@ -115,10 +114,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 				color: pickArray(colors),
 				fields: [
 					{ name: "ID", value: `${channel?.id}`, inline: true },
-					{ name: "Type", value: `${channel?.type}`, inline: true },
+					{ name: "Type", value: `${ChannelTypes[channel?.type]}`, inline: true },
 					{ name: "Position", value: `${channel?.position}`, inline: true },
 					...fields,
-					{ name: "Creation Date", value: `<t:${timestamp}:f> (<t:${timestamp}:R>)`, inline: true },
+					{ name: "Created", value: `<t:${timestamp}:R>`, inline: true },
 				],
 			}] })
 			break
@@ -143,7 +142,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 					description: guild.description ? `Server Description: ${guild.description}` : "",
 					fields: [
 						{ name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
-						{ name: "Creation Date", value: `<t:${toTimestamp(guild.id)}:D>`, inline: true },
+						{ name: "Created", value: `<t:${toTimestamp(guild.id)}:R>`, inline: true },
 						{ name: "Vanity Invite URL", value: guild.vanityUrlCode ?? "None", inline: true },
 						{ name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
 						{ name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
@@ -158,7 +157,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 								${guild.roles.size} Roles
 								${guild.emojis.size} Emojis
 								┣ ${emojis.filter(e => !e.toggles.animated).size} static
-								╰ ${emojis.filter(e => e.toggles.animated).size} animated`,
+								┗ ${emojis.filter(e => e.toggles.animated).size} animated`,
 							inline: true,
 						},
 						{
@@ -170,8 +169,8 @@ export async function main(bot: Bot, interaction: Interaction) {
 							inline: true,
 						},
 					],
-					image: { url: imageURL(guild.id, guild.banner, "banners") ?? "" },
-					thumbnail: { url: imageURL(guild.id, guild.icon, "icons") ?? "" },
+					image: guild.banner ? { url: imageURL(guild.id, guild.banner, "banners") } : undefined,
+					thumbnail: guild.icon ? { url: imageURL(guild.id, guild.icon, "icons") } : undefined,
 					footer: { text: `Server ID • ${guild.id}` },
 				}],
 			})
@@ -190,10 +189,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 					fields: [
 						{ name: "Tag", value: user.discriminator, inline: true },
 						{ name: "ID", value: user.id.toString(), inline: true },
-						{ name: "Creation Date", value: `<t:${createdAt}:f> (<t:${createdAt}:R>)`, inline: true },
+						{ name: "Joined", value: `<t:${createdAt}:R>`, inline: true },
 					],
-					image: { url: imageURL(user.id, discordUser.banner, "banners") },
-					thumbnail: { url: imageURL(user.id, user.avatar, "avatars") },
+					image: discordUser.banner ? { url: imageURL(user.id, discordUser.banner, "banners") } : undefined,
+					thumbnail: user.avatar ? { url: imageURL(user.id, user.avatar, "avatars") } : undefined,
 				}],
 			})
 			break

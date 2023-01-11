@@ -204,7 +204,7 @@ export async function main(interaction: ChatInputCommandInteraction) {
 								title: summary.title.replaceAll("_", " "),
 								url: page.fullurl,
 								description: `**\`\`\`${summary.description}\`\`\`**\n${summary.extract}`,
-								color: parseInt(pickArray(colors), 16),
+								color: pickArray(colors),
 								thumbnail: { url: summary.thumbnail.source },
 							}] })
 						})
@@ -240,7 +240,7 @@ export async function main(interaction: ChatInputCommandInteraction) {
 
 							interaction.editReply({ embeds: [{
 								title: (title = `${data.title} - ${data.artist_names}`).length > 100 ? title.slice(0, 99) + "…" : title,
-								color: parseInt(pickArray(colors), 16),
+								color: pickArray(colors),
 								description: lyrics || "No lyrics",
 								thumbnail: { url: data.song_art_image_url },
 								footer: { text: `Source • Genius | Album • ${data.album?.name || "None"} | Release Date` },
@@ -258,7 +258,7 @@ export async function main(interaction: ChatInputCommandInteraction) {
 						.then(result => {
 							interaction.editReply({ embeds: [{
 								title: "Translation",
-								color: parseInt(pickArray(colors), 16),
+								color: pickArray(colors),
 								fields: [
 									{ name: `From ${googtrans.languages[result.from.language.iso]}`, value: `${txt}` },
 									{ name: `To ${googtrans.languages[dst]}`, value: `${result.text}` },
@@ -314,7 +314,7 @@ export async function main(interaction: ChatInputCommandInteraction) {
 
 							const weatherEmbed = {
 								title: data.title,
-								color: parseInt(pickArray(colors), 16),
+								color: pickArray(colors),
 								description: `Data Provided by ${
 									shorthand("WeatherAPI")
 								} [WeatherAPI](https://www.weatherapi.com/)\`\`\`Weather • ${data.current.condition.text}\`\`\``,
@@ -408,7 +408,7 @@ export async function selectMenu(interaction: SelectMenuInteraction) {
 					title: summary.title.replaceAll("_", " "),
 					url: page.fullurl,
 					description: `**\`\`\`${summary.description}\`\`\`**\n${summary.extract}`,
-					color: parseInt(pickArray(colors), 16),
+					color: pickArray(colors),
 					thumbnail: { url: summary.thumbnail.source },
 				}] })
 			})

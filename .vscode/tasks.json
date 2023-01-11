@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Denon: Run bot with watcher",
+			"type": "shell",
+			"command": "denon dev",
+			"problemMatcher": [
+				"$deno"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
