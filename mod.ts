@@ -12,6 +12,15 @@ const bot = createBot({
 	events: {},
 })
 
+if (Deno.args.includes("debug")) {
+	bot.rest.debug = (text: string) =>
+		console.botLog(text.match(/(?<=(^\[\S.*?] )).*/)?.[0], {
+			noSend: true,
+			logLevel: "DEBUG",
+			tag: text.match(/(?<=\[)\S.*?(?=\])/)?.[0],
+		})
+}
+
 console.botLog = async (content: any, options?: LogOptions) => {
 	options = Object.assign({ tag: undefined, noSend: false, embed: undefined }, options)
 	const { tag, noSend } = options
@@ -53,7 +62,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 	const formattedLog = rgb24(logTime, Nord.blue) + rgb24(logLevel.padStart(6, " "), logColor) + rgb24(" | ", Nord.blue)
 		+ content.replaceAll("\n", "\n" + " ".repeat(29) + rgb24("| ", Nord.blue))
 
-	console.log(formattedLog)
+	console[logLevel.toLowerCase()](formattedLog)
 	Deno.writeTextFileSync("./Resources/discord.log", stripColor(formattedLog) + "\n", { append: true })
 
 	// Discord logging
