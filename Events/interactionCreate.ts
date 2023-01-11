@@ -46,11 +46,11 @@ export async function main(bot: Bot, interaction: Interaction) {
 			description: stripColor(`<t:${toTimestamp(interaction.id)}:f> [${timestamp}]\n**Interaction** • ${log}`),
 			author: {
 				name: invoker,
-				iconUrl: imageURL(interaction.user.id, interaction.user.avatar, "avatars"),
+				iconUrl: interaction.user.avatar ? imageURL(interaction.user.id, interaction.user.avatar, "avatars") : undefined,
 			},
 			footer: {
-				text: guildName ? `${guildName} #${channelName}` : "**DM**",
-				iconUrl: imageURL(guild?.id, guild?.icon, "icons"),
+				text: guildName ? `${guildName} #${channelName}` : "DM",
+				iconUrl: guild?.icon ? imageURL(guild?.id, guild.icon, "icons") : undefined,
 			},
 			timestamp: Number(timestamp),
 		}
