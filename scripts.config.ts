@@ -27,6 +27,10 @@ export default <DenonConfig> {
 			cmd: "deno repl",
 			watch: false,
 		},
+		run: {
+			cmd: "deno run",
+			watch: false,
+		},
 	},
-	watcher: { exts: ["ts"], skip: ["Commands/*$eval.ts"] },
+	watcher: { exts: ["ts"] },
 }
