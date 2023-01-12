@@ -1,7 +1,24 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction, MessageComponentTypes,
+import { stripIndents } from "commonTags"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Embed, Interaction, MessageComponentTypes,
 	TextStyles } from "discordeno"
-import { capitalize, defer, getValue, respond } from "modules"
+import { format } from "duration"
+import { capitalize, defer, edit, getValue, respond } from "modules"
 import { TOTP } from "otpauth"
+import { Temporal } from "temporal"
+
+// Eval import
+import axiod from "axiod"
+import * as colors from "colors"
+import commonTags from "commonTags"
+import * as discordeno from "discordeno"
+import Fuse from "fuse"
+import * as googleTranslate from "googleTranslate"
+import mathjs from "mathjs"
+import otpauth from "otpauth"
+import progressbar from "progressbar"
+import * as time from "time"
+import * as urban from "urban"
+import * as wikipedia from "wikipedia"
 
 const otp = new TOTP({
 	algorithm: "SHA1",
@@ -33,7 +50,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await respond(bot, interaction, {
 		title: "Eval",
-		customId: "manage_eval",
+		customId: "manage/eval",
 		components: [{
 			type: MessageComponentTypes.ActionRow,
 			components: [{
@@ -50,19 +67,38 @@ export async function main(bot: Bot, interaction: Interaction) {
 export async function modal(bot: Bot, interaction: Interaction) {
 	await defer(bot, interaction)
 	const code = getValue(interaction, "code", "Modal")
-	var response = `**Code**\n\`\`\`ts\n${code}\`\`\`\n`
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const discordeno = await import("discordeno")
 
-	try {
-		let output = Deno.inspect(await eval(code?.replaceAll("await ", "") ?? ""), { compact: false })
-		for (const brack of ["()", "[]", "{}"]) {
-			output = output.replaceAll(new RegExp(`(\\${brack.charAt(0)}\\n\\s+\\${brack.charAt(1)},)`, "gm"), `${brack},`)
-		}
-		if (output !== undefined) response += `**Output**\n\`\`\`ts\n${output} [typeof ${capitalize(typeof output)}]\`\`\``
-	} catch (err) {
-		response += `**Error**\n\`\`\`ts\n${err.stack.replaceAll(Deno.cwd(), "Endo").replaceAll("    ", "  ")}\`\`\``
+	const embed: Embed = {
+		description: stripIndents`\
+		**Code**
+		\`\`\`ts
+		${code}
+		\`\`\`
+		**Output**
+		\`\`\`ts
+		`,
+		timestamp: Temporal.Now.instant().epochMilliseconds,
 	}
 
-	respond(bot, interaction, response)
+	try {
+		const start = Temporal.Now.instant().epochMicroseconds
+		const evalOutput = await eval(code ?? "")
+		const end = Temporal.Now.instant().epochMicroseconds
+
+		let output = Deno.inspect(evalOutput, { compact: false })
+		embed.description += "\n" + output
+		embed.footer = {
+			text: `Time: ${format(Number((end - start) / 1000n), { style: "narrow", ignoreZero: true })} | Type: ${
+				capitalize(typeof evalOutput)
+			}`,
+		}
+	} catch (err) {
+		embed.description?.replace("**Output**", "**Error**")
+		embed.description += "\n" + err.stack.replaceAll(Deno.cwd(), "Endo")
+	}
+
+	if ((embed.description?.length ?? 0) > 4096) embed.description = embed.description?.slice(0, 4090) + "...\`\`\`"
+	else embed.description += "\`\`\`"
+
+	edit(bot, interaction, { embeds: [embed] })
 }

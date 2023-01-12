@@ -103,7 +103,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 		<t:${finalDate.epochSeconds}:F> [GMT ${timeZone.length == 6 ? timeZone : timezones.find(e => e.id == timeZone)?.offset}]
 		**Milliseconds** • ${finalDate.epochMilliseconds}
 		**Seconds** • ${finalDate.epochSeconds}
-		**Timestamp Styles Table** • Format timestamp with \`<t:Seconds:Style>\``,
+		**Styles Table** • Format timestamp with \`<t:Seconds:Style>\``,
 		file: {
 			name: "timestampStyles.png",
 			blob: new Blob([await Deno.readFile(join(Deno.cwd(), "Resources", "timestampStyles.png"))]),

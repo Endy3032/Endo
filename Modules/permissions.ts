@@ -27,7 +27,7 @@ export const checkPermission = (bot: Bot, interaction: Interaction, ...perms: Bi
 	let block = false
 	let consoleLog = `${rgb24("Permissions:", Nord.yellow)}\n`
 	let content = `Required permissions for \`/${
-		[getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)].join(" ").replaceAll(/ {2,}/, " ")
+		[getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)].join(" ").replaceAll(/ {2,}/g, " ")
 	}\`:`
 
 	perms.forEach(permission => {

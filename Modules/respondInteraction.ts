@@ -10,7 +10,7 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 	if (typeof response != "string") {
 		type = response.title
 			? InteractionResponseTypes.Modal
-			: interaction.type == InteractionTypes.ApplicationCommandAutocomplete && response.choices
+			: interaction.type === InteractionTypes.ApplicationCommandAutocomplete
 			? InteractionResponseTypes.ApplicationCommandAutocompleteResult
 			: InteractionResponseTypes.ChannelMessageWithSource
 	}
@@ -21,17 +21,16 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 }
 
 export async function edit(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string) {
-	if (interaction.type !== InteractionTypes.ApplicationCommandAutocomplete) {
-		return await bot.helpers.editOriginalInteractionResponse(
-			interaction.token,
-			typeof response === "string" ? { content: response } : response,
-		)
-			.catch(err => console.botLog(err, { logLevel: "ERROR" }))
-	}
+	if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) throw new Error("Cannot edit autocomplete interactions")
+
+	return await bot.helpers.editOriginalInteractionResponse(
+		interaction.token,
+		typeof response === "string" ? { content: response } : response,
+	).catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
 export async function defer(bot: Bot, interaction: Interaction, ephemeral = false) {
-	if (interaction.type == InteractionTypes.ApplicationCommandAutocomplete) throw new Error("Cannot defer an autocomplete interaction.")
+	if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) throw new Error("Cannot defer autocomplete interactions")
 
 	const responseType = [InteractionTypes.ApplicationCommand, InteractionTypes.ModalSubmit].includes(interaction.type)
 		? InteractionResponseTypes.DeferredChannelMessageWithSource

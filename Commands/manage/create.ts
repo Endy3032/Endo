@@ -1,6 +1,6 @@
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes,
 	CreateGuildChannel, Interaction, ModifyGuildChannelPositions } from "discordeno"
-import { checkPermission, defer, getSubcmd, getValue, respond, shorthand } from "modules"
+import { checkPermission, defer, edit, getSubcmd, getValue, respond, shorthand } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "create",
@@ -215,7 +215,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await bot.helpers.createChannel(interaction.guildId, options)
 		.then(async channel => {
-			await respond(bot, interaction, `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
+			await edit(bot, interaction, `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
 
 			const swapOptions: ModifyGuildChannelPositions[] = channels
 				.filter(channel => channel.type == options.type)
