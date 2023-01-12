@@ -39,8 +39,15 @@ export async function handleInteraction(bot: Bot, interaction: Interaction) {
 	}
 
 	if (!command || !handle) {
-		console.botLog(`No handler found for \`${[cmd, group ?? subcmd].join("/")}\``, { logLevel: "ERROR" })
-		return respond(bot, interaction, `${shorthand("error")} No handler found for \`${cmd}\``, true)
+		console.botLog(interaction, { noSend: true })
+
+		const name = [cmd, group ?? subcmd].join("/")
+		const type = interaction.type === InteractionTypes.MessageComponent
+			? MessageComponentTypes[interaction.data?.componentType ?? 2]
+			: InteractionTypes[interaction.type]
+
+		console.botLog(`No ${type} handler found for \`${name}\``, { logLevel: "ERROR" })
+		return respond(bot, interaction, `${shorthand("error")} No ${type} handler found for \`${name}\``, true)
 	}
 
 	try {

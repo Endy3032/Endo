@@ -10,8 +10,11 @@ export const name: keyof EventHandlers = "interactionCreate"
 export async function main(bot: Bot, interaction: Interaction) {
 	const isLocal = Deno.build.vendor !== "unknown"
 	const isTestGuild = interaction.guildId == BigInt(testGuildID ?? "0")
-	const isReplitTest = interaction.channelId == BigInt(testGuildChannel ?? "0")
-	if ((isLocal && (!isTestGuild || isReplitTest)) || (!isLocal && isTestGuild && !isReplitTest)) return
+	const isRemoteTest = interaction.channelId == BigInt(testGuildChannel ?? "0")
+
+	const notLocalTestLocation = isLocal && (!isTestGuild || isRemoteTest)
+	const notRemoteTestLocation = !isLocal && isTestGuild && !isRemoteTest
+	if ((notLocalTestLocation || notRemoteTestLocation) && !Deno.args.includes("noLimit")) return
 
 	const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
 
@@ -33,9 +36,9 @@ export async function main(bot: Bot, interaction: Interaction) {
 			interaction.type == InteractionTypes.ApplicationCommand
 				? `/${[commandName, group, subcmd].join(" ").replace(/\s+/, " ")}`
 				: interaction.type == InteractionTypes.MessageComponent
-				? `(${commandName}/${interaction.data?.values?.join(", ") ?? interaction.data?.customId})`
+				? `/${[commandName, group, subcmd].join(" ")} [${interaction.data?.values?.join(", ") ?? interaction.data?.customId}]`
 				: interaction.type == InteractionTypes.ModalSubmit
-				? `{${commandName}/${interaction.data?.customId}}`
+				? `{${interaction.data?.customId}}`
 				: "Unknown",
 			BrightNord.green,
 		)

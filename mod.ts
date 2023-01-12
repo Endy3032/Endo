@@ -63,7 +63,11 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		+ content.replaceAll("\n", "\n" + " ".repeat(29) + rgb24("| ", Nord.blue))
 
 	console[logLevel.toLowerCase()](formattedLog)
-	Deno.writeTextFileSync("./Resources/discord.log", stripColor(formattedLog) + "\n", { append: true })
+	Deno.writeTextFileSync(
+		`./Resources/${logLevel === "DEBUG" ? "debug" : logLevel === "ERROR" ? "error" : "discord"}.log`,
+		stripColor(formattedLog) + "\n",
+		{ append: true },
+	)
 
 	// Discord logging
 	if (logChannel === undefined || noSend) return
