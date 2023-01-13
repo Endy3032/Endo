@@ -1,6 +1,5 @@
 {
 	"imports": {
-		"~/": "./",
 		"modules": "./Modules/mod.ts",
 		"axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
 		"axiodInterfaces": "https://deno.land/x/axiod@0.26.2/interfaces.ts",
@@ -8,8 +7,8 @@
 		"canvas": "https://deno.land/x/canvas@v1.4.1/mod.ts",
 		"colorConvert": "https://deno.land/x/color@v0.2.3/mod.ts",
 		"colors": "https://deno.land/std@0.171.0/fmt/colors.ts",
-		"commonTags": "https://esm.sh/common-tags@1.8.2",
-		"discordeno": "https://deno.land/x/discordeno@17.0.1/mod.ts",
+		"commonTags": "https://esm.sh/common-tags@1.8.2#=",
+		"discordeno": "https://raw.githubusercontent.com/discordeno/discordeno/18.0.0/mod.ts",
 		"dom": "https://deno.land/x/deno_dom@v0.1.36-alpha/deno-dom-wasm.ts",
 		"duration": "https://deno.land/std@0.171.0/fmt/duration.ts",
 		"exif": "https://deno.land/x/deno_exif@0.0.3/mod.ts",

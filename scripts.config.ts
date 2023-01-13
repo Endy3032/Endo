@@ -6,31 +6,26 @@ const cmd = "mod.ts"
 export default <DenonConfig> {
 	allow: "all",
 	env: env(),
+
 	importMap: "./imports.json",
 	tsconfig: "./deno.json",
+
+	watch: false,
+	watcher: { exts: ["ts"] },
+
 	scripts: {
-		start: {
-			cmd,
-			desc: "Start the bot",
-			watch: false,
-		},
 		dev: {
 			cmd,
-			desc: "Start the bot in dev mode",
+			watch: true,
+		},
+		debug: {
+			cmd: `denon dev debug`,
 			inspect: "127.0.0.1:9229",
+			watch: true,
 		},
-		fmt: {
-			cmd: "dprint fmt && eslint --fix .",
-			watch: false,
-		},
-		repl: {
-			cmd: "deno repl",
-			watch: false,
-		},
-		run: {
-			cmd: "deno run",
-			watch: false,
-		},
+		start: { cmd },
+		run: { cmd: "deno run" },
+		repl: { cmd: "deno repl" },
+		fmt: { cmd: "dprint fmt && eslint --fix ." },
 	},
-	watcher: { exts: ["ts"] },
 }
