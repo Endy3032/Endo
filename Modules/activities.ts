@@ -21,22 +21,18 @@ const status: Activity & StreamingActivity = {
 	},
 }
 
-function getActivity() {
+export function activities(): StatusUpdate {
 	const type = pickArray(Object.keys(status))
 	const name = pickArray(type == "Streaming" ? Object.keys(status.Streaming) : status[type])
 	const url = type === "Streaming" ? `https://youtube.com/watch?v=${pickArray(status.Streaming[name])}` : undefined
 
 	return {
-		name,
-		url,
-		type: parseInt(ActivityTypes[type]),
-		createdAt: Temporal.Now.instant().epochMilliseconds,
-	}
-}
-
-export function activities(): StatusUpdate {
-	return {
-		activities: [getActivity()],
+		activities: [{
+			name,
+			url,
+			type: parseInt(ActivityTypes[type]),
+			createdAt: Temporal.Now.instant().epochMilliseconds,
+		}],
 		status: "idle",
 	}
 }

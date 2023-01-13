@@ -1,4 +1,4 @@
-export const getFiles = (dir: string, options?: { fileTypes?: string[] | string | "folders"; filterMod?: boolean }) => {
+export function getFiles(dir: string, options?: { fileTypes?: string[] | string | "folders"; filterMod?: boolean }) {
 	const { fileTypes, filterMod } = Object.assign({ fileTypes: "ts", filterMod: true }, options)
 
 	const regex = new RegExp(`\\.(${(typeof fileTypes === "string" ? [fileTypes] : fileTypes).join("|")})$`)

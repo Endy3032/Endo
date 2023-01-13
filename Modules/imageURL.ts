@@ -5,7 +5,7 @@ type Options = {
 	size: 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 | 4096
 }
 
-export const imageURL = (targetID: ID, hash: ID, endpoint: Endpoints, options?: Options): string => {
+export function imageURL(targetID: ID, hash: ID, endpoint: Endpoints, options?: Options): string {
 	if (targetID === undefined || hash === undefined || targetID === null || hash === null) return ""
 
 	hash = hash.toString(16)

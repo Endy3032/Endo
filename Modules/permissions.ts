@@ -4,10 +4,9 @@ import { capitalize } from "./capitalize.ts"
 import { Nord } from "./constants.ts"
 import { shorthand } from "./emojis.ts"
 import { getCmdName, getSubcmd, getSubcmdGroup } from "./getInteractionData.ts"
-import { respond } from "./respondInteraction.ts"
 
-const permissions = Object.fromEntries(new Map(
-	Object.entries(BitwisePermissionFlags).filter(([key]) => !parseInt(key)).map(([k, v]) => [
+export const permissions = Object.fromEntries(new Map(
+	Object.entries(BitwisePermissionFlags).filter(([k]) => !parseInt(k)).map(([k, v]) => [
 		v,
 		k.split("_")
 			.map(word => capitalize(word, true))
@@ -17,17 +16,13 @@ const permissions = Object.fromEntries(new Map(
 	]),
 ))
 
-export const checkPermission = (bot: Bot, interaction: Interaction, ...perms: BitwisePermissionFlags[]) => {
-	if (!interaction.guildId) {
-		respond(bot, interaction, `${shorthand("warn")} This command can only be used in servers`, true)
-		return true
-	}
-
+export async function checkPermission(interaction: Interaction, ...perms: BitwisePermissionFlags[]) {
 	const memberPerm = interaction.member?.permissions ?? 0n
+
 	let block = false
-	let consoleLog = `${rgb24("Permissions:", Nord.yellow)}\n`
-	let content = `Required permissions for \`/${
-		[getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)].join(" ").replaceAll(/ {2,}/g, " ")
+	let consoleLog = `${rgb24("Permissions:", Nord.yellow)}`
+	let response = `Required permissions for \`/${
+		[getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)].join(" ").replace(/ {2,}/, " ")
 	}\`:`
 
 	perms.forEach(permission => {
@@ -37,12 +32,12 @@ export const checkPermission = (bot: Bot, interaction: Interaction, ...perms: Bi
 
 		if (!hasPerm) block = true
 		consoleLog += `\n  ${rgb24(permName, hasPerm ? Nord.green : Nord.red)}`
-		content += `\n${hasPerm ? shorthand("success") : shorthand("error")} \`${permName}\``
+		response += `\n${shorthand(hasPerm ? "success" : "error")} \`${permName}\``
 	})
 
 	if (block) {
-		console.botLog(`${consoleLog} ]`, { logLevel: "WARN" })
-		respond(bot, interaction, content, true)
+		console.botLog(consoleLog, { logLevel: "WARN" })
+		return response
 	}
-	return block
+	return false
 }

@@ -23,7 +23,7 @@ export async function deploy(bot: Bot, args: string[]) {
 		const guildFolders = getFiles("./Commands/Guilds", { fileTypes: "folders" })
 
 		for await (const guildID of guildFolders) {
-			const { commands } = await import(`~/Commands/Guilds/${guildID}/mod.ts`)
+			const { commands } = await import(`../Commands/Guilds/${guildID}/mod.ts`)
 			const guildCommands: CreateApplicationCommand[] = commands.map(command => replaceDescription(command.cmd, "G"))
 			const deployed = await bot.helpers.upsertGuildApplicationCommands(BigInt(guildID), guildCommands)
 			console.botLog(`${deployed.size} guild commands [${guildID}]`, { tag: "Deploy", noSend: true })
