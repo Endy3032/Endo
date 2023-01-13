@@ -1,6 +1,6 @@
 import { ActivityTypes, StatusUpdate } from "discordeno"
 import { Temporal } from "temporal"
-import { pickArray } from "./random.ts"
+import { pickArray } from "./utils.ts"
 
 type Activity = { [key in Exclude<keyof typeof ActivityTypes, "Custom" | "Competing" | "Streaming">]: string[] }
 type StreamingActivity = { Streaming: { [key: string]: string[] } }
