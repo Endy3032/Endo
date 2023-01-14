@@ -1,7 +1,7 @@
 // TODO Fix file for api changes
 import { Bot, Interaction, InteractionCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
-import { MessageFlags } from "./constants.ts"
 import { shorthand } from "./emojis.ts"
+import { MessageFlags } from "./types.ts"
 
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string, ephemeral = false) {
 	let type = InteractionResponseTypes.ChannelMessageWithSource
