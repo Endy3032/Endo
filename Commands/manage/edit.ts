@@ -108,7 +108,7 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+	if (checkPermission(interaction, Permissions.MANAGE_CHANNELS)) return
 	switch (getSubcmd(interaction)) {
 		case "channel": {
 			const channel = getValue(interaction, "channel", "Channel")

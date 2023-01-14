@@ -21,9 +21,6 @@ const sortRole = (a: Role, b: Role) => (a.position ?? 0) > (b.position ?? 1) ? -
 export async function main(bot: Bot, interaction: Interaction) {
 	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 
-	const server = await getValue(interaction, "server", "String")
-	interaction.guildId = BigInt(server ?? interaction.guildId)
-
 	const channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort(sortChannel)
 	const roles = (await bot.helpers.getRoles(interaction.guildId)).array().sort(sortRole)
 

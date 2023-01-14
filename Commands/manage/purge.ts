@@ -46,7 +46,7 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
+	if (checkPermission(interaction, Permissions.MANAGE_MESSAGES)) return
 	const amount = getValue(interaction, "amount", "Integer") ?? 0
 	const option = getValue(interaction, "option", "String")
 	const user = getValue(interaction, "user", "User")

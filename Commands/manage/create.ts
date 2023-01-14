@@ -1,6 +1,6 @@
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes,
 	CreateGuildChannel, Interaction, ModifyGuildChannelPositions } from "discordeno"
-import { checkPermission, defer, edit, getSubcmd, getValue, respond, shorthand } from "modules"
+import { checkPermission, defer, edit, getSubcmd, getValue, shorthand } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "create",
@@ -135,10 +135,12 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
-
 	await defer(bot, interaction, true)
-	if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+
+	if (!interaction.guildId) return await edit(bot, interaction, "This action can only be performed in a server")
+
+	const blockMsg = await checkPermission(interaction, Permissions.MANAGE_CHANNELS)
+	if (blockMsg) return await edit(bot, interaction, blockMsg)
 
 	const name = getValue(interaction, "name", "String") ?? "channel"
 	const reason = getValue(interaction, "reason", "String")

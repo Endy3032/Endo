@@ -31,7 +31,7 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+	if (checkPermission(interaction, Permissions.MANAGE_CHANNELS)) return
 	switch (getSubcmd(interaction)) {
 		case "channel": {
 			const channel = getValue(interaction, "channel", "Channel")
@@ -63,7 +63,7 @@ export async function button(bot: Bot, interaction: Interaction) {
 	await defer(bot, interaction)
 	switch (type) {
 		case "channel": {
-			if (checkPermission(bot, interaction, Permissions.MANAGE_CHANNELS)) return
+			if (checkPermission(interaction, Permissions.MANAGE_CHANNELS)) return
 			const [, , channelID] = customID
 			const reason = interaction.message?.content.split(": ")[1]
 				?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
@@ -74,7 +74,7 @@ export async function button(bot: Bot, interaction: Interaction) {
 		}
 
 		case "messages": {
-			if (checkPermission(bot, interaction, Permissions.MANAGE_MESSAGES)) return
+			if (checkPermission(interaction, Permissions.MANAGE_MESSAGES)) return
 			if (interaction.channelId === undefined) return respond(bot, interaction, "Cannot get current channel")
 			const [, , amount, option, user] = customID
 			const reason = interaction.message?.content.split(": ")[1]
