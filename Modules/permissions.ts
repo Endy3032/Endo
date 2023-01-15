@@ -16,7 +16,7 @@ export const permissions = Object.fromEntries(new Map(
 	]),
 ))
 
-export async function checkPermission(interaction: Interaction, ...perms: BitwisePermissionFlags[]) {
+export function checkPermission(interaction: Interaction, ...permissions: BitwisePermissionFlags[]) {
 	const memberPerm = interaction.member?.permissions ?? 0n
 
 	let block = false
@@ -25,9 +25,14 @@ export async function checkPermission(interaction: Interaction, ...perms: Bitwis
 		[getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)].join(" ").replace(/ {2,}/, " ")
 	}\`:`
 
-	perms.forEach(permission => {
+	permissions = [...new Set(permissions)]
+	const perms = permissions.reduce((out, cur) => out + BigInt(cur), BigInt(0))
+
+	if ((memberPerm & perms) === perms) return false
+
+	new Set(permissions).forEach(permission => {
 		const perm = BigInt(permission)
-		const hasPerm = (memberPerm & perm) === perm
+		const hasPerm = (memberPerm & perm) !== 0n
 		const permName = permissions[permission.toString()]
 
 		if (!hasPerm) block = true

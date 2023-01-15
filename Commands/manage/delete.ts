@@ -47,7 +47,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 						label: "Delete",
 						customId: `delete-channel-${channel?.id}`,
 						style: ButtonStyles.Danger,
-						emoji: { id: emojis.trash },
+						emoji: { id: BigInt(emojis.warn) },
 					}],
 				}],
 			}, true)
@@ -80,7 +80,7 @@ export async function button(bot: Bot, interaction: Interaction) {
 			const reason = interaction.message?.content.split(": ")[1]
 				?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 
-			let clear = (await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) }))
+			let clear = await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) })
 			if (option != "null" || user != "undefined") {
 				clear = clear.filter(msg => {
 					let cond = false

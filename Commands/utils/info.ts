@@ -1,8 +1,8 @@
 import { format } from "bytes"
 import { stripIndents } from "commonTags"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ChannelTypes, DiscordEmbedField, DiscordUser,
-	Interaction } from "discordeno"
-import { BotPerms, colors, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ChannelTypes, DiscordApplication, DiscordEmbedField,
+	DiscordUser, Interaction } from "discordeno"
+import { BotPerms, colors, DenoInspectConfig, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "info",
@@ -49,15 +49,24 @@ export const cmd: ApplicationCommandOption = {
 export async function main(bot: Bot, interaction: Interaction) {
 	switch (getSubcmd(interaction)) {
 		case "bot": {
-			const app = await bot.helpers.getApplicationInfo()
-			const timestamp = toTimestamp(bot.id)
-			const owner = await bot.helpers.getUser(app.team?.ownerUserId ?? app.owner?.id ?? bot.id)
-			const inviteLink =
-				`https://discord.com/api/v9/oauth2/authorize?client_id=${bot.id}&permissions=${BotPerms}&scope=bot%20applications.commands`
+			const app = await bot.rest.runMethod<DiscordApplication>(
+				bot.rest,
+				"GET",
+				bot.constants.routes.OAUTH2_APPLICATION(),
+			)
 
-			const { version: dnVer } = Deno
-			const ddVer = bot.constants.DISCORDENO_VERSION
-			const memory = Deno.memoryUsage()
+			const timestamp = toTimestamp(bot.id)
+
+			const owner = app.team
+				? app.team.members.find(m => m.user.id === app.team?.owner_user_id)?.user
+				: await bot.helpers.getUser(app.owner?.id ?? bot.id)
+
+			const inviteLink = `https://discord.com/oauth2/authorize?client_id=${bot.id}`
+				+ `&permissions=${app.install_params?.permissions ?? 0}&scope=${app.install_params?.scopes.join("%20") ?? "bot"}`
+
+			const ddeno = bot.constants.DISCORDENO_VERSION
+			const { version: { deno, v8, typescript } } = Deno
+			const { rss, heapUsed, heapTotal } = Deno.memoryUsage()
 
 			await respond(bot, interaction, { embeds: [{
 				author: { name: `About @${app.name}` },
@@ -73,16 +82,16 @@ export async function main(bot: Bot, interaction: Interaction) {
 					{ name: "Created", value: `<t:${timestamp}:R>`, inline: true },
 					{
 						name: "Runtime Info",
-						value: stripIndents`**Deno** • [${dnVer.deno}](https://deno.land/x/deno@v${dnVer.deno})
-							V8 • [${dnVer.v8}](https://github.com/v8/v8/releases/tag/${dnVer.v8})
-							TypeScript • [${dnVer.typescript}](https://github.com/microsoft/TypeScript/releases/tag/${dnVer.typescript})
-							Discordeno • [${ddVer}](https://deno.land/x/discordeno@${ddVer}/mod.ts)`,
+						value: stripIndents`**Deno** • [${deno}](https://deno.land/x/deno@v${deno})
+							V8 • [${v8}](https://github.com/v8/v8/releases/tag/${v8})
+							TypeScript • [${typescript}](https://github.com/microsoft/TypeScript/releases/tag/${typescript})
+							Discordeno • [${ddeno}](https://deno.land/x/discordeno@${ddeno}/mod.ts)`,
 						inline: true,
 					},
 					{
 						name: "Memory Usage",
-						value: stripIndents`**RSS** • ${format(memory.rss)}
-							**Heap** • ${format(memory.heapUsed)}/${format(memory.heapTotal)}`,
+						value: stripIndents`**RSS** • ${format(rss)}
+							**Heap** • ${format(heapUsed)}/${format(heapTotal)}`,
 						inline: true,
 					},
 				],
@@ -93,9 +102,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 		case "channel": {
 			if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
-			if (!interaction.channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
 
 			const channelId = getValue(interaction, "target", "Channel")?.id ?? interaction.channelId
+			if (!channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
+
 			const channel = await bot.helpers.getChannel(channelId)
 			const timestamp = toTimestamp(channelId)
 
