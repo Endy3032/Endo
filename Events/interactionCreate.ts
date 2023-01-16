@@ -16,12 +16,11 @@ export async function main(bot: Bot, interaction: Interaction) {
 	const notRemoteTestLocation = !isLocal && isTestGuild && !isRemoteTest
 	if ((notLocalTestLocation || notRemoteTestLocation) && !Deno.args.includes("noLimit")) return
 
-	const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
+	handleInteraction(bot, interaction)
 
 	if (interaction.type != InteractionTypes.ApplicationCommandAutocomplete) {
-		const guild = interaction.guildId ? await bot.helpers.getGuild(interaction.guildId) : null
-		const guildName = guild?.name
-		const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
+		const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
+
 		const invoker = `${interaction.user.username}#${interaction.user.discriminator}`
 
 		const tag = interaction.type === InteractionTypes.ApplicationCommand
@@ -46,21 +45,21 @@ export async function main(bot: Bot, interaction: Interaction) {
 		const timestamp = toTimestamp(interaction.id, "ms")
 
 		const embed: Embed = {
-			description: stripColor(`<t:${toTimestamp(interaction.id)}:f> [${timestamp}]\n**Interaction** • ${log}`),
+			description: stripColor(`[${timestamp}]\n**Interaction** • ${log}`),
 			author: {
 				name: invoker,
 				iconUrl: interaction.user.avatar ? imageURL(interaction.user.id, interaction.user.avatar, "avatars") : undefined,
 			},
 			footer: {
-				text: guildName ? `${guildName} #${channelName}` : "DM",
-				iconUrl: guild?.icon ? imageURL(guild?.id, guild.icon, "icons") : undefined,
+				text: interaction.guildId ? `${interaction.guildId} - #${interaction.channelId}` : "DM",
 			},
 			timestamp: Number(timestamp),
 		}
 
-		log += rgb24(` [${invoker} | ${guildName ? `${guildName} #${channelName}` : "DM"}]`, BrightNord.blue)
+		log += rgb24(
+			` [${invoker} | ${interaction.guildId ? `${interaction.guildId} - #${interaction.channelId}` : "DM"}]`,
+			BrightNord.blue,
+		)
 		console.botLog(log, { logLevel: "INFO", embed, tag })
 	}
-
-	handleInteraction(bot, interaction)
 }

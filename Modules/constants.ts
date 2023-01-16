@@ -40,7 +40,7 @@ export const colors = [
 	0x000000,
 ]
 
-export const DenoInspectConfig = {
+export const InspectConfig = {
 	colors: true,
 	compact: false,
 	depth: 8,

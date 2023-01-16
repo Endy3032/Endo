@@ -1,5 +1,5 @@
 import { Bot, Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
-import { Command, DenoInspectConfig, getCmdName, getFiles, getSubcmd, getSubcmdGroup, InteractionHandler, respond,
+import { Command, getCmdName, getFiles, getSubcmd, getSubcmdGroup, InspectConfig, InteractionHandler, respond,
 	shorthand } from "modules"
 
 const commands: CreateApplicationCommand[] = []
@@ -55,8 +55,7 @@ export async function handleInteraction(bot: Bot, interaction: Interaction) {
 	} catch (e) {
 		console.botLog(e, { logLevel: "ERROR" })
 		let content = `${shorthand("error")} Something failed back here... Techy debug stuff below\`\`\`${
-			Deno.inspect(e, DenoInspectConfig)
-				.replaceAll(Deno.cwd(), "Endo")
+			Deno.inspect(e, InspectConfig).replaceAll(Deno.cwd(), "Endo")
 		}`
 
 		if (content.length > 1997) content = content.slice(0, 1994) + "..."

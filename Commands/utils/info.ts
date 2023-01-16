@@ -2,7 +2,7 @@ import { format } from "bytes"
 import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ChannelTypes, DiscordApplication, DiscordEmbedField,
 	DiscordUser, Interaction } from "discordeno"
-import { BotPerms, colors, DenoInspectConfig, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
+import { colors, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "info",

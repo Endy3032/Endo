@@ -1,6 +1,6 @@
 import { rgb24, stripColor } from "colors"
 import { createBot, EventHandlers, Intents, startBot } from "discordeno"
-import { activities, BrightNord, capitalize, deploy, getFiles, LogOptions, Nord } from "modules"
+import { activities, BrightNord, capitalize, deploy, getFiles, InspectConfig, LogOptions, Nord } from "modules"
 import { Temporal } from "temporal"
 
 const [token, logChannel] = [Deno.env.get("DiscordToken"), Deno.env.get("Log")]
@@ -13,12 +13,22 @@ const bot = createBot({
 })
 
 if (Deno.args.includes("debug")) {
-	bot.rest.debug = (text: string) =>
-		console.botLog(text.match(/(?<=(^\[\S.*?] )).*/)?.[0], {
-			noSend: true,
-			logLevel: "DEBUG",
-			tag: text.match(/(?<=\[)\S.*?(?=\])/)?.[0],
-		})
+	bot.rest.debug = (text: string) => {
+		const tag = text.match(/(?<=\[)\S.*?(?=\])/)?.[0]
+		let content = text.match(/(?<=(^\[\S.*?] )).*/)?.[0]
+
+		if (tag?.includes("RequestCreate")) {
+			const json = content?.match(/(?<=( \| Body: )).*/)?.[0] ?? ""
+			content = content?.replace(" | Body: " + json, "\n") + Deno.inspect(JSON.parse(json != "undefined" ? json : "{}"), InspectConfig)
+		} else if (tag?.includes("FetchSuccess")) {
+			const json = content?.match(/(?<=^(URL: .*? \| )).*/)?.[0] ?? ""
+			content = content?.replace(" | " + json, "\n") + Deno.inspect(JSON.parse(json), InspectConfig)
+		} else if (tag?.includes("fetchSuccess")) {
+			content = Deno.inspect(JSON.parse(content ?? "\n"), InspectConfig)
+		}
+
+		console.botLog(content, { noSend: true, logLevel: "DEBUG", tag })
+	}
 }
 
 console.botLog = async (content: any, options?: LogOptions) => {
@@ -49,7 +59,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		content = content.stack ?? "Unable to capture Error stack"
 		logLevel = "ERROR"
 	} else if (typeof content !== "string") {
-		content = Deno.inspect(content, { colors: true, compact: false, depth: 8, iterableLimit: 300, strAbbreviateSize: 1000 })
+		content = Deno.inspect(content, InspectConfig)
 	}
 
 	content = content.replaceAll(Deno.cwd(), "Endo")
@@ -101,7 +111,7 @@ await deploy(bot, Deno.args)
 await startBot(bot)
 
 const listener = Deno.listen({ port: 8080 })
-console.botLog("Server", { tag: "Ready" })
+console.botLog("Server", { tag: "Ready", noSend: true })
 
 async function http(conn: Deno.Conn) {
 	for await (const req of Deno.serveHttp(conn)) req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
