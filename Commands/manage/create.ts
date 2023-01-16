@@ -1,6 +1,6 @@
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes,
-	CreateGuildChannel, Interaction, ModifyGuildChannelPositions } from "discordeno"
-import { checkPermission, defer, edit, getSubcmd, getValue, shorthand } from "modules"
+	CreateGuildChannel, Interaction } from "discordeno"
+import { checkPermission, defer, edit, getSubcmd, getValue, modifyChannelPositions, shorthand } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "create",
@@ -139,20 +139,21 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	if (!interaction.guildId) return await edit(bot, interaction, "This action can only be performed in a server")
 
-	const blockMsg = await checkPermission(interaction, Permissions.MANAGE_CHANNELS)
+	const blockMsg = checkPermission(interaction, Permissions.MANAGE_CHANNELS)
 	if (blockMsg) return await edit(bot, interaction, blockMsg)
 
+	const below = getValue(interaction, "below", "Channel")
 	const name = getValue(interaction, "name", "String") ?? "channel"
 	const reason = getValue(interaction, "reason", "String")
 		?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
+
 	const options: CreateGuildChannel = { name, reason }
 
-	let parentId: bigint | undefined = undefined, position = 0
+	let parentId: bigint | undefined, position = 0
 	const channels = await bot.helpers.getChannels(interaction.guildId)
 
 	switch (getSubcmd(interaction)) {
 		case "category": {
-			const below = getValue(interaction, "below", "Channel")
 			const belowPos = channels.find(channel => channel.id == below?.id)?.position
 			position = belowPos ? belowPos + 1 : 0
 
@@ -161,7 +162,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 		}
 
 		case "text": {
-			const below = getValue(interaction, "below", "Channel")
 			const nsfw = getValue(interaction, "nsfw", "Boolean") ?? false
 			const rateLimitPerUser = getValue(interaction, "slowmode", "Integer") ?? 0
 			const topic = getValue(interaction, "topic", "String") ?? undefined
@@ -189,7 +189,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 		}
 
 		case "voice": {
-			const below = getValue(interaction, "below", "Channel")
 			const bitrate = getValue(interaction, "bitrate", "Integer") ?? 32000
 			const userLimit = getValue(interaction, "user-limit", "Integer") ?? 0
 			const type = getValue(interaction, "type", "Integer") ?? ChannelTypes.GuildVoice
@@ -219,15 +218,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 		.then(async channel => {
 			await edit(bot, interaction, `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
 
-			const swapOptions: ModifyGuildChannelPositions[] = channels
-				.filter(channel => channel.type == options.type)
-				.map(channel => ({
-					id: channel.id.toString(),
-					position: (channel.position ?? 0) >= (options.position ?? 0) ? (channel.position ?? 0) + 1 : channel.position,
-				}))
-
-			swapOptions.push({ id: channel.id.toString(), position: options.position ?? 0 })
-			await bot.helpers.swapChannels(channel.guildId, swapOptions)
+			await bot.helpers.swapChannels(
+				channel.guildId,
+				modifyChannelPositions(channels, channel.id, channel.type, options.position ?? 0),
+			)
 		})
 		.catch(async err => console.botLog(err))
 }
