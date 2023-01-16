@@ -40,13 +40,4 @@ export const main: EventHandlers["ready"] = async (bot, payload) => {
 	}
 
 	if (Deno.build.vendor === "unknown") setInterval(() => reloadPresence(), 20 * TimeMetric.milli_min)
-
-	const globalCommands = await bot.helpers.getGlobalApplicationCommands()
-	console.botLog(`${globalCommands.size} Commands`, { tag: "Global", noSend: true })
-
-	const testGuild = Deno.env.get("TestGuild")
-	if (testGuild !== undefined) {
-		const testCommands = await bot.helpers.getGuildApplicationCommands(BigInt(testGuild))
-		console.botLog(`${testCommands.size} Commands`, { tag: "Test", noSend: true })
-	}
 }

@@ -47,22 +47,3 @@ export const InspectConfig = {
 	iterableLimit: 300,
 	strAbbreviateSize: 1000,
 }
-
-export const BotPerms = Permissions.MANAGE_GUILD
-	+ Permissions.MANAGE_ROLES
-	+ Permissions.MANAGE_CHANNELS
-	+ Permissions.KICK_MEMBERS
-	+ Permissions.BAN_MEMBERS
-	+ Permissions.MANAGE_WEBHOOKS
-	+ Permissions.VIEW_CHANNEL
-	+ Permissions.MODERATE_MEMBERS
-	+ Permissions.SEND_MESSAGES
-	+ Permissions.CREATE_PUBLIC_THREADS
-	+ Permissions.CREATE_PRIVATE_THREADS
-	+ Permissions.SEND_MESSAGES_IN_THREADS
-	+ Permissions.MANAGE_MESSAGES
-	+ Permissions.MANAGE_THREADS
-	+ Permissions.EMBED_LINKS
-	+ Permissions.ATTACH_FILES
-	+ Permissions.USE_EXTERNAL_EMOJIS
-	+ Permissions.ADD_REACTIONS
