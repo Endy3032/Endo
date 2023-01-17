@@ -1,6 +1,6 @@
 import { rgb24, stripColor } from "colors"
 import { Bot, Embed, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
-import { BrightNord, getCmdName, getSubcmd, getSubcmdGroup, imageURL, toTimestamp } from "modules"
+import { getCmdName, getSubcmd, getSubcmdGroup, imageURL, Nord, toTimestamp } from "modules"
 import { handleInteraction } from "../Commands/mod.ts"
 
 const [testGuildID, testGuildChannel] = [Deno.env.get("TestGuild"), Deno.env.get("TestChannel")]
@@ -26,7 +26,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 		const tag = interaction.type === InteractionTypes.ApplicationCommand
 			? "Command"
 			: interaction.type === InteractionTypes.MessageComponent
-			? (interaction.data?.componentType == MessageComponentTypes.Button ? "Button" : "Select")
+			? MessageComponentTypes[interaction.data?.componentType!]
 			: interaction.type === InteractionTypes.ModalSubmit
 			? "Submit"
 			: "Unknown"
@@ -39,13 +39,13 @@ export async function main(bot: Bot, interaction: Interaction) {
 				: interaction.type == InteractionTypes.ModalSubmit
 				? `{${interaction.data?.customId}}`
 				: "Unknown",
-			BrightNord.green,
+			Nord.brightGreen,
 		)
 
 		const timestamp = toTimestamp(interaction.id, "ms")
 
 		const embed: Embed = {
-			description: stripColor(`[${timestamp}]\n**Interaction** • ${log}`),
+			description: stripColor(`**Interaction [${tag}]** • ${log}`),
 			author: {
 				name: invoker,
 				iconUrl: interaction.user.avatar ? imageURL(interaction.user.id, interaction.user.avatar, "avatars") : undefined,
@@ -58,7 +58,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 		log += rgb24(
 			` [${invoker} | ${interaction.guildId ? `${interaction.guildId} - #${interaction.channelId}` : "DM"}]`,
-			BrightNord.blue,
+			Nord.brightBlue,
 		)
 		console.botLog(log, { logLevel: "INFO", embed, tag })
 	}

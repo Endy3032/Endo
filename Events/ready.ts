@@ -2,7 +2,7 @@ import axiod from "axiod"
 import { IAxiodError, IAxiodResponse } from "axiodInterfaces"
 import { bold, rgb24 } from "colors"
 import { EventHandlers } from "discordeno"
-import { activities, BrightNord, Nord, TimeMetric } from "modules"
+import { activities, Nord, TimeMetric } from "modules"
 
 export const name: keyof EventHandlers = "ready"
 export const main: EventHandlers["ready"] = async (bot, payload) => {
@@ -10,7 +10,7 @@ export const main: EventHandlers["ready"] = async (bot, payload) => {
 		location = Deno.build.vendor === "unknown" ? "Replit" : "Local",
 		gatewayInfo = `[v${payload.v} | ${bot.gateway.gatewayBot.sessionStartLimit.remaining} Left | ${location}]`
 
-	console.botLog(`${user} ${rgb24(gatewayInfo, BrightNord.yellow)}`, { tag: "Login" })
+	console.botLog(`${user} ${rgb24(gatewayInfo, Nord.brightYellow)}`, { tag: "Login" })
 	;(function pinger() {
 		const servers = ["pinger"]
 		servers.forEach(server => {
@@ -34,9 +34,9 @@ export const main: EventHandlers["ready"] = async (bot, payload) => {
 		let log = `${typeString[type]} ${name}`
 		if (name === "lofi" && url) {
 			const res = await axiod.get(`https://noembed.com/embed?url=${url.replace("www.youtube.com/watch?v=", "youtu.be/")}`)
-			log += rgb24(`\n${res.data.title}│${rgb24(res.data.url, BrightNord.green)}`, BrightNord.cyan)
+			log += rgb24(`│${res.data.title}\n${rgb24(res.data.url, Nord.brightGreen)}`, Nord.brightCyan)
 		}
-		console.botLog(log, { embed: { description: `**Status** • ${typeString[type]} ${name}` }, tag: "Status" })
+		console.botLog(log, { embed: { description: `[Status] ${typeString[type]} ${name}` }, tag: "Status" })
 	}
 
 	if (Deno.build.vendor === "unknown") setInterval(() => reloadPresence(), 20 * TimeMetric.milli_min)

@@ -1,6 +1,7 @@
 import { rgb24, stripColor } from "colors"
+import { stripIndents } from "commonTags"
 import { createBot, EventHandlers, Intents, startBot } from "discordeno"
-import { activities, BrightNord, capitalize, deploy, getFiles, InspectConfig, LogOptions, Nord } from "modules"
+import { activities, deploy, getFiles, InspectConfig, LogLevel, LogOptions, Nord } from "modules"
 import { Temporal } from "temporal"
 
 const [token, logChannel] = [Deno.env.get("DiscordToken"), Deno.env.get("Log")]
@@ -21,10 +22,24 @@ if (Deno.args.includes("debug")) {
 			const json = content?.match(/(?<=( \| Body: )).*/)?.[0] ?? ""
 			content = content?.replace(" | Body: " + json, "\n") + Deno.inspect(JSON.parse(json != "undefined" ? json : "{}"), InspectConfig)
 		} else if (tag?.includes("FetchSuccess")) {
-			const json = content?.match(/(?<=^(URL: .*? \| )).*/)?.[0] ?? ""
-			content = content?.replace(" | " + json, "\n") + Deno.inspect(JSON.parse(json), InspectConfig)
-		} else if (tag?.includes("fetchSuccess")) {
-			content = Deno.inspect(JSON.parse(content ?? "\n"), InspectConfig)
+			const matched = content?.match(/(?<=^(URL: .*? \| )).*/)?.[0] ?? ""
+			content = content?.replace(" | " + matched, "\n")
+
+			const json = JSON.parse(matched)
+			if (json.payload?.body) {
+				try {
+					json.payload.body = JSON.parse(json.payload.body)
+				} catch {}
+			}
+			content += Deno.inspect(json, InspectConfig)
+		} else if (tag?.includes("fetchSuccess") || tag?.includes("Add To Global Queue")) {
+			const json = JSON.parse(content ?? "\n")
+			if (json.payload?.body) {
+				try {
+					json.payload.body = JSON.parse(json.payload.body)
+				} catch {}
+			}
+			content = Deno.inspect(json, InspectConfig)
 		}
 
 		console.botLog(content, { noSend: true, logLevel: "DEBUG", tag })
@@ -32,10 +47,10 @@ if (Deno.args.includes("debug")) {
 }
 
 console.botLog = async (content: any, options?: LogOptions) => {
-	options = Object.assign({ tag: undefined, noSend: false, embed: undefined }, options)
+	options = options ?? {}
 	const { tag, noSend } = options
-	let { embed } = options
-	let logLevel = options.logLevel ?? "INFO"
+	const embed = options.embed ?? {}
+	let logLevel: LogLevel = options.logLevel ?? "INFO"
 
 	// Time
 	const temporal = Temporal.Now.instant()
@@ -52,9 +67,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		fractionalSecondDigits: 2,
 	}).replace(",", "")
 
-	const timestamp = `<t:${temporal.epochSeconds}:T> [\`${temporal.epochMilliseconds}\`]`
-
-	// Sanitization
+	// Sanitization & Formatting
 	if (content instanceof Error) {
 		content = content.stack ?? "Unable to capture Error stack"
 		logLevel = "ERROR"
@@ -64,35 +77,50 @@ console.botLog = async (content: any, options?: LogOptions) => {
 
 	content = content.replaceAll(Deno.cwd(), "Endo")
 
-	// Formatting
-	if (tag) content = `${rgb24(`[${tag}]`, BrightNord.orange)} ${content}`
+	if (tag) content = `${rgb24(`[${tag}]`, Nord.brightOrange)} ${content}`
 
 	const plainLog = stripColor(content)
-	const logColor = Nord[logLevel.toLowerCase()]
-	const formattedLog = rgb24(logTime, Nord.blue) + rgb24(logLevel.padStart(6, " "), logColor) + rgb24(" | ", Nord.blue)
-		+ content.replaceAll("\n", "\n" + " ".repeat(29) + rgb24("| ", Nord.blue))
 
+	const formattedLog = rgb24(logTime, Nord.blue)
+		+ rgb24(logLevel.padStart(6, " "), Nord[logLevel.toLowerCase()])
+		+ rgb24(" │ ", Nord.blue)
+		+ content.replaceAll("\n", "\n" + " ".repeat(29) + rgb24("│ ", Nord.blue))
+
+	// Local logging
 	console[logLevel.toLowerCase()](formattedLog)
+
 	Deno.writeTextFileSync(
-		`./Resources/${logLevel === "DEBUG" ? "debug" : logLevel === "ERROR" ? "error" : "discord"}.log`,
+		`./Resources/${["DEBUG", "ERROR"].includes(logLevel) ? logLevel.toUpperCase() : "discord"}.log`,
 		stripColor(formattedLog) + "\n",
 		{ append: true },
 	)
 
 	// Discord logging
 	if (logChannel === undefined || noSend) return
+
 	try {
-		embed = embed ?? {}
 		if (!embed.timestamp) embed.timestamp = temporal.epochMilliseconds
-		if (!/^<t:\d+:[tTdDfFR]>/.test(embed.description ?? "")) {
-			embed.description = `**${capitalize(logLevel)}**│${timestamp}\n${logLevel !== "ERROR" ? `\`\`\`${plainLog}\`\`\`\n` : ""}${
-				embed.description ? `\`\`\`${embed.description}\`\`\`` : ""
-			}`
+
+		const descriptionInfo = `**${logLevel}**│\`${temporal.epochMilliseconds}\``
+		if (!embed.description) {
+			embed.description = stripIndents`${descriptionInfo}
+			${logLevel !== "ERROR" ? `\`\`\`${plainLog}\`\`\`\n` : ""}${embed.description ? `\`\`\`${embed.description}\`\`\`` : ""}`
 		}
-		if (logLevel === "ERROR") content = `${timestamp} \`\`\`${plainLog}\`\`\``
-		const embeds = embed ? [embed] : undefined
-		await bot.helpers.sendMessage(logChannel, { content: embed.description?.includes(content) ? stripColor(content) : undefined,
-			embeds })
+
+		if (!embed.description?.startsWith(descriptionInfo)) embed.description = `${descriptionInfo}\n${embed.description}`
+
+		if (logLevel === "ERROR") {
+			content = stripIndents`\`\`\`ts
+			${plainLog.length > 2015 ? plainLog.slice(0, 2012) + "..." : plainLog}
+			[${temporal.epochMilliseconds}]\`\`\``
+		}
+
+		await bot.helpers.sendMessage(
+			logChannel,
+			(!embed.description.includes(plainLog) && !embed.description.includes("Interaction")) || embed.description.includes("Streaming")
+				? { content: stripColor(content) }
+				: { embeds: [embed] },
+		)
 	} catch (err) {
 		console.botLog(err, { logLevel: "ERROR" })
 	}
