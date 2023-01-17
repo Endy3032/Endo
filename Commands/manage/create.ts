@@ -1,6 +1,6 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ChannelTypes,
-	CreateGuildChannel, Interaction } from "discordeno"
-import { checkPermission, defer, edit, getSubcmd, getValue, modifyChannelPositions, shorthand } from "modules"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles,
+	ChannelTypes, CreateGuildChannel, Interaction, MessageComponentTypes } from "discordeno"
+import { checkPermission, defer, edit, getSubcmd, getValue, modifyChannelPositions, respond, shorthand } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "create",
@@ -155,60 +155,44 @@ export async function main(bot: Bot, interaction: Interaction) {
 	switch (getSubcmd(interaction)) {
 		case "category": {
 			const belowPos = channels.find(channel => channel.id == below?.id)?.position
-			position = belowPos ? belowPos + 1 : 0
+			position = belowPos ?? 0
 
 			Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, { type: ChannelTypes.GuildCategory, position })
 			break
 		}
 
-		case "text": {
-			const nsfw = getValue(interaction, "nsfw", "Boolean") ?? false
-			const rateLimitPerUser = getValue(interaction, "slowmode", "Integer") ?? 0
-			const topic = getValue(interaction, "topic", "String") ?? undefined
+		default: {
+			const nsfw = getValue(interaction, "nsfw", "Boolean")
+			const topic = getValue(interaction, "topic", "String")
+			const rateLimitPerUser = getValue(interaction, "slowmode", "Integer")
+
+			const userLimit = getValue(interaction, "user-limit", "Integer")
+			const bitrate = getValue(interaction, "bitrate", "Integer") ?? 32000
+			const type = getValue(interaction, "type", "Integer") ?? ChannelTypes.GuildVoice
 
 			if (below?.type === ChannelTypes.GuildCategory) {
 				parentId = below.id
-				position = channels
-					.filter(channel => channel.parentId === parentId).array()
-					.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
-			} else if (below?.type === ChannelTypes.GuildText) {
-				const channel = await bot.helpers.getChannel(below.id)
-				parentId = channel?.parentId ?? undefined
-				position = channel?.position ? channel.position + 1 : 0
+				position = Math.max(
+					(channels
+						.filter(channel => channel.parentId === parentId).array()
+						.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 1) - 1,
+					0,
+				)
+			} else if (below) {
+				const channel = channels.find(channel => channel.id === below.id)
+				parentId = channel?.parentId
+				position = channel?.position ?? 0
 			}
 
 			Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
-				type: ChannelTypes.GuildText,
 				rateLimitPerUser,
 				topic,
 				nsfw,
 				position,
 				parentId,
-			})
-			break
-		}
-
-		case "voice": {
-			const bitrate = getValue(interaction, "bitrate", "Integer") ?? 32000
-			const userLimit = getValue(interaction, "user-limit", "Integer") ?? 0
-			const type = getValue(interaction, "type", "Integer") ?? ChannelTypes.GuildVoice
-
-			if (below?.type === ChannelTypes.GuildCategory) {
-				parentId = below.id
-				position = channels.filter(channel => channel.parentId === parentId).array()
-					.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 0
-			} else if (below?.type === ChannelTypes.GuildVoice) {
-				const channel = await bot.helpers.getChannel(below.id)
-				parentId = channel?.parentId ?? undefined
-				position = channel?.position ? channel.position + 1 : 0
-			}
-
-			Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, {
-				type,
-				bitrate,
 				userLimit,
-				position,
-				parentId,
+				bitrate: getSubcmd(interaction) === "voice" ? bitrate : undefined,
+				type: getSubcmd(interaction) === "text" ? ChannelTypes.GuildText : type ?? ChannelTypes.GuildVoice,
 			})
 			break
 		}
@@ -216,12 +200,38 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await bot.helpers.createChannel(interaction.guildId, options)
 		.then(async channel => {
-			await edit(bot, interaction, `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`)
+			await edit(bot, interaction, {
+				content: `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`,
+				components: [{
+					type: MessageComponentTypes.ActionRow,
+					components: [{
+						type: MessageComponentTypes.Button,
+						label: "Delete",
+						style: ButtonStyles.Danger,
+						customId: channel.id.toString(),
+					}],
+				}],
+			})
 
 			await bot.helpers.swapChannels(
 				channel.guildId,
-				modifyChannelPositions(channels, channel.id, channel.type, options.position ?? 0),
+				modifyChannelPositions(channels, channel),
 			)
 		})
 		.catch(async err => console.botLog(err))
+}
+
+export async function button(bot: Bot, interaction: Interaction) {
+	await defer(bot, interaction)
+
+	await bot.helpers.deleteChannel(interaction.data?.customId ?? 0n)
+
+	await edit(bot, interaction, {
+		content: `${shorthand("success")} Deleted channel`,
+		components: [],
+	})
+
+	try {
+		setTimeout(() => bot.helpers.deleteOriginalInteractionResponse(interaction.token), 1500)
+	} catch {}
 }
