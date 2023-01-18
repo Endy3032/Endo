@@ -12,29 +12,3 @@
 [![Add to Server](https://img.shields.io/badge/Add%20to%20Server-2e3440?style=for-the-badge&logo=discord)](https://discord.com/api/v9/oauth2/authorize?client_id=699911346367627374&scope=bot%20applications.commands)
 
 </div>
-
-# Privacy Policy
-
-When using Endo, I collect data about you for debugging purposes only.
-
-## What personal informations do I collect from people using Endo?
-
-- Public server informations: Server ID, Server Name, Server Icon, Channel Name
-- Public user informations: Username, User ID, Profile picture
-- Any errors that occured while using the bot
-
-These informations will only be logged to a private Discord channel when a command is invoked.
-
-## How do we use your information?
-
-Your information will only be used for logging and debugging purposes.
-
-## Agreement
-
-By using Endo, you agree to the terms of this Privacy Policy. If you do not agree to these terms you must not use my service.
-
-## Contact
-
-If you have any questions or suggestions about my Privacy Policy, please contact me on Discord at Endy#3032.
-
-<sup>Last Modified 15th October 2022.</sup>
