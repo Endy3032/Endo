@@ -24,7 +24,7 @@
 	},
 	"Button Handler": {
 		"scope": "typescript",
-		"prefix": "bth",
+		"prefix": "btnh",
 		"body": [
 			"export async function button(bot: Bot, interaction: Interaction) {",
 			"\t$0",
@@ -33,7 +33,7 @@
 	},
 	"Select Menu Handler": {
 		"scope": "typescript",
-		"prefix": "slh",
+		"prefix": "slmh",
 		"body": [
 			"export async function select(bot: Bot, interaction: Interaction) {",
 			"\t$0",
@@ -42,7 +42,7 @@
 	},
 	"Autocomplete Handler": {
 		"scope": "typescript",
-		"prefix": "ach",
+		"prefix": "acph",
 		"body": [
 			"export async function autocomplete(bot: Bot, interaction: Interaction) {",
 			"\t$0",
@@ -51,7 +51,7 @@
 	},
 	"Modal Handler": {
 		"scope": "typescript",
-		"prefix": "mdh",
+		"prefix": "mdlh",
 		"body": [
 			"export async function modal(bot: Bot, interaction: Interaction) {",
 			"\t$0",
