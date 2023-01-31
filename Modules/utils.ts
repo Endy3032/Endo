@@ -24,25 +24,22 @@ export function getFiles(dir: string, options?: { fileTypes?: string[] | string 
 // Source https://github.com/discordjs/discord.js/blob/main/packages/discord.js/src/util/Util.js#L75
 export function escapeMarkdown(text: string) {
 	return text
-		// Codeblocks
+		// Basic Formatting
 		.replaceAll("`", "\\`")
-		// Bold, Italic & Underline
 		.replaceAll("*", "\\*")
 		.replaceAll("_", "\\_")
-		// Strikethrough
-		.replaceAll("~~", "\\~\\~")
-		// Spoiler
-		.replaceAll("||", "\\|\\|")
+		.replaceAll("~", "\\~")
+		.replaceAll("|", "\\|")
+		.replaceAll("<t:", "\\<t:")
+		// Masked Link
+		.replaceAll(/\[.+\]\(.+\)/gm, "\\$&")
+		// Forum Markdown
 		// Heading
 		.replaceAll(/^( {0,2}[*-] +)?(#{1,3} )/gm, "$1\\$2")
 		// Bulleted List
 		.replaceAll(/^( *)[*-]( +)/gm, "$1\\-$2")
 		// Numbered List
 		.replaceAll(/^( *\d+)\./gm, "$1\\.")
-		// Masked Link
-		.replaceAll(/\[.+\]\(.+\)/gm, "\\$&")
-		// Timestamp
-		.replaceAll("<t:", "\\<t:")
 }
 
 // #region Image URL

@@ -12,16 +12,18 @@ export const main: EventHandlers["ready"] = async (bot, payload) => {
 
 	console.botLog(`${user} ${rgb24(gatewayInfo, Nord.brightYellow)}`, { tag: "Login" })
 	;(function pinger() {
-		const servers = ["pinger"]
-		servers.forEach(server => {
-			axiod.head(`https://${server}.endy3032.repl.co`)
-				.catch((err: IAxiodError) => {
-					console.botLog(
-						bold(rgb24(`${err.response.status} ${err.response.statusText}`, Nord.error)),
-						{ logLevel: "WARN", tag: server },
-					)
-				})
-		})
+		axiod.head(`https://pinger.endy3032.repl.co`)
+			.catch((err: IAxiodError) => {
+				console.botLog(
+					bold(rgb24(
+						err.response !== undefined
+							? `${err.response.status} ${err.response.statusText}`
+							: "Unreachable",
+						Nord.error,
+					)),
+					{ logLevel: "WARN", tag: "pinger" },
+				)
+			})
 		setTimeout(() => pinger(), 5 * TimeMetric.milli_min)
 	})()
 

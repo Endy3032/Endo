@@ -90,7 +90,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 	console[logLevel.toLowerCase()](formattedLog)
 
 	Deno.writeTextFileSync(
-		`./Resources/${["DEBUG", "ERROR"].includes(logLevel) ? logLevel.toUpperCase() : "discord"}.log`,
+		`./Resources/${logLevel.toLowerCase()}.log`,
 		stripColor(formattedLog) + "\n",
 		{ append: true },
 	)

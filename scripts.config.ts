@@ -7,24 +7,22 @@ export default <DenonConfig> {
 	allow: "all",
 	env: env(),
 
-	importMap: "./imports.json",
 	tsconfig: "./deno.json",
 
 	watch: false,
-	watcher: { exts: ["ts"] },
+	watcher: {
+		exts: ["ts", "tsx"],
+		skip: ["./Old/*.*"],
+	},
+
+	inspect: "127.0.0.1:9229",
 
 	scripts: {
 		dev: {
 			cmd,
 			watch: true,
 		},
-		debug: {
-			cmd: `denon dev debug`,
-			inspect: "127.0.0.1:9229",
-			watch: true,
-		},
 		start: { cmd },
-		run: { cmd: "deno run" },
 		repl: { cmd: "deno repl" },
 		fmt: { cmd: "dprint fmt && eslint --fix ." },
 	},
