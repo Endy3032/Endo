@@ -7,11 +7,12 @@ export const cmd: CreateContextApplicationCommand = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	if (interaction.guildId) return await respond(bot, interaction, `${shorthand("warn")} This command can only be used in my DM.`, true)
+	if (interaction.guildId) return await respond(bot, interaction, `${shorthand("warn")} This command is exclusive to my DM`, true)
 
-	const message = interaction.data?.resolved?.messages?.array()[0]
+	const message = interaction.data?.resolved?.messages?.first()
+
 	if (message?.authorId !== bot.id) {
-		return await respond(bot, interaction, `${shorthand("warn")} This action is used to delete my message`, true)
+		return await respond(bot, interaction, `${shorthand("warn")} This command is exlusive to my messages`, true)
 	}
 
 	const channel = await bot.helpers.getDmChannel(interaction.user.id)

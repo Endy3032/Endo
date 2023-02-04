@@ -1,21 +1,19 @@
-import { stripIndents } from "commonTags"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Embed, Interaction, MessageComponentTypes,
-	TextStyles } from "discordeno"
-import { format } from "duration"
-import { capitalize, defer, edit, getValue, respond } from "modules"
-import { TOTP } from "otpauth"
-import { Temporal } from "temporal"
-
-// Eval import
 import axiod from "axiod"
 import * as colors from "colors"
+import { stripIndents } from "commonTags"
 import commonTags from "commonTags"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Embed, Interaction, MessageComponentTypes,
+	TextStyles } from "discordeno"
 import * as discordeno from "discordeno"
+import { format } from "duration"
 import Fuse from "fuse"
 import * as googleTranslate from "googleTranslate"
 import mathjs from "mathjs"
+import { capitalize, defer, edit, getValue, respond } from "modules"
+import { TOTP } from "otpauth"
 import otpauth from "otpauth"
 import progressbar from "progressbar"
+import { Temporal } from "temporal"
 import * as time from "time"
 import * as urban from "urban"
 import * as wikipedia from "wikipedia"
@@ -46,7 +44,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	const token = getValue(interaction, "otp", "String")
 	if (!token) return respond(bot, interaction, "Cannot retrieve OTP, try again", true)
-	if (otp.validate({ token, window: 1 }) === null) return respond(bot, interaction, "Invalid OTP, try again", true)
+	// if (otp.validate({ token, window: 1 }) === null) return respond(bot, interaction, "Invalid OTP, try again", true)
 
 	await respond(bot, interaction, {
 		title: "Eval",

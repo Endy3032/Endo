@@ -21,27 +21,6 @@ export function getFiles(dir: string, options?: { fileTypes?: string[] | string 
 		.map(entry => entry.name)
 }
 
-// Source https://github.com/discordjs/discord.js/blob/main/packages/discord.js/src/util/Util.js#L75
-export function escapeMarkdown(text: string) {
-	return text
-		// Basic Formatting
-		.replaceAll("`", "\\`")
-		.replaceAll("*", "\\*")
-		.replaceAll("_", "\\_")
-		.replaceAll("~", "\\~")
-		.replaceAll("|", "\\|")
-		.replaceAll("<t:", "\\<t:")
-		// Masked Link
-		.replaceAll(/\[.+\]\(.+\)/gm, "\\$&")
-		// Forum Markdown
-		// Heading
-		.replaceAll(/^( {0,2}[*-] +)?(#{1,3} )/gm, "$1\\$2")
-		// Bulleted List
-		.replaceAll(/^( *)[*-]( +)/gm, "$1\\-$2")
-		// Numbered List
-		.replaceAll(/^( *\d+)\./gm, "$1\\.")
-}
-
 // #region Image URL
 type ID = string | number | BigInt | null | undefined
 type Endpoints = "app-icons" | "avatars" | "banners" | "discovery-splashes" | "icons" | "role-icons" | "splashes"

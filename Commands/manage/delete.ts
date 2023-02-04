@@ -1,10 +1,11 @@
+import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles,
 	ChannelTypes, Interaction, MessageComponentTypes } from "discordeno"
-import { checkPermission, defer, emojis, error, getSubcmd, getValue, respond, shorthand } from "modules"
+import { checkPermission, defer, edit, emojis, error, getSubcmd, getValue, respond, shorthand } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "delete",
-	description: "Delete something in the server",
+	description: "Delete something from the server",
 	type: ApplicationCommandOptionTypes.SubCommandGroup,
 	options: [
 		{
@@ -21,7 +22,7 @@ export const cmd: ApplicationCommandOption = {
 				},
 				{
 					name: "reason",
-					description: "Reason for deleting the channel [Length 0~512]",
+					description: "Reason for deletion [Length 0~512]",
 					type: ApplicationCommandOptionTypes.String,
 					required: false,
 				},
@@ -31,7 +32,9 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	if (checkPermission(interaction, Permissions.MANAGE_CHANNELS)) return
+	const blockMsg = checkPermission(interaction, Permissions.MANAGE_CHANNELS)
+	if (blockMsg) return await edit(bot, interaction, blockMsg)
+
 	switch (getSubcmd(interaction)) {
 		case "channel": {
 			const channel = getValue(interaction, "channel", "Channel")
@@ -39,15 +42,17 @@ export async function main(bot: Bot, interaction: Interaction) {
 				?? `Deleted by ${interaction.user.username}#${interaction.user.discriminator}`
 
 			await respond(bot, interaction, {
-				content: `Confirm to delete <#${channel?.id}> with the following reason: ${reason}`,
+				content: stripIndents`${shorthand("warn")} Confirm deletion
+				**Target:** <#${channel?.id}>
+				**Reason:** ${reason}`,
 				components: [{
 					type: MessageComponentTypes.ActionRow,
 					components: [{
 						type: MessageComponentTypes.Button,
 						label: "Delete",
-						customId: `delete-channel-${channel?.id}`,
+						customId: `channel-${channel?.id}`,
 						style: ButtonStyles.Danger,
-						emoji: { id: BigInt(emojis.warn) },
+						emoji: { id: BigInt(emojis.trash) },
 					}],
 				}],
 			}, true)
@@ -57,49 +62,20 @@ export async function main(bot: Bot, interaction: Interaction) {
 }
 
 export async function button(bot: Bot, interaction: Interaction) {
-	const customID = (interaction.data?.customId ?? "").split("-")
-	const [, type] = customID
-
 	await defer(bot, interaction)
+
+	const customID = (interaction.data?.customId ?? "").split("-")
+	const [type, id] = customID
+
 	switch (type) {
 		case "channel": {
-			if (checkPermission(interaction, Permissions.MANAGE_CHANNELS)) return
-			const [, , channelID] = customID
-			const reason = interaction.message?.content.split(": ")[1]
-				?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
-			await bot.helpers.deleteChannel(BigInt(channelID), reason)
-				.then(() => respond(bot, interaction, { content: `${shorthand("success")} Deleted the channel`, components: [] }))
+			const reason = interaction.message?.content.match(/(?<=\*\*Reason:\*\* ).*/)?.[0]
+				?? `Deleted by ${interaction.user.username}#${interaction.user.discriminator}`
+
+			await bot.helpers.deleteChannel(BigInt(id), reason)
+				.then(() => edit(bot, interaction, { content: `${shorthand("success")} Deleted the channel`, components: [] }))
 				.catch(err => error(bot, interaction, err, "Channel Deletion", true))
 			break
-		}
-
-		case "messages": {
-			if (checkPermission(interaction, Permissions.MANAGE_MESSAGES)) return
-			if (interaction.channelId === undefined) return respond(bot, interaction, "Cannot get current channel")
-			const [, , amount, option, user] = customID
-			const reason = interaction.message?.content.split(": ")[1]
-				?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
-
-			let clear = await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) })
-			if (option != "null" || user != "undefined") {
-				clear = clear.filter(msg => {
-					let cond = false
-					if (option == "bots") cond = cond || msg.isFromBot
-					if (option == "users") cond = cond || !msg.isFromBot
-					if (user != "undefined") cond = cond || (msg.authorId == BigInt(user))
-					return cond
-				})
-			}
-
-			if (clear.size < 1) return await respond(bot, interaction, `${shorthand("warn")} Found no messages to purge`)
-			else {
-				await purge(bot, interaction.channelId, clear.map(msg => msg.id), reason)
-					.then(() => {
-						respond(bot, interaction, `${shorthand("success")} Found and purged ${clear.size}/${amount} messages`)
-						console.botLog(`Found and purged ${clear.size}/${amount} messages`)
-					})
-					.catch(err => error(bot, interaction, err, "Message Purge", true))
-			}
 		}
 	}
 }

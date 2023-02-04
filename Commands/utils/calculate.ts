@@ -16,9 +16,12 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	const expression = getValue(interaction, "expression", "String") ?? ""
-	const subexpressions = expression.split(";").map(e => e.trim()).filter(e => e.length > 0)
-	const nodes = parse(subexpressions)
+	const expression = (getValue(interaction, "expression", "String") ?? "")
+		.split(";")
+		.map(e => e.trim())
+		.filter(e => e.length > 0)
+
+	const nodes = parse(expression)
 
 	const scope = {
 		π: Math.PI,
@@ -32,15 +35,12 @@ export async function main(bot: Bot, interaction: Interaction) {
 		await respond(bot, interaction, {
 			embeds: [{
 				color: pickArray(colors),
-				fields: [{
-					name: "Result",
-					value: `\`\`\`${subexpressions.map((e, i) => `${e}: ${result[i]}`).join("\n")}\`\`\``,
-					inline: false,
-				}],
+				author: { name: "Result" },
+				description: `\`\`\`${expression.map((e, i) => `${e}: ${result[i]}`).join("\n")}\`\`\``,
 			}],
 		})
 	} catch (e) {
 		console.botLog(e, { logLevel: "ERROR" })
-		await respond(bot, interaction, stripIndents`Cannot evaluate \`${expression}\` - \`${e.message}\``)
+		await respond(bot, interaction, stripIndents`Unable to evaluate \`${expression.join("; ")}\` - \`${e.message}\``)
 	}
 }

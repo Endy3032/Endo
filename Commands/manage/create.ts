@@ -1,3 +1,4 @@
+import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, BitwisePermissionFlags as Permissions, Bot, ButtonStyles,
 	ChannelTypes, CreateGuildChannel, Interaction, MessageComponentTypes } from "discordeno"
 import { checkPermission, defer, edit, getSubcmd, getValue, modifyChannelPositions, respond, shorthand } from "modules"
@@ -201,7 +202,9 @@ export async function main(bot: Bot, interaction: Interaction) {
 	await bot.helpers.createChannel(interaction.guildId, options)
 		.then(async channel => {
 			await edit(bot, interaction, {
-				content: `${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}>`,
+				content: stripIndents`\
+				${shorthand("success")} Created ${getSubcmd(interaction)} channel <#${channel.id}> ${reason ? `with reason \`${reason}\`` : ""}
+				Channel position might not be correct. Manually reorder it if needed.`,
 				components: [{
 					type: MessageComponentTypes.ActionRow,
 					components: [{
