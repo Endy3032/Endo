@@ -22,7 +22,7 @@ const status: Activity & StreamingActivity = {
 }
 
 export function activities(): StatusUpdate {
-	const type = pickArray(Object.keys(status))
+	const type = pickArray(Object.keys(status)) as keyof typeof status
 	const name = pickArray(type == "Streaming" ? Object.keys(status.Streaming) : status[type])
 	const url = type === "Streaming" ? `https://youtube.com/watch?v=${pickArray(status.Streaming[name])}` : undefined
 
@@ -30,7 +30,7 @@ export function activities(): StatusUpdate {
 		activities: [{
 			name,
 			url,
-			type: parseInt(ActivityTypes[type]),
+			type: ActivityTypes[type],
 			createdAt: Temporal.Now.instant().epochMilliseconds,
 		}],
 		status: "idle",
