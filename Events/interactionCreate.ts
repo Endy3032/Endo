@@ -16,13 +16,9 @@ export async function main(bot: Bot, interaction: Interaction) {
 	const notRemoteTestLocation = !isLocal && isTestGuild && !isRemoteTest
 	if ((notLocalTestLocation || notRemoteTestLocation) && !Deno.args.includes("noLimit")) return
 
-	handleInteraction(bot, interaction)
+	await handleInteraction(bot, interaction)
 
 	if (interaction.type != InteractionTypes.ApplicationCommandAutocomplete) {
-		const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
-
-		const invoker = `${interaction.user.username}#${interaction.user.discriminator}`
-
 		const tag = interaction.type === InteractionTypes.ApplicationCommand
 			? "Command"
 			: interaction.type === InteractionTypes.MessageComponent
@@ -30,6 +26,8 @@ export async function main(bot: Bot, interaction: Interaction) {
 			: interaction.type === InteractionTypes.ModalSubmit
 			? "Submit"
 			: "Unknown"
+
+		const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
 
 		let log = rgb24(
 			interaction.type == InteractionTypes.ApplicationCommand
@@ -42,6 +40,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 			Nord.brightGreen,
 		)
 
+		// const guild = interaction.guildId ? await bot.helpers.getGuild(interaction.guildId) : null
+		// const guildName = guild?.name
+		// const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
+		const invoker = `${interaction.user.username}#${interaction.user.discriminator}`
 		const timestamp = toTimestamp(interaction.id, "ms")
 
 		const embed: Embed = {
@@ -52,10 +54,13 @@ export async function main(bot: Bot, interaction: Interaction) {
 			},
 			footer: {
 				text: interaction.guildId ? `${interaction.guildId} - #${interaction.channelId}` : "DM",
+				// text: guildName ? `${guildName} #${channelName}` : "DM",
+				// iconUrl: guild?.icon ? imageURL(guild?.id, guild.icon, "icons") : undefined,
 			},
 			timestamp: Number(timestamp),
 		}
 
+		// log += rgb24(` [${invoker} | ${guildName ? `${guildName} #${channelName}` : "DM"}]`, Nord.brightBlue)
 		log += rgb24(
 			` [${invoker} | ${interaction.guildId ? `${interaction.guildId} - #${interaction.channelId}` : "DM"}]`,
 			Nord.brightBlue,
