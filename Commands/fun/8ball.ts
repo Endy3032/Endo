@@ -43,13 +43,12 @@ export async function main(bot: Bot, interaction: Interaction) {
 		],
 	}
 
-	const index = Math.floor(Math.random() * 300) % 3
 	const question = getValue(interaction, "question", "String") ?? ""
 	const response = question.match(/^[\u200a]|[\u200a]$/)
 		? pickArray(responses.yes)
 		: question.match(/^[\u200b]|[\u200b]$/)
 		? pickArray(responses.no)
-		: pickArray(responses[Object.keys(responses)[index]])
+		: pickArray(pickArray(Object.values(responses)))
 
 	respond(bot, interaction, {
 		embeds: [{

@@ -20,15 +20,15 @@ export async function main(bot: Bot, interaction: Interaction) {
 	await bot.helpers.editOriginalInteractionResponse(interaction.token, {
 		content: "",
 		embeds: [{
-			title: "Pong!",
+			title: "Pong! - Latency Info",
 			color: pickArray(colors),
 			fields: [
 				{
-					name: "WebSocket Latency",
-					value: noPing ? "Unavailable" : `${wsPing}ms${wsPing < 0 ? " (how did this happen)" : ""}`,
+					name: "WebSocket",
+					value: noPing ? "Unavailable" : `${wsPing}ms${wsPing < 0 ? " (how...)" : ""}`,
 				},
 				{
-					name: "Roundtrip Latency",
+					name: "Roundtrip",
 					value: `${BigInt(original.timestamp) - toTimestamp(interaction.id, "ms")}ms`,
 				},
 			],
