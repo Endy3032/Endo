@@ -1,5 +1,8 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction, MessageComponents } from "discordeno"
-import { respond } from "modules"
+import { ActionRow, ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ButtonStyles, DiscordEmbedField, Interaction,
+	MessageComponents, MessageComponentTypes, TextStyles } from "discordeno"
+import { capitalize, colors, getCmdName, getValue, pickArray, randRange, respond } from "modules"
+import { splitBar } from "progressbar"
+import { Temporal } from "temporal"
 
 export const cmd: ApplicationCommandOption = {
 	name: "poll",
@@ -8,123 +11,113 @@ export const cmd: ApplicationCommandOption = {
 }
 
 export async function main(bot: Bot, interaction: Interaction) {
-	const placeholders = [
+	const placeholder = pickArray([
 		["Do you like pineapples on pizza?", "Yes", "No", "Why even?", "What the heck is a pineapple pizza"],
 		["Where should we go to eat today", "McDonald's", "Burger King", "Taco Bell", "Wendy's"],
 		["What's your favorite primary color?", "Red", "Green", "Green", "Yellow"],
-	]
-	const index = Math.floor(Math.random() * placeholders.length)
+	])
 
-	const modalData: MessageComponents = []
-
-	for (let i = 0; i < 5; i++) {
-		modalData.push({
-			type: 1,
+	await respond(bot, interaction, {
+		title: "Create a Poll",
+		customId: "utils/poll",
+		components: placeholder.map<ActionRow>((e, i) => ({
+			type: MessageComponentTypes.ActionRow,
 			components: [{
-				type: 4,
+				type: MessageComponentTypes.InputText,
+				customId: i === 0 ? "question" : `option${i}`,
+				style: TextStyles.Short,
 				label: i === 0 ? "Question" : `Option ${i}`,
-				placeholder: placeholders[index][i],
-				style: 1,
-				minLength: 1,
-				maxLength: i === 0 ? 500 : 100,
-				customId: "Poll Question",
+				placeholder: e,
 				required: i < 3,
 			}],
+		})),
+	}, true)
+}
+
+export async function button(bot: Bot, interaction: Interaction) {
+	if (getCmdName(interaction) == "poll") {
+		const embed = interaction.message?.embeds[0]
+		// let user = embed.description?.split(" ").at(-1) as string
+		// user = user.slice(2, user.length - 1)
+		// switch(true) {
+		//   case interaction.customId.startsWith("poll"): {
+		//     switch(interaction.customId.slice(5)) {
+		//       case "close": {
+		//         console.log("close")
+		//         if (interaction.user.id == user) {await interaction.message.edit({ components: [] })}
+		//         else {await interaction.reply({ content: "You cannot close this poll", ephemeral: true })}
+		//         break
+		//       }
+		//     }
+		//     break
+		//   }
+		// }
+	}
+}
+
+export async function modal(bot: Bot, interaction: Interaction) {
+	const question = getValue(interaction, "question", "String")!
+	const option1 = getValue(interaction, "option1", "String")!
+	const option2 = getValue(interaction, "option2", "String")!
+	const option3 = getValue(interaction, "option3", "String")
+	const option4 = getValue(interaction, "option4", "String")
+
+	const amount = Math.floor(Math.random() * 1000)
+
+	const fields: DiscordEmbedField[] = []
+	const components: MessageComponents = [
+		{
+			type: MessageComponentTypes.ActionRow,
+			components: [],
+		},
+		{
+			type: MessageComponentTypes.ActionRow,
+			components: [{
+				type: MessageComponentTypes.Button,
+				style: ButtonStyles.Danger,
+				label: "Close Poll",
+				customId: "poll_close",
+			}],
+		},
+	]
+
+	for (const option of [option1, option2, option3, option4].filter(e => e !== undefined) as string[]) {
+		const split = splitBar(100, randRange(0, 100), 25)
+
+		fields.push({
+			name: `${capitalize(option)} • 0/${amount} Votes • ${split[1]}%`,
+			value: `[${split[0]}]`,
+			inline: false,
+		})
+
+		components[0].components.push({
+			type: MessageComponentTypes.Button,
+			style: ButtonStyles.Primary,
+			label: option,
+			customId: `poll_${option}_0`,
 		})
 	}
 
-	// await respond(bot, interaction, {
-	//   title: "Create a Poll",
-	//   customId: "poll",
-	//   components: modalData
-	// }, true)
-	await respond(bot, interaction, "Poll is currently unavailable", true)
+	components.push({
+		type: MessageComponentTypes.ActionRow,
+		components: [{
+			type: MessageComponentTypes.Button,
+			style: ButtonStyles.Danger,
+			label: "Close Poll",
+			customId: "poll_close",
+		}],
+	})
+	const timestamp = Temporal.Now.instant()
+
+	await respond(bot, interaction, {
+		embeds: [{
+			title: `Poll - ${question.charAt(0).toUpperCase() + question.slice(1)}`,
+			color: pickArray(colors),
+			description: `0 votes so far\nPoll Created <t:${timestamp.epochSeconds}:R> by <@${interaction.user.id}>`,
+			fields: fields,
+			footer: { text: "Last updated" },
+			timestamp: timestamp.epochMilliseconds,
+		}],
+		components,
+	})
 }
-
-// export async function button(bot: Bot, interaction: Interaction) {
-//   if (getCmdName(interaction) == "poll") {
-//     const embed = interaction.message?.embeds[0]
-//     // let user = embed.description?.split(" ").at(-1) as string
-//     // user = user.slice(2, user.length - 1)
-//     // switch(true) {
-//     //   case interaction.customId.startsWith("poll"): {
-//     //     switch(interaction.customId.slice(5)) {
-//     //       case "close": {
-//     //         console.log("close")
-//     //         if (interaction.user.id == user) {await interaction.message.edit({ components: [] })}
-//     //         else {await interaction.reply({ content: "You cannot close this poll", ephemeral: true })}
-//     //         break
-//     //       }
-//     //     }
-//     //     break
-//     //   }
-//     // }
-//   }
-// }
-
-// export async function modal(bot: Bot, interaction: Interaction) {
-//   //   const ques = interaction.options.getString("question")
-//   //   const opt1 = interaction.options.getString("option1")
-//   //   const opt2 = interaction.options.getString("option2")
-//   //   const opt3 = interaction.options.getString("option3") || null
-//   //   const opt4 = interaction.options.getString("option4") || null
-//   //   const opt5 = interaction.options.getString("option5") || null
-
-//   //   const split1 = splitBar(100, 0, 25)
-//   //   const split2 = splitBar(100, 0, 25)
-
-//   //   creation = new Date()
-//   //   creation = (creation - creation.getMilliseconds()) / 1000
-
-//   //   amount = Math.floor(Math.random() * 1000)
-
-//   //   fields = [
-//   //     { name: `${opt1.charAt(0).toUpperCase() + opt1.slice(1)} • 0/${amount} Votes • ${split1[1]}%`, value: `[${split1[0]}]`, inline: false },
-//   //     { name: `${opt2.charAt(0).toUpperCase() + opt2.slice(1)} • 0/${amount} Votes • ${split2[1]}%`, value: `[${split2[0]}]`, inline: false },
-//   //   ]
-
-//   //   components = [
-//   //     {
-//   //       "type": 1,
-//   //       "components": [
-//   //         { "type": 2, "style": 2, "label": opt1, "custom_id": "poll_1_0" },
-//   //         { "type": 2, "style": 2, "label": opt2, "custom_id": "poll_2_0" }
-//   //       ]
-//   //     },
-//   //     {
-//   //       "type": 1,
-//   //       "components": [
-//   //         { "type": 2, "style": 4, "label": "Close Poll", "custom_id": "poll_close" },
-//   //       ]
-//   //     }
-//   //   ]
-
-//   //   if (opt3) {
-//   //     const split3 = splitBar(100, 0, 25)
-//   //     fields.push({ name: `${opt3.charAt(0).toUpperCase() + opt3.slice(1)} • 0/${amount} Votes • ${split3[1]}%`, value: `[${split3[0]}]`, inline: false })
-//   //     components[0].components.push({ "type": 2, "style": 2, "label": opt3, "custom_id": "poll_3_0" })
-//   //   }
-
-//   //   if (opt4) {
-//   //     const split4 = splitBar(100, 0, 25)
-//   //     fields.push({ name: `${opt4.charAt(0).toUpperCase() + opt4.slice(1)} • 0/${amount} Votes • ${split4[1]}%`, value: `[${split4[0]}]`, inline: false })
-//   //     components[0].components.push({ "type": 2, "style": 2, "label": opt4, "custom_id": "poll_4_0" })
-//   //   }
-
-//   //   if (opt5) {
-//   //     const split5 = splitBar(100, 0, 25)
-//   //     fields.push({ name: `${opt5.charAt(0).toUpperCase() + opt5.slice(1)} • 0/${amount} Votes • ${split5[1]}%`, value: `[${split5[0]}]`, inline: false })
-//   //     components[0].components.push({ "type": 2, "style": 2, "label": opt5, "custom_id": "poll_5_0" })
-//   //   }
-
-//   //   embed = {
-//   //     title: `Poll - ${ques.charAt(0).toUpperCase() + ques.slice(1)}`,
-//   //     color: pickArray(colors),
-//   //     description: `0 votes so far\nPoll Created <t:${creation}:R> by <@${interaction.user.id}>`,
-//   //     fields: fields,
-//   //     footer: { text: "Last updated" },
-//   //     timestamp: new Date().toISOString()
-//   //   }
-
-//   //   await interaction.reply({ embeds: [embed], components: components })
-// }

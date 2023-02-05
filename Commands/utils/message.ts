@@ -16,10 +16,15 @@ export async function main(bot: Bot, interaction: Interaction) {
 		components: [
 			{
 				type: MessageComponentTypes.ActionRow,
+				// @ts-ignore
 				components: [{
-					type: MessageComponentTypes.SelectMenuChannels,
+					type: 8, // MessageComponentTypes.SelectMenuChannels,
 					customId: "target",
 					placeholder: "Target channel",
+					minValues: 1,
+					maxValues: 3,
+					// @ts-ignore
+					// channel_types: 0 + 5 + 10 + 11 + 12,
 				}],
 			},
 			{
@@ -36,7 +41,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 						{ label: "Author", value: "author" },
 						{ label: "Footer", value: "footer" },
 					],
-					maxValues: 25,
 				}],
 			},
 		],
