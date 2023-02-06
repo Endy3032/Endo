@@ -57,8 +57,8 @@ export async function button(bot: Bot, interaction: Interaction) {
 
 export async function modal(bot: Bot, interaction: Interaction) {
 	const question = getValue(interaction, "question", "String")!
-	const option1 = getValue(interaction, "option1", "String")!
-	const option2 = getValue(interaction, "option2", "String")!
+	const option1 = getValue(interaction, "option1", "String")
+	const option2 = getValue(interaction, "option2", "String")
 	const option3 = getValue(interaction, "option3", "String")
 	const option4 = getValue(interaction, "option4", "String")
 
@@ -68,6 +68,7 @@ export async function modal(bot: Bot, interaction: Interaction) {
 	const components: MessageComponents = [
 		{
 			type: MessageComponentTypes.ActionRow,
+			// @ts-expect-error Adding components later
 			components: [],
 		},
 		{

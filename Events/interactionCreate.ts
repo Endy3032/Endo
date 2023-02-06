@@ -22,7 +22,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 		const tag = interaction.type === InteractionTypes.ApplicationCommand
 			? "Command"
 			: interaction.type === InteractionTypes.MessageComponent
-			? MessageComponentTypes[interaction.data?.componentType!]
+			? MessageComponentTypes[interaction.data?.componentType!] ?? "MentionableSelectMenu"
 			: interaction.type === InteractionTypes.ModalSubmit
 			? "Submit"
 			: "Unknown"
@@ -30,10 +30,11 @@ export async function main(bot: Bot, interaction: Interaction) {
 		const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
 
 		let log = rgb24(
-			interaction.type == InteractionTypes.ApplicationCommand
+			[InteractionTypes.ApplicationCommand, InteractionTypes.MessageComponent].includes(interaction.type)
 				? `/${[commandName, group, subcmd].join(" ").replace(/\s+/, " ")}`
-				: interaction.type == InteractionTypes.MessageComponent
-				? `/${[commandName, group, subcmd].join(" ")} [${interaction.data?.values?.join(", ") ?? interaction.data?.customId}]`
+					+ (interaction.type == InteractionTypes.MessageComponent
+						? ` [${interaction.data?.values?.join(", ") ?? interaction.data?.customId}]`
+						: "")
 				: interaction.type == InteractionTypes.ModalSubmit
 				? `{${interaction.data?.customId}}`
 				: "Unknown",

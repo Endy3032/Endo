@@ -1,9 +1,10 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction, MessageComponentTypes } from "discordeno"
-import { respond } from "modules"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ChannelTypes, Interaction,
+	MessageComponentTypes } from "discordeno"
+import { defer, respond } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "message",
-	description: "Send a custom message to this channel",
+	description: "Send a customized message",
 	type: ApplicationCommandOptionTypes.SubCommand,
 }
 
@@ -24,7 +25,11 @@ export async function main(bot: Bot, interaction: Interaction) {
 					minValues: 1,
 					maxValues: 3,
 					// @ts-ignore
-					// channel_types: 0 + 5 + 10 + 11 + 12,
+					channel_types: ChannelTypes.GuildText
+						| ChannelTypes.GuildAnnouncement
+						| ChannelTypes.AnnouncementThread
+						| ChannelTypes.PublicThread
+						| ChannelTypes.PrivateThread,
 				}],
 			},
 			{
@@ -45,4 +50,17 @@ export async function main(bot: Bot, interaction: Interaction) {
 			},
 		],
 	}, true)
+}
+
+export async function select(bot: Bot, interaction: Interaction) {
+	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
+
+	switch (interaction.data?.customId) {
+		case "target": {
+			await defer(bot, interaction)
+			break
+		}
+
+		case "elements": {}
+	}
 }
