@@ -1,5 +1,5 @@
-import { ActionRow, ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ButtonStyles, DiscordEmbedField, Interaction,
-	MessageComponents, MessageComponentTypes, TextStyles } from "discordeno"
+import { ActionRow, ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ButtonComponent, ButtonStyles, DiscordEmbedField,
+	Interaction, MessageComponents, MessageComponentTypes, TextStyles } from "discordeno"
 import { capitalize, colors, getCmdName, getValue, pickArray, randRange, respond } from "modules"
 import { splitBar } from "progressbar"
 import { Temporal } from "temporal"
@@ -57,19 +57,33 @@ export async function button(bot: Bot, interaction: Interaction) {
 
 export async function modal(bot: Bot, interaction: Interaction) {
 	const question = getValue(interaction, "question", "String")!
-	const option1 = getValue(interaction, "option1", "String")
-	const option2 = getValue(interaction, "option2", "String")
+	const option1 = getValue(interaction, "option1", "String")!
+	const option2 = getValue(interaction, "option2", "String")!
 	const option3 = getValue(interaction, "option3", "String")
 	const option4 = getValue(interaction, "option4", "String")
 
 	const amount = Math.floor(Math.random() * 1000)
 
-	const fields: DiscordEmbedField[] = []
+	const options = [option1, option2, option3, option4].filter(e => e !== undefined) as string[]
+
+	const fields: DiscordEmbedField[] = options.map(opt => {
+		const split = splitBar(100, randRange(0, 100), 25)
+
+		return {
+			name: `${capitalize(opt)} • 0/${amount} Votes • ${split[1]}%`,
+			value: `[${split[0]}]`,
+			inline: false,
+		}
+	})
 	const components: MessageComponents = [
 		{
 			type: MessageComponentTypes.ActionRow,
-			// @ts-expect-error Adding components later
-			components: [],
+			components: options.map<ButtonComponent>((opt, i) => ({
+				type: MessageComponentTypes.Button,
+				label: opt,
+				style: ButtonStyles.Primary,
+				customId: `poll_${i}_0`,
+			})) as [ButtonComponent],
 		},
 		{
 			type: MessageComponentTypes.ActionRow,
@@ -82,32 +96,6 @@ export async function modal(bot: Bot, interaction: Interaction) {
 		},
 	]
 
-	for (const option of [option1, option2, option3, option4].filter(e => e !== undefined) as string[]) {
-		const split = splitBar(100, randRange(0, 100), 25)
-
-		fields.push({
-			name: `${capitalize(option)} • 0/${amount} Votes • ${split[1]}%`,
-			value: `[${split[0]}]`,
-			inline: false,
-		})
-
-		components[0].components.push({
-			type: MessageComponentTypes.Button,
-			style: ButtonStyles.Primary,
-			label: option,
-			customId: `poll_${option}_0`,
-		})
-	}
-
-	components.push({
-		type: MessageComponentTypes.ActionRow,
-		components: [{
-			type: MessageComponentTypes.Button,
-			style: ButtonStyles.Danger,
-			label: "Close Poll",
-			customId: "poll_close",
-		}],
-	})
 	const timestamp = Temporal.Now.instant()
 
 	await respond(bot, interaction, {
