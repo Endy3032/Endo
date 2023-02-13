@@ -1,6 +1,6 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ChannelTypes, Interaction,
-	MessageComponentTypes } from "discordeno"
-import { defer, respond } from "modules"
+import { ActionRow, ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ButtonComponent, ButtonStyles, ChannelTypes, Embed,
+	Interaction, MessageComponents, MessageComponentTypes, SelectMenuComponent } from "discordeno"
+import { defer, edit, respond } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "message",
@@ -8,47 +8,155 @@ export const cmd: ApplicationCommandOption = {
 	type: ApplicationCommandOptionTypes.SubCommand,
 }
 
+const defaultEmbed: Embed = {
+	author: { name: "Author", iconUrl: "https://cdn.discordapp.com/embed/avatars/0.png" },
+	title: "Title",
+	description: "Description",
+	image: { url: "https://support.discord.com/hc/article_attachments/1500017894801/5.13_Brand_Refresh_Changelog-Header.jpg" },
+	thumbnail: { url: "https://cdn.discordapp.com/embed/avatars/1.png" },
+	footer: { text: "Footer", iconUrl: "https://cdn.discordapp.com/embed/avatars/2.png" },
+}
+
+const channelPicker: ActionRow = {
+	type: MessageComponentTypes.ActionRow,
+	// @ts-ignore
+	components: [{
+		type: 8, // MessageComponentTypes.SelectMenuChannels,
+		customId: "target",
+		placeholder: "Target channel",
+		maxValues: 1,
+		// @ts-ignore
+		channel_types: ChannelTypes.GuildText
+			| ChannelTypes.GuildAnnouncement
+			| ChannelTypes.AnnouncementThread
+			| ChannelTypes.PublicThread
+			| ChannelTypes.PrivateThread,
+	}],
+}
+
+const elementsPicker: ActionRow = {
+	type: MessageComponentTypes.ActionRow,
+	components: [
+		{
+			type: MessageComponentTypes.SelectMenu,
+			customId: "elements",
+			placeholder: "Elements in the message embed",
+			minValues: 1,
+			maxValues: 6,
+			options: [
+				{
+					label: "Author",
+					value: "author",
+					description: "Name, Icon, URL at the top of the embed",
+					default: true,
+				},
+				{
+					label: "Title",
+					value: "title",
+					description: "Title, URL below Author",
+					default: true,
+				},
+				{
+					label: "Description",
+					value: "description",
+					description: "Text below Title",
+					default: true,
+				},
+				{
+					label: "Thumbnail",
+					value: "thumbnail",
+					description: "Right side image URL",
+					default: true,
+				},
+				{
+					label: "Image",
+					value: "image",
+					description: "Bottom image URL",
+					default: true,
+				},
+				{
+					label: "Footer",
+					value: "footer",
+					description: "Text, Icon, URL at the bottom of the embed",
+					default: true,
+				},
+			],
+		},
+	],
+}
+
+const elenentEditor: ActionRow = {
+	type: MessageComponentTypes.ActionRow,
+	components: [{
+		type: MessageComponentTypes.SelectMenu,
+		customId: "edit",
+		placeholder: "Edit Element",
+		options: [
+			{
+				label: "Author",
+				description: "Name, Icon, URL for the top of the embed",
+				value: "author",
+			},
+			{
+				label: "Content",
+				description: "Message, Title, Title URL, Description",
+				value: "content",
+			},
+			{
+				label: "Images",
+				description: "Bottom Image & Right Thumbnail",
+				value: "image",
+			},
+			{
+				label: "Footer",
+				description: "Text, Icon, URL for the bottom of the embed",
+				value: "footer",
+			},
+		],
+	}],
+}
+
+const fieldEditor: ActionRow = {
+	type: MessageComponentTypes.ActionRow,
+	components: [{
+		type: MessageComponentTypes.SelectMenu,
+		customId: "fields",
+		placeholder: "Edit Fields",
+		options: [{
+			label: "Add Field",
+			value: "add",
+			description: "Add a field to the embed",
+		}],
+	}],
+}
+
+const buttons: ActionRow = {
+	type: MessageComponentTypes.ActionRow,
+	components: [
+		{
+			type: MessageComponentTypes.Button,
+			customId: "cancel",
+			label: "Cancel",
+			style: ButtonStyles.Danger,
+		},
+		{
+			type: MessageComponentTypes.Button,
+			customId: "send",
+			label: "Send",
+			style: ButtonStyles.Primary,
+		},
+	],
+}
+
+const defaultComponents: MessageComponents = [channelPicker, elementsPicker, elenentEditor, fieldEditor, buttons]
+
 export async function main(bot: Bot, interaction: Interaction) {
 	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 	if (!interaction.channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
 
 	await respond(bot, interaction, {
-		content: "**Message Builder** [Incomplete until Modal supports select]",
-		components: [
-			{
-				type: MessageComponentTypes.ActionRow,
-				// @ts-ignore
-				components: [{
-					type: 8, // MessageComponentTypes.SelectMenuChannels,
-					customId: "target",
-					placeholder: "Target channel",
-					minValues: 1,
-					maxValues: 3,
-					// @ts-ignore
-					channel_types: ChannelTypes.GuildText
-						| ChannelTypes.GuildAnnouncement
-						| ChannelTypes.AnnouncementThread
-						| ChannelTypes.PublicThread
-						| ChannelTypes.PrivateThread,
-				}],
-			},
-			{
-				type: MessageComponentTypes.ActionRow,
-				components: [{
-					type: MessageComponentTypes.SelectMenu,
-					customId: "elements",
-					placeholder: "Elements in the message embed",
-					options: [
-						{ label: "Title", value: "title" },
-						{ label: "Description", value: "description" },
-						{ label: "Image", value: "image" },
-						{ label: "Thumbnail", value: "thumbnail" },
-						{ label: "Author", value: "author" },
-						{ label: "Footer", value: "footer" },
-					],
-				}],
-			},
-		],
+		embeds: [defaultEmbed],
+		components: [channelPicker, elementsPicker, elenentEditor, fieldEditor, buttons],
 	}, true)
 }
 
@@ -61,6 +169,32 @@ export async function select(bot: Bot, interaction: Interaction) {
 			break
 		}
 
-		case "elements": {}
+		case "elements": {
+			await defer(bot, interaction)
+
+			const elements = interaction.data?.values ?? []
+			let embed: Embed = Object.fromEntries(
+				new Map(
+					["author", "title", "description", "thumbnail", "image", "footer"].map(
+						e => [e, elements.includes(e) ? defaultEmbed[e] : undefined],
+					),
+				),
+			)
+
+			const components = [channelPicker, elementsPicker, elenentEditor, fieldEditor, buttons]
+
+			const modifiedElementsPicker = (components[1].components[0] as SelectMenuComponent).options
+			;(components[1].components[0] as SelectMenuComponent).options = modifiedElementsPicker.map(
+				e => ({ ...e, default: elements.includes(e.value) }),
+			)
+
+			await edit(bot, interaction, { embeds: [embed], components })
+			break
+		}
+
+		default: {
+			await defer(bot, interaction)
+			break
+		}
 	}
 }
