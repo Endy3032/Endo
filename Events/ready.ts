@@ -9,7 +9,7 @@ export const main: EventHandlers["ready"] = async (bot, payload) => {
 	const location = Deno.build.vendor === "unknown" ? "Replit" : "Local",
 		gatewayInfo = `[v${payload.v} | ${bot.gateway.gatewayBot.sessionStartLimit.remaining} Left | ${location}]`
 
-	console.botLog(`${payload.user.username}#${payload.user.discriminator}} ${rgb24(gatewayInfo, Nord.brightYellow)}`, { tag: "Login" })
+	console.botLog(`${payload.user.username}#${payload.user.discriminator} ${rgb24(gatewayInfo, Nord.brightYellow)}`, { tag: "Login" })
 
 	function pinger() {
 		axiod.head(`https://pinger.endy3032.repl.co`)
