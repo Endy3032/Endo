@@ -2,45 +2,66 @@
 import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, InteractionTypes, Member, Role, User } from "discordeno"
 
 export function getCmdName(interaction: Interaction) {
-	if (
-		interaction.type === InteractionTypes.ApplicationCommand
-		|| interaction.type === InteractionTypes.ApplicationCommandAutocomplete
-	) return interaction.data?.name.replace(/^(\[.\]) /, "") ?? ""
-	else if (interaction.type === InteractionTypes.MessageComponent) return interaction.message?.interaction?.name.split(" ")[0] ?? ""
-	else if (interaction.type === InteractionTypes.ModalSubmit) return interaction.data?.customId?.split("_")[0] ?? ""
-	else return "null"
+	switch (interaction.type) {
+		case InteractionTypes.MessageComponent:
+			return interaction.message?.interaction?.name.split(" ")[0] ?? ""
+
+		case InteractionTypes.ModalSubmit:
+			return (interaction.message
+				? interaction.message?.interaction?.name.split(" ")
+				: interaction.data?.customId?.split(/[^\w]|_/))?.[0] ?? ""
+
+		default:
+			return interaction.data?.name.replace(/^\[.\] /, "") ?? ""
+	}
 }
 
 export function getSubcmd(interaction: Interaction) {
-	if (interaction.type === InteractionTypes.ApplicationCommand) {
-		if (!interaction.data?.options) return undefined
+	switch (interaction.type) {
+		case InteractionTypes.ModalSubmit:
+		case InteractionTypes.MessageComponent: {
+			const cmd = !interaction.message
+				? interaction.data?.customId?.split(/[^\w]|_/)
+				: interaction.message?.interaction?.name.split(" ")
 
-		if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommandGroup) {
-			return interaction.data.options?.[0].options?.[0].name
-		} else if (interaction.data.options[0].type === ApplicationCommandOptionTypes.SubCommand) {
-			return interaction.data.options[0].name
+			return cmd?.length === 3 ? cmd[2] : cmd?.length === 2 ? cmd[1] : undefined
 		}
-	} else if (interaction.type === InteractionTypes.MessageComponent) {
-		const cmd = interaction.message?.interaction?.name.split(" ")
-		if (cmd?.length === 3) return cmd[2]
-		else if (cmd?.length === 2) return cmd[1]
-		else return undefined
+
+		default: {
+			if (!interaction.data?.options) return undefined
+
+			switch (interaction.data.options[0].type) {
+				case ApplicationCommandOptionTypes.SubCommand:
+					return interaction.data.options[0].name
+
+				case ApplicationCommandOptionTypes.SubCommandGroup:
+					return interaction.data.options?.[0].options?.[0].name
+
+				default:
+					return undefined
+			}
+		}
 	}
 }
 
 export function getSubcmdGroup(interaction: Interaction) {
-	if (interaction.type === InteractionTypes.ApplicationCommand) {
-		if (interaction.data?.options === undefined
-			|| interaction.data.options[0].type !== ApplicationCommandOptionTypes.SubCommandGroup)
-		{
-			return undefined
+	switch (interaction.type) {
+		case InteractionTypes.ModalSubmit:
+		case InteractionTypes.MessageComponent: {
+			const cmd = !interaction.message
+				? interaction.data?.customId?.split(/[^\w]|_/)
+				: interaction.message?.interaction?.name.split(" ")
+
+			return cmd?.length === 3 ? cmd[1] : undefined
 		}
 
-		return interaction.data.options[0].name
-	} else if (interaction.type === InteractionTypes.MessageComponent) {
-		const cmd = interaction.message?.interaction?.name.split(" ")
-		if (cmd?.length !== 3) return undefined
-		return cmd[1]
+		default: {
+			if (!interaction.data?.options || interaction.data.options[0].type !== ApplicationCommandOptionTypes.SubCommandGroup) {
+				return undefined
+			}
+
+			return interaction.data.options[0].name
+		}
 	}
 }
 
