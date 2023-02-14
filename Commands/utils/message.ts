@@ -1,5 +1,5 @@
 import { ActionRow, ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ButtonComponent, ButtonStyles, ChannelTypes, Embed,
-	Interaction, MessageComponents, MessageComponentTypes, SelectMenuComponent } from "discordeno"
+	Interaction, MessageComponents, MessageComponentTypes, SelectMenuComponent, TextStyles } from "discordeno"
 import { defer, edit, respond } from "modules"
 
 export const cmd: ApplicationCommandOption = {
@@ -8,6 +8,7 @@ export const cmd: ApplicationCommandOption = {
 	type: ApplicationCommandOptionTypes.SubCommand,
 }
 
+// #region Default
 const defaultEmbed: Embed = {
 	author: { name: "Author", iconUrl: "https://cdn.discordapp.com/embed/avatars/0.png" },
 	title: "Title",
@@ -17,6 +18,7 @@ const defaultEmbed: Embed = {
 	footer: { text: "Footer", iconUrl: "https://cdn.discordapp.com/embed/avatars/2.png" },
 }
 
+// #region Components
 const channelPicker: ActionRow = {
 	type: MessageComponentTypes.ActionRow,
 	// @ts-ignore
@@ -85,7 +87,7 @@ const elementsPicker: ActionRow = {
 	],
 }
 
-const elenentEditor: ActionRow = {
+const elementEditor: ActionRow = {
 	type: MessageComponentTypes.ActionRow,
 	components: [{
 		type: MessageComponentTypes.SelectMenu,
@@ -109,7 +111,7 @@ const elenentEditor: ActionRow = {
 			},
 			{
 				label: "Footer",
-				description: "Text, Icon, URL for the bottom of the embed",
+				description: "Text, Icon, Timestamp for the bottom of the embed",
 				value: "footer",
 			},
 		],
@@ -147,8 +149,9 @@ const buttons: ActionRow = {
 		},
 	],
 }
+// #endregion
 
-const defaultComponents: MessageComponents = [channelPicker, elementsPicker, elenentEditor, fieldEditor, buttons]
+// #endregion
 
 export async function main(bot: Bot, interaction: Interaction) {
 	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
@@ -156,7 +159,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await respond(bot, interaction, {
 		embeds: [defaultEmbed],
-		components: [channelPicker, elementsPicker, elenentEditor, fieldEditor, buttons],
+		components: [channelPicker, elementsPicker, elementEditor, fieldEditor, buttons],
 	}, true)
 }
 
@@ -181,7 +184,7 @@ export async function select(bot: Bot, interaction: Interaction) {
 				),
 			)
 
-			const components = [channelPicker, elementsPicker, elenentEditor, fieldEditor, buttons]
+			const components = [channelPicker, elementsPicker, elementEditor, fieldEditor, buttons]
 
 			const modifiedElementsPicker = (components[1].components[0] as SelectMenuComponent).options
 			;(components[1].components[0] as SelectMenuComponent).options = modifiedElementsPicker.map(
@@ -189,6 +192,186 @@ export async function select(bot: Bot, interaction: Interaction) {
 			)
 
 			await edit(bot, interaction, { embeds: [embed], components })
+			break
+		}
+
+		case "edit": {
+			const element = interaction.data?.values?.[0] ?? "content"
+
+			switch (element) {
+				case "author": {
+					await respond(bot, interaction, {
+						title: "Author",
+						customId: "utils/message",
+						components: [
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "authorName",
+									label: "Name",
+									placeholder: interaction.user.username,
+									style: TextStyles.Short,
+									required: true,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "authorIcon",
+									label: "Icon",
+									placeholder: "https://example.com/icon.png",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "authorUrl",
+									label: "URL",
+									placeholder: "https://example.com",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+						],
+					})
+					break
+				}
+
+				case "content": {
+					await respond(bot, interaction, {
+						title: "Content",
+						customId: "utils/message",
+						components: [
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "message",
+									label: "Message",
+									placeholder: "Message",
+									style: TextStyles.Paragraph,
+									required: false,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "title",
+									label: "Title",
+									placeholder: "Title",
+									style: TextStyles.Short,
+									required: true,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "titleUrl",
+									label: "Title URL",
+									placeholder: "https://example.com",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "description",
+									label: "Description",
+									placeholder: "Description",
+									style: TextStyles.Paragraph,
+									required: false,
+								}],
+							},
+						],
+					})
+					break
+				}
+
+				case "image": {
+					await respond(bot, interaction, {
+						title: "Image",
+						customId: "utils/message",
+						components: [
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "image",
+									label: "Image URL",
+									placeholder: "https://example.com/image.png",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "thumbnail",
+									label: "Thumbnail URL",
+									placeholder: "https://example.com/thumbnail.png",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+						],
+					})
+					break
+				}
+
+				case "footer": {
+					await respond(bot, interaction, {
+						title: "Footer",
+						customId: "utils/message",
+						components: [
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "footerText",
+									label: "Text",
+									placeholder: interaction.user.username,
+									style: TextStyles.Short,
+									required: true,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "footerIcon",
+									label: "Icon",
+									placeholder: "https://example.com/icon.png",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+							{
+								type: MessageComponentTypes.ActionRow,
+								components: [{
+									type: MessageComponentTypes.InputText,
+									customId: "authorUrl",
+									label: "Timestamp",
+									placeholder: "True for current time, False to disable, or an epoch millisecond",
+									style: TextStyles.Short,
+									required: false,
+								}],
+							},
+						],
+					})
+					break
+				}
+			}
+
 			break
 		}
 
