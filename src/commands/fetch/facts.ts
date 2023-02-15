@@ -93,11 +93,11 @@ export async function main(bot: Bot, interaction: Interaction) {
 	switch (getSubcmd(interaction)) {
 		case "cat": {
 			try {
-				fact = JSON.parse(Deno.readTextFileSync("./Resources/cat-facts.json"))
+				fact = JSON.parse(Deno.readTextFileSync("./assets/cat-facts.json"))
 			} catch {
 				const { data } = await axiod.get("https://raw.githubusercontent.com/vadimdemedes/cat-facts/master/cat-facts.json")
 				fact = data
-				Deno.writeTextFileSync("./Resources/cat-facts.json", JSON.stringify(fact, null, 2))
+				Deno.writeTextFileSync("./assets/cat-facts.json", JSON.stringify(fact, null, 2))
 			}
 
 			;[source, url] = ["vadimdemedes", "https://github.com/vadimdemedes/cat-facts"]

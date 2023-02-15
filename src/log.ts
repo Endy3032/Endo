@@ -1,7 +1,7 @@
 import { rgb24, stripColor } from "colors"
 import { stripIndents } from "commonTags"
-import { createBot, EventHandlers, Intents, startBot } from "discordeno"
-import { activities, deploy, getFiles, InspectConfig, LogLevel, LogOptions, Nord } from "modules"
+import { createBot, Intents } from "discordeno"
+import { InspectConfig, LogLevel, LogOptions, Nord } from "modules"
 import { Temporal } from "temporal"
 
 const [token, logChannel] = [Deno.env.get("DiscordToken"), Deno.env.get("Log")]
@@ -12,39 +12,6 @@ const bot = createBot({
 	intents: Intents.Guilds | Intents.DirectMessages,
 	events: {},
 })
-
-if (Deno.args.includes("debug")) {
-	bot.rest.debug = (text: string) => {
-		const tag = text.match(/(?<=\[)\S.*?(?=\])/)?.[0]
-		let content = text.match(/(?<=(^\[\S.*?] )).*/)?.[0]
-
-		if (tag?.includes("RequestCreate")) {
-			const json = content?.match(/(?<=( \| Body: )).*/)?.[0] ?? ""
-			content = content?.replace(" | Body: " + json, "\n") + Deno.inspect(JSON.parse(json != "undefined" ? json : "{}"), InspectConfig)
-		} else if (tag?.includes("FetchSuccess")) {
-			const matched = content?.match(/(?<=^(URL: .*? \| )).*/)?.[0] ?? ""
-			content = content?.replace(" | " + matched, "\n")
-
-			const json = JSON.parse(matched)
-			if (json.payload?.body) {
-				try {
-					json.payload.body = JSON.parse(json.payload.body)
-				} catch {}
-			}
-			content += Deno.inspect(json, InspectConfig)
-		} else if (tag?.includes("fetchSuccess") || tag?.includes("Add To Global Queue")) {
-			const json = JSON.parse(content ?? "\n")
-			if (json.payload?.body) {
-				try {
-					json.payload.body = JSON.parse(json.payload.body)
-				} catch {}
-			}
-			content = Deno.inspect(json, InspectConfig)
-		}
-
-		console.botLog(content, { noSend: true, logLevel: "DEBUG", tag })
-	}
-}
 
 console.botLog = async (content: any, options?: LogOptions) => {
 	options = options ?? {}
@@ -90,7 +57,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 	console[logLevel.toLowerCase()](formattedLog)
 
 	Deno.writeTextFileSync(
-		`./Resources/${logLevel.toLowerCase()}.log`,
+		`./assets/${logLevel.toLowerCase()}.log`,
 		stripColor(formattedLog) + "\n",
 		{ append: true },
 	)
@@ -125,24 +92,3 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		console.botLog(err, { logLevel: "ERROR" })
 	}
 }
-
-const activity = activities()
-bot.gateway.manager.createShardOptions.makePresence = () => activity
-
-for await (const file of getFiles("./Events")) {
-	const { name, main } = await import(`./Events/${file}`)
-	bot.events[name as keyof EventHandlers] = main
-}
-
-console.clear()
-await deploy(bot, Deno.args)
-await startBot(bot)
-
-const listener = Deno.listen({ port: 8080 })
-console.botLog("Server", { tag: "Ready", noSend: true })
-
-async function http(conn: Deno.Conn) {
-	for await (const req of Deno.serveHttp(conn)) req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
-}
-
-for await (const conn of listener) http(conn)

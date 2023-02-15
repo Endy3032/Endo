@@ -5,17 +5,17 @@ import { Command, getCmdName, getFiles, getSubcmd, getSubcmdGroup, InspectConfig
 const commands: CreateApplicationCommand[] = []
 const handlers = new Collection<string, Command>()
 
-for await (const file of getFiles("./Commands")) {
+for await (const file of getFiles("./commands")) {
 	const command: Command = await import(`./${file}`)
 	handlers.set(command.cmd.name, command)
 	commands.push(command.cmd)
 }
 
-for (const folder of getFiles("./Commands", { fileTypes: "folders" })) {
+for (const folder of getFiles("./commands", { fileTypes: "folders" })) {
 	const { cmd } = await import(`./${folder}/mod.ts`)
 	commands.push(cmd)
 
-	for await (const file of getFiles(`./Commands/${folder}`)) {
+	for await (const file of getFiles(`./commands/${folder}`)) {
 		const command: Command = await import(`./${folder}/${file}`)
 		handlers.set(`${folder}/${command.cmd.name}`, command)
 	}

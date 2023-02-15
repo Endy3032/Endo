@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img height=256 src="Resources/Readme/Header.png">
+<img height=256 src="src/assets/Readme/Header.png">
 
 ### **A hobby project Discord bot**
 

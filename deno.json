@@ -1,8 +1,10 @@
 {
 	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"compilerOptions": {
-		"types": ["./mod.d.ts"],
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"types": ["./src/mod.d.ts"],
+		"jsxFactory": "window.createElement",
+		"jsxFragmentFactory": "window.Fragment"
 	},
 	"lint": {
 		"files": {
@@ -15,7 +17,9 @@
 		}
 	},
 	"imports": {
-		"modules": "./Modules/mod.ts",
+		"bot": "./src/bot.ts",
+		"jsx": "./src/jsx.ts",
+		"modules": "./src/modules/mod.ts",
 		"axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
 		"axiodInterfaces": "https://deno.land/x/axiod@0.26.2/interfaces.ts",
 		"bytes": "https://deno.land/std@0.177.0/fmt/bytes.ts",

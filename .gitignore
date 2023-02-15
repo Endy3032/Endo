@@ -4,7 +4,7 @@
 *.log
 deno.lock
 .DS_Store
-Resources/**/*.json
+src/assets/**/*.json
 
 # Folders
 Local

@@ -106,7 +106,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 		**Styles Table** • Format timestamp with \`<t:Seconds:Style>\``,
 		file: {
 			name: "timestampStyles.png",
-			blob: new Blob([await Deno.readFile(join(Deno.cwd(), "Resources", "timestampStyles.png"))]),
+			blob: new Blob([await Deno.readFile(join(Deno.cwd(), "assets", "timestampStyles.png"))]),
 		},
 	}, true)
 }

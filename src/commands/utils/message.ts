@@ -38,53 +38,52 @@ const channelPicker: ActionRow = {
 
 const elementsPicker: ActionRow = {
 	type: MessageComponentTypes.ActionRow,
-	components: [
-		{
-			type: MessageComponentTypes.SelectMenu,
-			customId: "elements",
-			placeholder: "Elements in the message embed",
-			minValues: 1,
-			maxValues: 6,
-			options: [
-				{
-					label: "Author",
-					value: "author",
-					description: "Name, Icon, URL at the top of the embed",
-					default: true,
-				},
-				{
-					label: "Title",
-					value: "title",
-					description: "Title, URL below Author",
-					default: true,
-				},
-				{
-					label: "Description",
-					value: "description",
-					description: "Text below Title",
-					default: true,
-				},
-				{
-					label: "Thumbnail",
-					value: "thumbnail",
-					description: "Right side image URL",
-					default: true,
-				},
-				{
-					label: "Image",
-					value: "image",
-					description: "Bottom image URL",
-					default: true,
-				},
-				{
-					label: "Footer",
-					value: "footer",
-					description: "Text, Icon, URL at the bottom of the embed",
-					default: true,
-				},
-			],
-		},
-	],
+	// @ts-ignore
+	components: [{
+		type: MessageComponentTypes.SelectMenu,
+		customId: "elements",
+		placeholder: "Elements in the message embed",
+		minValues: 1,
+		maxValues: 6,
+		options: [
+			{
+				label: "Author",
+				value: "author",
+				description: "Name, Icon, URL at the top of the embed",
+				default: true,
+			},
+			{
+				label: "Title",
+				value: "title",
+				description: "Title, URL below Author",
+				default: true,
+			},
+			{
+				label: "Description",
+				value: "description",
+				description: "Text below Title",
+				default: true,
+			},
+			{
+				label: "Thumbnail",
+				value: "thumbnail",
+				description: "Right side image URL",
+				default: true,
+			},
+			{
+				label: "Image",
+				value: "image",
+				description: "Bottom image URL",
+				default: true,
+			},
+			{
+				label: "Footer",
+				value: "footer",
+				description: "Text, Icon, URL at the bottom of the embed",
+				default: true,
+			},
+		],
+	}],
 }
 
 const elementEditor: ActionRow = {
@@ -176,20 +175,16 @@ export async function select(bot: Bot, interaction: Interaction) {
 			await defer(bot, interaction)
 
 			const elements = interaction.data?.values ?? []
-			let embed: Embed = Object.fromEntries(
-				new Map(
-					["author", "title", "description", "thumbnail", "image", "footer"].map(
-						e => [e, elements.includes(e) ? defaultEmbed[e] : undefined],
-					),
-				),
-			)
+			let embed: Embed = Object.fromEntries(new Map(
+				["author", "title", "description", "thumbnail", "image", "footer"]
+					.map(e => [e, elements.includes(e) ? defaultEmbed[e] : undefined]),
+			))
 
 			const components = [channelPicker, elementsPicker, elementEditor, fieldEditor, buttons]
 
 			const modifiedElementsPicker = (components[1].components[0] as SelectMenuComponent).options
-			;(components[1].components[0] as SelectMenuComponent).options = modifiedElementsPicker.map(
-				e => ({ ...e, default: elements.includes(e.value) }),
-			)
+			;(components[1].components[0] as SelectMenuComponent).options = modifiedElementsPicker
+				.map(e => ({ ...e, default: elements.includes(e.value) }))
 
 			await edit(bot, interaction, { embeds: [embed], components })
 			break

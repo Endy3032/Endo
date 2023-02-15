@@ -34,7 +34,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 export async function autocomplete(bot: Bot, interaction: Interaction) {
 	const current = getFocused(interaction) ?? ""
-	const memeFiles = getFiles("./Resources/Meme/", { fileTypes: "png" })
+	const memeFiles = getFiles("./assets/Meme/", { fileTypes: "png" })
 
 	const choices: ApplicationCommandOptionChoice[] = [
 		...memeFiles.map(file => ({ name: file.split(".")[0].replaceAll("_", " "), value: file.split(".")[0] })),

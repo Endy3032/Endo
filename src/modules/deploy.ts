@@ -20,10 +20,10 @@ function replaceDescription(cmd: CreateApplicationCommand, tag: string) {
 export async function deploy(bot: Bot, args: string[]) {
 	if (args.includes("guilds")) {
 		// TODO Finalize this later
-		const guildFolders = getFiles("./Commands/Guilds", { fileTypes: "folders" })
+		const guildFolders = getFiles("./commands/Guilds", { fileTypes: "folders" })
 
 		for await (const guildID of guildFolders) {
-			const { commands } = await import(`../Commands/Guilds/${guildID}/mod.ts`)
+			const { commands } = await import(`../commands/Guilds/${guildID}/mod.ts`)
 			const guildCommands: CreateApplicationCommand[] = commands.map(command => replaceDescription(command.cmd, "G"))
 			const deployed = await bot.helpers.upsertGuildApplicationCommands(BigInt(guildID), guildCommands)
 			console.botLog(`${deployed.size} guild commands [${guildID}]`, { tag: "Deploy", noSend: true })
@@ -31,7 +31,7 @@ export async function deploy(bot: Bot, args: string[]) {
 	}
 
 	if (args.some(arg => ["global", "test"].includes(arg))) {
-		const { commands } = await import("../Commands/mod.ts")
+		const { commands } = await import("../commands/mod.ts")
 
 		if (args.includes("global")) {
 			bot.helpers.upsertGlobalApplicationCommands(commands)
