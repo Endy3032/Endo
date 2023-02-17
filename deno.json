@@ -18,8 +18,8 @@
 	},
 	"imports": {
 		"bot": "./src/bot.ts",
-		"jsx": "./src/jsx.ts",
 		"log": "./src/log.ts",
+		"jsx": "./src/jsx/mod.ts",
 		"modules": "./src/modules/mod.ts",
 		"axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
 		"axiodInterfaces": "https://deno.land/x/axiod@0.26.2/interfaces.ts",
