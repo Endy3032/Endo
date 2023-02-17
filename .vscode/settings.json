@@ -7,7 +7,7 @@
 	"explorer.fileNesting.patterns": {
 		"info.log": "*.log",
 		"*.svg": "${capture}.png",
-		"*.ts": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+		"*.ts": "${capture}.d.ts",
 		"scripts.config.ts": "deno.lock, deno.json, dprint.json, .env, .eslintrc, .gitignore, .replit, README.md, Privacy Policy.md"
 	},
 	"[json]": {

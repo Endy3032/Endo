@@ -1,18 +1,20 @@
 // TODO Fix file for api changes
-import { ApplicationCommandOptionTypes, Attachment, Channel, Interaction, InteractionTypes, Member, Role, User } from "discordeno"
+import { ApplicationCommandOptionTypes as CommandOptionTypes, Attachment, Channel, Interaction, InteractionDataOption,
+	InteractionTypes, Member, Role, User } from "discordeno"
 
 export function getCmdName(interaction: Interaction) {
 	switch (interaction.type) {
-		case InteractionTypes.MessageComponent:
-			return interaction.message?.interaction?.name.split(" ")[0] ?? ""
-
+		// Modal can be triggered via component or command
+		// Message always present on component interaction
 		case InteractionTypes.ModalSubmit:
-			return (interaction.message
-				? interaction.message?.interaction?.name.split(" ")
-				: interaction.data?.customId?.split(/[^\w]|_/))?.[0] ?? ""
+		case InteractionTypes.MessageComponent:
+			return (!interaction.message
+				? interaction.data?.customId?.split(/[^\w]|_/)
+				: interaction.message?.interaction?.name.split(" "))?.[0] ?? undefined
 
+		// Command name always present on other interactions
 		default:
-			return interaction.data?.name.replace(/^\[.\] /, "") ?? ""
+			return interaction.data?.name.replace(/^\[.\] /, "") ?? undefined
 	}
 }
 
@@ -31,10 +33,10 @@ export function getSubcmd(interaction: Interaction) {
 			if (!interaction.data?.options) return undefined
 
 			switch (interaction.data.options[0].type) {
-				case ApplicationCommandOptionTypes.SubCommand:
+				case CommandOptionTypes.SubCommand:
 					return interaction.data.options[0].name
 
-				case ApplicationCommandOptionTypes.SubCommandGroup:
+				case CommandOptionTypes.SubCommandGroup:
 					return interaction.data.options?.[0].options?.[0].name
 
 				default:
@@ -56,35 +58,32 @@ export function getSubcmdGroup(interaction: Interaction) {
 		}
 
 		default: {
-			if (!interaction.data?.options || interaction.data.options[0].type !== ApplicationCommandOptionTypes.SubCommandGroup) {
-				return undefined
-			}
-
+			if (!interaction.data?.options || interaction.data.options[0].type !== CommandOptionTypes.SubCommandGroup) return undefined
 			return interaction.data.options[0].name
 		}
 	}
 }
 
-function getOptions(interaction: Interaction) {
-	return interaction.data?.options?.[0].type === ApplicationCommandOptionTypes.SubCommandGroup
-		? interaction.data?.options?.[0].options?.[0].options
-		: interaction.data?.options?.[0].type === ApplicationCommandOptionTypes.SubCommand
-		? interaction.data?.options[0].options
-		: interaction.data?.options
+function getOptions(interaction: Interaction): InteractionDataOption[] | undefined {
+	switch (interaction.data?.options?.[0].type) {
+		case CommandOptionTypes.SubCommandGroup:
+			return interaction.data?.options?.[0].options?.[0].options
+
+		case CommandOptionTypes.SubCommand:
+			return interaction.data?.options[0].options
+
+		default:
+			return interaction.data?.options
+	}
 }
 
-type ResolvedOptions = {
-	[key in Extract<keyof typeof ApplicationCommandOptionTypes, "Attachment" | "Channel" | "Role">]: string
-}
-
-const resolvedOptionTypeToKey: ResolvedOptions = {
+const resolvedKeys: { [key in Extract<keyof typeof CommandOptionTypes, "Attachment" | "Channel" | "Role">]: string } = {
 	Attachment: "attachments",
 	Channel: "channels",
 	Role: "roles",
 }
 
-const needResolved = [ApplicationCommandOptionTypes.Attachment, ApplicationCommandOptionTypes.Channel,
-	ApplicationCommandOptionTypes.Role, ApplicationCommandOptionTypes.User]
+const resolvedTypes = [CommandOptionTypes.Attachment, CommandOptionTypes.Channel, CommandOptionTypes.Role, CommandOptionTypes.User]
 
 export function getValue(interaction: Interaction, name: string, type?: "String" | "Modal"): string | undefined
 export function getValue(interaction: Interaction, name: string, type?: "Boolean"): boolean | undefined
@@ -94,54 +93,60 @@ export function getValue(interaction: Interaction, name: string, type?: "Channel
 export function getValue(interaction: Interaction, name: string, type?: "Attachment"): Attachment | undefined
 export function getValue(interaction: Interaction, name: string, type?: "Mentionable"): User | Channel | Role | undefined
 export function getValue(interaction: Interaction, name: string, type?: "User"): { user: User; member?: Member } | undefined
-export function getValue(interaction: Interaction, name: string, type?: keyof typeof ApplicationCommandOptionTypes | "Modal") {
+export function getValue(interaction: Interaction, name: string, type?: keyof typeof CommandOptionTypes | "Modal") {
+	// #region Modal
 	if (interaction.type === InteractionTypes.ModalSubmit) {
-		const modalData = interaction.data?.components?.map(component => component.components).flat()
-		return modalData?.find(input => input?.customId === name)?.value
+		const modalData = interaction.data?.components?.map(comp => comp.components).flat()
+		return modalData?.find(comp => comp?.customId === name)?.value
 	}
+	// #endregion
 
+	// #region Getting data
 	const options = getOptions(interaction)
-	if (options === undefined) return undefined
+	if (!options) return undefined
 
-	const option = options.find(option => {
-		let cond = option.name === name
-		if (type) cond = cond && option.type === ApplicationCommandOptionTypes[type]
-		return cond
+	const option = options.find(opt => {
+		if (opt.name !== name) return false
+		if (type) return opt.type === CommandOptionTypes[type]
+		return true
 	})
-	if (option === undefined) return undefined
+	if (!option) return undefined
 
-	if (type && needResolved.includes(ApplicationCommandOptionTypes[type]) || needResolved.includes(option.type)) {
-		const resolved = interaction.data?.resolved
-		if (resolved === undefined) return undefined
+	if (!resolvedTypes.includes(CommandOptionTypes[type ?? option.type])) return option.value
+	// #endregion
 
-		const key = resolvedOptionTypeToKey[type || option.type]
-		const value = BigInt(option.value as string)
-		if (![type, option.type].includes(ApplicationCommandOptionTypes.User)) {
-			if (resolved[key] === undefined) return undefined
-			return resolved[key].get(value)
-		}
+	// #region Getting resolved data if needed
+	const resolved = interaction.data?.resolved
+	if (!resolved) return undefined
 
+	const key = resolvedKeys[type || option.type]
+	const value = BigInt(option.value as string)
+
+	if ([type, option.type].includes(CommandOptionTypes.User)) {
 		return {
 			user: resolved.users?.get(value) ?? undefined,
 			member: resolved.members?.get(value) ?? undefined,
 		}
 	}
 
-	return option.value
+	if (!resolved[key]) return undefined
+	return resolved[key].get(value)
+	// #endregion
 }
 
-type AutocompleteOptionTypes = Extract<keyof typeof ApplicationCommandOptionTypes, "String" | "Integer" | "Number">
-export function getFocused(interaction: Interaction, type?: "String"): string | null
-export function getFocused(interaction: Interaction, type?: "Integer" | "Number"): number | null
-export function getFocused(interaction: Interaction, type?: AutocompleteOptionTypes) {
+type AutocompleteApplicationCommandOptionTypes = Extract<keyof typeof CommandOptionTypes, "String" | "Integer" | "Number">
+
+export function getFocused(interaction: Interaction, type?: "String"): string | undefined
+export function getFocused(interaction: Interaction, type?: "Integer" | "Number"): number | undefined
+export function getFocused(interaction: Interaction, type?: AutocompleteApplicationCommandOptionTypes): string | number | undefined {
 	const options = getOptions(interaction)
-	if (options === undefined) return null
+	if (!options) return undefined
 
 	const option = options.find(option => {
-		let cond = option.focused === true
-		if (type) cond = cond && option.type === ApplicationCommandOptionTypes[type]
-		return cond
+		if (!option.focused) return false
+		if (type) return option.type === CommandOptionTypes[type]
+		return true
 	})
-	if (option === undefined) return null
-	return option.value
+	if (!option) return undefined
+	return option.value as string | number | undefined
 }

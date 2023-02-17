@@ -1,11 +1,11 @@
 import "jsx"
-import "./log.ts"
+import "log"
 import { bot } from "bot"
 import { startBot } from "discordeno"
 import { deploy } from "modules"
 
-console.clear()
-await deploy(bot, Deno.args)
+// console.clear()
+await deploy(bot)
 await startBot(bot)
 
 const listener = Deno.listen({ port: 8080 })

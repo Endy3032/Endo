@@ -1,5 +1,4 @@
-// import "./log.ts"
-import { createBot, EventHandlers, Intents, startBot } from "discordeno"
+import { createBot, EventHandlers, Intents } from "discordeno"
 import { activities, getFiles, InspectConfig } from "modules"
 
 const token = Deno.env.get("DiscordToken")

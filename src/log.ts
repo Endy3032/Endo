@@ -1,17 +1,10 @@
+import { bot } from "bot"
 import { rgb24, stripColor } from "colors"
 import { stripIndents } from "commonTags"
-import { createBot, Intents } from "discordeno"
 import { InspectConfig, LogLevel, LogOptions, Nord } from "modules"
 import { Temporal } from "temporal"
 
-const [token, logChannel] = [Deno.env.get("DiscordToken"), Deno.env.get("Log")]
-if (token === undefined) throw new Error("Missing Token")
-
-const bot = createBot({
-	token,
-	intents: Intents.Guilds | Intents.DirectMessages,
-	events: {},
-})
+const logChannel = Deno.env.get("Log")
 
 async function botLog(content: any, options?: LogOptions) {
 	options = options ?? {}
@@ -19,7 +12,7 @@ async function botLog(content: any, options?: LogOptions) {
 	const embed = options.embed ?? {}
 	let logLevel: LogLevel = options.logLevel ?? "INFO"
 
-	// Time
+	// #region Time
 	const temporal = Temporal.Now.instant()
 
 	const logTime = temporal.toLocaleString("default", {
@@ -33,8 +26,9 @@ async function botLog(content: any, options?: LogOptions) {
 		hourCycle: "h24",
 		fractionalSecondDigits: 2,
 	}).replace(",", "")
+	// #endregion
 
-	// Sanitization & Formatting
+	// #region Sanitization & Formatting
 	if (content instanceof Error) {
 		content = content.stack ?? "Unable to capture Error stack"
 		logLevel = "ERROR"
@@ -52,8 +46,9 @@ async function botLog(content: any, options?: LogOptions) {
 		+ rgb24(logLevel.padStart(6, " "), Nord[logLevel.toLowerCase()])
 		+ rgb24(" │ ", Nord.blue)
 		+ content.replaceAll("\n", "\n" + " ".repeat(29) + rgb24("│ ", Nord.blue))
+	// #endregion
 
-	// Local logging
+	// #region Local logging
 	console[logLevel.toLowerCase()](formattedLog)
 
 	Deno.writeTextFileSync(
@@ -61,8 +56,9 @@ async function botLog(content: any, options?: LogOptions) {
 		stripColor(formattedLog) + "\n",
 		{ append: true },
 	)
+	// #endregion
 
-	// Discord logging
+	// #region Discord logging
 	if (logChannel === undefined || noSend) return
 
 	try {
@@ -91,6 +87,7 @@ async function botLog(content: any, options?: LogOptions) {
 	} catch (err) {
 		console.botLog(err, { logLevel: "ERROR" })
 	}
+	// #endregion
 }
 
 console.botLog = botLog

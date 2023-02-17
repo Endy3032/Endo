@@ -11,7 +11,6 @@ const emojis = Object.fromEntries(new Map(
 ))
 
 // IntelliSense
-
 Deno.writeTextFileSync(new URL("./emojis.json", import.meta.url), JSON.stringify(emojis, null, "\t"))
 
 import emojisJson from "./emojis.json" assert { type: "json" }

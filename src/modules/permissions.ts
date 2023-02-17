@@ -1,8 +1,8 @@
 import { rgb24 } from "colors"
 import { BitwisePermissionFlags, Bot, Interaction } from "discordeno"
 import { shorthand } from "./emojis.ts"
+import { Nord } from "./exports.ts"
 import { getCmdName, getSubcmd, getSubcmdGroup } from "./getInteractionData.ts"
-import { Nord } from "./types.ts"
 import { capitalize } from "./utils.ts"
 
 export const permissions = Object.fromEntries(new Map(
