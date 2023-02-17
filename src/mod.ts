@@ -1,12 +1,8 @@
-import { rgb24, stripColor } from "colors"
-import { stripIndents } from "commonTags"
-import { createBot, EventHandlers, Intents, startBot } from "discordeno"
-import { activities, deploy, getFiles, InspectConfig, LogLevel, LogOptions, Nord } from "modules"
-import { Temporal } from "temporal"
-
-import "./log.ts"
 import "jsx"
+import "./log.ts"
 import { bot } from "bot"
+import { startBot } from "discordeno"
+import { deploy } from "modules"
 
 console.clear()
 await deploy(bot, Deno.args)
