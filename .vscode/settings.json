@@ -1,19 +1,15 @@
 {
 	"deno.enable": true,
 	"deno.config": "deno.json",
-	"editor.defaultFormatter": "dprint.dprint",
 	"editor.formatOnSave": true,
 	"editor.formatOnPaste": true,
+	"editor.defaultFormatter": "dprint.dprint",
+	"files.exclude": {
+		".env": true,
+		".replit": true,
+		"deno.lock": true
+	},
 	"[json]": {
 		"editor.defaultFormatter": "dprint.dprint"
-	},
-	"files.exclude": {
-		"**/.git": true,
-		"**/.svn": true,
-		"**/.hg": true,
-		"**/CVS": true,
-		"**/.DS_Store": true,
-		"**/Thumbs.db": true
-	},
-	"hide-files.files": []
+	}
 }
