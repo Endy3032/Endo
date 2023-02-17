@@ -13,7 +13,7 @@ const bot = createBot({
 	events: {},
 })
 
-console.botLog = async (content: any, options?: LogOptions) => {
+async function botLog(content: any, options?: LogOptions) {
 	options = options ?? {}
 	const { tag, noSend } = options
 	const embed = options.embed ?? {}
@@ -57,7 +57,7 @@ console.botLog = async (content: any, options?: LogOptions) => {
 	console[logLevel.toLowerCase()](formattedLog)
 
 	Deno.writeTextFileSync(
-		`./assets/${logLevel.toLowerCase()}.log`,
+		`src/assets/${logLevel.toLowerCase()}.log`,
 		stripColor(formattedLog) + "\n",
 		{ append: true },
 	)
@@ -92,3 +92,6 @@ console.botLog = async (content: any, options?: LogOptions) => {
 		console.botLog(err, { logLevel: "ERROR" })
 	}
 }
+
+console.botLog = botLog
+export type BotLog = typeof botLog

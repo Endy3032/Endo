@@ -1,4 +1,5 @@
-import { BotLog } from "modules"
+import type { CreateElement, Fragment } from "jsx"
+import type { BotLog } from "log"
 
 declare global {
 	interface Console {
@@ -6,7 +7,7 @@ declare global {
 	}
 
 	interface Window {
-		createElement: typeof createElement
-		Fragment: typeof Fragment
+		createElement: CreateElement
+		Fragment: Fragment
 	}
 }

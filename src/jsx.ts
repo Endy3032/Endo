@@ -6,5 +6,8 @@ export const createElement = <Attributes, Children extends any[], Return>(
 	...children: Children
 ): Return => component({ ...attributes, children })
 
-window.createElement = createElement
 window.Fragment = Fragment
+export type Fragment = typeof Fragment
+
+window.createElement = createElement
+export type CreateElement = typeof createElement

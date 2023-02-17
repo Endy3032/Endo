@@ -14,7 +14,7 @@ const bot = createBot({
 const activity = activities()
 bot.gateway.manager.createShardOptions.makePresence = () => activity
 
-for await (const file of getFiles("./events")) {
+for await (const file of getFiles("events")) {
 	const { name, main } = await import(`./events/${file}`)
 	bot.events[name as keyof EventHandlers] = main
 }

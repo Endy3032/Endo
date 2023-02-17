@@ -1,3 +1,5 @@
+import { join } from "path"
+
 export function capitalize(content: string, lower?: boolean) {
 	return content[0].toUpperCase() + (lower ? content.slice(1).toLowerCase() : content.slice(1))
 }
@@ -9,11 +11,11 @@ export function toTimestamp(id: BigInt, type: "ms" | "s" = "s"): bigint | number
 	return type === "ms" ? ms : Math.floor(Number(ms / 1000n))
 }
 
-export function getFiles(dir: string, options?: { fileTypes?: string[] | string | "folders"; filterMod?: boolean }) {
+export function getFiles(dir: string | URL, options?: { fileTypes?: string[] | string | "folders"; filterMod?: boolean }) {
 	const { fileTypes, filterMod } = Object.assign({ fileTypes: "ts", filterMod: true }, options)
 
 	const regex = new RegExp(`\\.(${(typeof fileTypes === "string" ? [fileTypes] : fileTypes).join("|")})$`)
-	return [...Deno.readDirSync(dir)]
+	return [...Deno.readDirSync(dir instanceof URL ? dir : join(Deno.cwd(), "src", dir))]
 		.filter(entry =>
 			(fileTypes === "folders" ? entry.isDirectory : entry.isFile && regex.test(entry.name))
 			&& (filterMod ? entry.name !== "mod.ts" : true)

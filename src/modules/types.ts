@@ -26,8 +26,6 @@ export interface LogOptions {
 	message?: CreateMessage
 }
 
-export type BotLog = (content: any, options?: LogOptions) => Promise<void>
-
 export enum Nord {
 	red = 0xBF616A,
 	yellow = 0xEBCB8B,
