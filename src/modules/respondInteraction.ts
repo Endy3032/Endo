@@ -1,6 +1,6 @@
 // TODO Fix file for api changes
+import { stripIndents } from "commonTags"
 import { Bot, Interaction, InteractionCallbackData, InteractionResponseTypes, InteractionTypes } from "discordeno"
-import { shorthand } from "./emojis.ts"
 import { MessageFlags } from "./exports.ts"
 
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string, ephemeral = false) {
@@ -41,9 +41,14 @@ export async function defer(bot: Bot, interaction: Interaction, ephemeral = fals
 	}).catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
-export async function error(bot: Bot, interaction: Interaction, err: Error, type?: string, isEdit = false) {
-	const content = `${shorthand("error")} This interaction failed [${type || "Unknown"}]\`\`\`\n${err.name}: ${err.message}\n\`\`\``
-	if (isEdit) await edit(bot, interaction, content)
-	else await respond(bot, interaction, content, true)
-	console.botLog(err, { logLevel: "ERROR" })
+export async function error(bot: Bot, interaction: Interaction, err: Error, options: { type?: string; isEdit?: boolean }) {
+	const { isEdit, type } = Object.assign(options, { type: "Unknown" })
+
+	const content = stripIndents`This \`${InteractionTypes[interaction.type]}\` interaction failed [${type}]
+	\`\`\`ts
+	${err.name}: ${err.message}
+	\`\`\``
+
+	await console.botLog(err)
+	isEdit ? edit(bot, interaction, content) : respond(bot, interaction, content, true)
 }
