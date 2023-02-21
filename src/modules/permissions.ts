@@ -2,7 +2,7 @@ import { rgb24 } from "colors"
 import { BitwisePermissionFlags, Bot, Interaction } from "discordeno"
 import { shorthand } from "./emojis.ts"
 import { Nord } from "./exports.ts"
-import { getCmdName, getSubcmd, getSubcmdGroup } from "./getInteractionData.ts"
+import { getCmd, getGroup, getSubcmd } from "./interactionName.ts"
 import { capitalize } from "./utils.ts"
 
 export const permissions = Object.fromEntries(new Map(
@@ -22,7 +22,7 @@ export function checkPermission(interaction: Interaction, ...permissions: Bitwis
 	let block = false
 	let consoleLog = `${rgb24("Permissions:", Nord.yellow)}`
 	let response = `Required permissions for \`/${
-		[getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)].join(" ").replace(/ {2,}/, " ")
+		[getCmd(interaction), getGroup(interaction), getSubcmd(interaction)].join(" ").replace(/ {2,}/, " ")
 	}\`:`
 
 	permissions = [...new Set(permissions)]

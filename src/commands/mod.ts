@@ -1,6 +1,5 @@
 import { Bot, Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
-import { Command, getCmdName, getFiles, getSubcmd, getSubcmdGroup, InspectConfig, InteractionHandler, respond,
-	shorthand } from "modules"
+import { Command, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, InteractionHandler, respond, shorthand } from "modules"
 
 const commands: CreateApplicationCommand[] = []
 const handlers = new Collection<string, Command>()
@@ -22,8 +21,8 @@ for (const folder of getFiles("./commands", { fileTypes: "folders" })) {
 }
 
 export async function handleInteraction(bot: Bot, interaction: Interaction) {
-	const [cmd, group, subcmd] = [getCmdName(interaction), getSubcmdGroup(interaction), getSubcmd(interaction)]
-	const command = handlers.get(cmd) ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
+	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)]
+	const command = handlers.get(cmd ?? "") ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
 
 	let handle: InteractionHandler | undefined = command?.main
 	if (interaction.type === InteractionTypes.MessageComponent) {
