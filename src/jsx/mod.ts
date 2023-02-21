@@ -1,17 +1,13 @@
-export const Fragment = <Children extends any[]>({ children }: { children: Children }) => children
-
 export const createElement = <Attributes, Children extends any[], Return>(
-	component: (props: Attributes & { children: Children }) => Return,
+	component: (props: Attributes, children: Children) => Return,
 	attributes: Attributes,
 	...children: Children
-): Return => component({ ...attributes, children })
-
-window.Fragment = Fragment
-export type Fragment = typeof Fragment
+): Return => component({ ...attributes }, children)
 
 window.createElement = createElement
 export type CreateElement = typeof createElement
 
-export * from "./button.tsx"
-export * from "./input.tsx"
-export * from "./select.tsx"
+export * from "./button.ts"
+export * from "./embed.ts"
+export * from "./input.ts"
+export * from "./menu.ts"

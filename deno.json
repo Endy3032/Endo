@@ -3,8 +3,7 @@
 	"compilerOptions": {
 		"noImplicitAny": false,
 		"types": ["./mod.d.ts"],
-		"jsxFactory": "window.createElement",
-		"jsxFragmentFactory": "window.Fragment"
+		"jsxFactory": "window.createElement"
 	},
 	"lint": {
 		"files": {
