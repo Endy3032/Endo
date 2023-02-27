@@ -1,2 +1,2 @@
 language = "bash"
-run = "deno run -A --import-map imports.json --config deno.json mod.ts"
+run = "deno run -A --config deno.json mod.ts"

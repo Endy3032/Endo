@@ -1,16 +1,8 @@
 {
-	"env": {
-		"es2022": true,
-		"node": true,
-		"commonjs": true
-	},
+	"env": { "es2022": true },
 	"parser": "@typescript-eslint/parser",
 	"plugins": ["@typescript-eslint"],
-	"extends": [
-		"plugin:@typescript-eslint/recommended",
-		"prettier",
-		"prettier/@typescript-eslint"
-	],
+	"extends": ["plugin:@typescript-eslint/recommended"],
 	"rules": {
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
@@ -22,7 +14,7 @@
 		}],
 		"linebreak-style": ["warn", "unix"],
 		"no-unneeded-ternary": "error",
-		"no-var": "warn",
+		"no-var": "error",
 		"no-whitespace-before-property": "error",
 		"object-curly-spacing": ["warn", "always"],
 		"prefer-destructuring": "warn",

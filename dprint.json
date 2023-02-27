@@ -11,7 +11,7 @@
 		"constructSignature.spaceAfterNewKeyword": true,
 		"preferHanging": true
 	},
-	"includes": ["**/*.{ts,js,tsx,jsx,json,md}"],
+	"includes": ["**/*.{ts,tsx,json,md}"],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.83.0.wasm",
 		"https://plugins.dprint.dev/json-0.17.0.wasm",
