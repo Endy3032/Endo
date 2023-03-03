@@ -8,3 +8,5 @@ src/assets/**/*.json
 
 # Folders
 Local
+.deno
+.git
