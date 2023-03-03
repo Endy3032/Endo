@@ -1,6 +1,6 @@
 import { rgb24, stripColor } from "colors"
 import { Bot, Embed, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
-import { getCmdName, getSubcmd, getSubcmdGroup, imageURL, Nord, toTimestamp } from "modules"
+import { getCmd, getGroup, getSubcmd, imageURL, Nord, toTimestamp } from "modules"
 import { handleInteraction } from "../commands/mod.ts"
 
 const [testGuildID, testGuildChannel] = [Deno.env.get("TestGuild"), Deno.env.get("TestChannel")]
@@ -27,7 +27,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 			? "Submit"
 			: "Unknown"
 
-		const [commandName, subcmd, group] = [getCmdName(interaction), getSubcmd(interaction), getSubcmdGroup(interaction)]
+		const [commandName, subcmd, group] = [getCmd(interaction), getSubcmd(interaction), getGroup(interaction)]
 
 		let log = rgb24(
 			[InteractionTypes.ApplicationCommand, InteractionTypes.MessageComponent].includes(interaction.type)

@@ -1,6 +1,6 @@
 import { ActionRow, ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ButtonComponent, ButtonStyles, DiscordEmbedField,
 	Interaction, MessageComponents, MessageComponentTypes, TextStyles } from "discordeno"
-import { capitalize, colors, getCmdName, getValue, pickArray, randRange, respond } from "modules"
+import { capitalize, colors, getCmd, getValue, pickArray, randRange, respond } from "modules"
 import { splitBar } from "progressbar"
 import { Temporal } from "temporal"
 
@@ -35,7 +35,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 }
 
 export async function button(bot: Bot, interaction: Interaction) {
-	if (getCmdName(interaction) == "poll") {
+	if (getCmd(interaction) == "poll") {
 		const embed = interaction.message?.embeds[0]
 		// let user = embed.description?.split(" ").at(-1) as string
 		// user = user.slice(2, user.length - 1)
