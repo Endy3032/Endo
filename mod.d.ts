@@ -1,4 +1,4 @@
-import type { CreateElement, Fragment } from "jsx"
+import type { CreateElement } from "jsx"
 import type { BotLog } from "log"
 
 declare global {
@@ -8,6 +8,5 @@ declare global {
 
 	interface Window {
 		createElement: CreateElement
-		Fragment: Fragment
 	}
 }

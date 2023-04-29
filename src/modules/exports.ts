@@ -1,4 +1,5 @@
-import { Bot, CreateApplicationCommand, CreateMessage, Embed, Interaction } from "discordeno"
+import { CreateMessageOptions, Embed, Interaction } from "discordeno"
+import { Bot, CreateApplicationCommand } from "discordeno"
 
 export const timezone = "+00:00"
 
@@ -71,7 +72,7 @@ export interface LogOptions {
 	tag?: string
 	embed?: Embed
 	noSend?: boolean
-	message?: CreateMessage
+	message?: CreateMessageOptions
 }
 
 export enum Nord {

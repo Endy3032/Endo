@@ -4,11 +4,11 @@ export function capitalize(content: string, lower?: boolean) {
 	return content[0].toUpperCase() + (lower ? content.slice(1).toLowerCase() : content.slice(1))
 }
 
-export function toTimestamp(id: BigInt, type?: "ms"): bigint
-export function toTimestamp(id: BigInt, type?: "s" | undefined): number
-export function toTimestamp(id: BigInt, type: "ms" | "s" = "s"): bigint | number {
+type BigString = string | bigint
+export function toTimestamp(id: BigString, type: "ms" | "s" = "s"): string {
+	if (typeof id === "string") id = BigInt(id)
 	const ms = id.valueOf() / 4194304n + 1420070400000n
-	return type === "ms" ? ms : Math.floor(Number(ms / 1000n))
+	return (type === "ms" ? ms : Math.floor(Number(ms / 1000n))).toString()
 }
 
 export function getFiles(dir: string | URL, options?: { fileTypes?: string[] | string | "folders"; filterMod?: boolean }) {

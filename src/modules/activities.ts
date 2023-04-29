@@ -1,5 +1,4 @@
-import { ActivityTypes, StatusUpdate } from "discordeno"
-import { Temporal } from "temporal"
+import { ActivityTypes, BotStatusUpdate } from "discordeno"
 import { pickArray } from "./utils.ts"
 
 type Activity = { [key in Exclude<keyof typeof ActivityTypes, "Custom" | "Competing" | "Streaming">]: string[] }
@@ -13,25 +12,26 @@ const status: Activity & StreamingActivity = {
 		lofi: [
 			"dQw4w9WgXcQ",
 			"9FIkzOrryf8",
-			"5qap5aO4i9A",
-			"DWcJFNfaw9c",
+			"jfKfPfyJRdk",
+			"MVPTGNGiI-4",
+			"rUxyKA_-grg",
 			"TsTtqGAxvWk",
 			"CIfGUiICf8U",
 		],
 	},
 }
 
-export function activities(): StatusUpdate {
+export function activities(): BotStatusUpdate {
 	const type = pickArray(Object.keys(status)) as keyof typeof status
 	const name = pickArray(type == "Streaming" ? Object.keys(status.Streaming) : status[type])
 	const url = type === "Streaming" ? `https://youtube.com/watch?v=${pickArray(status.Streaming[name])}` : undefined
 
 	return {
+		since: null,
 		activities: [{
 			name,
 			url,
 			type: ActivityTypes[type],
-			createdAt: Temporal.Now.instant().epochMilliseconds,
 		}],
 		status: "idle",
 	}

@@ -1,4 +1,4 @@
-import { bot } from "bot"
+import bot from "bot"
 import { rgb24, stripColor } from "colors"
 import { stripIndents } from "commonTags"
 import { InspectConfig, LogLevel, LogOptions, Nord } from "modules"
@@ -78,11 +78,11 @@ async function botLog(content: any, options?: LogOptions) {
 			[${temporal.epochMilliseconds}]\`\`\``
 		}
 
-		await bot.helpers.sendMessage(
+		await bot.rest.sendMessage(
 			logChannel,
 			(!embed.description.includes(plainLog) && !embed.description.includes("Interaction")) || embed.description.includes("Streaming")
 				? { content: stripColor(content) }
-				: { embeds: [embed] },
+				: { embeds: [bot.transformers.reverse.embed(bot, embed)] },
 		)
 	} catch (err) {
 		console.botLog(err, { logLevel: "ERROR" })

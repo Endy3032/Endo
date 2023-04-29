@@ -12,7 +12,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	if (!message) return respond(bot, interaction, "Unable to fetch the message", true)
 
-	const attachments = message.attachments.map(attachment => attachment.proxyUrl)
+	const attachments = message.attachments?.map(attachment => attachment.proxyUrl)
 	const messageContent = escapeMarkdown(message.content ?? "")
 
 	const content = `${messageContent.length > 0 ? messageContent : "None"}\n\n`

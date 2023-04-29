@@ -98,5 +98,5 @@ export async function modal(bot: Bot, interaction: Interaction) {
 	if ((embed.description?.length ?? 0) > 4096) embed.description = embed.description?.slice(0, 4090) + "...\`\`\`"
 	else embed.description += "\`\`\`"
 
-	edit(bot, interaction, { embeds: [embed] })
+	edit(bot, interaction, { embeds: [bot.transformers.reverse.embed(bot, embed)] })
 }

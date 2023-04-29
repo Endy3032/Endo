@@ -1,22 +1,23 @@
 import { rgb24, stripColor } from "colors"
-import { Bot, Embed, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
+import { Embed, EventHandlers, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
 import { getCmd, getGroup, getSubcmd, imageURL, Nord, toTimestamp } from "modules"
+import { Temporal } from "temporal"
 import { handleInteraction } from "../commands/mod.ts"
 
 const [testGuildID, testGuildChannel] = [Deno.env.get("TestGuild"), Deno.env.get("TestChannel")]
 
 export const name: keyof EventHandlers = "interactionCreate"
 
-export async function main(bot: Bot, interaction: Interaction) {
+export async function main(interaction: Interaction) {
 	const isLocal = Deno.build.vendor !== "unknown"
-	const isTestGuild = interaction.guildId == BigInt(testGuildID ?? "0")
-	const isRemoteTest = interaction.channelId == BigInt(testGuildChannel ?? "0")
+	const isTestGuild = interaction.guildId == testGuildID ?? "0"
+	const isRemoteTest = interaction.channelId == testGuildChannel ?? "0"
 
 	const notLocalTestLocation = isLocal && (!isTestGuild || isRemoteTest)
 	const notRemoteTestLocation = !isLocal && isTestGuild && !isRemoteTest
 	if ((notLocalTestLocation || notRemoteTestLocation) && !Deno.args.includes("noLimit")) return
 
-	await handleInteraction(bot, interaction)
+	await handleInteraction(interaction)
 
 	if (interaction.type != InteractionTypes.ApplicationCommandAutocomplete) {
 		const tag = interaction.type === InteractionTypes.ApplicationCommand
@@ -27,6 +28,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 			? "Submit"
 			: "Unknown"
 
+		const user = interaction.user ?? interaction.member?.user
 		const [commandName, subcmd, group] = [getCmd(interaction), getSubcmd(interaction), getGroup(interaction)]
 
 		let log = rgb24(
@@ -44,21 +46,21 @@ export async function main(bot: Bot, interaction: Interaction) {
 		// const guild = interaction.guildId ? await bot.helpers.getGuild(interaction.guildId) : null
 		// const guildName = guild?.name
 		// const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
-		const invoker = `${interaction.user.username}#${interaction.user.discriminator}`
+		const invoker = `${user?.username}#${user?.discriminator}`
 		const timestamp = toTimestamp(interaction.id, "ms")
 
 		const embed: Embed = {
 			description: stripColor(`**Interaction [${tag}]** • ${log}`),
 			author: {
 				name: invoker,
-				iconUrl: interaction.user.avatar ? imageURL(interaction.user.id, interaction.user.avatar, "avatars") : undefined,
+				iconUrl: user?.avatar ? imageURL(user?.id, user?.avatar, "avatars") : undefined,
 			},
 			footer: {
 				text: interaction.guildId ? `${interaction.guildId} - #${interaction.channelId}` : "DM",
 				// text: guildName ? `${guildName} #${channelName}` : "DM",
 				// iconUrl: guild?.icon ? imageURL(guild?.id, guild.icon, "icons") : undefined,
 			},
-			timestamp: Number(timestamp),
+			timestamp: parseInt(timestamp),
 		}
 
 		// log += rgb24(` [${invoker} | ${guildName ? `${guildName} #${channelName}` : "DM"}]`, Nord.brightBlue)

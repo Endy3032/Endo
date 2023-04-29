@@ -1,9 +1,7 @@
 import { Channel, ChannelTypes, Collection, ModifyGuildChannelPositions } from "discordeno"
 
-type Channels = Collection<bigint, Channel>
-
-export function modifyChannelPositions(channels: Channels, channel: Channel): ModifyGuildChannelPositions[] {
-	const sorted = channels.array().filter(c => {
+export function modifyChannelPositions(channels: Channel[], channel: Channel): ModifyGuildChannelPositions[] {
+	const sorted = channels.filter(c => {
 		if ([ChannelTypes.GuildVoice, ChannelTypes.GuildStageVoice].includes(channel.type)) {
 			return [ChannelTypes.GuildVoice, ChannelTypes.GuildStageVoice].includes(c.type)
 		} else return c.type === channel.type

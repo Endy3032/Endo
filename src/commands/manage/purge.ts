@@ -94,21 +94,21 @@ export async function button(bot: Bot, interaction: Interaction) {
 	if (option != "null" || user != "undefined") {
 		clear = clear.filter(msg => {
 			let cond = false
-			if (option == "bots") cond = cond || msg.isFromBot
-			if (option == "users") cond = cond || !msg.isFromBot
-			if (user != "undefined") cond = cond || (msg.authorId == BigInt(user))
+			if (option == "bots") cond = cond || msg.author.bot
+			if (option == "users") cond = cond || !msg.author.bot
+			if (user != "undefined") cond = cond || (msg.author.id == BigInt(user))
 			return cond
 		})
 	}
 
-	if (clear.size < 1) return await respond(bot, interaction, `${shorthand("warn")} Found no messages to purge`)
+	if (clear.length < 1) return await edit(bot, interaction, `${shorthand("warn")} Found no messages to purge`)
 	else {
 		await purge(bot, interaction.channelId, clear.map(msg => msg.id), reason)
 			.then(() => {
-				respond(bot, interaction, `${shorthand("success")} Found and purged ${clear.size}/${amount} messages`)
-				console.botLog(`Found and purged ${clear.size}/${amount} messages`)
+				respond(bot, interaction, `${shorthand("success")} Found and purged ${clear.length}/${amount} messages`)
+				console.botLog(`Found and purged ${clear.length}/${amount} messages`)
 			})
-			.catch(err => error(bot, interaction, err, "Message Purge", true))
+		// .catch(err => error(bot, interaction, err, "Message Purge", true))
 	}
 }
 

@@ -16,7 +16,7 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 
 	const data = typeof response === "string" ? { content: response } : response
 	if (ephemeral) data.flags = MessageFlags.Ephemeral
-	await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, { type, data })
+	await bot.rest.sendInteractionResponse(interaction.id, interaction.token, { type, data })
 		.catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
@@ -24,7 +24,7 @@ export async function edit(bot: Bot, interaction: Interaction, response: Interac
 	if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) throw new Error("Cannot edit autocomplete interactions")
 
 	const data = typeof response === "string" ? { content: response } : response
-	await bot.helpers.editOriginalInteractionResponse(interaction.token, data)
+	await bot.rest.editOriginalInteractionResponse(interaction.token, data)
 		.catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
@@ -35,7 +35,7 @@ export async function defer(bot: Bot, interaction: Interaction, ephemeral = fals
 		? InteractionResponseTypes.DeferredUpdateMessage
 		: InteractionResponseTypes.DeferredChannelMessageWithSource
 
-	await bot.helpers.sendInteractionResponse(interaction.id, interaction.token, {
+	await bot.rest.sendInteractionResponse(interaction.id, interaction.token, {
 		type,
 		data: { flags: ephemeral ? MessageFlags.Ephemeral : undefined },
 	}).catch(err => console.botLog(err, { logLevel: "ERROR" }))

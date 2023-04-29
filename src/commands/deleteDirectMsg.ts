@@ -11,7 +11,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	const message = interaction.data?.resolved?.messages?.first()
 
-	if (message?.authorId !== bot.id) {
+	if (message?.author.id !== bot.id) {
 		return await respond(bot, interaction, `${shorthand("warn")} This command is exlusive to my messages`, true)
 	}
 

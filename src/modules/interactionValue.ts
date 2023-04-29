@@ -21,6 +21,9 @@ export function getValue(interaction: Interaction, name: string, type?: keyof ty
 	// Modal
 	if (interaction.type === InteractionTypes.ModalSubmit) {
 		const modalData = interaction.data?.components?.map(comp => comp.components).flat()
+		// .filter(comp => comp?.type === MessageComponentTypes.InputText)
+
+		console.log(modalData)
 		return modalData?.find(comp => comp?.customId === name)?.value
 	}
 
@@ -42,17 +45,16 @@ export function getValue(interaction: Interaction, name: string, type?: keyof ty
 	if (!resolved) return undefined
 
 	const key = resolvedKeys[type || option.type]
-	const value = BigInt(option.value as string)
+	const value = option.value as string
 
 	if ([type, option.type].includes(CommandOptionTypes.User)) {
 		return {
-			user: resolved.users?.get(value) ?? undefined,
-			member: resolved.members?.get(value) ?? undefined,
+			user: resolved.users?.[value],
+			member: resolved.members?.[value],
 		}
 	}
 
-	if (!resolved[key]) return undefined
-	return resolved[key].get(value)
+	return resolved[key][value]
 }
 
 function getOptions(interaction: Interaction): InteractionDataOption[] | undefined {

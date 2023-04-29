@@ -157,7 +157,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 	if (!interaction.channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
 
 	await respond(bot, interaction, {
-		embeds: [defaultEmbed],
+		embeds: [bot.transformers.reverse.embed(bot, defaultEmbed)],
 		components: [channelPicker, elementsPicker, elementEditor, fieldEditor, buttons],
 	}, true)
 }
@@ -186,7 +186,7 @@ export async function select(bot: Bot, interaction: Interaction) {
 			;(components[1].components[0] as SelectMenuComponent).options = modifiedElementsPicker
 				.map(e => ({ ...e, default: elements.includes(e.value) }))
 
-			await edit(bot, interaction, { embeds: [embed], components })
+			await edit(bot, interaction, { embeds: [bot.transformers.reverse.embed(bot, embed)], components })
 			break
 		}
 

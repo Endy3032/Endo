@@ -11,9 +11,9 @@ export async function main(bot: Bot, interaction: Interaction) {
 	await respond(bot, interaction, "Pinging...")
 
 	const original = await bot.helpers.getOriginalInteractionResponse(interaction.token)
-	const { shards } = bot.gateway.manager
-	const noPing = shards.filter(shard => shard.heart.rtt === undefined).size
-	const wsPing = shards.reduce((a, b) => a + (b.heart.rtt ?? 0), 0) / shards.size
+	const shards = [...bot.gateway.shards.values()]
+	const noPing = shards.filter(shard => shard.heart.rtt === undefined).length
+	const wsPing = shards.reduce((a, b) => a + (b.heart.rtt ?? 0), 0) / shards.length
 
 	if (wsPing < 0) console.botLog(shards.map(shard => shard.heart))
 
@@ -29,7 +29,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 				},
 				{
 					name: "Roundtrip",
-					value: `${BigInt(original.timestamp) - toTimestamp(interaction.id, "ms")}ms`,
+					value: `${BigInt(original.timestamp) - BigInt(toTimestamp(interaction.id, "ms"))}ms`,
 				},
 			],
 		}],

@@ -1,4 +1,4 @@
-import { Bot, Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
+import { Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
 import { Command, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, InteractionHandler, respond, shorthand } from "modules"
 
 const commands: CreateApplicationCommand[] = []
@@ -20,7 +20,7 @@ for (const folder of getFiles("./commands", { fileTypes: "folders" })) {
 	}
 }
 
-export async function handleInteraction(bot: Bot, interaction: Interaction) {
+export async function handleInteraction(interaction: Interaction) {
 	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)]
 	const command = handlers.get(cmd ?? "") ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
 
@@ -46,11 +46,11 @@ export async function handleInteraction(bot: Bot, interaction: Interaction) {
 			: InteractionTypes[interaction.type]
 
 		console.botLog(`No ${type} handler found for \`${name}\``, { logLevel: "ERROR" })
-		return respond(bot, interaction, `${shorthand("error")} No ${type} handler found for \`${name}\``, true)
+		return respond(interaction.bot, interaction, `${shorthand("error")} No ${type} handler found for \`${name}\``, true)
 	}
 
 	try {
-		await handle(bot, interaction)
+		await handle(interaction.bot, interaction)
 	} catch (e) {
 		console.botLog(e, { logLevel: "ERROR" })
 		let content = `${shorthand("error")} Something failed back here... Techy debug stuff below\`\`\`${
@@ -59,7 +59,7 @@ export async function handleInteraction(bot: Bot, interaction: Interaction) {
 
 		if (content.length > 1997) content = content.slice(0, 1994) + "..."
 		content += "```"
-		await respond(bot, interaction, content, true)
+		await respond(interaction.bot, interaction, content, true)
 	}
 }
 

@@ -74,7 +74,7 @@ export async function button(bot: Bot, interaction: Interaction) {
 
 			await bot.helpers.deleteChannel(BigInt(id), reason)
 				.then(() => edit(bot, interaction, { content: `${shorthand("success")} Deleted the channel`, components: [] }))
-				.catch(err => error(bot, interaction, err, "Channel Deletion", true))
+				.catch(err => error(bot, interaction, err, { type: "Channel Deletion", isEdit: true }))
 			break
 		}
 	}

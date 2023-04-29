@@ -104,10 +104,10 @@ export async function main(bot: Bot, interaction: Interaction) {
 		**Milliseconds** • ${finalDate.epochMilliseconds}
 		**Seconds** • ${finalDate.epochSeconds}
 		**Styles Table** • Format timestamp with \`<t:Seconds:Style>\``,
-		file: {
+		files: [{
 			name: "timestampStyles.png",
 			blob: new Blob([await Deno.readFile(join(Deno.cwd(), "assets", "timestampStyles.png"))]),
-		},
+		}],
 	}, true)
 }
 

@@ -21,8 +21,8 @@ const sortRole = (a: Role, b: Role) => (a.position ?? 0) > (b.position ?? 1) ? -
 export async function main(bot: Bot, interaction: Interaction) {
 	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 
-	const channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort(sortChannel)
-	const roles = (await bot.helpers.getRoles(interaction.guildId)).array().sort(sortRole)
+	const channels = (await bot.helpers.getChannels(interaction.guildId)).sort(sortChannel)
+	const roles = (await bot.helpers.getRoles(interaction.guildId)).sort(sortRole)
 
 	await respond(bot, interaction, {
 		embeds: positionEmbed(channels, roles),
@@ -50,8 +50,8 @@ export async function button(bot: Bot, interaction: Interaction) {
 	await defer(bot, interaction)
 	if (!interaction.guildId) return await respond(bot, interaction, "This action can only be performed in a server", true)
 
-	let channels = (await bot.helpers.getChannels(interaction.guildId)).array().sort(sortChannel)
-	const roles = (await bot.helpers.getRoles(interaction.guildId)).array().sort(sortRole)
+	let channels = (await bot.helpers.getChannels(interaction.guildId)).sort(sortChannel)
+	const roles = (await bot.helpers.getRoles(interaction.guildId)).sort(sortRole)
 
 	if (interaction.data?.customId === "fix") {
 		const fixPosition = (type: ChannelTypes) =>
@@ -63,7 +63,7 @@ export async function button(bot: Bot, interaction: Interaction) {
 
 		channels = [...categories, ...text, ...voice]
 
-		await bot.helpers.swapChannels(interaction.guildId,
+		await bot.helpers.editChannelPositions(interaction.guildId,
 			channels.map((c: Channel, i: number) => ({ id: c.id.toString(), position: i })))
 	}
 

@@ -1,6 +1,10 @@
 import { ActionRow, ButtonComponent, ButtonStyles, MessageComponentTypes } from "discordeno"
 
-export function Button(props: Omit<ButtonComponent, "style" | "type"> & { style?: keyof typeof ButtonStyles }): ButtonComponent {
+type BaseButton = Omit<ButtonComponent, "type" | "style">
+type LinkButton = BaseButton & { style: "Link"; url: string }
+type ActionButton = BaseButton & { style?: Exclude<keyof typeof ButtonStyles, "Link">; customId: string }
+
+export function Button(props: LinkButton | ActionButton): ButtonComponent {
 	if (props.style === "Link" && !props.url) throw new Error("Link button needs a URL")
 	if (props.style !== "Link" && !props.customId) throw new Error("Button needs `customId` if it's not a link.")
 

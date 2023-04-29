@@ -1,12 +1,7 @@
-import { createBot } from "discordeno"
-
-const token = Deno.env.get("DiscordToken")
-if (token === undefined) throw new Error("Missing Token")
-
-const bot = createBot({ token })
+import bot from "bot"
 
 const emojis = Object.fromEntries(new Map(
-	(await bot.helpers.getEmojis(Deno.env.get("TestGuild") ?? ""))
+	(await bot.rest.getEmojis(Deno.env.get("TestGuild") ?? ""))
 		.map(e => [e.name ?? "", e.id?.toString()]),
 ))
 

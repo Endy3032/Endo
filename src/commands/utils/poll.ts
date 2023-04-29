@@ -36,7 +36,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 export async function button(bot: Bot, interaction: Interaction) {
 	if (getCmd(interaction) == "poll") {
-		const embed = interaction.message?.embeds[0]
+		const embed = interaction.message?.embeds?.[0]
 		// let user = embed.description?.split(" ").at(-1) as string
 		// user = user.slice(2, user.length - 1)
 		// switch(true) {
@@ -99,14 +99,14 @@ export async function modal(bot: Bot, interaction: Interaction) {
 	const timestamp = Temporal.Now.instant()
 
 	await respond(bot, interaction, {
-		embeds: [{
+		embeds: [bot.transformers.reverse.embed(bot, {
 			title: `Poll - ${question.charAt(0).toUpperCase() + question.slice(1)}`,
 			color: pickArray(colors),
 			description: `0 votes so far\nPoll Created <t:${timestamp.epochSeconds}:R> by <@${interaction.user.id}>`,
 			fields: fields,
 			footer: { text: "Last updated" },
 			timestamp: timestamp.epochMilliseconds,
-		}],
+		})],
 		components,
 	})
 }

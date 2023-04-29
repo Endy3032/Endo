@@ -138,7 +138,7 @@ export const cmd: ApplicationCommandOption = {
 export async function main(bot: Bot, interaction: Interaction) {
 	await defer(bot, interaction, true)
 
-	if (!interaction.guildId) return await edit(bot, interaction, "This action can only be performed in a server")
+	if (interaction.guildId === undefined) return await edit(bot, interaction, "This action can only be performed in a server")
 
 	const blockMsg = checkPermission(interaction, Permissions.MANAGE_CHANNELS)
 	if (blockMsg) return await edit(bot, interaction, blockMsg)
@@ -148,7 +148,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 	const reason = getValue(interaction, "reason", "String")
 		?? `Created by ${interaction.user.username}#${interaction.user.discriminator}`
 
-	const options: CreateGuildChannel = { name, reason }
+	const options: CreateGuildChannel = { name }
 
 	let parentId: bigint | undefined, position = 0
 	const channels = await bot.helpers.getChannels(interaction.guildId)
@@ -175,7 +175,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 				parentId = below.id
 				position = Math.max(
 					(channels
-						.filter(channel => channel.parentId === parentId).array()
+						.filter(channel => channel.parentId === parentId)
 						.reduce((a, b) => (a.position ?? 0) < (b.position ?? 0) ? a : b).position ?? 1) - 1,
 					0,
 				)
@@ -199,7 +199,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 		}
 	}
 
-	await bot.helpers.createChannel(interaction.guildId, options)
+	await bot.helpers.createChannel(interaction.guildId, options, reason)
 		.then(async channel => {
 			await edit(bot, interaction, {
 				content: stripIndents`\
@@ -216,8 +216,8 @@ export async function main(bot: Bot, interaction: Interaction) {
 				}],
 			})
 
-			await bot.helpers.swapChannels(
-				channel.guildId,
+			await bot.helpers.editChannelPositions(
+				interaction.guildId!,
 				modifyChannelPositions(channels, channel),
 			)
 		})

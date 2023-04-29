@@ -1,18 +1,22 @@
-import "jsx"
 import "log"
-import { bot } from "bot"
-import { startBot } from "discordeno"
+import "jsx"
+import bot from "bot"
 import { deploy } from "modules"
+import eventHandlers from "./events/mod.ts"
+import { fixGatewayWebsocket } from "./fixGateway.ts"
 
 // console.clear()
+bot.events = eventHandlers
+fixGatewayWebsocket(bot.gateway)
+
 await deploy(bot)
-await startBot(bot)
+await bot.start()
 
 const listener = Deno.listen({ port: 8080 })
 console.botLog("Server", { tag: "Ready", noSend: true })
 
-async function http(conn: Deno.Conn) {
-	for await (const req of Deno.serveHttp(conn)) req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
+for await (const conn of listener) {
+	for await (const req of Deno.serveHttp(conn)) {
+		req.respondWith(new Response("200", { status: 200, statusText: "OK" }))
+	}
 }
-
-for await (const conn of listener) http(conn)

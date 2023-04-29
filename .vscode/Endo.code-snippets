@@ -58,4 +58,11 @@
 			"}"
 		]
 	},
+	"Discordeno Types Shortcut": {
+		"scope": "typescript",
+		"prefix": "dts",
+		"body": [
+			"export type $1 = Camelize<Discord$1>"
+		]
+	}
 }

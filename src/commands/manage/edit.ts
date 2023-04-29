@@ -133,7 +133,7 @@ export async function autocomplete(bot: Bot, interaction: Interaction) {
 		})
 	}
 
-	const choices: ApplicationCommandOptionChoice[] = (await bot.helpers.getVoiceRegions(interaction.guildId)).array().map(region => {
+	const choices: ApplicationCommandOptionChoice[] = (await bot.helpers.getVoiceRegions(interaction.guildId)).map(region => {
 		let { name } = region
 		if (region.optimal) name += " [Optimal]"
 		if (region.deprecated) name += " [Deprecated]"

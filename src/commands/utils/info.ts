@@ -49,10 +49,9 @@ export const cmd: ApplicationCommandOption = {
 export async function main(bot: Bot, interaction: Interaction) {
 	switch (getSubcmd(interaction)) {
 		case "bot": {
-			const app = await bot.rest.runMethod<DiscordApplication>(
-				bot.rest,
+			const app = await bot.rest.makeRequest<DiscordApplication>(
 				"GET",
-				bot.constants.routes.OAUTH2_APPLICATION(),
+				bot.rest.routes.oauth2Application(),
 			)
 
 			const timestamp = toTimestamp(bot.id)
@@ -64,7 +63,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 			const inviteLink = `https://discord.com/oauth2/authorize?client_id=${bot.id}`
 				+ `&permissions=${app.install_params?.permissions ?? 0}&scope=${app.install_params?.scopes.join("%20") ?? "bot"}`
 
-			const ddeno = bot.constants.DISCORDENO_VERSION
+			const ddeno = "19.0.0-alpha.1" // bot.constants.DISCORDENO_VERSION
 			const { version: { deno, v8, typescript } } = Deno
 			const { rss, heapUsed, heapTotal } = Deno.memoryUsage()
 
@@ -166,16 +165,16 @@ export async function main(bot: Bot, interaction: Interaction) {
 							value: stripIndents`~${guild.approximateMemberCount} Members
 								${guild.roles.size} Roles
 								${guild.emojis.size} Emojis
-								┣ ${emojis.filter(e => !e.toggles.animated).size} static
-								┗ ${emojis.filter(e => e.toggles.animated).size} animated`,
+								┣ ${emojis.filter(e => !e.toggles.animated).length} static
+								┗ ${emojis.filter(e => e.toggles.animated).length} animated`,
 							inline: true,
 						},
 						{
 							name: "Channels Count",
-							value: stripIndents`${channels.filter(c => c.type === ChannelTypes.GuildCategory).size} Categories
-								${channels.filter(c => c.type === ChannelTypes.GuildText).size} Text
-								${channels.filter(c => c.type === ChannelTypes.GuildVoice).size} Voice
-								${channels.filter(c => c.type === ChannelTypes.GuildStageVoice).size} Stages`,
+							value: stripIndents`${channels.filter(c => c.type === ChannelTypes.GuildCategory).length} Categories
+								${channels.filter(c => c.type === ChannelTypes.GuildText).length} Text
+								${channels.filter(c => c.type === ChannelTypes.GuildVoice).length} Voice
+								${channels.filter(c => c.type === ChannelTypes.GuildStageVoice).length} Stages`,
 							inline: true,
 						},
 					],
@@ -189,7 +188,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 		case "user": {
 			const { user } = getValue(interaction, "target", "User") ?? interaction
-			const discordUser = await bot.rest.runMethod<DiscordUser>(bot.rest, "GET", bot.constants.routes.USER(user.id))
+			const discordUser = await bot.rest.makeRequest<DiscordUser>("GET", bot.rest.routes.user(user.id))
 			const createdAt = toTimestamp(user.id)
 
 			await respond(bot, interaction, {
