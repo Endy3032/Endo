@@ -1,5 +1,4 @@
-import { CreateMessageOptions, Embed, Interaction } from "discordeno"
-import { Bot, CreateApplicationCommand } from "discordeno"
+import { CreateMessageOptions, Embed } from "discordeno"
 
 export const timezone = "+00:00"
 
@@ -41,25 +40,13 @@ export const colors = [
 	0x000000,
 ]
 
-export const InspectConfig = {
+export const InspectConfig: Deno.InspectOptions = {
 	colors: true,
 	compact: false,
 	depth: 8,
 	iterableLimit: 300,
 	strAbbreviateSize: 1000,
 }
-
-export type InteractionHandler = (bot: Bot, interaction: Interaction) => Promise<void>
-
-export type CommandHandler = {
-	main: InteractionHandler
-	button?: InteractionHandler
-	select?: InteractionHandler
-	modal?: InteractionHandler
-	autocomplete?: InteractionHandler
-}
-
-export type Command = CommandHandler & { cmd: CreateApplicationCommand }
 
 export type LogLevel =
 	| "INFO"

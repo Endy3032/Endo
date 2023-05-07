@@ -9,7 +9,7 @@ export const main: EventHandlers["debug"] = (text: string, ...args: any[]) => {
 
 	if (tag?.includes("RequestCreate")) {
 		const json = content?.match(/(?<=( \| Body: )).*/)?.[0] ?? ""
-		content = content?.replace(" | Body: " + json, "\n") + Deno.inspect(JSON.parse(json != "undefined" ? json : "{}"), InspectConfig)
+		content = content?.replace(" | Body: " + json, "\n") + Deno.inspect(JSON.parse(json !== "undefined" ? json : "{}"), InspectConfig)
 	} else if (tag?.includes("FetchSuccess")) {
 		const matched = content?.match(/(?<=^(URL: .*? \| )).*/)?.[0] ?? ""
 		content = content?.replace(" | " + matched, "\n")
@@ -18,7 +18,9 @@ export const main: EventHandlers["debug"] = (text: string, ...args: any[]) => {
 		if (json.payload?.body) {
 			try {
 				json.payload.body = JSON.parse(json.payload.body)
-			} catch {}
+			} catch (e) {
+				console.error(e)
+			}
 		}
 		content += Deno.inspect(json, InspectConfig)
 	} else if (tag?.includes("fetchSuccess") || tag?.includes("Add To Global Queue")) {
@@ -26,7 +28,9 @@ export const main: EventHandlers["debug"] = (text: string, ...args: any[]) => {
 		if (json.payload?.body) {
 			try {
 				json.payload.body = JSON.parse(json.payload.body)
-			} catch {}
+			} catch (e) {
+				console.error(e)
+			}
 		}
 		content = Deno.inspect(json, InspectConfig)
 	}

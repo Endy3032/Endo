@@ -6,11 +6,10 @@
 		"jsxFactory": "window.createElement"
 	},
 	"lint": {
-		"files": {
-			"include": ["**/*"],
-			"exclude": ["Old/*"]
-		},
+		"include": ["src/"],
+		"exclude": ["src/old/"],
 		"rules": {
+			"tags": ["recommended"],
 			"include": ["eqeqeq", "no-await-in-loop"],
 			"exclude": ["no-explicit-any"]
 		}
@@ -26,18 +25,19 @@
 		"bytes": "https://deno.land/std@0.184.0/fmt/bytes.ts",
 		"canvas": "https://deno.land/x/canvas@v1.4.1/mod.ts",
 		"colorConvert": "https://deno.land/x/color@v0.3.0/mod.ts",
-		"colors": "https://deno.land/std@0.184.0/fmt/colors.ts",
 		"commonTags": "https://esm.sh/common-tags@1.8.2#=",
-		"discordeno": "npm:@discordeno/bot@19.0.0-next.e2d86ea",
+		"discordeno": "npm:@discordeno/bot@19.0.0-next.2b83d69",
 		"dom": "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts",
 		"duration": "https://deno.land/std@0.184.0/fmt/duration.ts",
 		"exif": "https://deno.land/x/deno_exif@0.0.3/mod.ts",
 		"fuse": "https://esm.sh/fuse.js@6.6.2",
+		"genius": "npm:genius-lyrics-api",
 		"googleTranslate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
 		"mathjs": "https://esm.sh/mathjs@11.8.0/",
 		"otpauth": "https://deno.land/x/otpauth@v9.1.1/dist/otpauth.esm.js",
 		"path": "https://deno.land/std@0.184.0/path/mod.ts",
 		"progressbar": "https://esm.sh/string-progressbar@1.0.4",
+		"puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
 		"temporal": "https://esm.sh/@js-temporal/polyfill@0.4.3",
 		"time": "https://deno.land/x/time.ts@v2.0.1/mod.ts",
 		"urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",

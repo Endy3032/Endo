@@ -1,3 +1,4 @@
+import { iconBigintToHash } from "discordeno"
 import { join } from "path"
 
 export function capitalize(content: string, lower?: boolean) {
@@ -24,7 +25,7 @@ export function getFiles(dir: string | URL, options?: { fileTypes?: string[] | s
 }
 
 // #region Image URL
-type ID = string | number | BigInt | null | undefined
+type ID = string | number | bigint | null | undefined
 type Endpoints = "app-icons" | "avatars" | "banners" | "discovery-splashes" | "icons" | "role-icons" | "splashes"
 type Options = {
 	format: "jpg" | "jpeg" | "png" | "webp" | "gif" | "json"
@@ -34,13 +35,12 @@ type Options = {
 export function imageURL(targetID: ID, hash: ID, endpoint: Endpoints, options?: Options): string {
 	if (targetID === undefined || hash === undefined || targetID === null || hash === null) return ""
 
-	hash = hash.toString(16)
-	const animated = hash.startsWith("a")
-	hash = animated ? hash.replace(/^a(?!_)/, "a_") : hash.startsWith("b") ? hash.slice(1) : hash
+	const { format, size } = Object.assign<Options, Options | undefined>({
+		format: hash.toString(16).startsWith("a") ? "gif" : "png",
+		size: 1024,
+	}, options)
 
-	const { format, size } = Object.assign<Options, Options | undefined>({ format: animated ? "gif" : "png", size: 1024 }, options)
-
-	return `https://cdn.discordapp.com/${endpoint}/${targetID}/${hash}.${format}?size=${size}&quality=lossless`
+	return `https://cdn.discordapp.com/${endpoint}/${targetID}/${iconBigintToHash(BigInt(hash))}.${format}?size=${size}&quality=lossless`
 }
 // #endregion
 

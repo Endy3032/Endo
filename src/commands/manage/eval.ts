@@ -1,5 +1,4 @@
 import axiod from "axiod"
-import * as colors from "colors"
 import { stripIndents } from "commonTags"
 import commonTags from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Embed, Interaction, MessageComponentTypes,

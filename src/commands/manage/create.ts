@@ -155,7 +155,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	switch (getSubcmd(interaction)) {
 		case "category": {
-			const belowPos = channels.find(channel => channel.id == below?.id)?.position
+			const belowPos = channels.find(channel => channel.id === below?.id)?.position
 			position = belowPos ?? 0
 
 			Object.assign<CreateGuildChannel, Partial<CreateGuildChannel>>(options, { type: ChannelTypes.GuildCategory, position })

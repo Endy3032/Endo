@@ -35,7 +35,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 }
 
 export async function button(bot: Bot, interaction: Interaction) {
-	if (getCmd(interaction) == "poll") {
+	if (getCmd(interaction) === "poll") {
 		const embed = interaction.message?.embeds?.[0]
 		// let user = embed.description?.split(" ").at(-1) as string
 		// user = user.slice(2, user.length - 1)

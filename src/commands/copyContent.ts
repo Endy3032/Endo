@@ -1,18 +1,18 @@
-import { stripIndents } from "commonTags"
-import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction } from "discordeno"
-import { respond } from "modules"
+import { ApplicationCommandTypes, CreateContextApplicationCommand } from "discordeno"
+import { InteractionHandler, respond } from "modules"
 
 export const cmd: CreateContextApplicationCommand = {
 	name: "Raw Content",
 	type: ApplicationCommandTypes.Message,
 }
 
-export async function main(bot: Bot, interaction: Interaction) {
-	const message = interaction.data?.resolved?.messages?.first()
+export const main: InteractionHandler = async (bot, interaction, args) => {
+	console.log(interaction?.data?.resolved?.messages)
+	const { message } = args
 
 	if (!message) return respond(bot, interaction, "Unable to fetch the message", true)
 
-	const attachments = message.attachments?.map(attachment => attachment.proxyUrl)
+	const attachments = message.attachments?.map(attachment => attachment.proxyUrl) ?? []
 	const messageContent = escapeMarkdown(message.content ?? "")
 
 	const content = `${messageContent.length > 0 ? messageContent : "None"}\n\n`

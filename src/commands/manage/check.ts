@@ -55,7 +55,7 @@ export async function button(bot: Bot, interaction: Interaction) {
 
 	if (interaction.data?.customId === "fix") {
 		const fixPosition = (type: ChannelTypes) =>
-			channels.filter(c => c.type == type).map((c: Channel, i: number) => Object.assign(c, { position: i }))
+			channels.filter(c => c.type === type).map((c: Channel, i: number) => Object.assign(c, { position: i }))
 
 		const categories = fixPosition(ChannelTypes.GuildCategory)
 		const text = fixPosition(ChannelTypes.GuildText)
@@ -98,21 +98,21 @@ function positionEmbed(channels: Channel[], roles: Role[]) {
 				{
 					name: "Categories",
 					value: channels
-						.filter(channel => channel.type == ChannelTypes.GuildCategory)
+						.filter(channel => channel.type === ChannelTypes.GuildCategory)
 						.map(channel => `<#${channel.id}> ${channel.position}`).join("\n"),
 					inline: true,
 				},
 				{
 					name: "Text Channels",
 					value: channels
-						.filter(channel => channel.type == ChannelTypes.GuildText)
+						.filter(channel => channel.type === ChannelTypes.GuildText)
 						.map(channel => `<#${channel.id}> ${channel.position}`).join("\n"),
 					inline: true,
 				},
 				{
 					name: "Voice Channels",
 					value: channels
-						.filter(channel => channel.type == ChannelTypes.GuildVoice || channel.type == ChannelTypes.GuildStageVoice)
+						.filter(channel => channel.type === ChannelTypes.GuildVoice || channel.type === ChannelTypes.GuildStageVoice)
 						.map(channel => `<#${channel.id}> ${channel.position}`).join("\n"),
 					inline: true,
 				},

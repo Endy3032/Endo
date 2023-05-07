@@ -23,7 +23,7 @@ const status: Activity & StreamingActivity = {
 
 export function activities(): BotStatusUpdate {
 	const type = pickArray(Object.keys(status)) as keyof typeof status
-	const name = pickArray(type == "Streaming" ? Object.keys(status.Streaming) : status[type])
+	const name = pickArray(type === "Streaming" ? Object.keys(status.Streaming) : status[type])
 	const url = type === "Streaming" ? `https://youtube.com/watch?v=${pickArray(status.Streaming[name])}` : undefined
 
 	return {

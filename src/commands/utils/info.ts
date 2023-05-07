@@ -1,7 +1,7 @@
 import { format } from "bytes"
 import { stripIndents } from "commonTags"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, ChannelTypes, DiscordApplication, DiscordEmbedField,
-	DiscordUser, Interaction } from "discordeno"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, avatarUrl, Bot, ChannelTypes, DiscordApplication, DiscordEmbedField,
+	DiscordUser, guildBannerUrl, guildIconUrl, Interaction } from "discordeno"
 import { colors, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
 
 export const cmd: ApplicationCommandOption = {
@@ -178,8 +178,8 @@ export async function main(bot: Bot, interaction: Interaction) {
 							inline: true,
 						},
 					],
-					image: guild.banner ? { url: imageURL(guild.id, guild.banner, "banners") } : undefined,
-					thumbnail: guild.icon ? { url: imageURL(guild.id, guild.icon, "icons") } : undefined,
+					image: guild.banner ? { url: guildBannerUrl(guild.id, { banner: guild.banner, size: 512, format: "png" })! } : undefined,
+					thumbnail: guild.icon ? { url: guildIconUrl(guild.id, guild.icon, { size: 512, format: "png" })! } : undefined,
 					footer: { text: `Server ID • ${guild.id}` },
 				}],
 			})
@@ -200,8 +200,12 @@ export async function main(bot: Bot, interaction: Interaction) {
 						{ name: "ID", value: user.id.toString(), inline: true },
 						{ name: "Joined", value: `<t:${createdAt}:R>`, inline: true },
 					],
-					image: discordUser.banner ? { url: imageURL(user.id, discordUser.banner, "banners") } : undefined,
-					thumbnail: user.avatar ? { url: imageURL(user.id, user.avatar, "avatars") } : undefined,
+					image: discordUser.banner
+						? { url: guildBannerUrl(user.id, { banner: discordUser.banner, size: 512, format: "png" })! }
+						: undefined,
+					thumbnail: user.avatar
+						? { url: avatarUrl(user.id, user.discriminator, { avatar: user.avatar, size: 512, format: "png" })! }
+						: undefined,
 				}],
 			})
 			break

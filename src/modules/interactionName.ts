@@ -2,15 +2,11 @@ import { ApplicationCommandOptionTypes as CommandOptionTypes, Interaction, Inter
 
 export function getCmd(interaction: Interaction) {
 	switch (interaction.type) {
-		// Modal can be triggered via component or command
+		// Modals can be triggered via component or command
 		// Message always present on component interaction
 		case InteractionTypes.ModalSubmit:
 		case InteractionTypes.MessageComponent:
-			return (
-				!interaction.message
-					? interaction.data?.customId?.split(/[^\w]|_/)
-					: interaction.message?.interaction?.name.split(" ")
-			)?.[0] ?? undefined
+			return messageInteractionName(interaction)?.[0] ?? undefined
 
 		// Command name always present on other interactions
 		default:
@@ -18,14 +14,26 @@ export function getCmd(interaction: Interaction) {
 	}
 }
 
+export function getGroup(interaction: Interaction) {
+	switch (interaction.type) {
+		case InteractionTypes.ModalSubmit:
+		case InteractionTypes.MessageComponent: {
+			const cmd = messageInteractionName(interaction)
+			return cmd?.length === 3 ? cmd[1] : undefined
+		}
+
+		default: {
+			if (interaction.data?.options?.[0].type === CommandOptionTypes.SubCommandGroup) return interaction.data.options[0].name
+			return undefined
+		}
+	}
+}
+
 export function getSubcmd(interaction: Interaction) {
 	switch (interaction.type) {
 		case InteractionTypes.ModalSubmit:
 		case InteractionTypes.MessageComponent: {
-			const cmd = !interaction.message
-				? interaction.data?.customId?.split(/[^\w]|_/)
-				: interaction.message?.interaction?.name.split(" ")
-
+			const cmd = messageInteractionName(interaction)
 			return cmd?.length === 3 ? cmd[2] : cmd?.length === 2 ? cmd[1] : undefined
 		}
 
@@ -37,7 +45,7 @@ export function getSubcmd(interaction: Interaction) {
 					return interaction.data.options[0].name
 
 				case CommandOptionTypes.SubCommandGroup:
-					return interaction.data.options?.[0].options?.[0].name
+					return interaction.data.options[0].options![0].name
 
 				default:
 					return undefined
@@ -46,20 +54,8 @@ export function getSubcmd(interaction: Interaction) {
 	}
 }
 
-export function getGroup(interaction: Interaction) {
-	switch (interaction.type) {
-		case InteractionTypes.ModalSubmit:
-		case InteractionTypes.MessageComponent: {
-			const cmd = !interaction.message
-				? interaction.data?.customId?.split(/[^\w]|_/)
-				: interaction.message?.interaction?.name.split(" ")
-
-			return cmd?.length === 3 ? cmd[1] : undefined
-		}
-
-		default: {
-			if (interaction.data?.options?.[0].type === CommandOptionTypes.SubCommandGroup) return interaction.data.options[0].name
-			return undefined
-		}
-	}
+function messageInteractionName(interaction: Interaction) {
+	return !interaction.message
+		? interaction.data?.customId?.split(/[^\w]|_/)
+		: interaction.message?.interaction?.name.split(" ")
 }

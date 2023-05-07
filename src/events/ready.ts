@@ -1,8 +1,7 @@
 import axiod from "axiod"
 import { IAxiodError } from "axiodInterfaces"
 import bot from "bot"
-import { bold, rgb24 } from "colors"
-import { ActivityTypes, EventHandlers } from "discordeno"
+import { ActivityTypes, bold, EventHandlers, rgb24 } from "discordeno"
 import { activities, Nord, TimeMetric } from "modules"
 
 export const name: keyof EventHandlers = "ready"

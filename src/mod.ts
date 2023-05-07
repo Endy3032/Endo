@@ -5,7 +5,7 @@ import { deploy } from "modules"
 import eventHandlers from "./events/mod.ts"
 import { fixGatewayWebsocket } from "./fixGateway.ts"
 
-// console.clear()
+if (!Deno.args.includes("noClear")) console.clear()
 bot.events = eventHandlers
 fixGatewayWebsocket(bot.gateway)
 

@@ -22,6 +22,11 @@ export async function deploy(bot: Bot) {
 
 	const { commands } = await import("../commands/mod.ts")
 
+	if (args.includes("global")) {
+		bot.rest.upsertGlobalApplicationCommands(commands)
+			.then(deployed => console.botLog(`${deployed.length} commands`, { tag: "🌐 Deploy", noSend: true }))
+	}
+
 	if (args.includes("test")) {
 		let content = "No Development Guild"
 
@@ -34,11 +39,6 @@ export async function deploy(bot: Bot) {
 		}
 
 		console.botLog(content, { tag: "🛠  Deploy", noSend: true })
-	}
-
-	if (args.includes("global")) {
-		bot.rest.upsertGlobalApplicationCommands(commands)
-			.then(deployed => console.botLog(`${deployed.length} commands`, { tag: "🌐  Deploy", noSend: true }))
 	}
 }
 

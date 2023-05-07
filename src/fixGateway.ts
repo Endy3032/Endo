@@ -1,4 +1,4 @@
-import { DiscordenoShard, GatewayManager, ShardState, Transformers } from "discordeno"
+import { DiscordenoShard, GatewayManager, ShardState } from "discordeno"
 import { activities } from "modules"
 
 // https://github.com/discordeno/discordeno/blob/main/packages/gateway/src/Shard.ts#L120
@@ -34,6 +34,7 @@ export function fixGatewayWebsocket(gateway: GatewayManager) {
 	const baseSet = gateway.shards.set.bind(gateway.shards)
 
 	gateway.shards.set = (key, value) => {
+		// deno-lint-ignore require-await
 		value.makePresence = async () => activity
 		value.connect = () => connect.apply(value)
 		return baseSet(key, value)

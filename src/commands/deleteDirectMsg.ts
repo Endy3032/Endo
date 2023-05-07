@@ -1,21 +1,25 @@
-import { ApplicationCommandTypes, Bot, CreateContextApplicationCommand, Interaction } from "discordeno"
-import { respond, shorthand } from "modules"
+import { ApplicationCommandTypes, CreateContextApplicationCommand } from "discordeno"
+import { InteractionHandler, respond, shorthand } from "modules"
 
 export const cmd: CreateContextApplicationCommand = {
 	name: "Delete Message",
 	type: ApplicationCommandTypes.Message,
 }
 
-export async function main(bot: Bot, interaction: Interaction) {
-	if (interaction.guildId) return await respond(bot, interaction, `${shorthand("warn")} This command is exclusive to my DM`, true)
+export const main: InteractionHandler = async (bot, interaction, args) => {
+	const { message } = args
 
-	const message = interaction.data?.resolved?.messages?.first()
+	if (message?.interaction?.user?.id !== interaction.user.id) {
+		return respond(bot, interaction, `${shorthand("warn")} You can only delete responses from your interaction`, true)
+	}
 
 	if (message?.author.id !== bot.id) {
-		return await respond(bot, interaction, `${shorthand("warn")} This command is exlusive to my messages`, true)
+		return await respond(bot, interaction, `${shorthand("warn")} You can only delete my messages`, true)
 	}
 
 	const channel = await bot.helpers.getDmChannel(interaction.user.id)
-	await bot.helpers.deleteMessage(channel.id, message.id)
+	console.log(interaction.channelId, channel.id)
+
+	// await bot.helpers.deleteMessage(interaction.channelId ?? channel.id, message.id)
 	await respond(bot, interaction, `${shorthand("success")} Deleted the message!`, true)
 }

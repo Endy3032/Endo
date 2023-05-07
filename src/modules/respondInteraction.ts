@@ -6,7 +6,7 @@ import { MessageFlags } from "./exports.ts"
 export async function respond(bot: Bot, interaction: Interaction, response: InteractionCallbackData | string, ephemeral = false) {
 	let type = InteractionResponseTypes.ChannelMessageWithSource
 
-	if (typeof response != "string") {
+	if (typeof response !== "string") {
 		type = response.title
 			? InteractionResponseTypes.Modal
 			: interaction.type === InteractionTypes.ApplicationCommandAutocomplete
@@ -15,8 +15,9 @@ export async function respond(bot: Bot, interaction: Interaction, response: Inte
 	}
 
 	const data = typeof response === "string" ? { content: response } : response
-	if (ephemeral) data.flags = MessageFlags.Ephemeral
-	await bot.rest.sendInteractionResponse(interaction.id, interaction.token, { type, data })
+	// if (ephemeral) data.flags = MessageFlags.Ephemeral
+
+	await interaction.respond(data, { isPrivate: ephemeral })
 		.catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
@@ -35,10 +36,7 @@ export async function defer(bot: Bot, interaction: Interaction, ephemeral = fals
 		? InteractionResponseTypes.DeferredUpdateMessage
 		: InteractionResponseTypes.DeferredChannelMessageWithSource
 
-	await bot.rest.sendInteractionResponse(interaction.id, interaction.token, {
-		type,
-		data: { flags: ephemeral ? MessageFlags.Ephemeral : undefined },
-	}).catch(err => console.botLog(err, { logLevel: "ERROR" }))
+	await interaction.defer(ephemeral).catch(err => console.botLog(err, { logLevel: "ERROR" }))
 }
 
 export async function error(bot: Bot, interaction: Interaction, err: Error, options: { type?: string; isEdit?: boolean }) {
@@ -52,3 +50,13 @@ export async function error(bot: Bot, interaction: Interaction, err: Error, opti
 	await console.botLog(err)
 	isEdit ? edit(bot, interaction, content) : respond(bot, interaction, content, true)
 }
+
+enum Choices {
+	KeepTyping = "Keep typing to search...",
+	NoResults = "No results found.",
+}
+
+export const defaultChoice = (message: keyof typeof Choices, value = "…") =>
+	({
+		choices: [{ name: Choices[message], value }],
+	}) as InteractionCallbackData

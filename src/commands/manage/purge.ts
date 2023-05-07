@@ -91,12 +91,12 @@ export async function button(bot: Bot, interaction: Interaction) {
 		?? `Purged by ${interaction.user.username}#${interaction.user.discriminator}`
 
 	let clear = await bot.helpers.getMessages(interaction.channelId, { limit: parseInt(amount) })
-	if (option != "null" || user != "undefined") {
+	if (option !== "null" || user !== "undefined") {
 		clear = clear.filter(msg => {
 			let cond = false
-			if (option == "bots") cond = cond || msg.author.bot
-			if (option == "users") cond = cond || !msg.author.bot
-			if (user != "undefined") cond = cond || (msg.author.id == BigInt(user))
+			if (option === "bots") cond = cond || msg.author.bot
+			if (option === "users") cond = cond || !msg.author.bot
+			if (user !== "undefined") cond = cond || (msg.author.id === BigInt(user))
 			return cond
 		})
 	}

@@ -100,7 +100,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 
 	await respond(bot, interaction, {
 		content: stripIndents`${invalid ? "Invalid date. Fallback to current time:" : ""}
-		<t:${finalDate.epochSeconds}:F> [GMT ${timeZone.length == 6 ? timeZone : timezones.find(e => e.id == timeZone)?.offset}]
+		<t:${finalDate.epochSeconds}:F> [GMT ${timeZone.length === 6 ? timeZone : timezones.find(e => e.id === timeZone)?.offset}]
 		**Milliseconds** • ${finalDate.epochMilliseconds}
 		**Seconds** • ${finalDate.epochSeconds}
 		**Styles Table** • Format timestamp with \`<t:Seconds:Style>\``,

@@ -1,5 +1,7 @@
-import { Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes } from "discordeno"
-import { Command, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, InteractionHandler, respond, shorthand } from "modules"
+import { ApplicationCommandTypes, Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes,
+	stripColor } from "discordeno"
+import { Args, Command, DeepReadonly, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, InteractionHandler, parseOptions, respond,
+	shorthand } from "modules"
 
 const commands: CreateApplicationCommand[] = []
 const handlers = new Collection<string, Command>()
@@ -10,7 +12,7 @@ for await (const file of getFiles("./commands")) {
 	commands.push(command.cmd)
 }
 
-for (const folder of getFiles("./commands", { fileTypes: "folders" })) {
+for await (const folder of getFiles("./commands", { fileTypes: "folders" })) {
 	const { cmd } = await import(`./${folder}/mod.ts`)
 	commands.push(cmd)
 
@@ -24,13 +26,13 @@ export async function handleInteraction(interaction: Interaction) {
 	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)]
 	const command = handlers.get(cmd ?? "") ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
 
-	let handle: InteractionHandler | undefined = command?.main
+	const options = command?.cmd.type === ApplicationCommandTypes.ChatInput ? command.cmd.options : undefined
+	let handle: InteractionHandler<DeepReadonly<typeof options> | any> | undefined = command?.main
+
 	if (interaction.type === InteractionTypes.MessageComponent) {
-		if (interaction.data?.componentType === MessageComponentTypes.Button) {
-			handle = command?.button
-		} else {
-			handle = command?.select
-		}
+		handle = interaction.data?.componentType === MessageComponentTypes.Button
+			? command?.button
+			: command?.select
 	} else if (interaction.type === InteractionTypes.ModalSubmit) {
 		handle = command?.modal
 	} else if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) {
@@ -50,16 +52,16 @@ export async function handleInteraction(interaction: Interaction) {
 	}
 
 	try {
-		await handle(interaction.bot, interaction)
+		await handle(interaction.bot, interaction, parseOptions(interaction) as Args<typeof options | any>)
 	} catch (e) {
 		console.botLog(e, { logLevel: "ERROR" })
 		let content = `${shorthand("error")} Something failed back here... Techy debug stuff below\`\`\`${
 			Deno.inspect(e, InspectConfig).replaceAll(Deno.cwd(), "Endo")
 		}`
 
-		if (content.length > 1997) content = content.slice(0, 1994) + "..."
+		if (content.length > 1997) content = content.slice(0, 1996) + "…"
 		content += "```"
-		await respond(interaction.bot, interaction, content, true)
+		await respond(interaction.bot, interaction, stripColor(content), true)
 	}
 }
 

@@ -1,5 +1,4 @@
-import { rgb24 } from "colors"
-import { BitwisePermissionFlags, Interaction } from "discordeno"
+import { BitwisePermissionFlags, Interaction, rgb24 } from "discordeno"
 import { shorthand } from "./emojis.ts"
 import { Nord } from "./exports.ts"
 import { getCmd, getGroup, getSubcmd } from "./interactionName.ts"
