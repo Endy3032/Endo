@@ -37,7 +37,14 @@ export function parseOptions<T extends ReadonlyOptions = any>(
 	}
 
 	for (const option of options) {
-		const value = BigInt(option.value?.toString() as string)
+		let value: bigint | undefined
+		if ([
+			ApplicationCommandOptionTypes.Channel,
+			ApplicationCommandOptionTypes.User,
+			ApplicationCommandOptionTypes.Role,
+			ApplicationCommandOptionTypes.Mentionable,
+			ApplicationCommandOptionTypes.Attachment,
+		].includes(option.type)) value = BigInt(option.value?.toString() as string)
 
 		switch (option.type) {
 			case ApplicationCommandOptionTypes.SubCommandGroup:
@@ -50,33 +57,33 @@ export function parseOptions<T extends ReadonlyOptions = any>(
 			}
 
 			case ApplicationCommandOptionTypes.Channel: {
-				args[option.name] = interaction.data.resolved?.channels?.get(value)
+				args[option.name] = interaction.data.resolved?.channels?.get(value!)
 				break
 			}
 
 			case ApplicationCommandOptionTypes.User: {
 				args[option.name] = {
-					user: interaction.data.resolved?.users?.get(value),
-					member: interaction.data.resolved?.members?.get(value),
+					user: interaction.data.resolved?.users?.get(value!),
+					member: interaction.data.resolved?.members?.get(value!),
 				}
 				break
 			}
 
 			case ApplicationCommandOptionTypes.Role: {
-				args[option.name] = interaction.data.resolved?.roles?.get(value)
+				args[option.name] = interaction.data.resolved?.roles?.get(value!)
 				break
 			}
 
 			case ApplicationCommandOptionTypes.Mentionable: {
-				args[option.name] = interaction.data.resolved?.roles?.get(value) ?? {
-					user: interaction.data.resolved?.users?.get(value),
-					member: interaction.data.resolved?.members?.get(value),
+				args[option.name] = interaction.data.resolved?.roles?.get(value!) ?? {
+					user: interaction.data.resolved?.users?.get(value!),
+					member: interaction.data.resolved?.members?.get(value!),
 				}
 				break
 			}
 
 			case ApplicationCommandOptionTypes.Attachment: {
-				args[option.name] = interaction.data.resolved?.attachments?.get(value)
+				args[option.name] = interaction.data.resolved?.attachments?.get(value!)
 				break
 			}
 

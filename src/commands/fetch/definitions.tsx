@@ -61,6 +61,8 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 				await saveCache(["definitions", "wiktionary"], `${word}.json`, parse)
 			}
 
+			await interaction.edit("Wiktionary coming later")
+
 			console.log(parse.sections)
 			console.log(parse.wikitext["*"])
 
@@ -137,13 +139,12 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 			const definition: UrbanDefinition = JSON.parse(cachedDefs!)
 
 			const components: ActionRow[] = [
-				<SelectMenu customId="result">
+				<SelectMenu customId="result" placeholder={`${cachedResults[word].definitions.length} results found`}>
 					{...cachedResults[word].definitions.map(def => (
 						<Option
 							label={def.word}
 							description={def.author}
 							value={def.defid.toString()}
-							default={def.defid === definition.defid}
 						/>
 					))}
 				</SelectMenu>,
@@ -162,11 +163,6 @@ export const select: SelectHandler = async (bot, interaction, args) => {
 
 	const row = interaction.message!.components[0] as ActionRow
 	const menu = row.components[0] as SelectMenuComponent
-
-	menu.options = menu.options.map(e => ({
-		...e,
-		default: e.value === args.values[0],
-	}))
 
 	const cachedDefs = await getCache("definitions/urban", `${args.values[0]}.json`)!
 	const definition: UrbanDefinition = JSON.parse(cachedDefs!)
@@ -218,6 +214,7 @@ export const autocomplete: AutocompleteHandler<typeof cmd.options> = async (_bot
 
 function urbanEmbed(definition: UrbanDefinition) {
 	const defContent = `**Definition(s)**\n${definition.definition}`
+		.replaceAll(/\[(.*?)\]/g, (_, p1) => `[${p1}](https://${encodeURI(p1)}.urbanup.com)`)
 
 	const embed: EmbedObj = (
 		<Embed
@@ -229,7 +226,11 @@ function urbanEmbed(definition: UrbanDefinition) {
 			footerText={`ID: ${definition.defid} | Written on`}
 			timestamp={Temporal.Instant.from(definition.written_on).epochMilliseconds}
 		>
-			<Field name="Examples" value={definition.example} inline />
+			<Field
+				name="Examples"
+				value={definition.example.replaceAll(/\[(.*?)\]/g, (_, p1) => `[${p1}](https://${encodeURI(p1)}.urbanup.com)`)}
+				inline
+			/>
 			<Field name="Ratings" value={`${definition.thumbs_up} :+1: / ${definition.thumbs_down} :-1:`} inline />
 		</Embed>
 	)
