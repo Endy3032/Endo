@@ -2,7 +2,7 @@ import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
 import Fuse from "fuse"
 import { getFocused, getSubcmd, getValue, respond, timezone } from "modules"
-import { join } from "path"
+import { join } from "std:path"
 import { Temporal } from "temporal"
 import { timezone as timezones } from "time"
 

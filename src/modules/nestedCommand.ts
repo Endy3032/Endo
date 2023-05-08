@@ -1,5 +1,5 @@
 import { CreateApplicationCommand } from "discordeno"
-import { dirname, fromFileUrl, join } from "path"
+import { dirname, fromFileUrl, join } from "std:path"
 import { getFiles } from "./utils.ts"
 
 export async function createCommand(name: string, description: string, importMeta: ImportMeta) {

@@ -56,7 +56,7 @@ enum Choices {
 	NoResults = "No results found.",
 }
 
-export const defaultChoice = (message: keyof typeof Choices, value = "…") =>
+export const defaultChoice = (message: keyof typeof Choices | string, value = "…") =>
 	({
-		choices: [{ name: Choices[message], value }],
+		choices: [{ name: Choices[message] ?? message, value }],
 	}) as InteractionCallbackData

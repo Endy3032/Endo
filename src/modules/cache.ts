@@ -1,4 +1,4 @@
-import { dirname, join } from "path"
+import { dirname, join } from "std:path"
 
 export async function saveCache(
 	folder: string | string[],

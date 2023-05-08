@@ -1,6 +1,6 @@
 import { Bot, Collection, CreateApplicationCommand, Interaction } from "discordeno"
 import { CommandHandler, getFiles, getSubcmd, getSubcmdGroup, respond } from "modules"
-import { join } from "path"
+import { join } from "std:path"
 
 const cmd: CreateApplicationCommand = {
 	name: "utils",

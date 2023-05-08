@@ -1,4 +1,3 @@
-import { format } from "bytes"
 import { Color } from "colorConvert"
 import { stripIndents } from "commonTags"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, ChannelTypes, CreateApplicationCommand, DiscordEmbedField,
@@ -7,6 +6,7 @@ import Fuse from "fuse"
 import { evaluate } from "mathjs"
 import { BotPerms, colors, escapeMarkdown, getFocused, getSubcmd, getSubcmdGroup, getValue, imageURL, pickArray, randRange, respond,
 	timezone, toTimestamp } from "modules"
+import { format } from "std:bytes"
 import { Temporal } from "temporal"
 import { timezone as timezones } from "time"
 

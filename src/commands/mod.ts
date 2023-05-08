@@ -1,7 +1,5 @@
-import { ApplicationCommandTypes, Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes,
-	stripColor } from "discordeno"
-import { Args, Command, DeepReadonly, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, InteractionHandler, parseOptions, respond,
-	shorthand } from "modules"
+import { Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes, stripColor } from "discordeno"
+import { Command, CommandHandler, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, parseOptions } from "modules"
 
 const commands: CreateApplicationCommand[] = []
 const handlers = new Collection<string, Command>()
@@ -23,45 +21,42 @@ for await (const folder of getFiles("./commands", { fileTypes: "folders" })) {
 }
 
 export async function handleInteraction(interaction: Interaction) {
-	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)]
-	const command = handlers.get(cmd ?? "") ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
+	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)],
+		command = handlers.get(cmd ?? "") ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
 
-	const options = command?.cmd.type === ApplicationCommandTypes.ChatInput ? command.cmd.options : undefined
-	let handle: InteractionHandler<DeepReadonly<typeof options> | any> | undefined = command?.main
+	let handler: keyof CommandHandler = "main"
 
-	if (interaction.type === InteractionTypes.MessageComponent) {
-		handle = interaction.data?.componentType === MessageComponentTypes.Button
-			? command?.button
-			: command?.select
-	} else if (interaction.type === InteractionTypes.ModalSubmit) {
-		handle = command?.modal
-	} else if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) {
-		handle = command?.autocomplete
+	if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) handler = "autocomplete"
+	else if (interaction.type === InteractionTypes.ModalSubmit) handler = "modal"
+	else if (interaction.type === InteractionTypes.MessageComponent) {
+		handler = interaction.data?.componentType === MessageComponentTypes.Button ? "button" : "select"
 	}
 
-	if (!command || !handle) {
-		console.botLog(interaction, { noSend: true })
+	if (!command || !command[handler]) {
+		console.botLog(interaction, { logLevel: "DEBUG", noSend: true })
 
 		const name = [cmd, group ?? subcmd].join("/")
 		const type = interaction.type === InteractionTypes.MessageComponent
 			? MessageComponentTypes[interaction.data?.componentType ?? 2]
 			: InteractionTypes[interaction.type]
 
-		console.botLog(`No ${type} handler found for \`${name}\``, { logLevel: "ERROR" })
-		return respond(interaction.bot, interaction, `${shorthand("error")} No ${type} handler found for \`${name}\``, true)
+		const content = `No ${type} handler found for \`${name}\``
+
+		console.botLog(content, { logLevel: "ERROR" })
+		return await interaction.respond(content, { isPrivate: true })
 	}
 
 	try {
-		await handle(interaction.bot, interaction, parseOptions(interaction) as Args<typeof options | any>)
+		// @ts-expect-error parseOptions
+		await command[handler]?.(interaction.bot, interaction, parseOptions(interaction))
 	} catch (e) {
-		console.botLog(e, { logLevel: "ERROR" })
-		let content = `${shorthand("error")} Something failed back here... Techy debug stuff below\`\`\`${
-			Deno.inspect(e, InspectConfig).replaceAll(Deno.cwd(), "Endo")
-		}`
+		let content = `Something failed back here... Debug info below\`\`\`${Deno.inspect(e, InspectConfig)}`
 
 		if (content.length > 1997) content = content.slice(0, 1996) + "…"
 		content += "```"
-		await respond(interaction.bot, interaction, stripColor(content), true)
+
+		console.botLog(e, { logLevel: "ERROR" })
+		await interaction.respond(stripColor(content).replaceAll(Deno.cwd(), "Endo"), { isPrivate: true })
 	}
 }
 

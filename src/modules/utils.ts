@@ -1,5 +1,5 @@
 import { iconBigintToHash } from "discordeno"
-import { join } from "path"
+import { join } from "std:path"
 
 export function capitalize(content: string, lower?: boolean) {
 	return content[0].toUpperCase() + (lower ? content.slice(1).toLowerCase() : content.slice(1))
@@ -13,7 +13,7 @@ export function toTimestamp(id: BigString, type: "ms" | "s" = "s"): string {
 }
 
 export function getFiles(dir: string | URL, options?: { fileTypes?: string[] | string | "folders"; filterMod?: boolean }) {
-	const { fileTypes, filterMod } = Object.assign({ fileTypes: "ts", filterMod: true }, options)
+	const { fileTypes, filterMod } = Object.assign({ fileTypes: ["ts", "tsx"], filterMod: true }, options)
 
 	const regex = new RegExp(`\\.(${(typeof fileTypes === "string" ? [fileTypes] : fileTypes).join("|")})$`)
 	return [...Deno.readDirSync(dir instanceof URL ? dir : join(Deno.cwd(), "src", dir))]

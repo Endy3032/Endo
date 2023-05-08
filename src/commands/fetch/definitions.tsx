@@ -1,9 +1,11 @@
 import axiod from "axiod"
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes } from "discordeno"
-import { colors, defaultChoice, defer, edit, getCache, InteractionHandler, pickArray, ReadonlyOption, saveCache,
-	shorthand } from "modules"
+import { ActionRow, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, delay, type Embed as EmbedObj,
+	SelectMenuComponent } from "discordeno"
+import { Button, Embed, Field, Row } from "jsx"
+import { AutocompleteHandler, ButtonHandler, colors, defaultChoice, defer, getCache, InspectConfig, InteractionHandler, pickArray,
+	ReadonlyOption, saveCache, SelectHandler, TimeMetric } from "modules"
 import { Temporal } from "temporal"
-import * as urban from "urban"
+import { Option, SelectMenu } from "../../jsx/menu.ts"
 
 export const cmd = {
 	name: "definition",
@@ -43,7 +45,6 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 
 			if (cache) parse = JSON.parse(cache)
 			else {
-				console.log("fetching")
 				const { data } = await axiod.get(`https://en.wiktionary.org/w/api.php`, {
 					params: {
 						action: "parse",
@@ -113,55 +114,75 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 
 		case "urban": {
 			const cache = await getCache(["definitions", "urban"], `results.json`)
-			const cachedResults: Record<string, Pick<UrbanDefinition, "word" | "author" | "defid">[]> = cache ? JSON.parse(cache) : {}
+			const cachedResults: Record<string, CachedUrbanResults> = cache ? JSON.parse(cache) : {}
 
-			if (!cachedResults[word]) {
-				const { data } = await axiod.get<{ list: UrbanDefinition[] }>("https://api.urbandictionary.com/v0/define", {
-					params: { term: word },
-				})
+			if (!cachedResults[word] || cachedResults[word].timestamp < Temporal.Now.instant().epochMilliseconds - 14 * TimeMetric.sec_day) {
+				const { data } = await axiod.get<{ list: UrbanDefinition[] }>(
+					"https://api.urbandictionary.com/v0/define",
+					{ params: { term: word } },
+				)
 
 				if (data.list.length === 0) return interaction.edit("No results found.")
 
-				cachedResults[word] = data.list.map(def => ({ word: def.word, author: def.author, defid: def.defid }))
+				cachedResults[word] = {
+					timestamp: Temporal.Now.instant().epochMilliseconds,
+					definitions: data.list.map(def => ({ word: def.word, author: def.author, defid: def.defid })),
+				}
 				await saveCache(["definitions", "urban"], `results.json`, cachedResults)
 
 				for await (const def of data.list) await saveCache(["definitions", "urban"], `${def.defid}.json`, def)
 			}
 
-			const cachedResult = await getCache("definitions/urban", `${cachedResults[word][0].defid}.json`)!
-			const result: UrbanDefinition = JSON.parse(cachedResult!)
+			const cachedDefs = await getCache("definitions/urban", `${cachedResults[word].definitions[0].defid}.json`)!
+			const definition: UrbanDefinition = JSON.parse(cachedDefs!)
 
-			
-			let descriptionBefore = `**Definition(s)**\n${result.definition}`
-			const descriptionAfter =
-				`\n\n**Example(s)**\n${result.example}\n\n**Ratings** • ${result.thumbs_up} :+1: • ${result.thumbs_down} :-1:`
-
-			if (descriptionBefore.length + descriptionAfter.length > 4096) {
-				descriptionBefore = descriptionBefore.slice(0, 4095 - descriptionAfter.length) + "…"
-			}
-
-			const description = descriptionBefore + descriptionAfter
+			const components: ActionRow[] = [
+				<SelectMenu customId="result">
+					{...cachedResults[word].definitions.map(def => (
+						<Option
+							label={def.word}
+							description={def.author}
+							value={def.defid.toString()}
+							default={def.defid === definition.defid}
+						/>
+					))}
+				</SelectMenu>,
+			]
 
 			await interaction.edit({
-				embeds: [bot.transformers.reverse.embed(bot, {
-					title: word,
-					url: result.permalink,
-					color: pickArray(colors),
-					description,
-					author: { name: `Urban Dictionary - ${result.author}` },
-					footer: { text: `Definition ID • ${result.defid} | Written on` },
-					timestamp: Temporal.Instant.from(result.written_on).epochMilliseconds,
-				})],
+				embeds: [bot.transformers.reverse.embed(bot, urbanEmbed(definition))],
+				components,
 			})
 		}
 	}
 }
 
-export const autocomplete: InteractionHandler<typeof cmd.options> = async (_bot, interaction, args) => {
+export const select: SelectHandler = async (bot, interaction, args) => {
+	await interaction.defer()
+
+	const row = interaction.message!.components[0] as ActionRow
+	const menu = row.components[0] as SelectMenuComponent
+
+	menu.options = menu.options.map(e => ({
+		...e,
+		default: e.value === args.values[0],
+	}))
+
+	const cachedDefs = await getCache("definitions/urban", `${args.values[0]}.json`)!
+	const definition: UrbanDefinition = JSON.parse(cachedDefs!)
+
+	await interaction.edit({
+		embeds: [bot.transformers.reverse.embed(bot, urbanEmbed(definition))],
+		components: [<Row>{menu}</Row>],
+	})
+}
+
+export const autocomplete: AutocompleteHandler<typeof cmd.options> = async (_bot, interaction, args) => {
 	const { dictionary } = args,
 		value = args.focused.value?.toString() ?? "",
 		response: ApplicationCommandOptionChoice[] = []
 
+	if (!dictionary) return interaction.respond(defaultChoice("Choose a dictionary first"))
 	if (value?.length === 0) return interaction.respond(defaultChoice("KeepTyping"))
 
 	switch (dictionary) {
@@ -195,6 +216,27 @@ export const autocomplete: InteractionHandler<typeof cmd.options> = async (_bot,
 	}
 }
 
+function urbanEmbed(definition: UrbanDefinition) {
+	const defContent = `**Definition(s)**\n${definition.definition}`
+
+	const embed: EmbedObj = (
+		<Embed
+			title={definition.word}
+			url={definition.permalink}
+			color={pickArray(colors)}
+			description={defContent.length > 4096 ? defContent.slice(0, 4095) + "…" : defContent}
+			authorName={`Urban Dictionary | ${definition.author}`}
+			footerText={`ID: ${definition.defid} | Written on`}
+			timestamp={Temporal.Instant.from(definition.written_on).epochMilliseconds}
+		>
+			<Field name="Examples" value={definition.example} inline />
+			<Field name="Ratings" value={`${definition.thumbs_up} :+1: / ${definition.thumbs_down} :-1:`} inline />
+		</Embed>
+	)
+
+	return embed
+}
+
 type WiktionarySearch = {
 	query: {
 		searchinfo: { totalhits: number }
@@ -213,4 +255,9 @@ type UrbanDefinition = {
 	defid: number
 	permalink: string
 	written_on: string
+}
+
+type CachedUrbanResults = {
+	timestamp: number
+	definitions: Pick<UrbanDefinition, "word" | "author" | "defid">[]
 }

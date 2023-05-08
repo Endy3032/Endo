@@ -1,8 +1,8 @@
-import { format } from "bytes"
 import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionTypes, avatarUrl, Bot, ChannelTypes, DiscordApplication, DiscordEmbedField,
 	DiscordUser, guildBannerUrl, guildIconUrl, Interaction } from "discordeno"
 import { colors, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
+import { format } from "std:bytes"
 
 export const cmd: ApplicationCommandOption = {
 	name: "info",
