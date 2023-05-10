@@ -1,5 +1,5 @@
 import { ApplicationCommandTypes, Bot, CreateApplicationCommand } from "discordeno"
-import { getFiles } from "./utils.ts"
+import { getFiles } from "./getFiles.ts"
 
 const testGuild = Deno.env.get("TestGuild")
 

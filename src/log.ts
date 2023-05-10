@@ -1,10 +1,24 @@
 import bot from "bot"
 import { stripIndents } from "commonTags"
-import { rgb24, stripColor } from "discordeno"
-import { InspectConfig, LogLevel, LogOptions, Nord } from "modules"
+import { CreateMessageOptions, Embed, rgb24, stripColor } from "discordeno"
+import { InspectConfig, Nord } from "modules"
 import { Temporal } from "temporal"
 
 const logChannel = Deno.env.get("Log")
+
+type LogLevel =
+	| "INFO"
+	| "WARN"
+	| "ERROR"
+	| "DEBUG"
+
+interface LogOptions {
+	logLevel?: LogLevel
+	tag?: string
+	embed?: Embed
+	noSend?: boolean
+	message?: CreateMessageOptions
+}
 
 async function botLog(content: any, options?: LogOptions) {
 	options = options ?? {}

@@ -1,7 +1,7 @@
 import { stripIndents } from "commonTags"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, avatarUrl, Bot, ChannelTypes, DiscordApplication, DiscordEmbedField,
-	DiscordUser, guildBannerUrl, guildIconUrl, Interaction } from "discordeno"
-import { colors, getSubcmd, getValue, imageURL, pickArray, respond, toTimestamp } from "modules"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, avatarUrl, Bot, ChannelTypes, DiscordEmbedField, DiscordUser,
+	guildBannerUrl, guildIconUrl, Interaction, snowflakeToTimestamp } from "discordeno"
+import { colors, getSubcmd, getValue, imageURL, pickArray, respond } from "modules"
 import { format } from "std:bytes"
 
 export const cmd: ApplicationCommandOption = {
@@ -49,19 +49,14 @@ export const cmd: ApplicationCommandOption = {
 export async function main(bot: Bot, interaction: Interaction) {
 	switch (getSubcmd(interaction)) {
 		case "bot": {
-			const app = await bot.rest.makeRequest<DiscordApplication>(
-				"GET",
-				bot.rest.routes.oauth2Application(),
-			)
-
-			const timestamp = toTimestamp(bot.id)
+			const app = await bot.rest.getApplicationInfo()
 
 			const owner = app.team
-				? app.team.members.find(m => m.user.id === app.team?.owner_user_id)?.user
+				? app.team.members.find(m => m.user.id === app.team?.ownerUserId)?.user
 				: await bot.helpers.getUser(app.owner?.id ?? bot.id)
 
 			const inviteLink = `https://discord.com/oauth2/authorize?client_id=${bot.id}`
-				+ `&permissions=${app.install_params?.permissions ?? 0}&scope=${app.install_params?.scopes.join("%20") ?? "bot"}`
+				+ `&permissions=${app.installParams?.permissions ?? 0}&scope=${app.installParams?.scopes.join("%20") ?? "bot"}`
 
 			const ddeno = "19.0.0-alpha.1" // bot.constants.DISCORDENO_VERSION
 			const { version: { deno, v8, typescript } } = Deno
@@ -78,7 +73,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 						value: `[Link](${inviteLink})`,
 						inline: true,
 					},
-					{ name: "Created", value: `<t:${timestamp}:R>`, inline: true },
+					{ name: "Created", value: `<t:${snowflakeToTimestamp(bot.id) / 1000}:R>`, inline: true },
 					{
 						name: "Runtime Info",
 						value: stripIndents`**Deno** • [${deno}](https://deno.land/x/deno@v${deno})
@@ -106,7 +101,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 			if (!channelId) return await respond(bot, interaction, "Failed to get the channel ID", true)
 
 			const channel = await bot.helpers.getChannel(channelId)
-			const timestamp = toTimestamp(channelId)
 
 			const fields: DiscordEmbedField[] = ![ChannelTypes.GuildVoice, ChannelTypes.GuildStageVoice].includes(channel?.type)
 				? [
@@ -126,7 +120,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 					{ name: "Type", value: `${ChannelTypes[channel?.type]}`, inline: true },
 					{ name: "Position", value: `${channel?.position}`, inline: true },
 					...fields,
-					{ name: "Created", value: `<t:${timestamp}:R>`, inline: true },
+					{ name: "Created", value: `<t:${snowflakeToTimestamp(channelId) / 1000}:R>`, inline: true },
 				],
 			}] })
 			break
@@ -151,7 +145,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 					description: guild.description ? `Server Description: ${guild.description}` : "",
 					fields: [
 						{ name: "Owner", value: `<@${guild.ownerId}>`, inline: true },
-						{ name: "Created", value: `<t:${toTimestamp(guild.id)}:R>`, inline: true },
+						{ name: "Created", value: `<t:${snowflakeToTimestamp(guild.id) / 1000}:R>`, inline: true },
 						{ name: "Vanity Invite URL", value: guild.vanityUrlCode ?? "None", inline: true },
 						{ name: "Verification Level", value: verificationLevel[guild.verificationLevel], inline: true },
 						{ name: "Content Filter Level", value: filterLevel[guild.explicitContentFilter], inline: true },
@@ -189,7 +183,6 @@ export async function main(bot: Bot, interaction: Interaction) {
 		case "user": {
 			const { user } = getValue(interaction, "target", "User") ?? interaction
 			const discordUser = await bot.rest.makeRequest<DiscordUser>("GET", bot.rest.routes.user(user.id))
-			const createdAt = toTimestamp(user.id)
 
 			await respond(bot, interaction, {
 				embeds: [{
@@ -198,7 +191,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 					fields: [
 						{ name: "Tag", value: user.discriminator, inline: true },
 						{ name: "ID", value: user.id.toString(), inline: true },
-						{ name: "Joined", value: `<t:${createdAt}:R>`, inline: true },
+						{ name: "Joined", value: `<t:${snowflakeToTimestamp(user.id) / 1000}:R>`, inline: true },
 					],
 					image: discordUser.banner
 						? { url: guildBannerUrl(user.id, { banner: discordUser.banner, size: 512, format: "png" })! }

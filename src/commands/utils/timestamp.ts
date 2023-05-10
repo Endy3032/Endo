@@ -1,10 +1,13 @@
 import { stripIndents } from "commonTags"
 import { ApplicationCommandOption, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
 import Fuse from "fuse"
-import { getFocused, getSubcmd, getValue, respond, timezone } from "modules"
+import { getFocused, getSubcmd, getValue, respond } from "modules"
+import { Blob } from "node:buffer"
 import { join } from "std:path"
 import { Temporal } from "temporal"
 import { timezone as timezones } from "time"
+
+const timezone = "+00:00"
 
 export const cmd: ApplicationCommandOption = {
 	name: "timestamp",
@@ -88,7 +91,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 	const timeZone = getValue(interaction, "timezone", "String") ?? timezone
 	const year = getValue(interaction, "year", "Integer") ?? now.year
 
-	let date: Temporal.ZonedDateTime, invalid: boolean = false
+	let date: Temporal.ZonedDateTime, invalid = false
 	try {
 		date = Temporal.ZonedDateTime.from({ year, month, day, hour, minute, second, millisecond, timeZone })
 	} catch {

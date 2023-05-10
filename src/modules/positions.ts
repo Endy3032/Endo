@@ -1,4 +1,4 @@
-import { Channel, ChannelTypes, Collection, ModifyGuildChannelPositions } from "discordeno"
+import { Channel, ChannelTypes, ModifyGuildChannelPositions } from "discordeno"
 
 export function modifyChannelPositions(channels: Channel[], channel: Channel): ModifyGuildChannelPositions[] {
 	const sorted = channels.filter(c => {

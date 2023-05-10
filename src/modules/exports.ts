@@ -1,5 +1,3 @@
-import { CreateMessageOptions, Embed } from "discordeno"
-
 export const timezone = "+00:00"
 
 export const colors = [
@@ -24,19 +22,19 @@ export const colors = [
 	0x9C84EF,
 	0xF47FFF,
 	0xFFFFFF,
-	0x9684ec,
+	0x9684EC,
 	0x583694,
-	0x37393e,
-	0x5866ef,
-	0x3da560,
-	0xf9a62b,
-	0xf37668,
-	0x49ddc1,
-	0x4f5d7e,
-	0x09b0f2,
-	0x2f3136,
-	0xec4145,
-	0xfe73f6,
+	0x37393E,
+	0x5866EF,
+	0x3DA560,
+	0xF9A62B,
+	0xF37668,
+	0x49DDC1,
+	0x4F5D7E,
+	0x09B0F2,
+	0x2F3136,
+	0xEC4145,
+	0xFE73F6,
 	0x000000,
 ]
 
@@ -46,20 +44,6 @@ export const InspectConfig: Deno.InspectOptions = {
 	depth: 8,
 	iterableLimit: 300,
 	strAbbreviateSize: 1000,
-}
-
-export type LogLevel =
-	| "INFO"
-	| "WARN"
-	| "ERROR"
-	| "DEBUG"
-
-export interface LogOptions {
-	logLevel?: LogLevel
-	tag?: string
-	embed?: Embed
-	noSend?: boolean
-	message?: CreateMessageOptions
 }
 
 export enum Nord {

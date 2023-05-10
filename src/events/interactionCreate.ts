@@ -1,6 +1,6 @@
 import { avatarUrl, Embed, EventHandlers, guildIconUrl, Interaction, InteractionTypes, MessageComponentTypes, rgb24,
-	stripColor } from "discordeno"
-import { getCmd, getGroup, getSubcmd, Nord, toTimestamp } from "modules"
+	snowflakeToTimestamp, stripColor } from "discordeno"
+import { getCmd, getGroup, getSubcmd, Nord } from "modules"
 import { handleInteraction } from "../commands/mod.ts"
 
 const [testGuildID, testGuildChannel] = [Deno.env.get("TestGuild"), Deno.env.get("TestChannel")]
@@ -48,7 +48,6 @@ export async function main(interaction: Interaction) {
 	const guildName = guild?.name
 	const channelName = interaction.channelId ? (await bot.helpers.getChannel(BigInt(interaction.channelId)))?.name : null
 	const invoker = `${user.username}#${user.discriminator}`
-	const timestamp = toTimestamp(interaction.id, "ms")
 
 	const embed: Embed = {
 		description: stripColor(`**Interaction [${tag}]** • ${log}`),
@@ -61,7 +60,7 @@ export async function main(interaction: Interaction) {
 			text: guildName ? `${guildName} #${channelName}` : "DM",
 			iconUrl: guild?.icon ? guildIconUrl(guild.id, guild.icon, { size: 512, format: "png" }) : undefined,
 		},
-		timestamp: parseInt(timestamp),
+		timestamp: snowflakeToTimestamp(interaction.id),
 	}
 
 	log += rgb24(` [${invoker} | ${guildName ? `${guildName} #${channelName}` : "DM"}]`, Nord.brightBlue)

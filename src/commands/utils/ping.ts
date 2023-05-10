@@ -1,5 +1,5 @@
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
-import { colors, pickArray, respond, toTimestamp } from "modules"
+import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction, snowflakeToTimestamp } from "discordeno"
+import { colors, pickArray, respond } from "modules"
 
 export const cmd: ApplicationCommandOption = {
 	name: "ping",
@@ -29,7 +29,7 @@ export async function main(bot: Bot, interaction: Interaction) {
 				},
 				{
 					name: "Roundtrip",
-					value: `${BigInt(original.timestamp) - BigInt(toTimestamp(interaction.id, "ms"))}ms`,
+					value: `${original.timestamp - snowflakeToTimestamp(interaction.id)}ms`,
 				},
 			],
 		}],
