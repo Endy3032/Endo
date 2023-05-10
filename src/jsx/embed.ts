@@ -1,9 +1,9 @@
-import { DiscordEmbedField, Embed as EmbedComponent } from "discordeno"
+import { DiscordEmbed, DiscordEmbedField } from "discordeno"
 import { colors, pickArray } from "modules"
 import { Temporal } from "temporal"
 
 type EmbedProps =
-	& Omit<EmbedComponent, "author" | "footer" | "image" | "thumbnail" | "fields">
+	& Omit<DiscordEmbed, "author" | "footer" | "image" | "thumbnail" | "fields" | "timestamp">
 	& {
 		image?: string
 		thumbnail?: string
@@ -12,22 +12,23 @@ type EmbedProps =
 		authorUrl?: string
 		footerText?: string
 		footerIcon?: string
+		timestamp?: number
 	}
 
-export function Embed(props: EmbedProps, children: DiscordEmbedField[]): EmbedComponent {
+export function Embed(props: EmbedProps, children: DiscordEmbedField[]): DiscordEmbed {
 	return {
 		title: props.title,
 		url: props.url,
 		description: props.description,
 		color: props.color ?? pickArray(colors),
 
-		author: props.authorName ? { name: props.authorName, url: props.authorUrl, iconUrl: props.authorIcon } : undefined,
-		footer: props.footerText ? { text: props.footerText, iconUrl: props.footerIcon } : undefined,
+		author: props.authorName ? { name: props.authorName, url: props.authorUrl, icon_url: props.authorIcon } : undefined,
+		footer: props.footerText ? { text: props.footerText, icon_url: props.footerIcon } : undefined,
 		image: props.image ? { url: props.image } : undefined,
 		thumbnail: props.thumbnail ? { url: props.thumbnail } : undefined,
 
 		fields: children,
-		timestamp: props.timestamp ?? Temporal.Now.instant().epochMilliseconds,
+		timestamp: props.timestamp ? Temporal.Instant.fromEpochMilliseconds(props.timestamp).toString() : undefined,
 	}
 }
 

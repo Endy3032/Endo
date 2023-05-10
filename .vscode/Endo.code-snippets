@@ -3,8 +3,8 @@
 		"scope": "typescript,typescriptreact",
 		"prefix": "init",
 		"body": [
+			"import { ApplicationCommandOptionTypes } from \"discordeno\"",
 			"import { InteractionHandler, ReadonlyOption } from \"modules\"",
-			"import {} from \"discordeno\"",
 			"",
 			"export const cmd = ${1} as const satisfies ReadonlyOption",
 			"",
