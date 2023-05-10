@@ -4,25 +4,26 @@ import { Command, CommandHandler, getCmd, getFiles, getGroup, getSubcmd, Inspect
 const commands: CreateApplicationCommand[] = []
 const handlers = new Collection<string, Command>()
 
-for await (const file of getFiles("./commands")) {
+for await (const file of getFiles("commands")) {
 	const command: Command = await import(`./${file}`)
 	handlers.set(command.cmd.name, command)
 	commands.push(command.cmd)
 }
 
-for await (const folder of getFiles("./commands", { fileTypes: "folders" })) {
+for await (const folder of getFiles("commands", { fileTypes: "folders" })) {
 	const { cmd } = await import(`./${folder}/mod.ts`)
 	commands.push(cmd)
+	getHandlers(folder)
 
-	for await (const file of getFiles(`./commands/${folder}`)) {
-		const command: Command = await import(`./${folder}/${file}`)
-		handlers.set(`${folder}/${command.cmd.name}`, command)
-	}
+	const subfolders = getFiles(`commands/${folder}`, { fileTypes: "folders" })
+	for await (const subfolder of subfolders) await getHandlers(`${folder}/${subfolder}`)
 }
 
 export async function handleInteraction(interaction: Interaction) {
 	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)],
-		command = handlers.get(cmd ?? "") ?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
+		command = handlers.get(cmd ?? "")
+			?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
+			?? handlers.get(`${[cmd, group, subcmd].join("/")}`)
 
 	let handler: keyof CommandHandler = "main"
 
@@ -61,3 +62,10 @@ export async function handleInteraction(interaction: Interaction) {
 }
 
 export { commands }
+
+async function getHandlers(folder: string) {
+	for await (const file of getFiles(`commands/${folder}`)) {
+		const command: Command = await import(`./${folder}/${file}`)
+		handlers.set(`${folder}/${command.cmd.name}`, command)
+	}
+}

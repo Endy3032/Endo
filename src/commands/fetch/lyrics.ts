@@ -1,6 +1,6 @@
 import axiod from "axiod"
 import { IConfig } from "axiodInterfaces"
-import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
+import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes } from "discordeno"
 import { DOMParser, NodeList, NodeType } from "dom"
 import { colors, defer, edit, InteractionHandler, pickArray, ReadonlyOption, respond } from "modules"
 

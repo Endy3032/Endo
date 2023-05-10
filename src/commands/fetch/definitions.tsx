@@ -1,11 +1,9 @@
 import axiod from "axiod"
-import { ActionRow, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, delay, type Embed as EmbedObj,
-	SelectMenuComponent } from "discordeno"
-import { Button, Embed, Field, Row } from "jsx"
-import { AutocompleteHandler, ButtonHandler, colors, defaultChoice, defer, getCache, InspectConfig, InteractionHandler, pickArray,
-	ReadonlyOption, saveCache, SelectHandler, TimeMetric } from "modules"
+import { ActionRow, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, DiscordEmbed } from "discordeno"
+import { Embed, Field, Option, SelectMenu } from "jsx"
+import { AutocompleteHandler, colors, defaultChoice, defer, getCache, InteractionHandler, pickArray, ReadonlyOption, saveCache,
+	SelectHandler, TimeMetric } from "modules"
 import { Temporal } from "temporal"
-import { Option, SelectMenu } from "../../jsx/menu.ts"
 
 export const cmd = {
 	name: "definition",
@@ -68,48 +66,48 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 
 			// #region wiktionary
 			// await axiod.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-			// 	.then(response => {
-			// 		const { data } = response
-			// 		let desc = ""
-			// 		data.forEach((entry: { meanings: any[] }) => {
-			// 			entry.meanings.forEach(
-			// 				(meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
-			// 					desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
-			// 					desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
-			// 					desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
-			// 					desc += "\n**Meanings:**\n"
+			//      .then(response => {
+			//              const { data } = response
+			//              let desc = ""
+			//              data.forEach((entry: { meanings: any[] }) => {
+			//                      entry.meanings.forEach(
+			//                              (meaning: { partOfSpeech: string; synonyms: any[]; antonyms: any[]; definitions: any[] }) => {
+			//                                      desc += `\`\`\`${capitalize(meaning.partOfSpeech)}\`\`\``
+			//                                      desc += meaning.synonyms.length > 0 ? `**Synonyms:** ${meaning.synonyms.join(", ")}\n` : ""
+			//                                      desc += meaning.antonyms.length > 0 ? `**Antonyms:** ${meaning.antonyms.join(", ")}\n` : ""
+			//                                      desc += "\n**Meanings:**\n"
 
-			// 					meaning.definitions.forEach(
-			// 						(def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any },
-			// 							ind: number) =>
-			// 						{
-			// 							desc += `\`[${ind + 1}]\` ${def.definition}\n`
-			// 							desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
-			// 							desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
-			// 							desc += def.example ? `**• Example:** ${def.example}\n` : ""
-			// 							desc += "\n"
-			// 						},
-			// 					)
-			// 				},
-			// 			)
-			// 		})
+			//                                      meaning.definitions.forEach(
+			//                                              (def: { definition: any; synonyms: any[]; antonyms: string | any[]; examples: any[]; example: any },
+			//                                                      ind: number) =>
+			//                                              {
+			//                                                      desc += `\`[${ind + 1}]\` ${def.definition}\n`
+			//                                                      desc += def.synonyms.length > 0 ? `**• Synonyms:** ${def.synonyms.join(", ")}\n` : ""
+			//                                                      desc += def.antonyms.length > 0 ? `**• Antonyms:** ${def.examples.join(", ")}\n` : ""
+			//                                                      desc += def.example ? `**• Example:** ${def.example}\n` : ""
+			//                                                      desc += "\n"
+			//                                              },
+			//                                      )
+			//                              },
+			//                      )
+			//              })
 
-			// 		const phonetics = [
-			// 			...new Set(
-			// 				data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text),
-			// 			),
-			// 		].join(" - ")
+			//              const phonetics = [
+			//                      ...new Set(
+			//                              data[0].phonetics.filter((phonetic: { text: any }) => phonetic.text).map((phonetic: { text: any }) => phonetic.text),
+			//                      ),
+			//              ].join(" - ")
 
-			// 		edit(bot, interaction, {
-			// 			embeds: [{
-			// 				title: `${data[0].word} - ${phonetics ?? "//"}`,
-			// 				color: pickArray(colors),
-			// 				description: desc,
-			// 				footer: { text: "Source: DictionaryAPI.dev & Wiktionary" },
-			// 			}],
-			// 		})
-			// 	})
-			// 	.catch(() => edit(bot, interaction, `${shorthand("warn")} The word \`${word}\` was not found in the dictionary`))
+			//              edit(bot, interaction, {
+			//                      embeds: [{
+			//                              title: `${data[0].word} - ${phonetics ?? "//"}`,
+			//                              color: pickArray(colors),
+			//                              description: desc,
+			//                              footer: { text: "Source: DictionaryAPI.dev & Wiktionary" },
+			//                      }],
+			//              })
+			//      })
+			//      .catch(() => edit(bot, interaction, `${shorthand("warn")} The word \`${word}\` was not found in the dictionary`))
 			// #endregion
 			break
 		}
@@ -118,7 +116,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 			const cache = await getCache(["definitions", "urban"], `results.json`)
 			const cachedResults: Record<string, CachedUrbanResults> = cache ? JSON.parse(cache) : {}
 
-			if (!cachedResults[word] || cachedResults[word].timestamp < Temporal.Now.instant().epochMilliseconds - 14 * TimeMetric.sec_day) {
+			if (!cachedResults[word] || cachedResults[word].timestamp < Temporal.Now.instant().epochSeconds - 14 * TimeMetric.sec_day) {
 				const { data } = await axiod.get<{ list: UrbanDefinition[] }>(
 					"https://api.urbandictionary.com/v0/define",
 					{ params: { term: word } },
@@ -127,7 +125,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 				if (data.list.length === 0) return interaction.edit("No results found.")
 
 				cachedResults[word] = {
-					timestamp: Temporal.Now.instant().epochMilliseconds,
+					timestamp: Temporal.Now.instant().epochSeconds,
 					definitions: data.list.map(def => ({ word: def.word, author: def.author, defid: def.defid })),
 				}
 				await saveCache(["definitions", "urban"], `results.json`, cachedResults)
@@ -135,7 +133,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 				for await (const def of data.list) await saveCache(["definitions", "urban"], `${def.defid}.json`, def)
 			}
 
-			const cachedDefs = await getCache("definitions/urban", `${cachedResults[word].definitions[0].defid}.json`)!
+			const cachedDefs = await getCache(["definitions", "urban"], `${cachedResults[word].definitions[0].defid}.json`)!
 			const definition: UrbanDefinition = JSON.parse(cachedDefs!)
 
 			const components: ActionRow[] = [
@@ -151,7 +149,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 			]
 
 			await interaction.edit({
-				embeds: [bot.transformers.reverse.embed(bot, urbanEmbed(definition))],
+				embeds: [urbanEmbed(definition)],
 				components,
 			})
 		}
@@ -161,15 +159,14 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 export const select: SelectHandler = async (bot, interaction, args) => {
 	await interaction.defer()
 
-	const row = interaction.message!.components[0] as ActionRow
-	const menu = row.components[0] as SelectMenuComponent
+	const row = interaction.message!.components as ActionRow[]
 
-	const cachedDefs = await getCache("definitions/urban", `${args.values[0]}.json`)!
+	const cachedDefs = await getCache(["definitions", "urban"], `${args.values[0]}.json`)!
 	const definition: UrbanDefinition = JSON.parse(cachedDefs!)
 
 	await interaction.edit({
-		embeds: [bot.transformers.reverse.embed(bot, urbanEmbed(definition))],
-		components: [<Row>{menu}</Row>],
+		embeds: [urbanEmbed(definition)],
+		components: row,
 	})
 }
 
@@ -216,7 +213,7 @@ function urbanEmbed(definition: UrbanDefinition) {
 	const defContent = `**Definition(s)**\n${definition.definition}`
 		.replaceAll(/\[(.*?)\]/g, (_, p1) => `[${p1}](https://${encodeURI(p1)}.urbanup.com)`)
 
-	const embed: EmbedObj = (
+	const embed: DiscordEmbed = (
 		<Embed
 			title={definition.word}
 			url={definition.permalink}
@@ -238,14 +235,14 @@ function urbanEmbed(definition: UrbanDefinition) {
 	return embed
 }
 
-type WiktionarySearch = {
+interface WiktionarySearch {
 	query: {
 		searchinfo: { totalhits: number }
 		search: { ns: number; title: string; pageid: number }[]
 	}
 }
 
-type UrbanDefinition = {
+interface UrbanDefinition {
 	word: string
 	author: string
 	definition: string
@@ -258,7 +255,7 @@ type UrbanDefinition = {
 	written_on: string
 }
 
-type CachedUrbanResults = {
+interface CachedUrbanResults {
 	timestamp: number
 	definitions: Pick<UrbanDefinition, "word" | "author" | "defid">[]
 }
