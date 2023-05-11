@@ -15,7 +15,6 @@ export async function respond(interaction: Interaction, args: Args, fact?: strin
 			authorName={source?.name}
 			authorUrl={source?.url}
 			authorIcon={source?.icon ?? "https://github.com/fluidicon.png"}
-			color={pickArray(colors)}
 			description={fact ?? "Wow, such empty!"}
 		/>
 	)

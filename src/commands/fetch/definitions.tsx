@@ -217,7 +217,6 @@ function urbanEmbed(definition: UrbanDefinition) {
 		<Embed
 			title={definition.word}
 			url={definition.permalink}
-			color={pickArray(colors)}
 			description={defContent.length > 4096 ? defContent.slice(0, 4095) + "…" : defContent}
 			authorName={`Urban Dictionary | ${definition.author}`}
 			footerText={`ID: ${definition.defid} | Written on`}

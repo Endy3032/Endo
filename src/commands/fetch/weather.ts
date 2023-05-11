@@ -1,7 +1,7 @@
-import {} from "modules"
-import { ApplicationCommandOption, ApplicationCommandOptionTypes, Bot, Interaction } from "discordeno"
+import { ApplicationCommandOptionTypes } from "discordeno"
+import { InteractionHandler, ReadonlyOption } from "modules"
 
-export const cmd: ApplicationCommandOption = {
+export const cmd = {
 	name: "weather",
 	description: "Fetch the current weather for any places from www.weatherapi.com",
 	type: ApplicationCommandOptionTypes.SubCommand,
@@ -25,7 +25,6 @@ export const cmd: ApplicationCommandOption = {
 			required: false,
 		},
 	],
-}
+} as const satisfies ReadonlyOption
 
-export async function main(bot: Bot, interaction: Interaction) {
-}
+export const main: InteractionHandler<typeof cmd.options> = async (bot, interaction, args) => {}
