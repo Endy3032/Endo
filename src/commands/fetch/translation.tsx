@@ -30,17 +30,17 @@ export const cmd = {
 			autocomplete: true,
 			required: false,
 		},
-		{
-			name: "tts",
-			description: "Send an audio file for the translation",
-			type: ApplicationCommandOptionTypes.String,
-			choices: [
-				{ name: "Source only", value: "source" },
-				{ name: "Result only", value: "result" },
-				{ name: "Both", value: "both" },
-			],
-			required: false,
-		},
+		// {
+		//      name: "tts",
+		//      description: "Send a text-to-speech of the text (Only the first 200 characters)",
+		//      type: ApplicationCommandOptionTypes.String,
+		//      choices: [
+		//              { name: "Source only", value: "source" },
+		//              { name: "Result only", value: "result" },
+		//              { name: "Both", value: "both" },
+		//      ],
+		//      required: false,
+		// },
 	],
 } as const satisfies ReadonlyOption
 
@@ -49,41 +49,38 @@ const gtr = new GTR()
 export const main: InteractionHandler<typeof cmd.options> = async (bot, interaction, args) => {
 	await interaction.defer()
 
-	const { from, to, text, tts } = args
+	const { from, to, text } = args
 	const result = await gtr.translate(text, { sourceLang: from, targetLang: to })
 
-	const embed: DiscordEmbed = (
-		<Embed title="Translate">
-			<Field name={langs[result.lang]} value={result.orig} />
-			<Field name={langs[to]} value={result.trans} />
-		</Embed>
-	)
+	const embeds: DiscordEmbed[] = [
+		<Embed
+			title={langs[result.lang]}
+			description={result.orig.slice(0, 6000 - langs[result.lang].length - langs[to].length - result.trans.length)}
+		/>,
+		<Embed title={langs[to]} description={result.trans} />,
+	]
 
-	await interaction.edit({ content: tts ? "Audio pending..." : undefined, embeds: [embed] })
+	await interaction.edit({ embeds })
 
-	if (tts) {
-		const files: FileContent[] = []
+	// if (tts) {
+	//      const files: FileContent[] = []
 
-		await delay(3000)
-		if (["source", "both"].includes(tts)) {
-			const audio = await gtr.tts(result.orig, { targetLang: result.lang })
-			files.push({
-				name: "source.mp3",
-				blob: new NBlob([await audio.text()]),
-			})
-		}
+	//      await delay(2000)
+	//      if (["source", "both"].includes(tts)) {
+	//              const audio = await gtr.tts(result.orig.slice(0, 200), { targetLang: result.lang })
+	//              console.log(audio)
+	//              files.push({ name: "source.mp3", blob: audio as NBlob })
+	//      }
 
-		await delay(3000)
-		if (["result", "both"].includes(tts)) {
-			const audio = await gtr.tts(result.trans, { targetLang: to })
-			files.push({
-				name: "result.mp3",
-				blob: new NBlob([await audio.text()]),
-			})
-		}
+	//      await delay(2000)
+	//      if (["result", "both"].includes(tts)) {
+	//              const audio = await gtr.tts(result.trans.slice(0, 200), { targetLang: to })
+	//              console.log(audio)
+	//              files.push({ name: "result.mp3", blob: audio as NBlob })
+	//      }
 
-		await interaction.edit({ content: "", files })
-	}
+	//      await interaction.edit({ content: "", files })
+	// }
 }
 
 const langs = {

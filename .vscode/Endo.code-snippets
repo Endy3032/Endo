@@ -44,7 +44,7 @@
 		"scope": "typescript,typescriptreact",
 		"prefix": "acph",
 		"body": [
-			"export const autocomplete: AutocompleteHandler<typeof cmd.options> = async (bot, interaction, args) {",
+			"export const autocomplete: AutocompleteHandler<typeof cmd.options> = async (bot, interaction, args) => {",
 			"\t$0",
 			"}"
 		]

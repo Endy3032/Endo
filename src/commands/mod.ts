@@ -57,6 +57,8 @@ export async function handleInteraction(interaction: Interaction) {
 		content += "```"
 
 		console.botLog(e, { logLevel: "ERROR" })
+
+		if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) return
 		await interaction.respond(stripColor(content).replaceAll(Deno.cwd(), "Endo"), { isPrivate: true })
 	}
 }
