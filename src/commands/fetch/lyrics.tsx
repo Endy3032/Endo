@@ -111,7 +111,6 @@ function nodeListToText(nodes: NodeList) {
 	for (const node of nodes) {
 		if (node.childNodes.length > 0) result += nodeListToText(node.childNodes)
 		else {
-			console.log(node.nodeValue)
 			result += node.nodeName.toLowerCase() === "br"
 				? "\n"
 				: node.nodeType === NodeType.TEXT_NODE
