@@ -2,17 +2,17 @@
 	"deno.enable": true,
 	"deno.config": "deno.json",
 	"editor.formatOnSave": true,
-	"editor.formatOnPaste": true,
-	"editor.defaultFormatter": "dprint.dprint",
 	"explorer.fileNesting.patterns": {
 		"info.log": "*.log",
 		"*.svg": "${capture}.png",
 		"*.ts": "${capture}.d.ts",
-		"scripts.config.ts": ".env, .eslintrc, .gitignore, .replit, dprint.json",
+		"scripts.config.ts": ".env, .eslintrc, .gitignore, .replit, replit.nix, dprint.json",
 		"deno.json": "deno.lock",
 		"README.md": "Privacy Policy.md"
 	},
 	"[json]": {
 		"editor.defaultFormatter": "dprint.dprint"
-	}
+	},
+	"editor.defaultFormatter": "dprint.dprint",
+	"editor.formatOnPaste": true
 }
