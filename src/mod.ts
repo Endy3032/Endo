@@ -1,13 +1,19 @@
 import "log"
 import "jsx"
 import bot from "bot"
-import { deploy } from "modules"
+import { activities, deploy } from "modules"
 import eventHandlers from "./events/mod.ts"
-import { fixGatewayWebsocket } from "./fixGateway.ts"
 
 if (!Deno.args.includes("noClear")) console.clear()
 bot.events = eventHandlers
-fixGatewayWebsocket(bot.gateway)
+
+const activity = activities()
+const baseSet = bot.gateway.shards.set.bind(bot.gateway.shards)
+
+bot.gateway.shards.set = (key, value) => {
+	value.makePresence = () => Promise.resolve(activity)
+	return baseSet(key, value)
+}
 
 await deploy(bot)
 await bot.start()

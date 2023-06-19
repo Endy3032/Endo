@@ -18,7 +18,6 @@
 		"bot": "./src/bot.ts",
 		"log": "./src/log.ts",
 		"jsx": "./src/jsx/mod.ts",
-		"ddTypes": "./src/ddTypes.ts",
 		"modules": "./src/modules/mod.ts",
 
 		"std:bytes": "https://deno.land/std@0.192.0/fmt/bytes.ts",

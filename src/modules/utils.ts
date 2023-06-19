@@ -3,6 +3,9 @@ import { iconBigintToHash } from "discordeno"
 export const capitalize = (content: string, lower?: boolean) =>
 	content[0].toUpperCase() + (lower ? content.slice(1).toLowerCase() : content.slice(1))
 
+export const codeblock = (content: string | string[], language?: string) =>
+	`\`\`\`${language ?? ""}\n${typeof content === "string" ? content : content.join("\n")}\n\`\`\``
+
 export function randRange(lower: number, upper = 0) {
 	if (lower > upper) [upper, lower] = [lower, upper]
 	return Math.floor(Math.random() * (upper - lower + 1)) + lower

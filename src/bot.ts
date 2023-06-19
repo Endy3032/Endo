@@ -237,6 +237,7 @@ bot.transformers.desiredProperties = {
 	},
 	user: {
 		username: true,
+		globalName: true,
 		locale: true,
 		flags: true,
 		premiumType: true,
