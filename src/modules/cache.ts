@@ -1,11 +1,6 @@
 import { dirname, join } from "std:path"
 
-export async function saveCache(
-	folder: string | string[],
-	fileName: string,
-	content: any,
-	append = false,
-) {
+export async function saveCache(folder: string | string[], fileName: string, content: any, append = false) {
 	folder = typeof folder === "string" ? folder : folder.join("/")
 	const filePath = join(Deno.cwd(), "src", "cache", folder, fileName), encoder = new TextEncoder()
 

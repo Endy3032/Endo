@@ -52,8 +52,8 @@ export async function error(bot: Bot, interaction: Interaction, err: Error, opti
 }
 
 enum Choices {
-	KeepTyping = "Keep typing to search...",
-	NoResults = "No results found.",
+	KeepTyping = "Keep typing to search",
+	NoResults = "No results found",
 }
 
 export const defaultChoice = (message: keyof typeof Choices | string, value = "…") =>

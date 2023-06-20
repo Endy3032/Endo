@@ -1,24 +1,25 @@
 import { ApplicationCommandOptionTypes as CommandOptionTypes, Interaction, InteractionTypes } from "discordeno"
 
 export function getCmd(interaction: Interaction) {
-	switch (interaction.type) {
+	let name: string | undefined
+
+	if ([InteractionTypes.ModalSubmit, InteractionTypes.MessageComponent].includes(interaction.type)) {
 		// Modals can be triggered via component or command
 		// Message always present on component interaction
-		case InteractionTypes.ModalSubmit:
-		case InteractionTypes.MessageComponent:
-			return messageInteractionName(interaction)?.[0] ?? undefined
-
+		name = interactionName(interaction)?.[0]
+	} else {
 		// Command name always present on other interactions
-		default:
-			return interaction.data?.name.replace(/^\[.\] /, "") ?? undefined
+		name = interaction.data?.name
 	}
+
+	return name?.replace(/^\[.\] */, "") ?? undefined
 }
 
 export function getGroup(interaction: Interaction) {
 	switch (interaction.type) {
 		case InteractionTypes.ModalSubmit:
 		case InteractionTypes.MessageComponent: {
-			const cmd = messageInteractionName(interaction)
+			const cmd = interactionName(interaction)
 			return cmd?.length === 3 ? cmd[1] : undefined
 		}
 
@@ -33,7 +34,7 @@ export function getSubcmd(interaction: Interaction) {
 	switch (interaction.type) {
 		case InteractionTypes.ModalSubmit:
 		case InteractionTypes.MessageComponent: {
-			const cmd = messageInteractionName(interaction)
+			const cmd = interactionName(interaction)
 			return cmd?.length === 3 ? cmd[2] : cmd?.length === 2 ? cmd[1] : undefined
 		}
 
@@ -54,7 +55,7 @@ export function getSubcmd(interaction: Interaction) {
 	}
 }
 
-function messageInteractionName(interaction: Interaction) {
+export function interactionName(interaction: Interaction) {
 	return !interaction.message
 		? interaction.data?.customId?.split(/[^\w]|_/)
 		: interaction.message?.interaction?.name.split(" ")

@@ -23,8 +23,8 @@ export async function deploy(bot: Bot) {
 	const { commands } = await import("../commands/mod.ts")
 
 	if (args.includes("global")) {
-		bot.rest.upsertGlobalApplicationCommands(commands)
-			.then(deployed => console.botLog(`${deployed.length} commands`, { tag: "🌐 Deploy", noSend: true }))
+		const deployed = await bot.rest.upsertGlobalApplicationCommands(commands)
+		console.botLog(`${deployed.length} commands`, { tag: "🌐 Deploy", noSend: true })
 	}
 
 	if (args.includes("test")) {
@@ -33,7 +33,7 @@ export async function deploy(bot: Bot) {
 		if (testGuild) {
 			const deployed = await bot.rest.upsertGuildApplicationCommands(
 				BigInt(testGuild),
-				commands.map(c => replaceDescription(c, "DEV")),
+				[...commands].map(c => replaceDescription(c, "DEV")),
 			)
 			content = `${deployed.length} commands`
 		}
