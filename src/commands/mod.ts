@@ -1,5 +1,5 @@
 import { Collection, CreateApplicationCommand, Interaction, InteractionTypes, MessageComponentTypes, stripColor } from "discordeno"
-import { Command, CommandHandler, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, parseOptions } from "modules"
+import { Command, CommandHandler, getCmd, getFiles, getGroup, getSubcmd, InspectConfig, interactionName, parseOptions } from "modules"
 
 const commands: CreateApplicationCommand[] = []
 const handlers = new Collection<string, Command>()
@@ -19,19 +19,27 @@ for await (const folder of getFiles("commands", { fileTypes: "folders" })) {
 	for await (const subfolder of subfolders) await getHandlers(`${folder}/${subfolder}`)
 }
 
-export async function handleInteraction(interaction: Interaction) {
-	const [cmd, group, subcmd] = [getCmd(interaction), getGroup(interaction), getSubcmd(interaction)],
-		command = handlers.get(cmd ?? "")
-			?? handlers.get(`${[cmd, group ?? subcmd].join("/")}`)
-			?? handlers.get(`${[cmd, group, subcmd].join("/")}`)
-
-	let handler: keyof CommandHandler = "main"
-
-	if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) handler = "autocomplete"
-	else if (interaction.type === InteractionTypes.ModalSubmit) handler = "modal"
-	else if (interaction.type === InteractionTypes.MessageComponent) {
-		handler = interaction.data?.componentType === MessageComponentTypes.Button ? "button" : "select"
+async function getHandlers(folder: string) {
+	for await (const file of getFiles(`commands/${folder}`)) {
+		const command: Command = await import(`./${folder}/${file}`)
+		handlers.set(`${folder}/${command.cmd.name}`, command)
 	}
+}
+
+export { commands }
+
+export async function handleInteraction(interaction: Interaction) {
+	const name = interactionName(interaction)?.join(" ").replace(/^\[\w\] /, ""),
+		cmd = getCmd(interaction),
+		group = getGroup(interaction),
+		subcmd = getSubcmd(interaction)
+
+	const command = handlers.get(cmd ?? "")
+		?? handlers.get(name ?? "")
+		?? handlers.get([cmd, group ?? subcmd].join("/"))
+		?? handlers.get([cmd, group, subcmd].filter(e => e).join("/"))
+
+	const handler = handlerMap(interaction)[interaction.type] as keyof CommandHandler
 
 	if (!command || !command[handler]) {
 		console.botLog(interaction, { logLevel: "DEBUG", noSend: true })
@@ -51,7 +59,7 @@ export async function handleInteraction(interaction: Interaction) {
 		// @ts-expect-error parseOptions
 		await command[handler]?.(interaction.bot, interaction, parseOptions(interaction))
 	} catch (e) {
-		let content = `Something failed back here... Debug info below\`\`\`${Deno.inspect(e, InspectConfig)}`
+		let content = cleanToken(`Something failed back here... Debug info below\`\`\`${Deno.inspect(e, InspectConfig)}`)
 
 		if (content.length > 1997) content = content.slice(0, 1996) + "…"
 		content += "```"
@@ -63,11 +71,17 @@ export async function handleInteraction(interaction: Interaction) {
 	}
 }
 
-export { commands }
-
-async function getHandlers(folder: string) {
-	for await (const file of getFiles(`commands/${folder}`)) {
-		const command: Command = await import(`./${folder}/${file}`)
-		handlers.set(`${folder}/${command.cmd.name}`, command)
+function cleanToken(content: string) {
+	for (const token of ["DiscordToken", "Weather", "Nomics", "Genius", "ScrapingAnt", "RapidAPI"]) {
+		content = content.replaceAll(Deno.env.get(token) ?? "", `[${token}]`)
 	}
+
+	return content
 }
+
+const handlerMap = (interaction: Interaction) => ({
+	[InteractionTypes.ApplicationCommand]: "main",
+	[InteractionTypes.ApplicationCommandAutocomplete]: "autocomplete",
+	[InteractionTypes.MessageComponent]: interaction.data?.componentType === MessageComponentTypes.Button ? "button" : "select",
+	[InteractionTypes.ModalSubmit]: "modal",
+})
