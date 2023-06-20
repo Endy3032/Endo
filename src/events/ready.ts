@@ -6,31 +6,25 @@ import { activities, Nord, TimeMetric } from "modules"
 
 export const name: keyof EventHandlers = "ready"
 
-export const main: EventHandlers["ready"] = async (payload, raw) => {
-	const botGateway = await bot.rest.getGatewayBot()
+export const main: EventHandlers["ready"] = async payload => {
+	const location = Deno.build.vendor === "unknown" ? "Replit" : "Local"
+	const gatewayInfo = `[v${payload.v} | ${(await bot.rest.getGatewayBot()).sessionStartLimit.remaining} Left | ${location}]`
 
-	const location = Deno.build.vendor === "unknown" ? "Replit" : "Local",
-		gatewayInfo = `[v${payload.v} | ${botGateway.sessionStartLimit.remaining} Left | ${location}]`
-
-	console.botLog(`${raw.user.username}#${raw.user.discriminator} ${rgb24(gatewayInfo, Nord.brightYellow)}`, { tag: "Login" })
+	console.botLog(`${payload.user.username}#${payload.user.discriminator} ${rgb24(gatewayInfo, Nord.brightYellow)}`, { tag: "Login" })
 
 	setInterval(pinger, 5 * TimeMetric.milli_min)
 	if (Deno.build.vendor === "unknown") setInterval(reloadPresence, 30 * TimeMetric.milli_min)
 }
 
 function pinger() {
-	axiod.head(`https://pinger.endy3032.repl.co`)
-		.catch((err: IAxiodError) => {
-			console.botLog(
-				bold(rgb24(
-					err.response !== undefined
-						? `${err.response.status} ${err.response.statusText}`
-						: "Unreachable",
-					Nord.error,
-				)),
-				{ logLevel: "WARN", tag: "pinger" },
-			)
-		})
+	axiod.head(`https://pinger.endy3032.repl.co`).catch((err: IAxiodError) =>
+		console.botLog(bold(rgb24(
+			err.response !== undefined
+				? `${err.response.status} ${err.response.statusText}`
+				: "Unreachable",
+			Nord.error,
+		)), { logLevel: "WARN", tag: "pinger" })
+	)
 }
 
 async function reloadPresence() {
