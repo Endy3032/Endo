@@ -27,6 +27,6 @@ export function Row(_: any, children: ButtonRow): ActionRow {
 
 	return {
 		type: MessageComponentTypes.ActionRow,
-		components: children as ActionRow["components"],
+		components: children.filter(e => !!e) as ActionRow["components"],
 	}
 }

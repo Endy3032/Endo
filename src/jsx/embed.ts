@@ -27,7 +27,7 @@ export function Embed(props: EmbedProps, children: DiscordEmbedField[]): Discord
 		image: props.image ? { url: props.image } : undefined,
 		thumbnail: props.thumbnail ? { url: props.thumbnail } : undefined,
 
-		fields: children,
+		fields: children.filter(e => !!e),
 		timestamp: props.timestamp ? Temporal.Instant.fromEpochMilliseconds(props.timestamp).toString() : undefined,
 	}
 }

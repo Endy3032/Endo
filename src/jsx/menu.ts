@@ -6,7 +6,7 @@ export function SelectMenu(props: SelectProps, children: SelectOption[]): Action
 	const component: SelectMenuComponent = {
 		type: MessageComponentTypes.SelectMenu,
 		...props,
-		options: children,
+		options: children.filter(e => !!e),
 	}
 
 	return {
