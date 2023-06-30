@@ -5,17 +5,17 @@ import "./src/mod.ts"
  * +-----------------------------------------------+
  * | Command Deployment                            |
  * |-----------------------------------------------|
- * | test			|	Deploy commands to test guild      |
- * | global		|	Deploy commands globally           |
- * | guilds		|	Deploy guild-exclusive commands    |
+ * | test     | Deploy commands to test guild      |
+ * | global   | Deploy commands globally           |
+ * | guilds   | Deploy guild-exclusive commands    |
  * |-----------------------------------------------|
  * | Logging                                       |
  * |-----------------------------------------------|
- * | noClear	|	Don't clear console before running |
- * | logDebug	|	Log debug messages to console      |
+ * | noClear  | Don't clear console before running |
+ * | logDebug | Log debug messages to console      |
  * |-----------------------------------------------|
  * | Interaction Check                             |
  * |-----------------------------------------------|
- * | noLimit	|	Bypass test channel/guild check    |
+ * | noLimit  | Bypass test channel/guild check    |
  * +-----------------------------------------------+
  */
