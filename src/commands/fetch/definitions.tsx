@@ -123,10 +123,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (_, interactio
 }
 
 export const select: SelectHandler = async (bot, interaction, args) => {
-	// await interaction.defer()
-
-	const rows = interaction.message!.components as ActionRow[]
-	const partSelect = rows[1].components[0] as SelectMenuComponent
+	await interaction.defer()
 
 	switch (args.customId) {
 		case "result": {
