@@ -64,10 +64,10 @@ export async function handleInteraction(interaction: Interaction) {
 		if (content.length > 1997) content = content.slice(0, 1996) + "…"
 		content += "```"
 
-		console.botLog(e, { logLevel: "ERROR" })
+		console.botLog(e, { logLevel: "ERROR", tag: "HandleError" })
 
 		if (interaction.type === InteractionTypes.ApplicationCommandAutocomplete) return
-		await interaction.respond(stripColor(content).replaceAll(Deno.cwd(), "Endo"), { isPrivate: true })
+		await interaction.respond(stripColor(content).replaceAll(Deno.cwd(), "Endo"), { isPrivate: true }).catch()
 	}
 }
 

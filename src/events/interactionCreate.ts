@@ -39,8 +39,10 @@ export async function main(interaction: Interaction) {
 
 	const log = rgb24({
 		[InteractionTypes.ApplicationCommand]: `/${cmd}`,
-		[InteractionTypes.MessageComponent]: `/${cmd} [${interaction.data?.values?.join(", ") ?? interaction.data?.customId}]`,
-		[InteractionTypes.ModalSubmit]: `{${interaction.data?.customId}}`,
+		[InteractionTypes.MessageComponent]: `/${cmd} {${interaction.data!.customId}} ${
+			interaction.data?.values ? `[${interaction.data?.values.join(", ")}]` : ""
+		}`,
+		[InteractionTypes.ModalSubmit]: `{${interaction.data!.customId}}`,
 	}[interaction.type] ?? "Unknown", Nord.brightGreen)
 
 	console.botLog(log + rgb24(` [${invoker} | ${location}]`, Nord.brightBlue), { logLevel: "INFO", tag, embed: {
