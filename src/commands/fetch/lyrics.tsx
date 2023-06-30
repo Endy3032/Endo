@@ -3,7 +3,8 @@ import { IConfig } from "axiodInterfaces"
 import { ApplicationCommandOptionChoice, ApplicationCommandOptionTypes } from "discordeno"
 import { DOMParser, NodeList, NodeType } from "dom"
 import { Embed } from "jsx"
-import { defaultChoice, InteractionHandler, pickArray, ReadonlyOption } from "modules"
+import { defaultChoice, InteractionHandler, ReadonlyOption } from "modules"
+import { shorthand } from "modules"
 
 const { Genius: GeniusToken, ScrapingAnt } = Deno.env.toObject()
 
@@ -22,7 +23,8 @@ export const cmd = {
 
 export const main: InteractionHandler<typeof cmd.options> = async (bot, interaction, args) => {
 	if (!GeniusToken) return interaction.respond("No Genius API Token Provided", { isPrivate: true })
-	await interaction.defer()
+
+	await interaction.respond(`${shorthand("loading")} Fetching lyrics...`)
 
 	const { data } = await axiod.get(`https://api.genius.com/songs/${args.song}`, {
 		params: {
@@ -36,9 +38,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 			url: "https://api.scrapingant.com/v2/general",
 			config: {
 				params: {
-					url: `https://webcache.googleusercontent.com/search?strip=1&q=cache:https://genius.com/${
-						data.response.song.path.replace(/^\//, "")
-					}`,
+					url: `https://genius.com/${data.response.song.path.replace(/^\//, "")}`,
 					browser: "false",
 					"x-api-key": ScrapingAnt,
 				},
@@ -67,6 +67,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (bot, interact
 		cont = `[Continue on Genius.com](${url})`
 
 	await interaction.edit({
+		content: "",
 		embeds: [(
 			<Embed
 				title={title_with_featured}
