@@ -41,7 +41,7 @@ export const colors = [
 export const InspectConfig: Deno.InspectOptions = {
 	colors: true,
 	compact: false,
-	depth: 8,
+	depth: 12,
 	iterableLimit: 300,
 	strAbbreviateSize: 1000,
 }

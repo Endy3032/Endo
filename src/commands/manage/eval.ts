@@ -14,8 +14,6 @@ import progressbar from "progressbar"
 import { format } from "std:duration"
 import { Temporal } from "temporal"
 import * as time from "time"
-import * as urban from "urban"
-import * as wikipedia from "wikipedia"
 
 const otp = new TOTP({
 	algorithm: "SHA1",

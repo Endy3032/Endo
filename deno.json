@@ -28,9 +28,10 @@
 		"genius": "npm:genius-lyrics-api",
 		"commonTags": "npm:common-tags@1.8.2",
 		"fuse": "https://esm.sh/fuse.js@6.6.2",
-		"mathjs": "npm:mathjs@11.8.1/",
+		"mathjs": "npm:mathjs@11.8.1",
 		"progressbar": "npm:string-progressbar@1.0.4",
 		"temporal": "npm:@js-temporal/polyfill@0.4.4",
+		"wtf_wiki": "https://esm.sh/wtf_wikipedia@10.1.5",
 
 		"axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
 		"axiodInterfaces": "https://deno.land/x/axiod@0.26.2/interfaces.ts",
@@ -41,8 +42,6 @@
 		"googleTranslate": "https://deno.land/x/gtr@v0.0.1/mod.ts",
 		"otpauth": "https://deno.land/x/otpauth@v9.1.3/dist/otpauth.esm.js",
 		"puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
-		"time": "https://deno.land/x/time.ts@v2.0.1/mod.ts",
-		"urban": "https://deno.land/x/urbanary@1.0.2/mod.ts",
-		"wikipedia": "https://deno.land/x/denowiki@v0.2.1/mod.ts"
+		"time": "https://deno.land/x/time.ts@v2.0.1/mod.ts"
 	}
 }

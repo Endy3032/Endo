@@ -6,7 +6,7 @@ export function SelectMenu(props: SelectProps, children: SelectOption[]): Action
 	const component: SelectMenuComponent = {
 		type: MessageComponentTypes.SelectMenu,
 		...props,
-		options: children.filter(e => !!e),
+		options: (children[0] instanceof Array ? children[0] : children).filter(e => !!e).slice(0, 25),
 	}
 
 	return {
