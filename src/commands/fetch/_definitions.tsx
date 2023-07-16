@@ -106,7 +106,7 @@ export function toMarkdown(value: string | any[] | Record<string, any>) {
 	return value
 }
 
-export interface WDefinition {
+interface WDefinition {
 	definition: string
 	examples?: string[]
 	parsedExamples?: {
@@ -114,6 +114,10 @@ export interface WDefinition {
 		translation?: string
 		literally?: string
 	}[]
+}
+
+interface WLanguage {
+	[key: string]: WDefinition[]
 }
 
 export interface WResult {
@@ -133,29 +137,6 @@ export interface WResultCache {
 			[key: string]: WLanguage
 		}
 	}
-}
-
-export interface WRestSearch {
-	pages: {
-		id: number
-		key: string
-		title: string
-		excerpt: string
-		matched_title: string
-		description: string | null
-		thumbnail: {
-			mimetype: string
-			size: number | null
-			width: number | null
-			height: number | null
-			duration: number | null
-			url: string
-		} | null
-	}[]
-}
-
-interface WLanguage {
-	[key: string]: WDefinition[]
 }
 // #endregion
 

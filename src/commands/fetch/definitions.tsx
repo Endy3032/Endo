@@ -1,10 +1,11 @@
 import axiod from "axiod"
-import { ActionRow, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, SelectMenuComponent } from "discordeno"
+import { ActionRow, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes } from "discordeno"
 import { Option, SelectMenu } from "jsx"
 import { AutocompleteHandler, defaultChoice, getCache, InteractionHandler, ReadonlyOption, saveCache, SelectHandler,
 	TimeMetric } from "modules"
 import { Temporal } from "temporal"
-import { toMarkdown, UrbanDefinition, urbanEmbed, UrbanSearchCache, wiktionaryEmbed, wiktionaryMenus, WRestSearch, WResult,
+import { WikiRestSearch } from "./_common.ts"
+import { toMarkdown, UrbanDefinition, urbanEmbed, UrbanSearchCache, wiktionaryEmbed, wiktionaryMenus, WResult,
 	WResultCache } from "./_definitions.tsx"
 
 export const cmd = {
@@ -122,7 +123,7 @@ export const main: InteractionHandler<typeof cmd.options> = async (_, interactio
 	}
 }
 
-export const select: SelectHandler = async (bot, interaction, args) => {
+export const select: SelectHandler = async (_, interaction, args) => {
 	await interaction.defer()
 
 	switch (args.customId) {
@@ -166,7 +167,7 @@ export const autocomplete: AutocompleteHandler<typeof cmd.options> = async (_bot
 
 	switch (dictionary) {
 		case "wiktionary": {
-			const { data: { pages } } = await axiod.get<WRestSearch>("https://en.wiktionary.org/w/rest.php/v1/search/title", {
+			const { data: { pages } } = await axiod.get<WikiRestSearch>("https://en.wiktionary.org/w/rest.php/v1/search/title", {
 				params: {
 					q: value,
 					limit: 25,
