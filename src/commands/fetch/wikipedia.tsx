@@ -23,7 +23,8 @@ export const cmd = {
 	],
 } as const satisfies ReadonlyOption
 
-const excludedInfobox = ["title", "logo", "image", "image_size", "alt", "caption", "platforms", "released", "subsid"]
+const excludedInfobox = ["title", "logo", "image", "image_size", "alt", "caption", "platforms", "released", "subsid", "signature",
+	"signature_alt", "signature_size"]
 
 export const main: InteractionHandler<typeof cmd.options> = async (_, interaction, args) => {
 	await interaction.defer()
