@@ -24,7 +24,7 @@
 		"std:duration": "https://deno.land/std@0.192.0/fmt/duration.ts",
 		"std:path": "https://deno.land/std@0.192.0/path/mod.ts",
 
-		"discordeno": "npm:@discordeno/bot@19.0.0-next.8d1ba2a",
+		"discordeno": "npm:@discordeno/bot@19.0.0-next.3445211",
 		"genius": "npm:genius-lyrics-api",
 		"commonTags": "npm:common-tags@1.8.2",
 		"fuse": "https://esm.sh/fuse.js@6.6.2",
