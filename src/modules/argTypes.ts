@@ -1,7 +1,13 @@
 import { ApplicationCommandOption, ApplicationCommandOptionChoice, ApplicationCommandOptionTypes, Attachment, Bot, Channel,
 	CreateApplicationCommand, Interaction, Member, Message, Role, User } from "discordeno"
 
-type UserObj = {
+export type CommandName = {
+	name: string
+	group: string | undefined
+	subcommand: string | undefined
+}
+
+type GuildUser = {
 	user: User
 	members?: Member
 }
@@ -12,9 +18,9 @@ type OptionTypeMap = {
 	[ApplicationCommandOptionTypes.Number]: number
 	[ApplicationCommandOptionTypes.Boolean]: boolean
 	[ApplicationCommandOptionTypes.Channel]: Channel
-	[ApplicationCommandOptionTypes.User]: UserObj
+	[ApplicationCommandOptionTypes.User]: GuildUser
 	[ApplicationCommandOptionTypes.Role]: Role
-	[ApplicationCommandOptionTypes.Mentionable]: UserObj | Role
+	[ApplicationCommandOptionTypes.Mentionable]: GuildUser | Role
 	[ApplicationCommandOptionTypes.Attachment]: Attachment
 }
 
@@ -33,19 +39,12 @@ type ToOptionType<T extends ReadonlyOption = any> = T extends ReadonlyOption
 	: OptionTypeMap[T["type"]]
 	: undefined
 
-export type Names = {
-	name: string
-	group: string
-	subcommand: string
-}
-
 export type Args<T extends ReadonlyOptions = any> =
-	& Names
-	& UnionToIntersection<{
-		[K in Exclude<T[number], { required: false }>["name"]]: ToOptionType<Extract<T[number], { name: K }>>
-	} & {
-		[K in Exclude<T[number], { required: true }>["name"]]?: ToOptionType<Extract<T[number], { name: K }>>
-	}>
+	& CommandName
+	& UnionToIntersection<
+		& { [K in Extract<T[number], { required: true }>["name"]]: ToOptionType<Extract<T[number], { name: K }>> }
+		& { [K in Exclude<T[number], { required: true }>["name"]]?: ToOptionType<Extract<T[number], { name: K }>> }
+	>
 	& {
 		user?: User
 		member?: Member
@@ -55,14 +54,14 @@ export type InteractionHandler<T extends ReadonlyOptions = any> = (bot: Bot, int
 	| Promise<any>
 	| any
 
-export type ButtonArgs = Names & { customId: string }
+export type ButtonArgs = CommandName & { customId: string }
 export type ButtonHandler = (bot: Bot, interaction: Interaction, args: ButtonArgs) => Promise<any> | any
 
-export type SelectArgs = Names & { customId: string; values: string[] }
+export type SelectArgs = CommandName & { customId: string; values: string[] }
 export type SelectHandler = (bot: Bot, interaction: Interaction, args: SelectArgs) => Promise<any> | any
 
 export type AutocompleteArgs<T extends ReadonlyOptions = any> =
-	& Names
+	& CommandName
 	& Partial<Args<T>>
 	& { focused: { name: string; value: string | number } }
 export type AutocompleteHandler<T extends ReadonlyOptions = any> = (
@@ -73,7 +72,7 @@ export type AutocompleteHandler<T extends ReadonlyOptions = any> = (
 
 export type CommandHandler<T extends ReadonlyOptions = any> = {
 	main: InteractionHandler<T>
-	button?: InteractionHandler<T>
+	button?: ButtonHandler
 	select?: SelectHandler
 	modal?: InteractionHandler<T>
 	autocomplete?: AutocompleteHandler<T>

@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionTypes, ApplicationCommandTypes, Interaction, InteractionDataOption,
 	InteractionTypes } from "discordeno"
-import { Args, AutocompleteArgs, ButtonArgs, Names, ReadonlyOptions, SelectArgs } from "./argTypes.ts"
+import { Args, AutocompleteArgs, ButtonArgs, CommandName, ReadonlyOptions, SelectArgs } from "./argTypes.ts"
 import { getCmd, getGroup, getSubcmd } from "./interactionName.ts"
 
 // https://github.com/discordeno/discordeno/blob/main/packages/utils/src/interactions.ts
@@ -11,10 +11,10 @@ export function parseOptions<T extends ReadonlyOptions = any>(
 	if (!interaction.data) return { name: "", group: "", subcommand: "" } as Args<T>
 	if (!options) options = interaction.data.options ?? []
 
-	const names: Names = {
+	const names: CommandName = {
 		name: getCmd(interaction) ?? "",
-		group: getGroup(interaction) ?? "",
-		subcommand: getSubcmd(interaction) ?? "",
+		group: getGroup(interaction),
+		subcommand: getSubcmd(interaction),
 	}
 
 	if (interaction.type === InteractionTypes.MessageComponent) {
