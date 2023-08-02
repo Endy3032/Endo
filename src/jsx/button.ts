@@ -23,6 +23,8 @@ type ButtonRow = ButtonComponent[]
 
 export function Row(_: any, children: ButtonRow): ActionRow {
 	if (children.length === 0) throw new Error("Row must have at least one child")
+
+	children = children.flat()
 	if (children.length > 5) children = children.slice(0, 5)
 
 	return {

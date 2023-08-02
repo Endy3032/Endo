@@ -2,18 +2,14 @@ import { ActionRow, MessageComponentTypes, SelectMenuComponent, SelectOption } f
 
 type SelectProps = Omit<SelectMenuComponent, "type" | "options">
 
-export function SelectMenu(props: SelectProps, children: SelectOption[]): ActionRow {
-	const component: SelectMenuComponent = {
+export const SelectMenu = (props: SelectProps, children: SelectOption[]): ActionRow => ({
+	type: MessageComponentTypes.ActionRow,
+	components: [{
 		type: MessageComponentTypes.SelectMenu,
 		...props,
-		options: (children[0] instanceof Array ? children[0] : children).filter(e => !!e).slice(0, 25),
-	}
-
-	return {
-		type: MessageComponentTypes.ActionRow,
-		components: [component],
-	}
-}
+		options: children.flat().filter(e => !!e).slice(0, 25),
+	}],
+})
 
 type OptionProps =
 	& Omit<SelectOption, "emoji">
@@ -23,9 +19,7 @@ type OptionProps =
 		animated?: boolean
 	}
 
-export function Option(props: OptionProps): SelectOption {
-	return {
-		...props,
-		emoji: { id: props.emojiId, name: props.emojiName, animated: props.animated },
-	}
-}
+export const Option = (props: OptionProps): SelectOption => ({
+	...props,
+	emoji: { id: props.emojiId, name: props.emojiName, animated: props.animated },
+})
